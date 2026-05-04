@@ -1,0 +1,1443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stadiora Labs — Performance Intelligence Check</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy:       #0a0e1a;
+    --card:       #111827;
+    --card-light: #1a2035;
+    --border:     rgba(255,255,255,0.07);
+    --teal:       #00d4ff;
+    --mint:       #00e6b4;
+    --white:      #f8fafc;
+    --gray:       #64748b;
+    --gray-lt:    #94a3b8;
+    --green:      #22c55e;
+    --yellow:     #f59e0b;
+    --red:        #ef4444;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--navy);
+    color: var(--white);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    line-height: 1.6;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ── Progress bar ── */
+  #progress-wrap {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: rgba(255,255,255,0.06);
+    z-index: 100;
+  }
+  #progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, var(--teal), var(--mint));
+    width: 0%;
+    transition: width 0.4s ease;
+  }
+
+  /* ── Top nav ── */
+  #topnav {
+    padding: 20px 24px 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: fixed;
+    top: 3px; left: 0; right: 0;
+    z-index: 99;
+    background: linear-gradient(to bottom, var(--navy) 80%, transparent);
+  }
+  .logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 20px;
+    letter-spacing: 3px;
+    background: linear-gradient(90deg, var(--teal), var(--mint));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  #step-counter {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--gray);
+  }
+
+  /* ── Main wrapper ── */
+  #app {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 100px 24px 60px;
+    min-height: 100vh;
+  }
+
+  /* ── Screen transition ── */
+  .screen {
+    display: none;
+    width: 100%;
+    max-width: 600px;
+    animation: fadeIn 0.35s ease;
+  }
+  .screen.active { display: block; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── Eyebrow / label ── */
+  .eyebrow {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--teal);
+    margin-bottom: 10px;
+  }
+
+  /* ── Display heading ── */
+  .display {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(32px, 6vw, 52px);
+    letter-spacing: 2px;
+    line-height: 1.1;
+    margin-bottom: 12px;
+    color: var(--white);
+  }
+
+  .display span { color: var(--teal); }
+
+  /* ── Body copy ── */
+  .body-copy {
+    font-size: 15px;
+    color: var(--gray-lt);
+    max-width: 480px;
+    margin-bottom: 32px;
+    line-height: 1.7;
+  }
+
+  /* ── Question ── */
+  .question-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--gray);
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .question-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+  .question-text {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(22px, 4vw, 30px);
+    letter-spacing: 1.5px;
+    line-height: 1.2;
+    margin-bottom: 24px;
+    color: var(--white);
+  }
+
+  /* ── Option cards ── */
+  .options {
+    display: grid;
+    gap: 10px;
+    margin-bottom: 28px;
+  }
+  .options.cols-2 { grid-template-columns: 1fr 1fr; }
+
+  .opt {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px 18px;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s, transform 0.15s;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .opt:hover {
+    border-color: rgba(0,212,255,0.3);
+    background: rgba(0,212,255,0.04);
+  }
+  .opt.selected {
+    border-color: var(--teal);
+    background: rgba(0,212,255,0.08);
+    transform: scale(1.01);
+  }
+  .opt.selected .opt-check { background: var(--teal); border-color: var(--teal); }
+  .opt.selected .opt-check::after { opacity: 1; }
+
+  .opt-check {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    border: 2px solid var(--gray);
+    flex-shrink: 0;
+    margin-top: 2px;
+    transition: all 0.2s;
+    position: relative;
+  }
+  .opt-check::after {
+    content: '';
+    position: absolute;
+    inset: 3px;
+    border-radius: 50%;
+    background: var(--navy);
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+
+  .opt-content { flex: 1; }
+  .opt-label {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--white);
+    line-height: 1.3;
+  }
+  .opt-detail {
+    font-size: 12px;
+    color: var(--gray-lt);
+    margin-top: 2px;
+  }
+
+  /* Large role/sport cards */
+  .big-opt {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 28px 24px;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s, transform 0.15s;
+    text-align: center;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .big-opt:hover, .big-opt.selected {
+    border-color: var(--teal);
+    background: rgba(0,212,255,0.07);
+    transform: translateY(-2px);
+  }
+  .big-opt .icon { font-size: 32px; margin-bottom: 12px; }
+  .big-opt .title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 22px;
+    letter-spacing: 2px;
+    color: var(--white);
+    margin-bottom: 6px;
+  }
+  .big-opt .desc { font-size: 12px; color: var(--gray-lt); line-height: 1.5; }
+
+  /* ── Buttons ── */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 15px 32px;
+    border-radius: 10px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: none;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+  .btn-primary {
+    background: linear-gradient(90deg, var(--teal), var(--mint));
+    color: var(--navy);
+  }
+  .btn-primary:hover { opacity: 0.9; transform: translateY(-1px); }
+  .btn-primary:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+    transform: none;
+  }
+  .btn-ghost {
+    background: transparent;
+    color: var(--gray-lt);
+    border: 1px solid var(--border);
+  }
+  .btn-ghost:hover { border-color: var(--gray); color: var(--white); }
+  .btn-outline-teal {
+    background: transparent;
+    color: var(--teal);
+    border: 1px solid var(--teal);
+  }
+  .btn-outline-teal:hover { background: rgba(0,212,255,0.1); }
+
+  .btn-row {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  /* ── Start screen ── */
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    background: rgba(0,212,255,0.1);
+    border: 1px solid rgba(0,212,255,0.2);
+    border-radius: 20px;
+    padding: 5px 14px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--teal);
+    margin-bottom: 20px;
+  }
+  .hero-badge .dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--teal);
+    animation: pulse 1.8s infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(1.3); }
+  }
+
+  .stat-row {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-top: 36px;
+    padding-top: 28px;
+    border-top: 1px solid var(--border);
+  }
+  .stat { flex: 1; min-width: 100px; }
+  .stat-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 28px;
+    letter-spacing: 1px;
+    color: var(--teal);
+  }
+  .stat-label { font-size: 11px; color: var(--gray); line-height: 1.4; }
+
+  /* ── Results screen ── */
+  .result-card {
+    background: var(--card);
+    border-radius: 16px;
+    padding: 28px;
+    margin-bottom: 16px;
+    border: 1px solid var(--border);
+  }
+
+  .status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+  .status-badge .dot { width: 8px; height: 8px; border-radius: 50%; }
+  .status-green  { background: rgba(34,197,94,0.12);  color: var(--green);  border: 1px solid rgba(34,197,94,0.25); }
+  .status-yellow { background: rgba(245,158,11,0.12); color: var(--yellow); border: 1px solid rgba(245,158,11,0.25); }
+  .status-red    { background: rgba(239,68,68,0.12);  color: var(--red);    border: 1px solid rgba(239,68,68,0.25); }
+  .dot-green  { background: var(--green); }
+  .dot-yellow { background: var(--yellow); }
+  .dot-red    { background: var(--red); }
+
+  .result-headline {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(24px, 4vw, 34px);
+    letter-spacing: 1.5px;
+    line-height: 1.2;
+    color: var(--white);
+    margin-bottom: 10px;
+  }
+  .result-sub {
+    font-size: 14px;
+    color: var(--gray-lt);
+    line-height: 1.7;
+    margin-bottom: 20px;
+  }
+
+  .insight-list { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+  .insight-item {
+    display: flex;
+    gap: 12px;
+    font-size: 13px;
+    color: var(--gray-lt);
+    line-height: 1.5;
+  }
+  .insight-icon {
+    width: 22px; height: 22px;
+    border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+  .insight-icon.teal   { background: rgba(0,212,255,0.12);  color: var(--teal); }
+  .insight-icon.yellow { background: rgba(245,158,11,0.12); color: var(--yellow); }
+  .insight-icon.red    { background: rgba(239,68,68,0.12);  color: var(--red); }
+  .insight-icon.green  { background: rgba(34,197,94,0.12);  color: var(--green); }
+
+  .urgency-box {
+    background: rgba(0,212,255,0.05);
+    border: 1px solid rgba(0,212,255,0.15);
+    border-left: 3px solid var(--teal);
+    border-radius: 0 10px 10px 0;
+    padding: 14px 16px;
+    font-size: 13px;
+    color: var(--gray-lt);
+    line-height: 1.6;
+    margin-top: 20px;
+  }
+  .urgency-box strong { color: var(--white); }
+
+  /* ── CTA section ── */
+  .cta-block {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 28px;
+    margin-top: 16px;
+  }
+  .cta-product-name {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--teal);
+    margin-bottom: 6px;
+  }
+  .cta-headline {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 24px;
+    letter-spacing: 1.5px;
+    color: var(--white);
+    margin-bottom: 8px;
+  }
+  .cta-copy {
+    font-size: 13px;
+    color: var(--gray-lt);
+    line-height: 1.6;
+    margin-bottom: 20px;
+  }
+
+  .email-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+  }
+  .email-input {
+    flex: 1;
+    min-width: 200px;
+    background: var(--card-light);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 13px 16px;
+    color: var(--white);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .email-input::placeholder { color: var(--gray); }
+  .email-input:focus { border-color: var(--teal); }
+
+  .privacy-note {
+    font-size: 11px;
+    color: var(--gray);
+    margin-bottom: 16px;
+  }
+
+  .divider {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 16px 0;
+    font-size: 11px;
+    color: var(--gray);
+    font-weight: 600;
+    letter-spacing: 1px;
+  }
+  .divider::before, .divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  .success-state {
+    display: none;
+    text-align: center;
+    padding: 12px 0;
+  }
+  .success-state .check {
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    background: rgba(34,197,94,0.12);
+    border: 1px solid rgba(34,197,94,0.3);
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 12px;
+    font-size: 20px;
+    color: var(--green);
+  }
+  .success-state p { font-size: 13px; color: var(--gray-lt); }
+
+  /* ── Score bar ── */
+  .score-section { margin: 20px 0; }
+  .score-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--gray);
+    margin-bottom: 8px;
+  }
+  .score-track {
+    height: 8px;
+    background: rgba(255,255,255,0.06);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .score-fill {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.8s ease;
+  }
+  .score-fill.green  { background: linear-gradient(90deg, var(--mint), var(--green)); }
+  .score-fill.yellow { background: linear-gradient(90deg, var(--yellow), #f97316); }
+  .score-fill.red    { background: linear-gradient(90deg, #f97316, var(--red)); }
+
+  /* ── Back button ── */
+  #back-btn {
+    position: fixed;
+    bottom: 24px;
+    left: 24px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 16px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--gray);
+    cursor: pointer;
+    transition: all 0.2s;
+    display: none;
+    letter-spacing: 0.5px;
+    z-index: 50;
+  }
+  #back-btn:hover { color: var(--white); border-color: var(--gray); }
+
+  /* ── Responsive ── */
+  @media (max-width: 520px) {
+    #app { padding: 90px 16px 80px; }
+    .options.cols-2 { grid-template-columns: 1fr; }
+    .email-row { flex-direction: column; }
+    .email-input { min-width: unset; }
+    .stat-row { gap: 14px; }
+  }
+</style>
+</head>
+<body>
+
+<div id="progress-wrap"><div id="progress-bar"></div></div>
+
+<div id="topnav">
+  <div class="logo">Stadiora Labs</div>
+  <div id="step-counter"></div>
+</div>
+
+<main id="app">
+
+  <!-- ══ SCREEN 0: INTRO ══ -->
+  <section class="screen active" id="s-intro">
+    <div class="hero-badge"><span class="dot"></span>Free Performance Check</div>
+    <div class="display">Your athletes generate<br><span>thousands of signals.</span><br>Are you reading them?</div>
+    <p class="body-copy">Answer 6 questions. Get an instant, personalized intelligence report — built on the same decision engine that powers elite training programs. No sign-up required to start.</p>
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="goTo('s-role')">Start My Check &nbsp;→</button>
+      <span style="font-size:12px;color:var(--gray)">Takes 2 minutes</span>
+    </div>
+    <div class="stat-row">
+      <div class="stat"><div class="stat-num">4</div><div class="stat-label">Sports covered</div></div>
+      <div class="stat"><div class="stat-num">9</div><div class="stat-label">Intelligence signals</div></div>
+      <div class="stat"><div class="stat-num">1</div><div class="stat-label">Clear decision output</div></div>
+    </div>
+  </section>
+
+  <!-- ══ SCREEN 1: ROLE ══ -->
+  <section class="screen" id="s-role">
+    <div class="eyebrow">Step 1 of 3</div>
+    <div class="display">I am a…</div>
+    <p class="body-copy">Your role determines which intelligence check we run for you.</p>
+    <div class="options cols-2" style="margin-bottom:0">
+      <div class="big-opt" data-value="athlete" onclick="selectRole(this)">
+        <div class="icon">🏃</div>
+        <div class="title">Athlete</div>
+        <div class="desc">I'm competing, training, or preparing for performance</div>
+      </div>
+      <div class="big-opt" data-value="coach" onclick="selectRole(this)">
+        <div class="icon">📋</div>
+        <div class="title">Coach</div>
+        <div class="desc">I manage, develop, or oversee athletes or a team</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ SCREEN 2: SPORT ══ -->
+  <section class="screen" id="s-sport">
+    <div class="eyebrow">Step 2 of 3</div>
+    <div class="display">My sport is…</div>
+    <p class="body-copy">We'll calibrate the intelligence check to your specific performance context.</p>
+    <div class="options cols-2" style="margin-bottom:0">
+      <div class="big-opt" data-value="tf" onclick="selectSport(this)">
+        <div class="icon">⚡</div>
+        <div class="title">Track &amp; Field</div>
+        <div class="desc">Sprints, jumps, throws, middle distance</div>
+      </div>
+      <div class="big-opt" data-value="soccer" onclick="selectSport(this)">
+        <div class="icon">⚽</div>
+        <div class="title">Football / Soccer</div>
+        <div class="desc">Club, academy, semi-pro, college, or professional</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ SCREEN 3: QUESTIONS ══ -->
+  <section class="screen" id="s-question">
+    <div class="question-label" id="q-label">Question 1 of 6</div>
+    <div class="question-text" id="q-text"></div>
+    <div class="options" id="q-options"></div>
+    <button class="btn btn-primary" id="next-btn" disabled onclick="nextQuestion()">Continue &nbsp;→</button>
+  </section>
+
+  <!-- ══ SCREEN 4: RESULTS ══ -->
+  <section class="screen" id="s-results">
+    <div id="result-content"></div>
+  </section>
+
+</main>
+
+<button id="back-btn" onclick="goBack()">← Back</button>
+
+<script>
+// ══════════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════════
+const S = {
+  role: null,
+  sport: null,
+  path: null,
+  answers: [],
+  qi: 0,
+  history: ['s-intro'],
+  currentScreen: 's-intro'
+};
+
+// ══════════════════════════════════════════════
+// PATH DATA
+// ══════════════════════════════════════════════
+const PATHS = {
+
+  // ── Athlete + Track & Field ──────────────────
+  'athlete-tf': {
+    label: 'Sprint Readiness Score',
+    product: 'Aria',
+    color: 'teal',
+    questions: [
+      {
+        q: 'How many hours did you sleep last night?',
+        options: [
+          { label: 'Less than 6 hours', detail: 'Sleep debt — recovery incomplete', score: 0, weak: 'Sleep was below the minimum threshold for neuromuscular recovery' },
+          { label: '6–7 hours', detail: 'Slightly below optimal', score: 1, weak: 'Mild sleep restriction may affect peak power output' },
+          { label: '7–9 hours', detail: 'Optimal recovery window', score: 3 },
+          { label: 'More than 9 hours', detail: 'Could indicate accumulated fatigue', score: 2 }
+        ]
+      },
+      {
+        q: 'How do your legs feel this morning?',
+        options: [
+          { label: 'Heavy and stiff', detail: 'Residual fatigue present', score: 0, weak: 'Leg heaviness signals incomplete muscular recovery' },
+          { label: 'A bit tired', detail: 'Mild fatigue carry-over', score: 1, weak: 'Mild leg fatigue detected — not ideal for max velocity' },
+          { label: 'Normal', detail: 'Baseline feel', score: 2 },
+          { label: 'Fresh and springy', detail: 'CNS fully recovered', score: 3 }
+        ]
+      },
+      {
+        q: 'How well did you fuel and hydrate in the last 12 hours?',
+        options: [
+          { label: 'Under-fueled', detail: 'Low energy availability', score: 0, weak: 'Inadequate fueling reduces force output and elevates injury risk' },
+          { label: 'Average — could have been better', detail: 'Partial nutrition compliance', score: 1, weak: 'Sub-optimal fueling may limit your peak output today' },
+          { label: 'Well fueled and hydrated', detail: 'Energy stores optimal', score: 3 }
+        ]
+      },
+      {
+        q: 'What did you do in your last training session?',
+        options: [
+          { label: 'Rest day or total rest', detail: 'Full recovery since last session', score: 3 },
+          { label: 'Light technical or drill work', detail: 'Low neuromuscular load', score: 2 },
+          { label: 'Moderate tempo or volume', detail: 'Mid-level load', score: 1 },
+          { label: 'Hard — max velocity or heavy lifting', detail: 'High neuromuscular demand', score: 0, weak: 'A hard session recently means your nervous system may still be recovering' }
+        ]
+      },
+      {
+        q: 'How long ago was that session?',
+        options: [
+          { label: 'Today (earlier)', detail: 'Same-day second session', score: 0, weak: 'Same-day back-to-back sessions require careful load management' },
+          { label: 'Yesterday', detail: '~24 hours', score: 1 },
+          { label: '2 days ago', detail: '~48 hours', score: 2 },
+          { label: '3 or more days ago', detail: 'Full recovery cycle', score: 3 }
+        ]
+      },
+      {
+        q: 'How are you feeling mentally going into training?',
+        options: [
+          { label: 'Distracted or stressed', detail: 'Mental load is high', score: 0, weak: 'Psychological stress elevates cortisol and impairs force production' },
+          { label: 'Okay — nothing special', detail: 'Neutral state', score: 1 },
+          { label: 'Motivated and focused', detail: 'Positive readiness', score: 2 },
+          { label: 'Locked in — ready to compete', detail: 'Peak mental readiness', score: 3 }
+        ]
+      },
+      {
+        q: 'Do you have a competition coming up?',
+        options: [
+          { label: 'This week or tomorrow', detail: 'Pre-competition window', score: 0, flag: 'competition-near' },
+          { label: 'Next week', detail: 'Final preparation phase', score: 1 },
+          { label: 'In 2 or more weeks', detail: 'Mid-block training', score: 2 },
+          { label: 'No upcoming competition', detail: 'General preparation phase', score: 2 }
+        ]
+      }
+    ],
+    score: function(answers) {
+      return answers.reduce((a, b) => a + b, 0);
+    },
+    tier: function(score, answers, questions) {
+      if (score >= 14) return 'green';
+      if (score >= 7)  return 'yellow';
+      return 'red';
+    },
+    result: function(score, answers, questions) {
+      const tier = score >= 14 ? 'green' : score >= 7 ? 'yellow' : 'red';
+      const pct = Math.round((score / 21) * 100);
+      const compNear = answers[6] === 0;
+      const weakSignals = questions.map((q, i) => q.options.find(o => o.score === answers[i])?.weak).filter(Boolean);
+
+      const tiers = {
+        green: {
+          badge: 'status-green',
+          dotClass: 'dot-green',
+          label: 'Ready to Push',
+          headline: "Your body is primed for high-intensity work. Don't waste it.",
+          sub: "Your signals are aligned — sleep, fueling, leg freshness, and mental state are all pointing in the right direction. This is the window to run fast.",
+          rec: "→ <strong>Today's recommendation:</strong> Speed work, acceleration blocks, or competition-pace reps.",
+          urgency: "<strong>This window opens for 2–3 days after a full recovery cycle.</strong> Most athletes miss it — not because they're lazy, but because they're guessing. A daily readiness check tells you exactly when to push and when to protect."
+        },
+        yellow: {
+          badge: 'status-yellow',
+          dotClass: 'dot-yellow',
+          label: 'Proceed With Caution',
+          headline: "Your body can train — but not at full intensity today.",
+          sub: "One or more signals are below optimal. Pushing max velocity or heavy lifting today carries an elevated injury risk without a proportional performance benefit.",
+          rec: "→ <strong>Today's recommendation:</strong> Tempo runs, technical drills, or event-specific skill work at 70–80% intensity.",
+          urgency: "<strong>Training hard on a yellow day doesn't build fitness. It delays your next green day.</strong> The athletes who compound results fastest are the ones who protect yellow days — not push through them."
+        },
+        red: {
+          badge: 'status-red',
+          dotClass: 'dot-red',
+          label: 'Recovery Day',
+          headline: "Pushing through today will cost you more than it gives you.",
+          sub: "Multiple signals indicate your body hasn't completed its recovery cycle. This is the profile when hamstrings, calves, and Achilles tendons break down.",
+          rec: "→ <strong>Today's recommendation:</strong> Active recovery, mobility, pool session, or full rest.",
+          urgency: "<strong>Elite programs protect rest days as aggressively as they protect race day.</strong> Recovery is when adaptation happens. Today's rest is tomorrow's performance."
+        }
+      };
+
+      const t = tiers[tier];
+
+      let insightsHTML = '';
+      if (weakSignals.length > 0) {
+        insightsHTML = '<ul class="insight-list" style="margin-top:16px">' +
+          weakSignals.slice(0, 3).map(w =>
+            `<li class="insight-item"><div class="insight-icon ${tier === 'red' ? 'red' : 'yellow'}">⚠</div><span>${w}</span></li>`
+          ).join('') +
+          '</ul>';
+      }
+      if (tier === 'green') {
+        insightsHTML = `<ul class="insight-list" style="margin-top:16px">
+          <li class="insight-item"><div class="insight-icon green">✓</div><span>Recovery signals are strong — CNS is ready for peak output</span></li>
+          <li class="insight-item"><div class="insight-icon green">✓</div><span>Fuel and freshness are aligned for high-speed work</span></li>
+          ${compNear ? '<li class="insight-item"><div class="insight-icon yellow">⚠</div><span>Competition is near — keep intensity controlled, prioritize clean execution</span></li>' : '<li class="insight-item"><div class="insight-icon green">✓</div><span>Mental readiness is supporting physical readiness</span></li>'}
+        </ul>`;
+      }
+
+      return `
+        <div class="result-card">
+          <div class="status-badge ${t.badge}"><span class="dot ${t.dotClass}"></span>${t.label}</div>
+          <div class="result-headline">${t.headline}</div>
+          <p class="result-sub">${t.sub}</p>
+          <div class="score-section">
+            <div class="score-label"><span>Readiness Score</span><span>${pct}%</span></div>
+            <div class="score-track"><div class="score-fill ${tier}" style="width:${pct}%"></div></div>
+          </div>
+          <p style="font-size:13px;color:var(--white);line-height:1.6">${t.rec}</p>
+          ${insightsHTML}
+          <div class="urgency-box">${t.urgency}</div>
+        </div>
+        <div class="cta-block">
+          <div class="cta-product-name">Powered by Aria · Track &amp; Field Intelligence</div>
+          <div class="cta-headline">Get this check every morning, automatically.</div>
+          <p class="cta-copy">Aria monitors your training load, recovery, sleep, fueling, mental readiness, and cycle phase — then tells you exactly what to do. Not a chart. A decision, every day.</p>
+          <div class="email-row">
+            <input type="email" class="email-input" id="cta-email" placeholder="Your email address">
+            <button class="btn btn-primary" onclick="submitEmail('athlete-tf')">Get Early Access</button>
+          </div>
+          <p class="privacy-note">No spam. No credit card. Early access only — we'll reach out personally.</p>
+          <div class="success-state" id="email-success">
+            <div class="check">✓</div>
+            <p>You're on the list. We'll be in touch soon.</p>
+          </div>
+          <div class="divider">or</div>
+          <a href="https://runwitharia.com" target="_blank" class="btn btn-outline-teal" style="width:100%;justify-content:center">Learn More About Aria →</a>
+        </div>`;
+    }
+  },
+
+  // ── Athlete + Soccer ─────────────────────────
+  'athlete-soccer': {
+    label: 'Player Availability Check',
+    product: 'Aria XI',
+    color: 'mint',
+    questions: [
+      {
+        q: 'How many hours did you sleep last night?',
+        options: [
+          { label: 'Less than 6 hours', detail: 'Significant sleep debt', score: 0, weak: 'Sleep below 6 hours significantly impairs reaction time and sprint capacity' },
+          { label: '6–7 hours', detail: 'Slightly below optimal', score: 1, weak: 'Mild sleep restriction — high-intensity bursts may feel harder today' },
+          { label: '7–9 hours', detail: 'Full recovery window', score: 3 },
+          { label: 'More than 9 hours', detail: 'May indicate accumulated fatigue', score: 2 }
+        ]
+      },
+      {
+        q: 'How do your legs feel right now?',
+        options: [
+          { label: 'Heavy and fatigued', detail: 'Residual match or training load', score: 0, weak: 'Leg heaviness indicates incomplete muscular recovery' },
+          { label: 'A bit sore or stiff', detail: 'DOMS or mild fatigue', score: 1, weak: 'Noticeable soreness suggests your muscles are still in repair mode' },
+          { label: 'Normal baseline', detail: 'No particular fatigue', score: 2 },
+          { label: 'Fresh and ready', detail: 'Full recovery', score: 3 }
+        ]
+      },
+      {
+        q: 'How many minutes did you play in your last match?',
+        options: [
+          { label: "Didn't play", detail: 'No match load', score: 3 },
+          { label: 'Under 45 minutes', detail: 'Low match exposure', score: 2 },
+          { label: '45–75 minutes', detail: 'Moderate match load', score: 1 },
+          { label: 'Full match (75+ minutes)', detail: 'High match load', score: 0, weak: 'Full match load requires at least 48–72h for full muscular recovery' }
+        ]
+      },
+      {
+        q: 'How many days ago was that match or your hardest session?',
+        options: [
+          { label: 'Today or yesterday', detail: '0–24 hours', score: 0, weak: 'Insufficient recovery time since last high-intensity load' },
+          { label: '2 days ago', detail: '~48 hours', score: 1, weak: 'Early in the recovery window for a full match load' },
+          { label: '3 days ago', detail: '~72 hours', score: 2 },
+          { label: '4 or more days ago', detail: 'Full recovery cycle', score: 3 }
+        ]
+      },
+      {
+        q: 'Any physical discomfort or soreness right now?',
+        options: [
+          { label: 'Significant pain or concern', detail: 'Needs assessment', score: 0, weak: 'Significant pain signals require physio review before training' },
+          { label: 'Noticeable soreness in a specific area', detail: 'Localised discomfort', score: 1, weak: 'Localised soreness is a key injury precursor — monitor closely' },
+          { label: 'Very mild, barely noticeable', detail: 'Normal training residue', score: 2 },
+          { label: 'No discomfort at all', detail: 'Clean physical state', score: 3 }
+        ]
+      },
+      {
+        q: 'How are you feeling mentally going into training?',
+        options: [
+          { label: 'Stressed, anxious, or distracted', detail: 'High cognitive load', score: 0, weak: 'Psychological stress elevates cortisol and increases injury risk' },
+          { label: 'Okay — nothing special', detail: 'Neutral readiness', score: 1 },
+          { label: 'Motivated and switched on', detail: 'Positive mental state', score: 2 },
+          { label: 'Fully ready — match mindset', detail: 'Peak mental readiness', score: 3 }
+        ]
+      }
+    ],
+    score: function(answers) { return answers.reduce((a, b) => a + b, 0); },
+    tier: function(score) {
+      if (score >= 13) return 'green';
+      if (score >= 7)  return 'yellow';
+      return 'red';
+    },
+    result: function(score, answers, questions) {
+      const tier = score >= 13 ? 'green' : score >= 7 ? 'yellow' : 'red';
+      const pct = Math.round((score / 18) * 100);
+      const weakSignals = questions.map((q, i) => q.options.find(o => o.score === answers[i])?.weak).filter(Boolean);
+
+      const tiers = {
+        green: {
+          badge: 'status-green', dotClass: 'dot-green', label: 'Full Training Available',
+          headline: "You're ready. Train at full intensity.",
+          sub: "Your recovery signals are aligned. Sleep, physical state, match load, and mental readiness are all pointing toward a productive session.",
+          rec: "→ <strong>Today:</strong> Full training, full intensity. Don't hold back.",
+          urgency: "<strong>Most players don't know when their green days are.</strong> They train the same way every day — missing peak sessions when they could push, and overloading recovery days when they should hold back."
+        },
+        yellow: {
+          badge: 'status-yellow', dotClass: 'dot-yellow', label: 'Modified Training Recommended',
+          headline: "Train, but adjust intensity. Your body is sending signals.",
+          sub: "You can participate in training today — but one or more recovery signals suggest full-intensity work carries elevated risk without proportional benefit.",
+          rec: "→ <strong>Today:</strong> Technical work, reduced sprint volume, or positional drills at 70%. Avoid repeated sprint sets.",
+          urgency: "<strong>Modified training is not weakness — it's periodisation.</strong> The players who avoid soft tissue injuries are the ones who listen to yellow-day signals, not push through them."
+        },
+        red: {
+          badge: 'status-red', dotClass: 'dot-red', label: 'Recovery Required',
+          headline: "Your body needs recovery, not more load.",
+          sub: "Multiple signals indicate your recovery cycle hasn't completed. Training at full intensity today increases soft tissue injury risk significantly.",
+          rec: "→ <strong>Today:</strong> Active recovery, pool work, mobility, or full rest. Protect your next match availability.",
+          urgency: "<strong>Missing one training session is recoverable. Missing 6 weeks with a hamstring is not.</strong> The data to make this call is already in your body — it just needs to be read."
+        }
+      };
+
+      const t = tiers[tier];
+      let insightsHTML = '';
+      if (weakSignals.length > 0 && tier !== 'green') {
+        insightsHTML = '<ul class="insight-list" style="margin-top:16px">' +
+          weakSignals.slice(0, 3).map(w =>
+            `<li class="insight-item"><div class="insight-icon ${tier === 'red' ? 'red' : 'yellow'}">⚠</div><span>${w}</span></li>`
+          ).join('') + '</ul>';
+      } else if (tier === 'green') {
+        insightsHTML = `<ul class="insight-list" style="margin-top:16px">
+          <li class="insight-item"><div class="insight-icon green">✓</div><span>Recovery load is manageable since last match</span></li>
+          <li class="insight-item"><div class="insight-icon green">✓</div><span>Physical and mental signals are aligned</span></li>
+          <li class="insight-item"><div class="insight-icon green">✓</div><span>No injury precursors flagged</span></li>
+        </ul>`;
+      }
+
+      return `
+        <div class="result-card">
+          <div class="status-badge ${t.badge}"><span class="dot ${t.dotClass}"></span>${t.label}</div>
+          <div class="result-headline">${t.headline}</div>
+          <p class="result-sub">${t.sub}</p>
+          <div class="score-section">
+            <div class="score-label"><span>Availability Score</span><span>${pct}%</span></div>
+            <div class="score-track"><div class="score-fill ${tier}" style="width:${pct}%"></div></div>
+          </div>
+          <p style="font-size:13px;color:var(--white);line-height:1.6">${t.rec}</p>
+          ${insightsHTML}
+          <div class="urgency-box">${t.urgency}</div>
+        </div>
+        <div class="cta-block">
+          <div class="cta-product-name">Powered by Aria XI · Football Availability Intelligence</div>
+          <div class="cta-headline">Get your availability decision every match day.</div>
+          <p class="cta-copy">Aria XI connects your recovery data, match load, physical signals, and mental readiness into one daily availability decision — for you and every player on the squad.</p>
+          <div class="email-row">
+            <input type="email" class="email-input" id="cta-email" placeholder="Your email address">
+            <button class="btn btn-primary" onclick="submitEmail('athlete-soccer')">Get Early Access</button>
+          </div>
+          <p class="privacy-note">No spam. No credit card. Early access only.</p>
+          <div class="success-state" id="email-success">
+            <div class="check">✓</div>
+            <p>You're on the list. We'll reach out personally.</p>
+          </div>
+          <div class="divider">or</div>
+          <a href="https://stadioralabs.com" target="_blank" class="btn btn-outline-teal" style="width:100%;justify-content:center">Learn More About Aria XI →</a>
+        </div>`;
+    }
+  },
+
+  // ── Coach + Track & Field ────────────────────
+  'coach-tf': {
+    label: 'Squad Readiness Snapshot',
+    product: 'Stadiora',
+    color: 'mint',
+    questions: [
+      {
+        q: 'How many athletes are you currently managing?',
+        options: [
+          { label: '1–5 athletes', detail: 'Small group or individual coaching', score: 0, ctx: 'small' },
+          { label: '6–15 athletes', detail: 'Mid-size program', score: 1, ctx: 'medium' },
+          { label: '16–30 athletes', detail: 'Full squad', score: 2, ctx: 'large' },
+          { label: 'More than 30', detail: 'Academy or multi-event program', score: 3, ctx: 'xlarge' }
+        ]
+      },
+      {
+        q: 'What percentage of your squad completed all planned sessions this week?',
+        options: [
+          { label: 'Less than half', detail: 'Significant compliance gap', score: 0, weak: 'Low session compliance is an early warning signal — fatigue, motivation, or workload issues' },
+          { label: 'About half to 70%', detail: 'Moderate compliance', score: 1, weak: 'Below-average session compliance — worth investigating the cause' },
+          { label: '70–85%', detail: 'Good compliance with some gaps', score: 2 },
+          { label: '85% or more', detail: 'Strong program adherence', score: 3 }
+        ]
+      },
+      {
+        q: 'How many athletes have reported fatigue, soreness, or discomfort this week?',
+        options: [
+          { label: 'More than half the squad', detail: 'Widespread fatigue signal', score: 0, weak: 'Widespread fatigue across the squad suggests training load may need recalibrating' },
+          { label: 'About a third', detail: 'Moderate fatigue spread', score: 1, weak: 'A third of the squad flagging fatigue warrants a load review before next session' },
+          { label: 'Just a few athletes', detail: 'Isolated cases', score: 2 },
+          { label: 'None reported', detail: 'Squad feels fresh', score: 3 }
+        ]
+      },
+      {
+        q: 'Is there a competition coming up?',
+        options: [
+          { label: 'In 1–2 days', detail: 'Immediate pre-competition window', score: 0, flag: 'comp-imminent' },
+          { label: 'This week', detail: 'Final preparation phase', score: 1 },
+          { label: 'Next week', detail: 'Penultimate week of prep', score: 2 },
+          { label: 'Not for 2 or more weeks', detail: 'Mid-block training', score: 3 }
+        ]
+      },
+      {
+        q: 'How many athletes are currently injured or in return-to-play?',
+        options: [
+          { label: '3 or more', detail: 'High injury burden', score: 0, weak: 'High concurrent injury load signals a potential training load or recovery management issue' },
+          { label: '2 athletes', detail: 'Moderate injury burden', score: 1, weak: 'Two athletes in RTP requires careful return progression to avoid reinjury' },
+          { label: '1 athlete', detail: 'Single case to manage', score: 2 },
+          { label: 'None currently injured', detail: 'Full squad available', score: 3 }
+        ]
+      },
+      {
+        q: 'How do you currently track athlete readiness and wellness?',
+        options: [
+          { label: 'I rely on observation and athlete feedback', detail: 'Informal monitoring', score: 0, weak: 'Without structured check-ins, at-risk athletes often go undetected until it\'s too late' },
+          { label: 'Athletes tell me when something is wrong', detail: 'Reactive tracking only', score: 1, weak: 'Reactive monitoring means you only learn about problems after they\'ve already developed' },
+          { label: 'I use a form or check-in system', detail: 'Basic structured data', score: 2 },
+          { label: 'I use a dedicated performance system', detail: 'Structured athlete monitoring', score: 3 }
+        ]
+      }
+    ],
+    score: function(answers) { return answers.slice(1).reduce((a, b) => a + b, 0); },
+    tier: function(score) {
+      if (score >= 11) return 'green';
+      if (score >= 6)  return 'yellow';
+      return 'red';
+    },
+    result: function(score, answers, questions) {
+      const tier = score >= 11 ? 'green' : score >= 6 ? 'yellow' : 'red';
+      const pct = Math.round((score / 15) * 100);
+      const weakSignals = questions.slice(1).map((q, i) => q.options.find(o => o.score === answers[i + 1])?.weak).filter(Boolean);
+      const squadSize = ['1–5', '6–15', '16–30', '30+'][answers[0]];
+      const injuredCount = [3, 2, 1, 0][answers[4]];
+      const attentionNeeded = answers[2] === 0 ? 'more than half your squad' : answers[2] === 1 ? 'around a third of your squad' : 'a few athletes';
+
+      const tiers = {
+        green: {
+          badge: 'status-green', dotClass: 'dot-green', label: 'Squad in Good Shape',
+          headline: "Your squad is managing well. Protect it.",
+          sub: `With ${squadSize} athletes under management, your squad health signals are solid. Compliance is high, fatigue load is manageable, and injury burden is low. The risk now is complacency.`,
+          rec: "→ <strong>This week:</strong> Maintain check-in discipline. Monitor the athletes closest to competition. Document what's working.",
+          urgency: "<strong>Good squad health is perishable.</strong> The programs that sustain it have systems — not just instincts. One missed check-in cycle is when a small issue becomes a missed competition."
+        },
+        yellow: {
+          badge: 'status-yellow', dotClass: 'dot-yellow', label: 'Several Athletes Need Monitoring',
+          headline: "Signals are mixed. You have athletes who need attention today.",
+          sub: `Within your squad of ${squadSize}, ${attentionNeeded} may be carrying more load than your current monitoring reveals. Without a structured system, these signals stay invisible until something breaks.`,
+          rec: "→ <strong>This week:</strong> Prioritise 1-on-1 check-ins with your highest-load athletes before your next session.",
+          urgency: "<strong>The problem with gut-feel coaching isn't that you don't care — it's that you can't scale it.</strong> You can't check in meaningfully with 15 athletes in the 10 minutes before a session starts."
+        },
+        red: {
+          badge: 'status-red', dotClass: 'dot-red', label: 'High Attention Required',
+          headline: "Multiple athletes are at risk. Your monitoring system has blind spots.",
+          sub: `Your squad is showing multiple warning signals: fatigue spread, compliance gaps${injuredCount > 0 ? `, and ${injuredCount} athlete${injuredCount > 1 ? 's' : ''} in injury management` : ''}. Without a structured readiness system, these compound silently.`,
+          rec: "→ <strong>This week:</strong> Do not run high-intensity sessions until you have a clear readiness picture for each athlete.",
+          urgency: "<strong>Coaches who rely on observation alone miss the signals that precede soft tissue injuries by 5–7 days.</strong> By the time an athlete tells you something is wrong, the window to prevent it has already closed."
+        }
+      };
+
+      const t = tiers[tier];
+      let insightsHTML = '';
+      if (weakSignals.length > 0) {
+        insightsHTML = '<ul class="insight-list" style="margin-top:16px">' +
+          weakSignals.slice(0, 3).map(w =>
+            `<li class="insight-item"><div class="insight-icon ${tier === 'red' ? 'red' : 'yellow'}">⚠</div><span>${w}</span></li>`
+          ).join('') + '</ul>';
+      } else {
+        insightsHTML = `<ul class="insight-list" style="margin-top:16px">
+          <li class="insight-item"><div class="insight-icon green">✓</div><span>Session compliance is strong across the squad</span></li>
+          <li class="insight-item"><div class="insight-icon green">✓</div><span>Fatigue load is within a manageable range</span></li>
+          <li class="insight-item"><div class="insight-icon green">✓</div><span>Injury burden is low — full squad largely available</span></li>
+        </ul>`;
+      }
+
+      return `
+        <div class="result-card">
+          <div class="status-badge ${t.badge}"><span class="dot ${t.dotClass}"></span>${t.label}</div>
+          <div class="result-headline">${t.headline}</div>
+          <p class="result-sub">${t.sub}</p>
+          <div class="score-section">
+            <div class="score-label"><span>Squad Health Score</span><span>${pct}%</span></div>
+            <div class="score-track"><div class="score-fill ${tier}" style="width:${pct}%"></div></div>
+          </div>
+          <p style="font-size:13px;color:var(--white);line-height:1.6">${t.rec}</p>
+          ${insightsHTML}
+          <div class="urgency-box">${t.urgency}</div>
+        </div>
+        <div class="cta-block">
+          <div class="cta-product-name">Powered by Stadiora · Track &amp; Field Coaching Intelligence</div>
+          <div class="cta-headline">Run this for every athlete, every week — automatically.</div>
+          <p class="cta-copy">Stadiora monitors your full roster's readiness, flags who needs attention, delivers structured training, and gives you the coach-level intelligence that used to require a sports science team.</p>
+          <div class="email-row">
+            <input type="email" class="email-input" id="cta-email" placeholder="Your email address">
+            <button class="btn btn-primary" onclick="submitEmail('coach-tf')">Request Coach Access</button>
+          </div>
+          <p class="privacy-note">For coaches and academies only. We'll follow up personally.</p>
+          <div class="success-state" id="email-success">
+            <div class="check">✓</div>
+            <p>Request received. We'll be in touch within 24 hours.</p>
+          </div>
+          <div class="divider">or</div>
+          <a href="https://stadioralabs.com" target="_blank" class="btn btn-outline-teal" style="width:100%;justify-content:center">Learn More About Stadiora →</a>
+        </div>`;
+    }
+  },
+
+  // ── Coach + Soccer ───────────────────────────
+  'coach-soccer': {
+    label: 'Player Availability Checker',
+    product: 'Aria XI',
+    color: 'teal',
+    questions: [
+      {
+        q: 'How many players are in your squad?',
+        options: [
+          { label: 'Under 15', detail: 'Small squad', score: 0 },
+          { label: '15–25 players', detail: 'Standard squad', score: 1 },
+          { label: '26–40 players', detail: 'Extended squad', score: 2 },
+          { label: 'More than 40', detail: 'Academy or multi-team', score: 3 }
+        ]
+      },
+      {
+        q: 'After your last session or match, how many players reported fatigue or soreness?',
+        options: [
+          { label: 'More than half the squad', detail: 'Widespread fatigue', score: 0, weak: 'Widespread post-session fatigue signals the squad may have exceeded optimal training load' },
+          { label: 'About a third', detail: 'Significant fatigue spread', score: 1, weak: 'A third of the squad flagging fatigue warrants load adjustment before the next session' },
+          { label: 'Just a few players', detail: 'Isolated fatigue cases', score: 2 },
+          { label: 'None reported', detail: 'Squad feels recovered', score: 3 }
+        ]
+      },
+      {
+        q: 'How intense was your last training session or match?',
+        options: [
+          { label: 'Full match', detail: 'Maximum load event', score: 0, weak: 'Post-match recovery requires 48–72h minimum before high-intensity training' },
+          { label: 'High-intensity training', detail: 'Heavy session load', score: 1, weak: 'High-intensity session load needs adequate recovery before repeat exposure' },
+          { label: 'Moderate session', detail: 'Medium training load', score: 2 },
+          { label: 'Light or recovery session', detail: 'Low load — recovery focused', score: 3 }
+        ]
+      },
+      {
+        q: 'How many days until your next match?',
+        options: [
+          { label: 'Tomorrow', detail: 'Match day minus 1', score: 0, flag: 'match-tomorrow' },
+          { label: '2–3 days', detail: 'Short preparation window', score: 1 },
+          { label: '4–5 days', detail: 'Standard preparation block', score: 2 },
+          { label: '6 or more days', detail: 'Full preparation window', score: 3 }
+        ]
+      },
+      {
+        q: 'How many players are currently injured or in return-to-play?',
+        options: [
+          { label: '3 or more', detail: 'High injury burden', score: 0, weak: 'High concurrent injury load often traces back to undetected overload 5–10 days earlier' },
+          { label: '2 players', detail: 'Moderate injury burden', score: 1, weak: 'Two players in RTP increases pressure on available squad members — monitor load carefully' },
+          { label: '1 player', detail: 'Single case to manage', score: 2 },
+          { label: 'None currently injured', detail: 'Full squad available', score: 3 }
+        ]
+      },
+      {
+        q: 'How do you currently determine who is ready to train at full intensity?',
+        options: [
+          { label: "We don't formally assess it", detail: 'No readiness process', score: 0, weak: 'Without a readiness process, high-risk players train at full intensity undetected every session' },
+          { label: 'Players tell me if something is wrong', detail: 'Reactive only', score: 1, weak: 'Players — especially young ones — rarely self-report fatigue or minor pain for fear of being dropped' },
+          { label: 'We use a wellness form or check-in', detail: 'Basic structured check', score: 2 },
+          { label: 'We use GPS, wearables, or a monitoring system', detail: 'Data-informed readiness', score: 3 }
+        ]
+      }
+    ],
+    score: function(answers) { return answers.slice(1).reduce((a, b) => a + b, 0); },
+    tier: function(score) {
+      if (score >= 11) return 'green';
+      if (score >= 6)  return 'yellow';
+      return 'red';
+    },
+    result: function(score, answers, questions) {
+      const tier = score >= 11 ? 'green' : score >= 6 ? 'yellow' : 'red';
+      const pct = Math.round((score / 15) * 100);
+      const weakSignals = questions.slice(1).map((q, i) => q.options.find(o => o.score === answers[i + 1])?.weak).filter(Boolean);
+      const matchTomorrow = answers[3] === 0;
+      const squadSizes = ['Under 15', '15–25', '26–40', '40+'];
+      const squadSize = squadSizes[answers[0]];
+
+      const tiers = {
+        green: {
+          badge: 'status-green', dotClass: 'dot-green', label: 'Availability Well Managed',
+          headline: "Your squad availability picture looks solid.",
+          sub: `With ${squadSize} players in your squad, your current signals suggest manageable load and reasonable readiness. The infrastructure to make good availability decisions appears to be in place.`,
+          rec: `→ <strong>Today:</strong> ${matchTomorrow ? 'Match day tomorrow — run final availability checks and confirm each player\'s status.' : 'Maintain check-in discipline. Document which players need modified sessions before you confirm the training plan.'}`,
+          urgency: "<strong>Good availability management is a competitive advantage.</strong> Squads that know who is ready win more than squads that guess. The margin between the two is a structured daily process."
+        },
+        yellow: {
+          badge: 'status-yellow', dotClass: 'dot-yellow', label: 'Availability Risk: Moderate',
+          headline: "You have players who need attention before today's session.",
+          sub: `Your squad is showing mixed signals. Without a clear readiness picture for each player, you're making session and selection decisions on incomplete information — a risk that compounds the closer you get to match day.`,
+          rec: `→ <strong>Before training today:</strong> ${matchTomorrow ? 'Match tomorrow — do not run high-intensity work without confirming readiness for each player.' : 'Conduct player check-ins before confirming the session plan. Identify who needs modification.'}`,
+          urgency: "<strong>The question isn't whether you have players who need modification today. You do.</strong> The question is whether you know which ones before the session starts — or only after something goes wrong."
+        },
+        red: {
+          badge: 'status-red', dotClass: 'dot-red', label: 'High Availability Risk',
+          headline: "Your squad has significant availability blind spots.",
+          sub: "Multiple signals indicate elevated player risk — high load, fatigue spread, injury burden, or a reactive-only monitoring approach. In this profile, soft tissue injuries and premature returns are a predictable outcome, not bad luck.",
+          rec: `→ <strong>Immediate action:</strong> ${matchTomorrow ? 'Match tomorrow — do not select players without individual readiness confirmation. The cost of a wrong call tomorrow is 4–6 weeks.' : 'Pause high-intensity training until you have a current readiness picture for every player. A modified session today prevents a 6-week absence next month.'}`,
+          urgency: "<strong>Coaches who rely on player self-reporting miss 60–70% of training-related risk signals.</strong> Players — especially young ones — do not report fatigue or minor pain for fear of losing their place. You need a system that catches what they don't say."
+        }
+      };
+
+      const t = tiers[tier];
+      let insightsHTML = '';
+      if (weakSignals.length > 0) {
+        insightsHTML = '<ul class="insight-list" style="margin-top:16px">' +
+          weakSignals.slice(0, 3).map(w =>
+            `<li class="insight-item"><div class="insight-icon ${tier === 'red' ? 'red' : 'yellow'}">⚠</div><span>${w}</span></li>`
+          ).join('') + '</ul>';
+      } else {
+        insightsHTML = `<ul class="insight-list" style="margin-top:16px">
+          <li class="insight-item"><div class="insight-icon green">✓</div><span>Training load is within a manageable recovery window</span></li>
+          <li class="insight-item"><div class="insight-icon green">✓</div><span>Injury burden is low — full squad largely available</span></li>
+          <li class="insight-item"><div class="insight-icon green">✓</div><span>Readiness monitoring process is in place</span></li>
+        </ul>`;
+      }
+
+      return `
+        <div class="result-card">
+          <div class="status-badge ${t.badge}"><span class="dot ${t.dotClass}"></span>${t.label}</div>
+          <div class="result-headline">${t.headline}</div>
+          <p class="result-sub">${t.sub}</p>
+          <div class="score-section">
+            <div class="score-label"><span>Availability Risk Score</span><span>${100 - pct}% risk</span></div>
+            <div class="score-track"><div class="score-fill ${tier}" style="width:${100 - pct}%"></div></div>
+          </div>
+          <p style="font-size:13px;color:var(--white);line-height:1.6">${t.rec}</p>
+          ${insightsHTML}
+          <div class="urgency-box">${t.urgency}</div>
+        </div>
+        <div class="cta-block">
+          <div class="cta-product-name">Powered by Aria XI · Football Availability Intelligence</div>
+          <div class="cta-headline">Know who is ready — before the session starts.</div>
+          <p class="cta-copy">Aria XI connects player recovery, match load, injury risk, wellness, and coach context into a single daily decision. Availability Index. Coach Attention Queue. Return-to-Play tracking. For every player, every day.</p>
+          <div class="email-row">
+            <input type="email" class="email-input" id="cta-email" placeholder="Your email address">
+            <button class="btn btn-primary" onclick="submitEmail('coach-soccer')">Request a Demo</button>
+          </div>
+          <p class="privacy-note">For coaches, clubs, and academies. We follow up personally within 24 hours.</p>
+          <div class="success-state" id="email-success">
+            <div class="check">✓</div>
+            <p>Request received. We'll reach out within 24 hours.</p>
+          </div>
+          <div class="divider">or</div>
+          <a href="https://stadioralabs.com" target="_blank" class="btn btn-outline-teal" style="width:100%;justify-content:center">Learn More About Aria XI →</a>
+        </div>`;
+    }
+  }
+};
+
+// ══════════════════════════════════════════════
+// NAVIGATION
+// ══════════════════════════════════════════════
+function goTo(screenId) {
+  document.querySelector('.screen.active').classList.remove('active');
+  document.getElementById(screenId).classList.add('active');
+  S.history.push(screenId);
+  S.currentScreen = screenId;
+  updateProgress();
+  updateBackBtn();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function goBack() {
+  if (S.history.length <= 1) return;
+  S.history.pop();
+  const prev = S.history[S.history.length - 1];
+  document.querySelector('.screen.active').classList.remove('active');
+  document.getElementById(prev).classList.add('active');
+  S.currentScreen = prev;
+  updateProgress();
+  updateBackBtn();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function updateBackBtn() {
+  const btn = document.getElementById('back-btn');
+  btn.style.display = S.history.length > 1 ? 'block' : 'none';
+}
+
+function updateProgress() {
+  const bar = document.getElementById('progress-bar');
+  const counter = document.getElementById('step-counter');
+  const map = { 'intro': 0, 'role': 1, 'sport': 2, 'question': 3, 'results': 4 };
+  const screen = S.currentScreen.replace('s-', '');
+
+  if (screen === 'intro') {
+    bar.style.width = '4%';
+    counter.textContent = '';
+    return;
+  }
+  if (screen === 'role') { bar.style.width = '12%'; counter.textContent = 'Step 1 of 3'; return; }
+  if (screen === 'sport') { bar.style.width = '24%'; counter.textContent = 'Step 2 of 3'; return; }
+  if (screen === 'results') { bar.style.width = '100%'; counter.textContent = ''; return; }
+
+  if (screen === 'question' && S.path) {
+    const total = PATHS[S.path].questions.length;
+    const pct = 24 + Math.round(((S.qi + 1) / total) * 70);
+    bar.style.width = pct + '%';
+    counter.textContent = `Question ${S.qi + 1} of ${total}`;
+  }
+}
+
+// ══════════════════════════════════════════════
+// ROLE & SPORT SELECTION
+// ══════════════════════════════════════════════
+function selectRole(el) {
+  document.querySelectorAll('#s-role .big-opt').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+  S.role = el.dataset.value;
+  setTimeout(() => goTo('s-sport'), 250);
+}
+
+function selectSport(el) {
+  document.querySelectorAll('#s-sport .big-opt').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+  S.sport = el.dataset.value;
+  S.path = `${S.role}-${S.sport}`;
+  S.answers = [];
+  S.qi = 0;
+  setTimeout(() => {
+    loadQuestion();
+    goTo('s-question');
+  }, 250);
+}
+
+// ══════════════════════════════════════════════
+// QUESTIONS
+// ══════════════════════════════════════════════
+function loadQuestion() {
+  const path = PATHS[S.path];
+  const q = path.questions[S.qi];
+  const total = path.questions.length;
+
+  document.getElementById('q-label').textContent = `Question ${S.qi + 1} of ${total}`;
+  document.getElementById('q-text').textContent = q.q;
+
+  const optContainer = document.getElementById('q-options');
+  optContainer.className = 'options';
+  optContainer.innerHTML = q.options.map((o, i) =>
+    `<div class="opt" onclick="selectOption(this, ${o.score})">
+      <div class="opt-check"></div>
+      <div class="opt-content">
+        <div class="opt-label">${o.label}</div>
+        ${o.detail ? `<div class="opt-detail">${o.detail}</div>` : ''}
+      </div>
+    </div>`
+  ).join('');
+
+  const nextBtn = document.getElementById('next-btn');
+  nextBtn.disabled = true;
+  nextBtn.textContent = S.qi < total - 1 ? 'Continue →' : 'See My Results →';
+  updateProgress();
+}
+
+function selectOption(el, score) {
+  document.querySelectorAll('#q-options .opt').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+  S._pendingScore = score;
+  document.getElementById('next-btn').disabled = false;
+}
+
+function nextQuestion() {
+  if (S._pendingScore === undefined) return;
+  S.answers[S.qi] = S._pendingScore;
+  S._pendingScore = undefined;
+
+  const path = PATHS[S.path];
+  if (S.qi < path.questions.length - 1) {
+    S.qi++;
+    loadQuestion();
+    // Re-trigger animation
+    const screen = document.getElementById('s-question');
+    screen.classList.remove('active');
+    void screen.offsetWidth;
+    screen.classList.add('active');
+  } else {
+    showResults();
+  }
+}
+
+// ══════════════════════════════════════════════
+// RESULTS
+// ══════════════════════════════════════════════
+function showResults() {
+  const path = PATHS[S.path];
+  const rawScore = path.score(S.answers);
+  const html = path.result(rawScore, S.answers, path.questions);
+  document.getElementById('result-content').innerHTML = html;
+  goTo('s-results');
+}
+
+// ══════════════════════════════════════════════
+// CTA / EMAIL
+// ══════════════════════════════════════════════
+function submitEmail(path) {
+  const input = document.getElementById('cta-email');
+  const email = input?.value?.trim();
+  if (!email || !email.includes('@')) {
+    input.style.borderColor = 'var(--red)';
+    setTimeout(() => input.style.borderColor = '', 1500);
+    return;
+  }
+  // ← Wire to your email provider here (Mailchimp, ConvertKit, etc.)
+  // e.g. fetch('/api/subscribe', { method: 'POST', body: JSON.stringify({ email, path }) })
+  const row = document.querySelector('.email-row');
+  const note = document.querySelector('.privacy-note');
+  const success = document.getElementById('email-success');
+  if (row) row.style.display = 'none';
+  if (note) note.style.display = 'none';
+  if (success) success.style.display = 'block';
+}
+
+// ══════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════
+updateProgress();
+</script>
+</body>
+</html>
