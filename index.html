@@ -1122,14 +1122,17 @@ if (widgetEl) {
   barObs.observe(widgetEl);
 }
 
-// Product tile video lazy-load — videos only load when tile enters viewport
+// Product tile video lazy-load — wait for canplay before showing
 const tileVidObs = new IntersectionObserver(entries => {
   entries.forEach(e => {
     if (e.isIntersecting) {
       const vid = e.target.querySelector('.ptile-video');
-      if (vid) {
+      if (vid && !vid.dataset.loading) {
+        vid.dataset.loading = '1';
+        vid.addEventListener('canplay', () => {
+          vid.play().then(() => vid.classList.add('vloaded')).catch(() => vid.classList.add('vloaded'));
+        }, { once: true });
         vid.load();
-        vid.play().then(() => vid.classList.add('vloaded')).catch(() => {});
       }
       tileVidObs.unobserve(e.target);
     }
