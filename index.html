@@ -318,12 +318,12 @@ body::before{
 .engine-intro h2{font-family:'Bebas Neue',sans-serif;font-size:clamp(40px,5.5vw,76px);letter-spacing:2px;line-height:.97;margin-bottom:18px}
 .engine-intro p{font-size:16px;color:rgba(255,255,255,.5);line-height:1.85}
 
-.flow{display:grid;grid-template-columns:1fr 300px 1fr;align-items:center;max-width:1100px;margin:0 auto;position:relative;z-index:1}
-.flow-col{display:flex;flex-direction:column;gap:9px}
-.flow-col.inputs{align-items:flex-end}
-.flow-col.outputs{align-items:flex-start}
+.flow{display:grid;grid-template-columns:230px 280px 230px;align-items:center;gap:0 0;max-width:960px;margin:0 auto;position:relative;z-index:1}
+.flow-col{display:flex;flex-direction:column;gap:10px;width:230px}
+.flow-col.inputs{align-items:stretch}
+.flow-col.outputs{align-items:stretch}
 
-.fpill{padding:10px 16px;border-radius:8px;font-size:12px;font-weight:600;white-space:nowrap}
+.fpill{padding:11px 16px;border-radius:9px;font-size:12px;font-weight:600;white-space:normal;text-align:center;line-height:1.35;width:100%;box-sizing:border-box}
 .fpill-in{background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.07);color:rgba(255,255,255,.36)}
 .fpill-out{border:1px solid;font-weight:700}
 .fp-cyan  {border-color:rgba(0,190,243,.38); background:rgba(0,190,243,.08); color:var(--cyan)}
@@ -779,8 +779,6 @@ body::before{
         <div class="fpill fpill-in">Recovery &amp; Sleep Data</div>
         <div class="fpill fpill-in">Injury Risk Signals</div>
         <div class="fpill fpill-in">Mental Readiness</div>
-        <div class="fpill fpill-in">Nutrition &amp; Hydration</div>
-        <div class="fpill fpill-in">Weather &amp; Conditions</div>
         <div class="fpill fpill-in">Cycle-Aware Context</div>
         <div class="fpill fpill-in">Coach Input</div>
       </div>
