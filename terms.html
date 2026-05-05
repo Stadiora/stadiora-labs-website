@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Stadiora Labs Terms of Use — the agreement governing your use of Aria Intelligence products and services.">
+<title>Terms of Use — Stadiora Labs</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+
+:root {
+  --black:   #010812;
+  --navy:    #040c1c;
+  --card:    #060e20;
+  --cyan:    #00BEF3;
+  --mint:    #34D399;
+  --violet:  #8B5CF6;
+  --white:   #ffffff;
+  --muted:   rgba(255,255,255,0.38);
+  --dim:     rgba(255,255,255,0.12);
+  --border:  rgba(255,255,255,0.07);
+  --border2: rgba(255,255,255,0.13);
+}
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--black);color:var(--white);font-family:'DM Sans',sans-serif;overflow-x:hidden;line-height:1.6}
+img{max-width:100%;display:block}
+a{text-decoration:none;color:inherit}
+
+.container{width:100%;max-width:1240px;margin:0 auto;padding:0 48px}
+
+/* ── NAV ── */
+#nav{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  padding:20px 0;background:rgba(1,8,18,.97);
+  border-bottom:1px solid var(--border);
+}
+.nav-inner{display:flex;align-items:center;gap:40px}
+.nav-logo{display:flex;align-items:center;gap:10px;margin-right:auto}
+.nav-logo img{height:48px;width:auto}
+.nav-logo-fallback{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:3px}
+.nav-back{
+  display:flex;align-items:center;gap:6px;
+  font-size:13px;font-weight:500;color:var(--muted);transition:color .2s;
+}
+.nav-back:hover{color:var(--white)}
+.nav-back svg{width:16px;height:16px}
+
+/* ── HERO ── */
+#hero{
+  padding:160px 0 80px;
+  border-bottom:1px solid var(--border);
+  background:linear-gradient(to bottom, var(--navy) 0%, var(--black) 100%);
+}
+.doc-eyebrow{
+  display:inline-flex;align-items:center;gap:8px;
+  font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;
+  color:var(--violet);margin-bottom:20px;
+}
+.doc-eyebrow::before{content:'';display:block;width:24px;height:1px;background:var(--violet)}
+.doc-title{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:clamp(52px,7vw,88px);letter-spacing:2px;line-height:.92;
+  margin-bottom:24px;
+}
+.doc-meta{display:flex;gap:32px;flex-wrap:wrap}
+.doc-meta-item{font-size:13px;color:var(--muted)}
+.doc-meta-item strong{color:rgba(255,255,255,.7);font-weight:600}
+
+/* ── MEDICAL NOTICE ── */
+.medical-notice{
+  background:rgba(239,68,68,.06);
+  border:1px solid rgba(239,68,68,.25);
+  border-radius:12px;padding:24px 28px;margin:48px 0;
+  display:flex;gap:16px;align-items:flex-start;
+}
+.medical-notice-icon{
+  width:36px;height:36px;border-radius:8px;
+  background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.2);
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;
+}
+.medical-notice-icon svg{width:18px;height:18px;color:#ef4444}
+.medical-notice-title{font-size:14px;font-weight:700;color:#ef4444;margin-bottom:6px}
+.medical-notice-body{font-size:13px;color:rgba(255,255,255,.6);line-height:1.7}
+
+/* ── LAYOUT ── */
+#doc-body{padding:80px 0 120px}
+.doc-layout{display:grid;grid-template-columns:220px 1fr;gap:80px;align-items:start}
+
+/* ── TOC ── */
+.toc{position:sticky;top:100px}
+.toc-title{font-size:10px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:rgba(255,255,255,.25);margin-bottom:16px}
+.toc-links{list-style:none;display:flex;flex-direction:column;gap:2px}
+.toc-links a{
+  font-size:12px;color:rgba(255,255,255,.35);
+  padding:6px 12px;border-radius:6px;border-left:2px solid transparent;
+  display:block;transition:.2s;line-height:1.4;
+}
+.toc-links a:hover{color:var(--white);background:rgba(255,255,255,.04);border-left-color:var(--violet)}
+.toc-links a.active{color:var(--violet);border-left-color:var(--violet);background:rgba(139,92,246,.05)}
+
+/* ── DOC CONTENT ── */
+.doc-content{max-width:760px}
+.doc-section{margin-bottom:64px;scroll-margin-top:100px}
+.doc-section h2{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:28px;letter-spacing:2px;color:var(--white);
+  margin-bottom:20px;padding-bottom:12px;
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:12px;
+}
+.section-num{
+  font-size:11px;font-weight:700;letter-spacing:2px;
+  color:var(--violet);background:rgba(139,92,246,.08);
+  border:1px solid rgba(139,92,246,.15);
+  padding:3px 8px;border-radius:4px;
+}
+.doc-section h3{
+  font-size:15px;font-weight:700;color:rgba(255,255,255,.9);
+  margin:28px 0 10px;
+}
+.doc-section p{
+  font-size:14px;color:rgba(255,255,255,.6);
+  line-height:1.85;margin-bottom:16px;
+}
+.doc-section p:last-child{margin-bottom:0}
+.doc-section ul,.doc-section ol{
+  margin:12px 0 16px 0;
+  padding-left:0;list-style:none;
+  display:flex;flex-direction:column;gap:8px;
+}
+.doc-section li{
+  font-size:14px;color:rgba(255,255,255,.6);
+  line-height:1.75;padding-left:20px;position:relative;
+}
+.doc-section ul li::before{
+  content:'';position:absolute;left:0;top:9px;
+  width:5px;height:5px;border-radius:50%;background:var(--violet);opacity:.6;
+}
+.doc-section ol{counter-reset:ol-counter}
+.doc-section ol li{counter-increment:ol-counter}
+.doc-section ol li::before{
+  content:counter(ol-counter) ".";
+  position:absolute;left:0;top:0;
+  font-size:12px;font-weight:700;color:var(--violet);opacity:.8;
+}
+
+.highlight-box{
+  background:var(--card);border:1px solid var(--border2);
+  border-radius:10px;padding:20px 24px;margin:20px 0;
+}
+.highlight-box p{margin-bottom:0;font-size:13px}
+
+.disclaimer-box{
+  background:rgba(139,92,246,.05);
+  border:1px solid rgba(139,92,246,.2);
+  border-radius:10px;padding:20px 24px;margin:20px 0;
+}
+.disclaimer-box p{margin-bottom:0;font-size:13px;color:rgba(255,255,255,.55)}
+
+.contact-box{
+  background:var(--card);border:1px solid var(--border2);border-radius:12px;
+  padding:28px;margin-top:20px;
+}
+.contact-box p{margin-bottom:8px}
+.contact-box a{color:var(--violet);border-bottom:1px solid rgba(139,92,246,.3);transition:.2s}
+.contact-box a:hover{border-bottom-color:var(--violet)}
+
+/* ── FOOTER ── */
+footer{background:var(--black);border-top:1px solid var(--border);padding:40px 0}
+.foot-btm{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px}
+.foot-copy{font-size:12px;color:rgba(255,255,255,.2)}
+.foot-legal{display:flex;gap:24px}
+.foot-legal a{font-size:12px;color:rgba(255,255,255,.2);transition:color .2s}
+.foot-legal a:hover{color:var(--muted)}
+
+/* ── RESPONSIVE ── */
+@media(max-width:860px){
+  .container{padding:0 24px}
+  .doc-layout{grid-template-columns:1fr}
+  .toc{display:none}
+}
+
+</style>
+</head>
+<body>
+
+<!-- ── NAV ── -->
+<nav id="nav">
+  <div class="container">
+    <div class="nav-inner">
+      <a href="./index.html" class="nav-logo">
+        <img src="./stadioralabs info/stadiora_labs_logo - white.png" alt="Stadiora Labs"
+          onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
+        <span class="nav-logo-fallback" style="display:none">STADIORA LABS</span>
+      </a>
+      <a href="./index.html" class="nav-back">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        Back to Stadiora Labs
+      </a>
+    </div>
+  </div>
+</nav>
+
+<!-- ── HERO ── -->
+<section id="hero">
+  <div class="container">
+    <div class="doc-eyebrow">Legal</div>
+    <h1 class="doc-title">Terms of Use</h1>
+    <div class="doc-meta">
+      <div class="doc-meta-item"><strong>Effective Date:</strong> May 5, 2026</div>
+      <div class="doc-meta-item"><strong>Last Updated:</strong> May 5, 2026</div>
+      <div class="doc-meta-item"><strong>Version:</strong> 1.0</div>
+    </div>
+
+    <div class="medical-notice">
+      <div class="medical-notice-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      </div>
+      <div>
+        <div class="medical-notice-title">Not a medical service — read Section 6</div>
+        <div class="medical-notice-body">Stadiora Labs products are decision-support tools, not medical devices, clinical services, or healthcare providers. Nothing generated by Aria Intelligence constitutes medical advice, diagnosis, or treatment. Coaches, athletes, and their medical teams are solely responsible for all training and health decisions. Section 6 sets out the full medical and health disclaimer. These terms should be reviewed by qualified legal counsel before enforcement. Questions: <a href="mailto:legal@stadioralabs.com" style="color:#ef4444;border-bottom:1px solid rgba(239,68,68,.3)">legal@stadioralabs.com</a></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── DOC BODY ── -->
+<section id="doc-body">
+  <div class="container">
+    <div class="doc-layout">
+
+      <!-- TOC -->
+      <nav class="toc">
+        <div class="toc-title">Contents</div>
+        <ul class="toc-links">
+          <li><a href="#s1">1. Agreement to Terms</a></li>
+          <li><a href="#s2">2. Our Services</a></li>
+          <li><a href="#s3">3. Eligibility</a></li>
+          <li><a href="#s4">4. Your Account</a></li>
+          <li><a href="#s5">5. Acceptable Use</a></li>
+          <li><a href="#s6">6. Medical Disclaimer</a></li>
+          <li><a href="#s7">7. Athlete Data</a></li>
+          <li><a href="#s8">8. API Terms</a></li>
+          <li><a href="#s9">9. Intellectual Property</a></li>
+          <li><a href="#s10">10. Third-Party Services</a></li>
+          <li><a href="#s11">11. Disclaimer of Warranties</a></li>
+          <li><a href="#s12">12. Limitation of Liability</a></li>
+          <li><a href="#s13">13. Indemnification</a></li>
+          <li><a href="#s14">14. Termination</a></li>
+          <li><a href="#s15">15. Governing Law</a></li>
+          <li><a href="#s16">16. Changes to Terms</a></li>
+          <li><a href="#s17">17. Contact</a></li>
+        </ul>
+      </nav>
+
+      <!-- Content -->
+      <div class="doc-content">
+
+        <div class="doc-section" id="s1">
+          <h2><span class="section-num">01</span> Agreement to Terms</h2>
+          <p>These Terms of Use ("Terms") constitute a legally binding agreement between you and Stadiora Labs ("Stadiora Labs," "we," "us," or "our") governing your access to and use of all Stadiora Labs products, services, and websites — including stadioralabs.com, runwitharia.com, the Aria application, the Stadiora coaching platform, Aria XI, and the Aria Intelligence API (collectively, the "Services").</p>
+          <p>By creating an account, accessing, or using any of our Services, you confirm that you have read, understood, and agree to be bound by these Terms and our <a href="./privacy.html" style="color:var(--violet);border-bottom:1px solid rgba(139,92,246,.3)">Privacy Policy</a>, which is incorporated into these Terms by reference.</p>
+          <p>If you do not agree to these Terms, you must not access or use our Services.</p>
+          <div class="highlight-box">
+            <p><strong>For organisations and coaches:</strong> If you are accepting these Terms on behalf of an organisation, academy, or club, you represent and warrant that you have the authority to bind that organisation to these Terms. References to "you" include both you personally and the organisation you represent.</p>
+          </div>
+        </div>
+
+        <div class="doc-section" id="s2">
+          <h2><span class="section-num">02</span> Our Services</h2>
+          <p>Stadiora Labs builds the Aria Intelligence engine — a sports AI decision layer that synthesises athlete performance, wellness, and health signals into actionable outputs. Our products are:</p>
+          <ul>
+            <li><strong>Aria:</strong> An AI training companion for track and field athletes. Synthesises training load, recovery, readiness, and mental state into daily session recommendations.</li>
+            <li><strong>Stadiora:</strong> A coaching intelligence platform for track and field coaches and academies. Provides athlete management, readiness monitoring, and squad-level decision support.</li>
+            <li><strong>Aria XI:</strong> A football availability intelligence tool for coaches, performance directors, and academy staff. Converts player data into daily availability classifications.</li>
+            <li><strong>Aria Intelligence API:</strong> A developer API exposing the core Aria Intelligence decision engine to authorised third-party developers building sports products across any sport.</li>
+          </ul>
+          <p>We reserve the right to modify, suspend, or discontinue any Service or feature at any time with reasonable notice. We will not be liable to you for any modification, suspension, or discontinuation of the Services.</p>
+        </div>
+
+        <div class="doc-section" id="s3">
+          <h2><span class="section-num">03</span> Eligibility</h2>
+          <p>To use our Services, you must:</p>
+          <ul>
+            <li>Be at least 13 years of age (or 16 years of age if you are located in the European Economic Area)</li>
+            <li>Have the legal capacity to enter into a binding agreement</li>
+            <li>Not be prohibited from using the Services under the laws of your jurisdiction</li>
+            <li>Not have previously had your account terminated for a violation of these Terms</li>
+          </ul>
+          <p><strong>Minors:</strong> Athletes under the age of 18 (or the age of majority in their jurisdiction) may use the Services only with verifiable consent from a parent or legal guardian. Coaches who register minor athletes on the platform are responsible for obtaining and documenting this consent before submitting any athlete data.</p>
+          <p>If you are registering on behalf of a minor athlete, you represent that you have the authority to do so and accept these Terms on their behalf.</p>
+        </div>
+
+        <div class="doc-section" id="s4">
+          <h2><span class="section-num">04</span> Your Account</h2>
+          <h3>Account Creation</h3>
+          <p>You must provide accurate, current, and complete information when creating an account. You are responsible for maintaining the accuracy of your account information and updating it promptly if it changes.</p>
+
+          <h3>Account Security</h3>
+          <p>You are responsible for maintaining the confidentiality of your login credentials and for all activity that occurs under your account. You must notify us immediately at <a href="mailto:security@stadioralabs.com" style="color:var(--violet);border-bottom:1px solid rgba(139,92,246,.3)">security@stadioralabs.com</a> if you become aware of any unauthorised access to your account.</p>
+
+          <h3>Coach and Organisation Accounts</h3>
+          <p>Coaches and organisations that add athletes to their account are responsible for:</p>
+          <ul>
+            <li>Ensuring all athletes are informed that their data will be processed through the platform</li>
+            <li>Obtaining any consents required under applicable law before submitting athlete data</li>
+            <li>Managing athlete access and permissions appropriately within the platform</li>
+            <li>Ensuring their use of athlete data complies with applicable data protection and sports governance rules</li>
+          </ul>
+
+          <h3>One Account Per User</h3>
+          <p>Each individual may maintain only one active personal account. Creating duplicate accounts or sharing accounts between multiple individuals is not permitted without express written authorisation from Stadiora Labs.</p>
+        </div>
+
+        <div class="doc-section" id="s5">
+          <h2><span class="section-num">05</span> Acceptable Use</h2>
+          <p>You agree to use the Services only for their intended purpose and in compliance with these Terms and all applicable laws. You must not:</p>
+
+          <h3>Prohibited Conduct</h3>
+          <ul>
+            <li>Use the Services in any way that violates applicable local, national, or international law or regulation</li>
+            <li>Submit false, misleading, or inaccurate athlete data with the intent to manipulate readiness outputs or availability classifications</li>
+            <li>Use the Services to make any medical diagnosis or to substitute for professional medical judgement</li>
+            <li>Attempt to reverse-engineer, decompile, or extract the source code or underlying models of the Aria Intelligence engine</li>
+            <li>Access the Services by automated means (including scrapers, bots, or crawlers) without prior written authorisation</li>
+            <li>Resell, sublicense, or otherwise commercially exploit the Services without a separate commercial agreement with Stadiora Labs</li>
+            <li>Transmit any malicious code, viruses, or disruptive content through the Services</li>
+            <li>Attempt to gain unauthorised access to any part of the Services, our servers, or connected systems</li>
+            <li>Use athlete data accessed through the Services for any purpose beyond delivering the agreed service to that athlete or team</li>
+            <li>Harass, intimidate, or harm any athlete or user on the basis of data generated by the platform</li>
+          </ul>
+
+          <h3>Data Integrity</h3>
+          <p>The accuracy of Aria Intelligence outputs depends on the accuracy of data inputs. You are responsible for the quality and truthfulness of data you submit. Deliberately submitting inaccurate data — including to manipulate readiness scores for team selection or contractual purposes — constitutes a material breach of these Terms and may have legal consequences beyond our platform.</p>
+        </div>
+
+        <div class="doc-section" id="s6">
+          <h2><span class="section-num">06</span> Medical & Health Disclaimer</h2>
+
+          <div class="medical-notice" style="margin-top:0">
+            <div class="medical-notice-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            </div>
+            <div>
+              <div class="medical-notice-title">This section governs health and safety. Read it carefully.</div>
+              <div class="medical-notice-body">Stadiora Labs is not a medical device company, healthcare provider, or clinical service. No part of these Terms or any Stadiora Labs product should be interpreted as medical advice.</div>
+            </div>
+          </div>
+
+          <h3>Decision-Support Only</h3>
+          <p>Aria Intelligence generates decision-support information for coaches, athletes, and performance staff. All outputs — including readiness scores, availability classifications, injury risk signals, and return-to-play assessments — are informational tools designed to support human judgement, not to replace it.</p>
+          <p><strong>Coaches, athletes, physiotherapists, and medical professionals retain full and sole responsibility for all training, health, and performance decisions.</strong> No output from Aria Intelligence overrides professional medical advice or clinical assessment.</p>
+
+          <h3>Not a Medical Device</h3>
+          <p>Aria Intelligence has not been evaluated, cleared, or approved by the United States Food and Drug Administration (FDA), the European Medicines Agency (EMA), or any other medical device regulatory authority. It is not intended to diagnose, treat, cure, monitor, or prevent any medical condition, disease, or injury.</p>
+
+          <h3>Injury Risk Signals</h3>
+          <p>The injury risk signals generated by Aria Intelligence are based on statistical patterns in performance and wellness data. They represent an elevated risk indicator — not a clinical prediction, diagnosis, or guarantee. An athlete may sustain an injury without any prior risk signal, and an elevated risk signal does not mean an injury will occur. Risk signals must always be assessed by qualified sports medicine or physiotherapy professionals before any clinical or training decision is made.</p>
+
+          <h3>Return-to-Play Protocol</h3>
+          <p>Return-to-play outputs are structured guidance tools that track progression through a rehabilitation framework. They do not constitute medical clearance. No athlete should return to full training or competition solely on the basis of a Stadiora Labs return-to-play output. Medical clearance from a qualified healthcare professional is required before return to play following injury.</p>
+
+          <h3>Cycle-Aware Context</h3>
+          <p>Readiness outputs contextualised by menstrual cycle data are intended to support training periodisation discussions between athletes and coaches. They are not gynaecological assessments or medical advice. Any health concerns related to the menstrual cycle should be discussed with a qualified medical professional.</p>
+
+          <h3>Emergency Situations</h3>
+          <p>Stadiora Labs products are not designed for emergency use. If an athlete is experiencing a medical emergency, contact emergency services immediately. Do not rely on platform outputs in any situation where immediate medical attention may be required.</p>
+
+          <div class="disclaimer-box">
+            <p>By using the Services, you expressly acknowledge and agree that: (a) you understand the decision-support nature of Aria Intelligence outputs; (b) you will not use platform outputs as a substitute for professional medical advice, diagnosis, or treatment; and (c) you assume all risks associated with training and performance decisions made in reliance on, or in conjunction with, platform outputs.</p>
+          </div>
+        </div>
+
+        <div class="doc-section" id="s7">
+          <h2><span class="section-num">07</span> Athlete Data</h2>
+          <h3>Ownership</h3>
+          <p>Athletes retain ownership of their personal data, including all health and performance data submitted to the platform. Stadiora Labs does not claim ownership of athlete data.</p>
+
+          <h3>Licence to Process</h3>
+          <p>By submitting data to the platform, you grant Stadiora Labs a limited, non-exclusive licence to process that data for the sole purpose of delivering the Services and, where applicable, improving our decision models using anonymised and aggregated datasets. This licence does not permit us to sell, commercially exploit, or share your data beyond what is described in our Privacy Policy.</p>
+
+          <h3>Coach Access to Athlete Data</h3>
+          <p>Athletes who join an organisation or coaching account consent to that coach or organisation having access to their readiness outputs, availability classifications, and performance history within the platform. Granular health signals — including reproductive health context and detailed biometric indicators — are subject to athlete-controlled sharing permissions. Athletes may modify these permissions at any time from their account settings.</p>
+
+          <h3>Data Accuracy</h3>
+          <p>The quality of Aria Intelligence outputs is directly dependent on the accuracy of the data submitted. Stadiora Labs makes no warranty regarding the accuracy of outputs generated from inaccurate, incomplete, or outdated input data.</p>
+        </div>
+
+        <div class="doc-section" id="s8">
+          <h2><span class="section-num">08</span> API Terms</h2>
+          <p>Use of the Aria Intelligence API is subject to these Terms and, where applicable, a separate API Developer Agreement entered into between Stadiora Labs and the developer. In the event of a conflict between these Terms and an API Developer Agreement, the Developer Agreement governs.</p>
+
+          <h3>Developer Responsibilities</h3>
+          <p>Developers accessing the Aria Intelligence API are responsible for:</p>
+          <ul>
+            <li>Ensuring all end-users of their applications are informed of how their data is processed through the Aria Intelligence engine</li>
+            <li>Obtaining all necessary consents from end-users before submitting their data to the API</li>
+            <li>Providing a compliant privacy notice to end-users that accurately describes the use of Aria Intelligence</li>
+            <li>Complying with all applicable data protection laws governing their end-users</li>
+            <li>Not using API outputs to make automated decisions that have legal or similarly significant effects on individuals without human review</li>
+          </ul>
+
+          <h3>Prohibited API Uses</h3>
+          <ul>
+            <li>Building applications that present Aria Intelligence outputs as clinical medical assessments</li>
+            <li>Reselling raw API access to third parties without a separate commercial arrangement</li>
+            <li>Using the API to build products that directly compete with Stadiora Labs core products without prior written consent</li>
+            <li>Exceeding API usage limits or attempting to circumvent rate controls where they apply</li>
+          </ul>
+
+          <h3>API Availability</h3>
+          <p>Stadiora Labs does not guarantee uninterrupted availability of the API. We will endeavour to provide reasonable advance notice of planned maintenance or significant changes to API endpoints, response schemas, or functionality.</p>
+        </div>
+
+        <div class="doc-section" id="s9">
+          <h2><span class="section-num">09</span> Intellectual Property</h2>
+          <h3>Our Property</h3>
+          <p>All intellectual property in the Services — including the Aria Intelligence decision engine, its underlying models and methodology, software, design, trademarks, brand names (Stadiora Labs, Aria, Aria XI, Stadiora, Aria Intelligence), and all related content — is owned by or licensed to Stadiora Labs. Nothing in these Terms transfers any ownership of our intellectual property to you.</p>
+
+          <h3>Licence to Use</h3>
+          <p>Subject to your compliance with these Terms, we grant you a limited, non-exclusive, non-transferable, revocable licence to access and use the Services for their intended purpose. This licence does not include the right to: sublicense, sell, or commercially exploit the Services; copy or replicate any part of the Aria Intelligence methodology; or use our trademarks or brand assets without prior written consent.</p>
+
+          <h3>Feedback</h3>
+          <p>If you submit feedback, suggestions, or ideas about our Services, you grant Stadiora Labs a perpetual, irrevocable, royalty-free licence to use that feedback for any purpose, including improving or developing new products, without any obligation to you.</p>
+        </div>
+
+        <div class="doc-section" id="s10">
+          <h2><span class="section-num">10</span> Third-Party Services</h2>
+          <p>Our Services may integrate with or link to third-party services, devices, and platforms — including wearable manufacturers, GPS providers, and third-party applications built on the Aria Intelligence API. These integrations are provided for your convenience.</p>
+          <p>Stadiora Labs does not control, endorse, or assume responsibility for third-party services, their availability, accuracy, or their privacy and data practices. Your use of any third-party service is governed by that service's own terms and privacy policy. We strongly encourage you to review the terms of any third-party service before connecting it to your Stadiora Labs account.</p>
+          <p>Where a third-party developer has built an application on the Aria Intelligence API, Stadiora Labs acts only as a data processor in that relationship. Your primary agreement and data rights are with that developer as the data controller.</p>
+        </div>
+
+        <div class="doc-section" id="s11">
+          <h2><span class="section-num">11</span> Disclaimer of Warranties</h2>
+          <p>To the maximum extent permitted by applicable law, the Services are provided on an <strong>"as is" and "as available"</strong> basis without warranties of any kind, either express or implied.</p>
+          <p>Stadiora Labs specifically disclaims all implied warranties of merchantability, fitness for a particular purpose, accuracy, and non-infringement. We do not warrant that:</p>
+          <ul>
+            <li>The Services will be uninterrupted, error-free, or free of harmful components</li>
+            <li>Any readiness score, availability classification, injury risk signal, or other output will be accurate, complete, or appropriate for your specific situation</li>
+            <li>The Services will meet your specific performance, health, or business requirements</li>
+            <li>Any defects in the Services will be corrected</li>
+          </ul>
+          <p>Some jurisdictions do not allow the exclusion of certain warranties. In such jurisdictions, the above exclusions apply to the maximum extent permitted by law.</p>
+        </div>
+
+        <div class="doc-section" id="s12">
+          <h2><span class="section-num">12</span> Limitation of Liability</h2>
+          <p>To the maximum extent permitted by applicable law, Stadiora Labs and its officers, directors, employees, and advisors shall not be liable for any:</p>
+          <ul>
+            <li>Indirect, incidental, special, consequential, or punitive damages</li>
+            <li>Loss of profits, revenue, data, goodwill, or business opportunities</li>
+            <li>Physical injury, illness, or harm arising from training or performance decisions made in reliance on platform outputs</li>
+            <li>Damages arising from the inaccuracy, incompleteness, or unavailability of any Service output</li>
+            <li>Damages resulting from unauthorised access to your account or data</li>
+          </ul>
+          <p>In all cases, our total aggregate liability to you for any claim arising out of or related to these Terms or the Services shall not exceed the greater of: (a) the total amount you paid to Stadiora Labs in the 12 months preceding the claim, or (b) one hundred US dollars (USD $100).</p>
+          <div class="disclaimer-box">
+            <p>The limitations in this section apply regardless of the legal theory under which the claim is brought — whether contract, tort, strict liability, or otherwise — and even if Stadiora Labs has been advised of the possibility of such damages. Some jurisdictions do not allow certain liability limitations; in those jurisdictions this section applies to the fullest extent permitted by law.</p>
+          </div>
+        </div>
+
+        <div class="doc-section" id="s13">
+          <h2><span class="section-num">13</span> Indemnification</h2>
+          <p>You agree to indemnify, defend, and hold harmless Stadiora Labs and its officers, directors, employees, contractors, and advisors from and against any claims, liabilities, damages, losses, and expenses (including reasonable legal fees) arising out of or related to:</p>
+          <ul>
+            <li>Your use of the Services in violation of these Terms</li>
+            <li>Your submission of inaccurate, false, or misleading athlete data</li>
+            <li>Your failure to obtain required consents from athletes whose data you submit</li>
+            <li>Any training, health, or performance decision you make in reliance on platform outputs</li>
+            <li>Any claim by a third party arising from your use of the Services</li>
+            <li>Your violation of any applicable law or third-party right</li>
+          </ul>
+        </div>
+
+        <div class="doc-section" id="s14">
+          <h2><span class="section-num">14</span> Termination</h2>
+          <h3>Termination by You</h3>
+          <p>You may terminate your account at any time by contacting us at <a href="mailto:support@stadioralabs.com" style="color:var(--violet);border-bottom:1px solid rgba(139,92,246,.3)">support@stadioralabs.com</a>. Upon termination, your access to the Services will cease and your data will be handled in accordance with our Privacy Policy and the retention periods described therein.</p>
+
+          <h3>Termination by Us</h3>
+          <p>We may suspend or terminate your access to the Services immediately, without notice, if we determine that you have:</p>
+          <ul>
+            <li>Materially violated these Terms</li>
+            <li>Engaged in fraudulent, abusive, or unlawful conduct</li>
+            <li>Submitted deliberately false athlete data</li>
+            <li>Caused harm or risk of harm to the platform, other users, or Stadiora Labs</li>
+          </ul>
+          <p>We may also terminate or suspend access for operational reasons — including non-payment of applicable fees — with reasonable advance notice where practicable.</p>
+
+          <h3>Effect of Termination</h3>
+          <p>Sections 6 (Medical Disclaimer), 9 (Intellectual Property), 11 (Disclaimer of Warranties), 12 (Limitation of Liability), 13 (Indemnification), and 15 (Governing Law) survive termination of these Terms.</p>
+        </div>
+
+        <div class="doc-section" id="s15">
+          <h2><span class="section-num">15</span> Governing Law & Disputes</h2>
+          <p>These Terms are governed by and construed in accordance with the laws applicable in Costa Rica, without regard to conflict of law principles, except where mandatory consumer protection laws in your jurisdiction require otherwise.</p>
+
+          <h3>For Users in the European Union</h3>
+          <p>If you are a consumer located in the EU, you benefit from any mandatory provisions of the law of your country of residence that cannot be excluded by contract. Nothing in these Terms affects your rights as a consumer under applicable EU law, including the right to bring claims before the courts of your place of habitual residence.</p>
+
+          <h3>For Users in the United States</h3>
+          <p>If you are located in the United States, you agree that any dispute arising from these Terms or the Services shall be resolved through binding individual arbitration administered under the rules of the American Arbitration Association, except for claims that qualify for small claims court. You waive any right to participate in a class action lawsuit or class-wide arbitration.</p>
+
+          <h3>Dispute Resolution — All Users</h3>
+          <p>Before initiating any formal dispute, we encourage you to contact us at <a href="mailto:legal@stadioralabs.com" style="color:var(--violet);border-bottom:1px solid rgba(139,92,246,.3)">legal@stadioralabs.com</a> so we can attempt to resolve the matter informally within 30 days.</p>
+        </div>
+
+        <div class="doc-section" id="s16">
+          <h2><span class="section-num">16</span> Changes to These Terms</h2>
+          <p>We may update these Terms from time to time to reflect changes in our Services, legal requirements, or business practices. When we make material changes, we will:</p>
+          <ul>
+            <li>Update the "Last Updated" date at the top of this page</li>
+            <li>Notify registered users by email at least 14 days before the changes take effect</li>
+            <li>Provide a summary of the material changes in the notification</li>
+          </ul>
+          <p>Your continued use of the Services after the effective date of revised Terms constitutes your acceptance of the changes. If you do not agree with material changes, you must stop using the Services before the effective date and may request account deletion.</p>
+          <p>Changes that are required by law or that address security vulnerabilities may take effect immediately without prior notice.</p>
+        </div>
+
+        <div class="doc-section" id="s17">
+          <h2><span class="section-num">17</span> Contact</h2>
+          <p>For legal and terms-related enquiries:</p>
+          <div class="contact-box">
+            <p><strong>Stadiora Labs — Legal</strong></p>
+            <p>General legal: <a href="mailto:legal@stadioralabs.com">legal@stadioralabs.com</a></p>
+            <p>Privacy matters: <a href="mailto:privacy@stadioralabs.com">privacy@stadioralabs.com</a></p>
+            <p>Security concerns: <a href="mailto:security@stadioralabs.com">security@stadioralabs.com</a></p>
+            <p>Account support: <a href="mailto:support@stadioralabs.com">support@stadioralabs.com</a></p>
+            <p style="margin-top:20px;font-size:13px;color:rgba(255,255,255,.35);line-height:1.7">These Terms were prepared in good faith based on the current nature of Stadiora Labs products and applicable legal frameworks as of May 2026. They should be reviewed and validated by qualified legal counsel — particularly with respect to health data processing, jurisdiction-specific consumer rights, and medical device regulatory requirements in markets where Stadiora Labs products are available.</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── FOOTER ── -->
+<footer>
+  <div class="container">
+    <div class="foot-btm">
+      <p class="foot-copy">© 2026 Stadiora Labs. All rights reserved. Built in Latin America & the United States.</p>
+      <div class="foot-legal">
+        <a href="./privacy.html">Privacy Policy</a>
+        <a href="./terms.html" style="color:rgba(255,255,255,.5)">Terms of Use</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+// TOC active state on scroll
+const sections = document.querySelectorAll('.doc-section');
+const tocLinks = document.querySelectorAll('.toc-links a');
+const obs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if(e.isIntersecting) {
+      tocLinks.forEach(l => l.classList.remove('active'));
+      const active = document.querySelector(`.toc-links a[href="#${e.target.id}"]`);
+      if(active) active.classList.add('active');
+    }
+  });
+}, { rootMargin:'-20% 0px -70% 0px' });
+sections.forEach(s => obs.observe(s));
+</script>
+</body>
+</html>
