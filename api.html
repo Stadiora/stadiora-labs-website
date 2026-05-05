@@ -301,7 +301,8 @@ pre{
   border-top:2px solid transparent;transition:.3s;
 }
 .uc-card:hover{border-top-color:var(--violet)}
-.uc-icon{font-size:28px;margin-bottom:16px}
+.uc-icon{width:48px;height:48px;border-radius:12px;background:rgba(139,92,246,.1);border:1px solid rgba(139,92,246,.2);display:flex;align-items:center;justify-content:center;margin-bottom:20px}
+.uc-icon svg{width:22px;height:22px;color:var(--violet)}
 .uc-title{font-size:16px;font-weight:700;margin-bottom:10px}
 .uc-desc{font-size:13px;color:var(--muted);line-height:1.75}
 .uc-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:18px}
@@ -762,37 +763,49 @@ footer{background:var(--black);border-top:1px solid var(--border);padding:80px 0
     </div>
     <div class="uc-grid">
       <div class="uc-card" data-reveal>
-        <div class="uc-icon">📱</div>
+        <div class="uc-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        </div>
         <div class="uc-title">Fitness & Training Apps</div>
         <div class="uc-desc">Replace generic session suggestions with sport-specific decision intelligence. Tell athletes exactly what their body is ready to do today — and why — instead of showing them a chart they have to interpret themselves.</div>
         <div class="uc-tags"><span class="uc-tag">Readiness</span><span class="uc-tag">Session Rec</span></div>
       </div>
       <div class="uc-card" data-reveal data-reveal-delay="1">
-        <div class="uc-icon">🏟️</div>
+        <div class="uc-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+        </div>
         <div class="uc-title">Club Management Platforms</div>
         <div class="uc-desc">Add availability intelligence to any team management tool. Coaches get a daily squad readiness picture — who is available, who needs modification, who needs attention — without switching platforms.</div>
         <div class="uc-tags"><span class="uc-tag">Availability</span><span class="uc-tag">Squad View</span></div>
       </div>
       <div class="uc-card" data-reveal data-reveal-delay="2">
-        <div class="uc-icon">⌚</div>
+        <div class="uc-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="7"/><path d="M12 10v4l2 2"/></svg>
+        </div>
         <div class="uc-title">Wearable Companies</div>
         <div class="uc-desc">Your device captures the signal. Aria Intelligence converts it into a decision. Add a layer of actionable output on top of biometric data without building the synthesis infrastructure from scratch.</div>
         <div class="uc-tags"><span class="uc-tag">Biometric</span><span class="uc-tag">Synthesis</span></div>
       </div>
       <div class="uc-card" data-reveal>
-        <div class="uc-icon">🏥</div>
+        <div class="uc-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+        </div>
         <div class="uc-title">Sports Medicine & Rehab</div>
         <div class="uc-desc">Embed Return-to-Play Protocol scoring into rehabilitation platforms. Give physiotherapists and medical staff a structured, data-informed progression output — replacing gut feel with a validated decision at every stage.</div>
         <div class="uc-tags"><span class="uc-tag">RTP Protocol</span><span class="uc-tag">Risk Signal</span></div>
       </div>
       <div class="uc-card" data-reveal data-reveal-delay="1">
-        <div class="uc-icon">📊</div>
+        <div class="uc-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+        </div>
         <div class="uc-title">Performance Analytics Platforms</div>
         <div class="uc-desc">Move beyond dashboards. Add a decision output layer to existing analytics products so coaches don't just see what happened — they see what to do about it.</div>
         <div class="uc-tags"><span class="uc-tag">Analytics</span><span class="uc-tag">Decisions</span></div>
       </div>
       <div class="uc-card" data-reveal data-reveal-delay="2">
-        <div class="uc-icon">🎓</div>
+        <div class="uc-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg>
+        </div>
         <div class="uc-title">Academies & Education Platforms</div>
         <div class="uc-desc">Build athlete monitoring into academy management tools. Give coaches at development programs the same quality of readiness and injury risk intelligence that senior professional clubs use — at the right price point.</div>
         <div class="uc-tags"><span class="uc-tag">Academy</span><span class="uc-tag">Development</span></div>
