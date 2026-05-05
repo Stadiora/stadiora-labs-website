@@ -1415,23 +1415,57 @@ function showResults() {
 
 // ══════════════════════════════════════════════
 // CTA / EMAIL
+// Submissions route to info@stadioralabs.com via Web3Forms.
+// To activate: go to https://web3forms.com, enter info@stadioralabs.com,
+// copy the access key from the email they send, and paste it below.
 // ══════════════════════════════════════════════
+const WEB3FORMS_KEY = 'PASTE_ACCESS_KEY_HERE';
+
+const PRODUCT_LABELS = {
+  'athlete-tf':     'Aria — Track & Field Athlete',
+  'athlete-soccer': 'Aria XI — Football Athlete',
+  'coach-tf':       'Stadiora — Track & Field Coach',
+  'coach-soccer':   'Aria XI — Football Coach'
+};
+
 function submitEmail(path) {
-  const input = document.getElementById('cta-email');
-  const email = input?.value?.trim();
+  const input    = document.getElementById('cta-email');
+  const email    = input?.value?.trim();
+  const row      = document.querySelector('.email-row');
+  const note     = document.querySelector('.privacy-note');
+  const success  = document.getElementById('email-success');
+  const btn      = row?.querySelector('button');
+
   if (!email || !email.includes('@')) {
     input.style.borderColor = 'var(--red)';
     setTimeout(() => input.style.borderColor = '', 1500);
     return;
   }
-  // ← Wire to your email provider here (Mailchimp, ConvertKit, etc.)
-  // e.g. fetch('/api/subscribe', { method: 'POST', body: JSON.stringify({ email, path }) })
-  const row = document.querySelector('.email-row');
-  const note = document.querySelector('.privacy-note');
-  const success = document.getElementById('email-success');
-  if (row) row.style.display = 'none';
-  if (note) note.style.display = 'none';
-  if (success) success.style.display = 'block';
+
+  if (btn) { btn.disabled = true; btn.textContent = 'Sending…'; }
+
+  fetch('https://api.web3forms.com/submit', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+    body: JSON.stringify({
+      access_key:  WEB3FORMS_KEY,
+      subject:     `Early Access Request — ${PRODUCT_LABELS[path] || path}`,
+      from_name:   'Stadiora Labs Website',
+      replyto:     email,
+      email:       email,
+      product:     PRODUCT_LABELS[path] || path,
+      message:     `New early access request\n\nEmail: ${email}\nProduct interest: ${PRODUCT_LABELS[path] || path}`
+    })
+  })
+  .then(r => r.json())
+  .then(() => {
+    if (row)     row.style.display     = 'none';
+    if (note)    note.style.display    = 'none';
+    if (success) success.style.display = 'block';
+  })
+  .catch(() => {
+    if (btn) { btn.disabled = false; btn.textContent = 'Try Again'; }
+  });
 }
 
 // ══════════════════════════════════════════════
