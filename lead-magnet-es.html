@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Stadiora Labs — Evaluación de Rendimiento</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy:       #0a0e1a;
+    --card:       #111827;
+    --card-light: #1a2035;
+    --border:     rgba(255,255,255,0.07);
+    --teal:       #00d4ff;
+    --mint:       #00e6b4;
+    --white:      #f8fafc;
+    --gray:       #64748b;
+    --gray-lt:    #94a3b8;
+    --green:      #22c55e;
+    --yellow:     #f59e0b;
+    --red:        #ef4444;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--navy); color: var(--white); font-family: 'DM Sans', sans-serif; font-size: 15px; line-height: 1.6; min-height: 100vh; display: flex; flex-direction: column; }
+
+  #progress-wrap { position: fixed; top: 0; left: 0; right: 0; height: 3px; background: rgba(255,255,255,0.06); z-index: 100; }
+  #progress-bar  { height: 100%; background: linear-gradient(90deg, var(--teal), var(--mint)); width: 0%; transition: width 0.4s ease; }
+
+  #topnav { padding: 20px 24px 0; display: flex; align-items: center; justify-content: space-between; position: fixed; top: 3px; left: 0; right: 0; z-index: 99; background: linear-gradient(to bottom, var(--navy) 80%, transparent); }
+  .logo { font-family: 'Bebas Neue', sans-serif; font-size: 20px; letter-spacing: 3px; background: linear-gradient(90deg, var(--teal), var(--mint)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  #step-counter { font-size: 11px; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; color: var(--gray); }
+
+  .lang-toggle { display: flex; gap: 4px; align-items: center; }
+  .lang-btn { font-size: 11px; font-weight: 700; letter-spacing: 1.5px; padding: 5px 11px; border-radius: 6px; border: 1px solid rgba(255,255,255,.1); color: rgba(255,255,255,.35); background: transparent; cursor: pointer; text-decoration: none; transition: all .2s; }
+  .lang-btn:hover { color: var(--white); border-color: rgba(255,255,255,.3); }
+  .lang-btn.active { color: var(--teal); border-color: rgba(0,212,255,.4); background: rgba(0,212,255,.07); }
+
+  #app { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 100px 24px 60px; min-height: 100vh; }
+
+  .screen { display: none; width: 100%; max-width: 600px; animation: fadeIn 0.35s ease; }
+  .screen.active { display: block; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+
+  .eyebrow { font-size: 10px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: var(--teal); margin-bottom: 10px; }
+  .display { font-family: 'Bebas Neue', sans-serif; font-size: clamp(32px, 6vw, 52px); letter-spacing: 2px; line-height: 1.1; margin-bottom: 12px; color: var(--white); }
+  .display span { color: var(--teal); }
+  .body-copy { font-size: 15px; color: var(--gray-lt); max-width: 480px; margin-bottom: 32px; line-height: 1.7; }
+
+  .question-label { font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--gray); margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+  .question-label::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+  .question-text { font-family: 'Bebas Neue', sans-serif; font-size: clamp(22px, 4vw, 30px); letter-spacing: 1.5px; line-height: 1.2; margin-bottom: 24px; color: var(--white); }
+
+  .options { display: grid; gap: 10px; margin-bottom: 28px; }
+  .options.cols-2 { grid-template-columns: 1fr 1fr; }
+  .opt { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px 18px; cursor: pointer; transition: border-color 0.2s, background 0.2s, transform 0.15s; display: flex; align-items: flex-start; gap: 12px; user-select: none; -webkit-tap-highlight-color: transparent; }
+  .opt:hover { border-color: rgba(0,212,255,0.3); background: rgba(0,212,255,0.04); }
+  .opt.selected { border-color: var(--teal); background: rgba(0,212,255,0.08); transform: scale(1.01); }
+  .opt.selected .opt-check { background: var(--teal); border-color: var(--teal); }
+  .opt.selected .opt-check::after { opacity: 1; }
+  .opt-check { width: 18px; height: 18px; border-radius: 50%; border: 2px solid var(--gray); flex-shrink: 0; margin-top: 2px; transition: all 0.2s; position: relative; }
+  .opt-check::after { content: ''; position: absolute; inset: 3px; border-radius: 50%; background: var(--navy); opacity: 0; transition: opacity 0.2s; }
+  .opt-content { flex: 1; }
+  .opt-label { font-size: 14px; font-weight: 600; color: var(--white); line-height: 1.3; }
+  .opt-detail { font-size: 12px; color: var(--gray-lt); margin-top: 2px; }
+
+  .big-opt { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 28px 24px; cursor: pointer; transition: border-color 0.2s, background 0.2s, transform 0.15s; text-align: center; -webkit-tap-highlight-color: transparent; }
+  .big-opt:hover, .big-opt.selected { border-color: var(--teal); background: rgba(0,212,255,0.07); transform: translateY(-2px); }
+  .big-opt .icon { font-size: 32px; margin-bottom: 12px; }
+  .big-opt .title { font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 2px; color: var(--white); margin-bottom: 6px; }
+  .big-opt .desc { font-size: 12px; color: var(--gray-lt); line-height: 1.5; }
+
+  .btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 15px 32px; border-radius: 10px; font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 700; letter-spacing: 0.5px; cursor: pointer; transition: all 0.2s; border: none; text-decoration: none; white-space: nowrap; }
+  .btn-primary { background: linear-gradient(90deg, var(--teal), var(--mint)); color: var(--navy); }
+  .btn-primary:hover { opacity: 0.9; transform: translateY(-1px); }
+  .btn-primary:disabled { opacity: 0.3; cursor: not-allowed; transform: none; }
+  .btn-ghost { background: transparent; color: var(--gray-lt); border: 1px solid var(--border); }
+  .btn-ghost:hover { border-color: var(--gray); color: var(--white); }
+  .btn-outline-teal { background: transparent; color: var(--teal); border: 1px solid var(--teal); }
+  .btn-outline-teal:hover { background: rgba(0,212,255,0.1); }
+  .btn-row { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+
+  .hero-badge { display: inline-flex; align-items: center; gap: 7px; background: rgba(0,212,255,0.1); border: 1px solid rgba(0,212,255,0.2); border-radius: 20px; padding: 5px 14px; font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--teal); margin-bottom: 20px; }
+  .hero-badge .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--teal); animation: pulse 1.8s infinite; }
+  @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.5; transform: scale(1.3); } }
+
+  .stat-row { display: flex; gap: 20px; flex-wrap: wrap; margin-top: 36px; padding-top: 28px; border-top: 1px solid var(--border); }
+  .stat { flex: 1; min-width: 100px; }
+  .stat-num { font-family: 'Bebas Neue', sans-serif; font-size: 28px; letter-spacing: 1px; color: var(--teal); }
+  .stat-label { font-size: 11px; color: var(--gray); line-height: 1.4; }
+
+  .result-card { background: var(--card); border-radius: 16px; padding: 28px; margin-bottom: 16px; border: 1px solid var(--border); }
+  .status-badge { display: inline-flex; align-items: center; gap: 8px; padding: 6px 16px; border-radius: 20px; font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 16px; }
+  .status-badge .dot { width: 8px; height: 8px; border-radius: 50%; }
+  .status-green  { background: rgba(34,197,94,0.12);  color: var(--green);  border: 1px solid rgba(34,197,94,0.25); }
+  .status-yellow { background: rgba(245,158,11,0.12); color: var(--yellow); border: 1px solid rgba(245,158,11,0.25); }
+  .status-red    { background: rgba(239,68,68,0.12);  color: var(--red);    border: 1px solid rgba(239,68,68,0.25); }
+  .dot-green  { background: var(--green); }
+  .dot-yellow { background: var(--yellow); }
+  .dot-red    { background: var(--red); }
+
+  .result-headline { font-family: 'Bebas Neue', sans-serif; font-size: clamp(24px, 4vw, 34px); letter-spacing: 1.5px; line-height: 1.2; color: var(--white); margin-bottom: 10px; }
+  .result-sub { font-size: 14px; color: var(--gray-lt); line-height: 1.7; margin-bottom: 20px; }
+
+  .insight-list { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+  .insight-item { display: flex; gap: 12px; font-size: 13px; color: var(--gray-lt); line-height: 1.5; }
+  .insight-icon { width: 22px; height: 22px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 12px; flex-shrink: 0; margin-top: 1px; }
+  .insight-icon.teal   { background: rgba(0,212,255,0.12);  color: var(--teal); }
+  .insight-icon.yellow { background: rgba(245,158,11,0.12); color: var(--yellow); }
+  .insight-icon.red    { background: rgba(239,68,68,0.12);  color: var(--red); }
+  .insight-icon.green  { background: rgba(34,197,94,0.12);  color: var(--green); }
+
+  .urgency-box { background: rgba(0,212,255,0.05); border: 1px solid rgba(0,212,255,0.15); border-left: 3px solid var(--teal); border-radius: 0 10px 10px 0; padding: 14px 16px; font-size: 13px; color: var(--gray-lt); line-height: 1.6; margin-top: 20px; }
+  .urgency-box strong { color: var(--white); }
+
+  .cta-block { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 28px; margin-top: 16px; }
+  .cta-product-name { font-size: 10px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: var(--teal); margin-bottom: 6px; }
+  .cta-headline { font-family: 'Bebas Neue', sans-serif; font-size: 24px; letter-spacing: 1.5px; color: var(--white); margin-bottom: 8px; }
+  .cta-copy { font-size: 13px; color: var(--gray-lt); line-height: 1.6; margin-bottom: 20px; }
+
+  .email-row { display: flex; gap: 10px; margin-bottom: 12px; flex-wrap: wrap; }
+  .email-input { flex: 1; min-width: 200px; background: var(--card-light); border: 1px solid var(--border); border-radius: 10px; padding: 13px 16px; color: var(--white); font-family: 'DM Sans', sans-serif; font-size: 14px; outline: none; transition: border-color 0.2s; }
+  .email-input::placeholder { color: var(--gray); }
+  .email-input:focus { border-color: var(--teal); }
+  .privacy-note { font-size: 11px; color: var(--gray); margin-bottom: 16px; }
+
+  .divider { display: flex; align-items: center; gap: 12px; margin: 16px 0; font-size: 11px; color: var(--gray); font-weight: 600; letter-spacing: 1px; }
+  .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+  .success-state { display: none; text-align: center; padding: 12px 0; }
+  .success-state .check { width: 44px; height: 44px; border-radius: 50%; background: rgba(34,197,94,0.12); border: 1px solid rgba(34,197,94,0.3); display: flex; align-items: center; justify-content: center; margin: 0 auto 12px; font-size: 20px; color: var(--green); }
+  .success-state p { font-size: 13px; color: var(--gray-lt); }
+
+  .score-section { margin: 20px 0; }
+  .score-label { display: flex; justify-content: space-between; font-size: 11px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; color: var(--gray); margin-bottom: 8px; }
+  .score-track { height: 8px; background: rgba(255,255,255,0.06); border-radius: 4px; overflow: hidden; }
+  .score-fill { height: 100%; border-radius: 4px; transition: width 0.8s ease; }
+  .score-fill.green  { background: linear-gradient(90deg, var(--mint), var(--green)); }
+  .score-fill.yellow { background: linear-gradient(90deg, var(--yellow), #f97316); }
+  .score-fill.red    { background: linear-gradient(90deg, #f97316, var(--red)); }
+
+  #back-btn { position: fixed; bottom: 24px; left: 24px; background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 10px 16px; font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 600; color: var(--gray); cursor: pointer; transition: all 0.2s; display: none; letter-spacing: 0.5px; z-index: 50; }
+  #back-btn:hover { color: var(--white); border-color: var(--gray); }
+
+  @media (max-width: 520px) {
+    #app { padding: 90px 16px 80px; }
+    .options.cols-2 { grid-template-columns: 1fr; }
+    .email-row { flex-direction: column; }
+    .email-input { min-width: unset; }
+    .stat-row { gap: 14px; }
+  }
+</style>
+</head>
+<body>
+
+<div id="progress-wrap"><div id="progress-bar"></div></div>
+
+<div id="topnav">
+  <div class="logo">Stadiora Labs</div>
+  <div class="lang-toggle">
+    <a href="./lead-magnet.html" class="lang-btn">EN</a>
+    <span class="lang-btn active">ES</span>
+  </div>
+  <div id="step-counter"></div>
+</div>
+
+<main id="app">
+
+  <!-- ══ PANTALLA 0: INTRO ══ -->
+  <section class="screen active" id="s-intro">
+    <div class="hero-badge"><span class="dot"></span>Evaluación Gratuita</div>
+    <div class="display">Tus atletas generan<br><span>miles de señales.</span><br>¿Las estás leyendo?</div>
+    <p class="body-copy">Responde 6 preguntas. Obtén un informe de inteligencia personalizado al instante — construido sobre el mismo motor de decisiones que impulsa los programas de entrenamiento de élite. Sin registro para comenzar.</p>
+    <div class="btn-row">
+      <button class="btn btn-primary" onclick="goTo('s-role')">Iniciar Mi Evaluación &nbsp;→</button>
+      <span style="font-size:12px;color:var(--gray)">2 minutos</span>
+    </div>
+    <div class="stat-row">
+      <div class="stat"><div class="stat-num">4</div><div class="stat-label">Deportes cubiertos</div></div>
+      <div class="stat"><div class="stat-num">9</div><div class="stat-label">Señales de inteligencia</div></div>
+      <div class="stat"><div class="stat-num">1</div><div class="stat-label">Resultado claro y accionable</div></div>
+    </div>
+  </section>
+
+  <!-- ══ PANTALLA 1: ROL ══ -->
+  <section class="screen" id="s-role">
+    <div class="eyebrow">Paso 1 de 3</div>
+    <div class="display">Yo soy…</div>
+    <p class="body-copy">Tu rol determina qué tipo de evaluación ejecutamos para ti.</p>
+    <div class="options cols-2" style="margin-bottom:0">
+      <div class="big-opt" data-value="athlete" onclick="selectRole(this)">
+        <div class="icon">🏃</div>
+        <div class="title">Atleta</div>
+        <div class="desc">Compito, entreno o me preparo para rendir al máximo</div>
+      </div>
+      <div class="big-opt" data-value="coach" onclick="selectRole(this)">
+        <div class="icon">📋</div>
+        <div class="title">Entrenador/a</div>
+        <div class="desc">Dirijo, desarrollo o superviso atletas o un equipo</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ PANTALLA 2: DEPORTE ══ -->
+  <section class="screen" id="s-sport">
+    <div class="eyebrow">Paso 2 de 3</div>
+    <div class="display">Mi deporte es…</div>
+    <p class="body-copy">Calibraremos la evaluación a tu contexto deportivo específico.</p>
+    <div class="options cols-2" style="margin-bottom:0">
+      <div class="big-opt" data-value="tf" onclick="selectSport(this)">
+        <div class="icon">⚡</div>
+        <div class="title">Atletismo</div>
+        <div class="desc">Velocidad, saltos, lanzamientos, medio fondo</div>
+      </div>
+      <div class="big-opt" data-value="soccer" onclick="selectSport(this)">
+        <div class="icon">⚽</div>
+        <div class="title">Fútbol</div>
+        <div class="desc">Club, academia, semiprofesional, universitario o profesional</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ PANTALLA 3: PREGUNTAS ══ -->
+  <section class="screen" id="s-question">
+    <div class="question-label" id="q-label">Pregunta 1 de 6</div>
+    <div class="question-text" id="q-text"></div>
+    <div class="options" id="q-options"></div>
+    <button class="btn btn-primary" id="next-btn" disabled onclick="nextQuestion()">Continuar &nbsp;→</button>
+  </section>
+
+  <!-- ══ PANTALLA 4: RESULTADOS ══ -->
+  <section class="screen" id="s-results">
+    <div id="result-content"></div>
+  </section>
+
+</main>
+
+<button id="back-btn" onclick="goBack()">← Volver</button>
+
+<script>
+const S = { role: null, sport: null, path: null, answers: [], qi: 0, history: ['s-intro'], currentScreen: 's-intro' };
+
+const WEB3FORMS_KEY = 'PASTE_ACCESS_KEY_HERE';
+
+const PRODUCT_LABELS = {
+  'athlete-tf':     'Aria — Atleta de Atletismo',
+  'athlete-soccer': 'Aria XI — Atleta de Fútbol',
+  'coach-tf':       'Stadiora — Entrenador/a de Atletismo',
+  'coach-soccer':   'Aria XI — Entrenador/a de Fútbol'
+};
+
+const PATHS = {
+
+  // ── Atleta + Atletismo ──────────────────────
+  'athlete-tf': {
+    label: 'Puntuación de Preparación para el Sprint',
+    product: 'Aria',
+    questions: [
+      {
+        q: '¿Cuántas horas dormiste anoche?',
+        options: [
+          { label: 'Menos de 6 horas', detail: 'Déficit de sueño — recuperación incompleta', score: 0, weak: 'El sueño insuficiente impide la recuperación neuromuscular completa' },
+          { label: '6 a 7 horas', detail: 'Levemente por debajo del óptimo', score: 1, weak: 'La restricción leve de sueño puede afectar la potencia máxima' },
+          { label: '7 a 9 horas', detail: 'Ventana de recuperación óptima', score: 3 },
+          { label: 'Más de 9 horas', detail: 'Podría indicar fatiga acumulada', score: 2 }
+        ]
+      },
+      {
+        q: '¿Cómo se sienten tus piernas esta mañana?',
+        options: [
+          { label: 'Pesadas y rígidas', detail: 'Fatiga residual presente', score: 0, weak: 'La pesadez en las piernas indica recuperación muscular incompleta' },
+          { label: 'Un poco cansadas', detail: 'Fatiga leve persistente', score: 1, weak: 'Fatiga leve detectada — no ideal para velocidad máxima' },
+          { label: 'Normal', detail: 'Estado de referencia', score: 2 },
+          { label: 'Frescas y elásticas', detail: 'Sistema nervioso completamente recuperado', score: 3 }
+        ]
+      },
+      {
+        q: '¿Qué tan bien te alimentaste e hidrataste en las últimas 12 horas?',
+        options: [
+          { label: 'Poco — me faltó combustible', detail: 'Disponibilidad energética baja', score: 0, weak: 'La alimentación insuficiente reduce la producción de fuerza y eleva el riesgo de lesión' },
+          { label: 'Regular — pudo ser mejor', detail: 'Cumplimiento nutricional parcial', score: 1, weak: 'Nutrición subóptima puede limitar tu rendimiento máximo hoy' },
+          { label: 'Bien alimentado/a e hidratado/a', detail: 'Depósitos de energía óptimos', score: 3 }
+        ]
+      },
+      {
+        q: '¿Qué hiciste en tu última sesión de entrenamiento?',
+        options: [
+          { label: 'Descanso completo', detail: 'Recuperación total desde la última sesión', score: 3 },
+          { label: 'Trabajo técnico o ejercicios leves', detail: 'Carga neuromuscular baja', score: 2 },
+          { label: 'Tempo moderado o volumen medio', detail: 'Carga media', score: 1 },
+          { label: 'Sesión dura — velocidad máxima o pesas pesadas', detail: 'Alta exigencia neuromuscular', score: 0, weak: 'Una sesión intensa reciente significa que tu sistema nervioso aún puede estar recuperándose' }
+        ]
+      },
+      {
+        q: '¿Hace cuánto tiempo fue esa sesión?',
+        options: [
+          { label: 'Hoy (antes)', detail: 'Segunda sesión en el mismo día', score: 0, weak: 'Las sesiones dobles en el mismo día requieren una gestión cuidadosa de la carga' },
+          { label: 'Ayer', detail: '~24 horas', score: 1 },
+          { label: 'Hace 2 días', detail: '~48 horas', score: 2 },
+          { label: 'Hace 3 días o más', detail: 'Ciclo de recuperación completo', score: 3 }
+        ]
+      },
+      {
+        q: '¿Cómo te sientes mentalmente antes del entrenamiento?',
+        options: [
+          { label: 'Distraído/a o estresado/a', detail: 'Carga mental elevada', score: 0, weak: 'El estrés psicológico eleva el cortisol y deteriora la producción de fuerza' },
+          { label: 'Bien — sin nada especial', detail: 'Estado neutral', score: 1 },
+          { label: 'Motivado/a y enfocado/a', detail: 'Preparación mental positiva', score: 2 },
+          { label: 'Concentrado/a al máximo — listo/a para competir', detail: 'Preparación mental óptima', score: 3 }
+        ]
+      },
+      {
+        q: '¿Tienes una competencia próximamente?',
+        options: [
+          { label: 'Esta semana o mañana', detail: 'Ventana precompetitiva', score: 0, flag: 'competition-near' },
+          { label: 'La semana que viene', detail: 'Fase final de preparación', score: 1 },
+          { label: 'En 2 semanas o más', detail: 'Entrenamiento en bloque medio', score: 2 },
+          { label: 'No tengo competencia próxima', detail: 'Fase de preparación general', score: 2 }
+        ]
+      }
+    ],
+    score: function(answers) { return answers.reduce((a, b) => a + b, 0); },
+    tier: function(score) { if (score >= 14) return 'green'; if (score >= 7) return 'yellow'; return 'red'; },
+    result: function(score, answers, questions) {
+      const tier = score >= 14 ? 'green' : score >= 7 ? 'yellow' : 'red';
+      const pct = Math.round((score / 21) * 100);
+      const compNear = answers[6] === 0;
+      const weakSignals = questions.map((q, i) => q.options.find(o => o.score === answers[i])?.weak).filter(Boolean);
+      const tiers = {
+        green: { badge: 'status-green', dotClass: 'dot-green', label: 'Listo/a para Dar el Máximo', headline: "Tu cuerpo está preparado para trabajo de alta intensidad. No lo desperdicies.", sub: "Tus señales están alineadas — sueño, alimentación, frescura de piernas y estado mental apuntan en la dirección correcta. Esta es la ventana para correr rápido.", rec: "→ <strong>Recomendación para hoy:</strong> Trabajo de velocidad, bloques de aceleración o repeticiones al ritmo de competencia.", urgency: "<strong>Esta ventana se abre durante 2 a 3 días después de un ciclo completo de recuperación.</strong> La mayoría de los atletas la pierden — no por falta de compromiso, sino porque están adivinando. Una evaluación diaria de preparación te dice exactamente cuándo empujar y cuándo protegerte." },
+        yellow: { badge: 'status-yellow', dotClass: 'dot-yellow', label: 'Proceder con Precaución', headline: "Tu cuerpo puede entrenar — pero no a máxima intensidad hoy.", sub: "Una o más señales están por debajo del óptimo. Forzar velocidad máxima o pesas pesadas hoy conlleva un riesgo de lesión elevado sin un beneficio de rendimiento proporcional.", rec: "→ <strong>Recomendación para hoy:</strong> Carreras de tempo, trabajo técnico o ejercicios específicos del evento al 70–80% de intensidad.", urgency: "<strong>Entrenar duro en un día amarillo no construye condición. Retrasa tu próximo día verde.</strong> Los atletas que acumulan resultados más rápido son los que protegen los días amarillos — no los que los ignoran." },
+        red: { badge: 'status-red', dotClass: 'dot-red', label: 'Día de Recuperación', headline: "Forzar el entrenamiento hoy te costará más de lo que te dará.", sub: "Múltiples señales indican que tu cuerpo no ha completado su ciclo de recuperación. Este es el perfil en el que isquiotibiales, gemelos y tendón de Aquiles ceden.", rec: "→ <strong>Recomendación para hoy:</strong> Recuperación activa, movilidad, sesión en piscina o descanso total.", urgency: "<strong>Los programas de élite protegen los días de descanso con la misma agresividad que el día de competencia.</strong> La recuperación es cuando ocurre la adaptación. El descanso de hoy es el rendimiento de mañana." }
+      };
+      const t = tiers[tier];
+      let insightsHTML = '';
+      if (weakSignals.length > 0) {
+        insightsHTML = '<ul class="insight-list" style="margin-top:16px">' + weakSignals.slice(0,3).map(w => `<li class="insight-item"><div class="insight-icon ${tier==='red'?'red':'yellow'}">⚠</div><span>${w}</span></li>`).join('') + '</ul>';
+      }
+      if (tier === 'green') {
+        insightsHTML = `<ul class="insight-list" style="margin-top:16px"><li class="insight-item"><div class="insight-icon green">✓</div><span>Las señales de recuperación son sólidas — el sistema nervioso está listo para máxima producción</span></li><li class="insight-item"><div class="insight-icon green">✓</div><span>Combustible y frescura están alineados para trabajo de alta velocidad</span></li>${compNear?'<li class="insight-item"><div class="insight-icon yellow">⚠</div><span>Competencia cercana — mantén la intensidad controlada, prioriza una ejecución técnica limpia</span></li>':'<li class="insight-item"><div class="insight-icon green">✓</div><span>La preparación mental está apoyando la preparación física</span></li>'}</ul>`;
+      }
+      return `<div class="result-card"><div class="status-badge ${t.badge}"><span class="dot ${t.dotClass}"></span>${t.label}</div><div class="result-headline">${t.headline}</div><p class="result-sub">${t.sub}</p><div class="score-section"><div class="score-label"><span>Puntuación de Preparación</span><span>${pct}%</span></div><div class="score-track"><div class="score-fill ${tier}" style="width:${pct}%"></div></div></div><p style="font-size:13px;color:var(--white);line-height:1.6">${t.rec}</p>${insightsHTML}<div class="urgency-box">${t.urgency}</div></div><div class="cta-block"><div class="cta-product-name">Impulsado por Aria · Inteligencia para Atletismo</div><div class="cta-headline">Obtén esta evaluación cada mañana, automáticamente.</div><p class="cta-copy">Aria monitorea tu carga de entrenamiento, recuperación, sueño, alimentación, preparación mental y fase del ciclo — y te dice exactamente qué hacer. No un gráfico. Una decisión, cada día.</p><div class="email-row"><input type="email" class="email-input" id="cta-email" placeholder="Tu correo electrónico"><button class="btn btn-primary" onclick="submitEmail('athlete-tf')">Acceso Anticipado</button></div><p class="privacy-note">Sin spam. Sin tarjeta de crédito. Solo acceso anticipado — nos comunicaremos personalmente.</p><div class="success-state" id="email-success"><div class="check">✓</div><p>Estás en la lista. Te contactaremos pronto.</p></div><div class="divider">o</div><a href="https://runwitharia.com" target="_blank" class="btn btn-outline-teal" style="width:100%;justify-content:center">Conoce Más Sobre Aria →</a></div>`;
+    }
+  },
+
+  // ── Atleta + Fútbol ─────────────────────────
+  'athlete-soccer': {
+    label: 'Verificación de Disponibilidad del Jugador',
+    product: 'Aria XI',
+    questions: [
+      { q: '¿Cuántas horas dormiste anoche?', options: [ { label: 'Menos de 6 horas', detail: 'Déficit de sueño significativo', score: 0, weak: 'El sueño inferior a 6 horas deteriora notablemente el tiempo de reacción y la capacidad de sprint' }, { label: '6 a 7 horas', detail: 'Levemente por debajo del óptimo', score: 1, weak: 'Leve restricción de sueño — los esfuerzos de alta intensidad pueden sentirse más difíciles hoy' }, { label: '7 a 9 horas', detail: 'Ventana de recuperación completa', score: 3 }, { label: 'Más de 9 horas', detail: 'Puede indicar fatiga acumulada', score: 2 } ] },
+      { q: '¿Cómo se sienten tus piernas ahora mismo?', options: [ { label: 'Pesadas y fatigadas', detail: 'Carga residual de partido o entrenamiento', score: 0, weak: 'La pesadez en piernas indica recuperación muscular incompleta' }, { label: 'Un poco adoloridas o rígidas', detail: 'Agujetas o fatiga leve', score: 1, weak: 'El dolor muscular notable sugiere que tus músculos aún están en fase de reparación' }, { label: 'Normal, sin fatiga particular', detail: 'Sin fatiga específica', score: 2 }, { label: 'Frescas y listas', detail: 'Recuperación completa', score: 3 } ] },
+      { q: '¿Cuántos minutos jugaste en tu último partido?', options: [ { label: 'No jugué', detail: 'Sin carga de partido', score: 3 }, { label: 'Menos de 45 minutos', detail: 'Baja exposición al partido', score: 2 }, { label: '45 a 75 minutos', detail: 'Carga moderada de partido', score: 1 }, { label: 'Partido completo (75+ minutos)', detail: 'Alta carga de partido', score: 0, weak: 'La carga de un partido completo requiere al menos 48 a 72 horas para la recuperación muscular completa' } ] },
+      { q: '¿Hace cuántos días fue ese partido o tu sesión más exigente?', options: [ { label: 'Hoy o ayer', detail: '0 a 24 horas', score: 0, weak: 'Tiempo de recuperación insuficiente desde la última carga de alta intensidad' }, { label: 'Hace 2 días', detail: '~48 horas', score: 1, weak: 'Aún en la fase inicial de recuperación para una carga de partido completo' }, { label: 'Hace 3 días', detail: '~72 horas', score: 2 }, { label: 'Hace 4 días o más', detail: 'Ciclo de recuperación completo', score: 3 } ] },
+      { q: '¿Tienes algún dolor o molestia física en este momento?', options: [ { label: 'Dolor significativo o preocupante', detail: 'Requiere evaluación', score: 0, weak: 'El dolor significativo requiere revisión fisioterapéutica antes de entrenar' }, { label: 'Molestia notable en una zona específica', detail: 'Malestar localizado', score: 1, weak: 'El dolor localizado es un precursor clave de lesión — monitorear de cerca' }, { label: 'Muy leve, apenas perceptible', detail: 'Residuo normal del entrenamiento', score: 2 }, { label: 'Sin molestias en absoluto', detail: 'Estado físico sin restricciones', score: 3 } ] },
+      { q: '¿Cómo te sientes mentalmente antes del entrenamiento?', options: [ { label: 'Estresado/a, ansioso/a o distraído/a', detail: 'Alta carga cognitiva', score: 0, weak: 'El estrés psicológico eleva el cortisol y aumenta el riesgo de lesión' }, { label: 'Bien — sin nada especial', detail: 'Preparación neutral', score: 1 }, { label: 'Motivado/a y activo/a mentalmente', detail: 'Estado mental positivo', score: 2 }, { label: 'Completamente listo/a — mentalidad de partido', detail: 'Preparación mental óptima', score: 3 } ] }
+    ],
+    score: function(answers) { return answers.reduce((a, b) => a + b, 0); },
+    tier: function(score) { if (score >= 13) return 'green'; if (score >= 7) return 'yellow'; return 'red'; },
+    result: function(score, answers, questions) {
+      const tier = score >= 13 ? 'green' : score >= 7 ? 'yellow' : 'red';
+      const pct = Math.round((score / 18) * 100);
+      const weakSignals = questions.map((q, i) => q.options.find(o => o.score === answers[i])?.weak).filter(Boolean);
+      const tiers = {
+        green: { badge: 'status-green', dotClass: 'dot-green', label: 'Entrenamiento Completo Disponible', headline: "Estás listo/a. Entrena a máxima intensidad.", sub: "Tus señales de recuperación están alineadas. Sueño, estado físico, carga de partido y preparación mental apuntan hacia una sesión productiva.", rec: "→ <strong>Hoy:</strong> Entrenamiento completo, intensidad máxima. No te contengas.", urgency: "<strong>La mayoría de los jugadores no saben cuándo son sus días verdes.</strong> Entrenan de la misma manera todos los días — perdiendo sesiones óptimas cuando podrían exigirse, y sobrecargando días de recuperación cuando deberían contenerse." },
+        yellow: { badge: 'status-yellow', dotClass: 'dot-yellow', label: 'Entrenamiento Modificado Recomendado', headline: "Entrena, pero ajusta la intensidad. Tu cuerpo está enviando señales.", sub: "Puedes participar en el entrenamiento hoy — pero una o más señales de recuperación sugieren que el trabajo a máxima intensidad conlleva un riesgo elevado sin beneficio proporcional.", rec: "→ <strong>Hoy:</strong> Trabajo técnico, volumen de sprint reducido o ejercicios posicionales al 70%. Evita series de sprints repetidos.", urgency: "<strong>El entrenamiento modificado no es debilidad — es periodización.</strong> Los jugadores que evitan lesiones de tejido blando son los que escuchan las señales de los días amarillos, no los que las ignoran." },
+        red: { badge: 'status-red', dotClass: 'dot-red', label: 'Recuperación Necesaria', headline: "Tu cuerpo necesita recuperación, no más carga.", sub: "Múltiples señales indican que tu ciclo de recuperación no ha concluido. Entrenar a máxima intensidad hoy aumenta significativamente el riesgo de lesión de tejido blando.", rec: "→ <strong>Hoy:</strong> Recuperación activa, trabajo en piscina, movilidad o descanso completo. Protege tu disponibilidad para el próximo partido.", urgency: "<strong>Perderse una sesión de entrenamiento es recuperable. Perderse 6 semanas con un isquiotibial roto, no.</strong> Los datos para tomar esta decisión ya están en tu cuerpo — solo hay que leerlos." }
+      };
+      const t = tiers[tier];
+      let insightsHTML = '';
+      if (weakSignals.length > 0 && tier !== 'green') {
+        insightsHTML = '<ul class="insight-list" style="margin-top:16px">' + weakSignals.slice(0,3).map(w => `<li class="insight-item"><div class="insight-icon ${tier==='red'?'red':'yellow'}">⚠</div><span>${w}</span></li>`).join('') + '</ul>';
+      } else if (tier === 'green') {
+        insightsHTML = `<ul class="insight-list" style="margin-top:16px"><li class="insight-item"><div class="insight-icon green">✓</div><span>La carga de recuperación desde el último partido es manejable</span></li><li class="insight-item"><div class="insight-icon green">✓</div><span>Las señales físicas y mentales están alineadas</span></li><li class="insight-item"><div class="insight-icon green">✓</div><span>No se detectaron precursores de lesión</span></li></ul>`;
+      }
+      return `<div class="result-card"><div class="status-badge ${t.badge}"><span class="dot ${t.dotClass}"></span>${t.label}</div><div class="result-headline">${t.headline}</div><p class="result-sub">${t.sub}</p><div class="score-section"><div class="score-label"><span>Puntuación de Disponibilidad</span><span>${pct}%</span></div><div class="score-track"><div class="score-fill ${tier}" style="width:${pct}%"></div></div></div><p style="font-size:13px;color:var(--white);line-height:1.6">${t.rec}</p>${insightsHTML}<div class="urgency-box">${t.urgency}</div></div><div class="cta-block"><div class="cta-product-name">Impulsado por Aria XI · Inteligencia de Disponibilidad para Fútbol</div><div class="cta-headline">Obtén tu decisión de disponibilidad cada día de partido.</div><p class="cta-copy">Aria XI conecta tus datos de recuperación, carga de partido, señales físicas y preparación mental en una sola decisión diaria de disponibilidad — para ti y cada jugador del equipo.</p><div class="email-row"><input type="email" class="email-input" id="cta-email" placeholder="Tu correo electrónico"><button class="btn btn-primary" onclick="submitEmail('athlete-soccer')">Acceso Anticipado</button></div><p class="privacy-note">Sin spam. Sin tarjeta de crédito. Solo acceso anticipado.</p><div class="success-state" id="email-success"><div class="check">✓</div><p>Estás en la lista. Te contactaremos personalmente.</p></div><div class="divider">o</div><a href="https://stadioralabs.com" target="_blank" class="btn btn-outline-teal" style="width:100%;justify-content:center">Conoce Más Sobre Aria XI →</a></div>`;
+    }
+  },
+
+  // ── Entrenador + Atletismo ───────────────────
+  'coach-tf': {
+    label: 'Resumen de Preparación del Equipo',
+    product: 'Stadiora',
+    questions: [
+      { q: '¿Cuántos atletas estás gestionando actualmente?', options: [ { label: '1 a 5 atletas', detail: 'Grupo pequeño o entrenamiento individual', score: 0, ctx: 'small' }, { label: '6 a 15 atletas', detail: 'Programa mediano', score: 1, ctx: 'medium' }, { label: '16 a 30 atletas', detail: 'Grupo completo', score: 2, ctx: 'large' }, { label: 'Más de 30', detail: 'Academia o programa multidisciplinar', score: 3, ctx: 'xlarge' } ] },
+      { q: '¿Qué porcentaje de tu grupo completó todas las sesiones planificadas esta semana?', options: [ { label: 'Menos de la mitad', detail: 'Brecha de cumplimiento significativa', score: 0, weak: 'El bajo cumplimiento de sesiones es una señal temprana de advertencia — fatiga, motivación o problemas de carga de trabajo' }, { label: 'Aproximadamente la mitad al 70%', detail: 'Cumplimiento moderado', score: 1, weak: 'Cumplimiento por debajo del promedio — vale la pena investigar la causa' }, { label: '70 al 85%', detail: 'Buen cumplimiento con algunas lagunas', score: 2 }, { label: '85% o más', detail: 'Fuerte adherencia al programa', score: 3 } ] },
+      { q: '¿Cuántos atletas han reportado fatiga, dolores o molestias esta semana?', options: [ { label: 'Más de la mitad del grupo', detail: 'Señal de fatiga generalizada', score: 0, weak: 'La fatiga generalizada en el grupo sugiere que la carga de entrenamiento puede necesitar recalibración' }, { label: 'Aproximadamente un tercio', detail: 'Fatiga moderada extendida', score: 1, weak: 'Un tercio del grupo señalando fatiga justifica una revisión de la carga antes de la próxima sesión' }, { label: 'Solo unos pocos atletas', detail: 'Casos aislados', score: 2 }, { label: 'Ninguno ha reportado', detail: 'El grupo se siente fresco', score: 3 } ] },
+      { q: '¿Hay una competencia próxima?', options: [ { label: 'En 1 a 2 días', detail: 'Ventana precompetitiva inmediata', score: 0, flag: 'comp-imminent' }, { label: 'Esta semana', detail: 'Fase final de preparación', score: 1 }, { label: 'La semana que viene', detail: 'Penúltima semana de preparación', score: 2 }, { label: 'No por 2 semanas o más', detail: 'Entrenamiento en bloque medio', score: 3 } ] },
+      { q: '¿Cuántos atletas están actualmente lesionados o en proceso de retorno?', options: [ { label: '3 o más', detail: 'Alta carga de lesiones', score: 0, weak: 'Una alta carga de lesiones simultáneas señala un posible problema de carga de entrenamiento o gestión de recuperación' }, { label: '2 atletas', detail: 'Carga de lesiones moderada', score: 1, weak: 'Dos atletas en proceso de retorno requiere una progresión cuidadosa para evitar recaídas' }, { label: '1 atleta', detail: 'Un solo caso a gestionar', score: 2 }, { label: 'Ninguno lesionado actualmente', detail: 'Grupo completo disponible', score: 3 } ] },
+      { q: '¿Cómo realizas actualmente el seguimiento de la preparación y bienestar de los atletas?', options: [ { label: 'Me baso en la observación y el feedback del atleta', detail: 'Monitoreo informal', score: 0, weak: 'Sin registros estructurados, los atletas en riesgo suelen pasar desapercibidos hasta que es demasiado tarde' }, { label: 'Los atletas me avisan cuando algo va mal', detail: 'Seguimiento solo reactivo', score: 1, weak: 'El monitoreo reactivo significa que solo te enteras de los problemas después de que ya se han desarrollado' }, { label: 'Uso un formulario o sistema de registro', detail: 'Datos básicos estructurados', score: 2 }, { label: 'Uso un sistema de rendimiento dedicado', detail: 'Monitoreo estructurado de atletas', score: 3 } ] }
+    ],
+    score: function(answers) { return answers.slice(1).reduce((a, b) => a + b, 0); },
+    tier: function(score) { if (score >= 11) return 'green'; if (score >= 6) return 'yellow'; return 'red'; },
+    result: function(score, answers, questions) {
+      const tier = score >= 11 ? 'green' : score >= 6 ? 'yellow' : 'red';
+      const pct = Math.round((score / 15) * 100);
+      const weakSignals = questions.slice(1).map((q, i) => q.options.find(o => o.score === answers[i+1])?.weak).filter(Boolean);
+      const squadSize = ['1 a 5', '6 a 15', '16 a 30', 'más de 30'][answers[0]];
+      const attentionNeeded = answers[2] === 0 ? 'más de la mitad de tu grupo' : answers[2] === 1 ? 'alrededor de un tercio de tu grupo' : 'algunos atletas';
+      const injuredCount = [3, 2, 1, 0][answers[4]];
+      const tiers = {
+        green: { badge: 'status-green', dotClass: 'dot-green', label: 'Grupo en Buena Forma', headline: "Tu grupo está bien. Protégelo.", sub: `Con ${squadSize} atletas bajo gestión, las señales de salud del grupo son sólidas. El cumplimiento es alto, la carga de fatiga es manejable y la carga de lesiones es baja. El riesgo ahora es la complacencia.`, rec: "→ <strong>Esta semana:</strong> Mantén la disciplina en los registros. Monitorea a los atletas más cercanos a la competencia. Documenta lo que está funcionando.", urgency: "<strong>La buena salud del grupo es perecedera.</strong> Los programas que la mantienen tienen sistemas — no solo instintos. Un ciclo de registro omitido es cuando un problema pequeño se convierte en una competencia perdida." },
+        yellow: { badge: 'status-yellow', dotClass: 'dot-yellow', label: 'Varios Atletas Necesitan Seguimiento', headline: "Las señales son mixtas. Tienes atletas que necesitan atención hoy.", sub: `Dentro de tu grupo de ${squadSize}, ${attentionNeeded} pueden estar cargando más de lo que tu monitoreo actual revela. Sin un sistema estructurado, estas señales permanecen invisibles hasta que algo se rompe.`, rec: "→ <strong>Esta semana:</strong> Prioriza conversaciones individuales con tus atletas de mayor carga antes de la próxima sesión.", urgency: "<strong>El problema con el entrenamiento por instinto no es que no te importe — es que no puedes escalarlo.</strong> No puedes hacer un seguimiento significativo de 15 atletas en los 10 minutos previos al inicio de una sesión." },
+        red: { badge: 'status-red', dotClass: 'dot-red', label: 'Se Requiere Alta Atención', headline: "Múltiples atletas están en riesgo. Tu sistema de monitoreo tiene puntos ciegos.", sub: `Tu grupo está mostrando múltiples señales de advertencia: fatiga extendida, brechas de cumplimiento${injuredCount > 0 ? ` y ${injuredCount} atleta${injuredCount > 1 ? 's' : ''} en gestión de lesión` : ''}. Sin un sistema de preparación estructurado, estos se acumulan silenciosamente.`, rec: "→ <strong>Esta semana:</strong> No ejecutes sesiones de alta intensidad hasta que tengas un panorama claro de preparación para cada atleta.", urgency: "<strong>Los entrenadores que se basan solo en la observación pierden las señales que preceden a las lesiones de tejido blando con 5 a 7 días de antelación.</strong> Para cuando un atleta te dice que algo va mal, la ventana para prevenirlo ya se ha cerrado." }
+      };
+      const t = tiers[tier];
+      let insightsHTML = '';
+      if (weakSignals.length > 0) {
+        insightsHTML = '<ul class="insight-list" style="margin-top:16px">' + weakSignals.slice(0,3).map(w => `<li class="insight-item"><div class="insight-icon ${tier==='red'?'red':'yellow'}">⚠</div><span>${w}</span></li>`).join('') + '</ul>';
+      } else {
+        insightsHTML = `<ul class="insight-list" style="margin-top:16px"><li class="insight-item"><div class="insight-icon green">✓</div><span>El cumplimiento de las sesiones es sólido en todo el grupo</span></li><li class="insight-item"><div class="insight-icon green">✓</div><span>La carga de fatiga está dentro de un rango manejable</span></li><li class="insight-item"><div class="insight-icon green">✓</div><span>La carga de lesiones es baja — el grupo completo está disponible en gran medida</span></li></ul>`;
+      }
+      return `<div class="result-card"><div class="status-badge ${t.badge}"><span class="dot ${t.dotClass}"></span>${t.label}</div><div class="result-headline">${t.headline}</div><p class="result-sub">${t.sub}</p><div class="score-section"><div class="score-label"><span>Puntuación de Salud del Grupo</span><span>${pct}%</span></div><div class="score-track"><div class="score-fill ${tier}" style="width:${pct}%"></div></div></div><p style="font-size:13px;color:var(--white);line-height:1.6">${t.rec}</p>${insightsHTML}<div class="urgency-box">${t.urgency}</div></div><div class="cta-block"><div class="cta-product-name">Impulsado por Stadiora · Plataforma de Inteligencia para Entrenadores de Atletismo</div><div class="cta-headline">Ejecuta esto para cada atleta, cada semana — automáticamente.</div><p class="cta-copy">Stadiora monitorea la preparación de todo tu plantel, identifica a quienes necesitan atención, entrega entrenamiento estructurado y te da la inteligencia de entrenador que antes requería un equipo completo de ciencias del deporte.</p><div class="email-row"><input type="email" class="email-input" id="cta-email" placeholder="Tu correo electrónico"><button class="btn btn-primary" onclick="submitEmail('coach-tf')">Solicitar Acceso para Entrenadores</button></div><p class="privacy-note">Solo para entrenadores y academias. Te contactaremos personalmente.</p><div class="success-state" id="email-success"><div class="check">✓</div><p>Solicitud recibida. Te contactaremos en las próximas 24 horas.</p></div><div class="divider">o</div><a href="https://stadioralabs.com" target="_blank" class="btn btn-outline-teal" style="width:100%;justify-content:center">Conoce Más Sobre Stadiora →</a></div>`;
+    }
+  },
+
+  // ── Entrenador + Fútbol ──────────────────────
+  'coach-soccer': {
+    label: 'Verificador de Disponibilidad de Jugadores',
+    product: 'Aria XI',
+    questions: [
+      { q: '¿Cuántos jugadores hay en tu plantilla?', options: [ { label: 'Menos de 15', detail: 'Plantilla pequeña', score: 0 }, { label: '15 a 25 jugadores', detail: 'Plantilla estándar', score: 1 }, { label: '26 a 40 jugadores', detail: 'Plantilla ampliada', score: 2 }, { label: 'Más de 40', detail: 'Academia o múltiples equipos', score: 3 } ] },
+      { q: 'Después de tu última sesión o partido, ¿cuántos jugadores reportaron fatiga o dolor?', options: [ { label: 'Más de la mitad de la plantilla', detail: 'Fatiga generalizada', score: 0, weak: 'La fatiga post-sesión generalizada indica que la plantilla puede haber superado la carga de entrenamiento óptima' }, { label: 'Aproximadamente un tercio', detail: 'Fatiga significativa extendida', score: 1, weak: 'Un tercio de la plantilla señalando fatiga justifica un ajuste de carga antes de la próxima sesión' }, { label: 'Solo unos pocos jugadores', detail: 'Casos de fatiga aislados', score: 2 }, { label: 'Ninguno reportó', detail: 'La plantilla se siente recuperada', score: 3 } ] },
+      { q: '¿Qué tan intensa fue tu última sesión de entrenamiento o partido?', options: [ { label: 'Partido completo', detail: 'Evento de máxima carga', score: 0, weak: 'La recuperación post-partido requiere un mínimo de 48 a 72 horas antes de entrenamiento de alta intensidad' }, { label: 'Entrenamiento de alta intensidad', detail: 'Sesión de carga elevada', score: 1, weak: 'La carga de una sesión de alta intensidad necesita recuperación adecuada antes de una nueva exposición' }, { label: 'Sesión moderada', detail: 'Carga de entrenamiento media', score: 2 }, { label: 'Sesión ligera o de recuperación', detail: 'Carga baja — enfocada en recuperación', score: 3 } ] },
+      { q: '¿Cuántos días faltan para tu próximo partido?', options: [ { label: 'Mañana', detail: 'Día de partido menos 1', score: 0, flag: 'match-tomorrow' }, { label: '2 a 3 días', detail: 'Ventana de preparación corta', score: 1 }, { label: '4 a 5 días', detail: 'Bloque de preparación estándar', score: 2 }, { label: '6 días o más', detail: 'Ventana de preparación completa', score: 3 } ] },
+      { q: '¿Cuántos jugadores están actualmente lesionados o en proceso de retorno?', options: [ { label: '3 o más', detail: 'Alta carga de lesiones', score: 0, weak: 'Una alta carga de lesiones simultáneas frecuentemente se origina en una sobrecarga no detectada 5 a 10 días antes' }, { label: '2 jugadores', detail: 'Carga de lesiones moderada', score: 1, weak: 'Dos jugadores en proceso de retorno aumenta la presión sobre los miembros disponibles — monitorear la carga cuidadosamente' }, { label: '1 jugador', detail: 'Un solo caso a gestionar', score: 2 }, { label: 'Ninguno lesionado actualmente', detail: 'Plantilla completa disponible', score: 3 } ] },
+      { q: '¿Cómo determinas actualmente quién está listo para entrenar a máxima intensidad?', options: [ { label: 'No lo evaluamos formalmente', detail: 'Sin proceso de preparación', score: 0, weak: 'Sin un proceso de preparación, los jugadores de alto riesgo entrenan a máxima intensidad sin ser detectados en cada sesión' }, { label: 'Los jugadores me dicen si algo va mal', detail: 'Solo reactivo', score: 1, weak: 'Los jugadores — especialmente los jóvenes — raramente reportan fatiga o dolor leve por miedo a perder su lugar' }, { label: 'Usamos un formulario de bienestar o registro', detail: 'Registro básico estructurado', score: 2 }, { label: 'Usamos GPS, wearables o un sistema de monitoreo', detail: 'Preparación informada por datos', score: 3 } ] }
+    ],
+    score: function(answers) { return answers.slice(1).reduce((a, b) => a + b, 0); },
+    tier: function(score) { if (score >= 11) return 'green'; if (score >= 6) return 'yellow'; return 'red'; },
+    result: function(score, answers, questions) {
+      const tier = score >= 11 ? 'green' : score >= 6 ? 'yellow' : 'red';
+      const pct = Math.round((score / 15) * 100);
+      const weakSignals = questions.slice(1).map((q, i) => q.options.find(o => o.score === answers[i+1])?.weak).filter(Boolean);
+      const matchTomorrow = answers[3] === 0;
+      const squadSize = ['Menos de 15', '15 a 25', '26 a 40', 'más de 40'][answers[0]];
+      const tiers = {
+        green: { badge: 'status-green', dotClass: 'dot-green', label: 'Disponibilidad Bien Gestionada', headline: "El panorama de disponibilidad de tu plantilla se ve sólido.", sub: `Con ${squadSize} jugadores en tu plantilla, tus señales actuales sugieren una carga manejable y una preparación razonable. La infraestructura para tomar buenas decisiones de disponibilidad parece estar en su lugar.`, rec: `→ <strong>Hoy:</strong> ${matchTomorrow ? 'Partido mañana — ejecuta las últimas verificaciones de disponibilidad y confirma el estado de cada jugador.' : 'Mantén la disciplina en los registros. Documenta qué jugadores necesitan sesiones modificadas antes de confirmar el plan de entrenamiento.'}`, urgency: "<strong>La buena gestión de disponibilidad es una ventaja competitiva.</strong> Las plantillas que saben quién está listo ganan más que las que adivinan. La diferencia entre ambas es un proceso diario estructurado." },
+        yellow: { badge: 'status-yellow', dotClass: 'dot-yellow', label: 'Riesgo de Disponibilidad: Moderado', headline: "Tienes jugadores que necesitan atención antes de la sesión de hoy.", sub: "Tu plantilla está mostrando señales mixtas. Sin un panorama claro de preparación para cada jugador, estás tomando decisiones de sesión y convocatoria con información incompleta — un riesgo que se amplifica cuanto más se acerca el partido.", rec: `→ <strong>Antes del entrenamiento hoy:</strong> ${matchTomorrow ? 'Partido mañana — no ejecutes trabajo de alta intensidad sin confirmar la preparación de cada jugador.' : 'Realiza registros individuales antes de confirmar el plan de sesión. Identifica quiénes necesitan modificación.'}`, urgency: "<strong>La pregunta no es si tienes jugadores que necesitan modificación hoy. Los tienes.</strong> La pregunta es si lo sabes antes de que empiece la sesión — o solo después de que algo salga mal." },
+        red: { badge: 'status-red', dotClass: 'dot-red', label: 'Alto Riesgo de Disponibilidad', headline: "Tu plantilla tiene puntos ciegos significativos de disponibilidad.", sub: "Múltiples señales indican un riesgo elevado de jugadores — alta carga, fatiga extendida, carga de lesiones o un enfoque de monitoreo solo reactivo. En este perfil, las lesiones de tejido blando y los regresos prematuros son un resultado predecible, no mala suerte.", rec: `→ <strong>Acción inmediata:</strong> ${matchTomorrow ? 'Partido mañana — no convoque jugadores sin confirmación de preparación individual. El costo de una decisión equivocada mañana son 4 a 6 semanas.' : 'Pausa el entrenamiento de alta intensidad hasta tener un panorama de preparación actual para cada jugador. Una sesión modificada hoy previene una ausencia de 6 semanas el próximo mes.'}`, urgency: "<strong>Los entrenadores que dependen del autorreporte de los jugadores pierden el 60 a 70% de las señales de riesgo relacionadas con el entrenamiento.</strong> Los jugadores — especialmente los jóvenes — no reportan fatiga ni dolor leve por miedo a perder su lugar. Necesitas un sistema que detecte lo que ellos no dicen." }
+      };
+      const t = tiers[tier];
+      let insightsHTML = '';
+      if (weakSignals.length > 0) {
+        insightsHTML = '<ul class="insight-list" style="margin-top:16px">' + weakSignals.slice(0,3).map(w => `<li class="insight-item"><div class="insight-icon ${tier==='red'?'red':'yellow'}">⚠</div><span>${w}</span></li>`).join('') + '</ul>';
+      } else {
+        insightsHTML = `<ul class="insight-list" style="margin-top:16px"><li class="insight-item"><div class="insight-icon green">✓</div><span>La carga de entrenamiento está dentro de una ventana de recuperación manejable</span></li><li class="insight-item"><div class="insight-icon green">✓</div><span>La carga de lesiones es baja — la plantilla completa está disponible en gran medida</span></li><li class="insight-item"><div class="insight-icon green">✓</div><span>El proceso de monitoreo de preparación está en su lugar</span></li></ul>`;
+      }
+      return `<div class="result-card"><div class="status-badge ${t.badge}"><span class="dot ${t.dotClass}"></span>${t.label}</div><div class="result-headline">${t.headline}</div><p class="result-sub">${t.sub}</p><div class="score-section"><div class="score-label"><span>Puntuación de Riesgo de Disponibilidad</span><span>${100-pct}% riesgo</span></div><div class="score-track"><div class="score-fill ${tier}" style="width:${100-pct}%"></div></div></div><p style="font-size:13px;color:var(--white);line-height:1.6">${t.rec}</p>${insightsHTML}<div class="urgency-box">${t.urgency}</div></div><div class="cta-block"><div class="cta-product-name">Impulsado por Aria XI · Inteligencia de Disponibilidad para Fútbol</div><div class="cta-headline">Sabe quién está listo — antes de que empiece la sesión.</div><p class="cta-copy">Aria XI conecta la recuperación, la carga de partido, el riesgo de lesión, el bienestar y el contexto del entrenador en una sola decisión diaria. Índice de Disponibilidad. Cola de Atención del Entrenador. Seguimiento del Retorno. Para cada jugador, cada día.</p><div class="email-row"><input type="email" class="email-input" id="cta-email" placeholder="Tu correo electrónico"><button class="btn btn-primary" onclick="submitEmail('coach-soccer')">Solicitar una Demo</button></div><p class="privacy-note">Para entrenadores, clubes y academias. Te contactaremos personalmente en 24 horas.</p><div class="success-state" id="email-success"><div class="check">✓</div><p>Solicitud recibida. Te contactaremos en las próximas 24 horas.</p></div><div class="divider">o</div><a href="https://stadioralabs.com" target="_blank" class="btn btn-outline-teal" style="width:100%;justify-content:center">Conoce Más Sobre Aria XI →</a></div>`;
+    }
+  }
+};
+
+// ── Navegación ──
+function goTo(screenId) {
+  document.querySelector('.screen.active').classList.remove('active');
+  document.getElementById(screenId).classList.add('active');
+  S.history.push(screenId);
+  S.currentScreen = screenId;
+  updateProgress();
+  updateBackBtn();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+function goBack() {
+  if (S.history.length <= 1) return;
+  S.history.pop();
+  const prev = S.history[S.history.length - 1];
+  document.querySelector('.screen.active').classList.remove('active');
+  document.getElementById(prev).classList.add('active');
+  S.currentScreen = prev;
+  updateProgress();
+  updateBackBtn();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+function updateBackBtn() {
+  document.getElementById('back-btn').style.display = S.history.length > 1 ? 'block' : 'none';
+}
+function updateProgress() {
+  const bar = document.getElementById('progress-bar');
+  const counter = document.getElementById('step-counter');
+  const screen = S.currentScreen.replace('s-', '');
+  if (screen === 'intro')    { bar.style.width = '4%';   counter.textContent = ''; return; }
+  if (screen === 'role')     { bar.style.width = '12%';  counter.textContent = 'Paso 1 de 3'; return; }
+  if (screen === 'sport')    { bar.style.width = '24%';  counter.textContent = 'Paso 2 de 3'; return; }
+  if (screen === 'results')  { bar.style.width = '100%'; counter.textContent = ''; return; }
+  if (screen === 'question' && S.path) {
+    const total = PATHS[S.path].questions.length;
+    const pct = 24 + Math.round(((S.qi + 1) / total) * 70);
+    bar.style.width = pct + '%';
+    counter.textContent = `Pregunta ${S.qi + 1} de ${total}`;
+  }
+}
+
+// ── Selección de rol y deporte ──
+function selectRole(el) {
+  document.querySelectorAll('#s-role .big-opt').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+  S.role = el.dataset.value;
+  setTimeout(() => goTo('s-sport'), 250);
+}
+function selectSport(el) {
+  document.querySelectorAll('#s-sport .big-opt').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+  S.sport = el.dataset.value;
+  S.path = `${S.role}-${S.sport}`;
+  S.answers = [];
+  S.qi = 0;
+  setTimeout(() => { loadQuestion(); goTo('s-question'); }, 250);
+}
+
+// ── Preguntas ──
+function loadQuestion() {
+  const path = PATHS[S.path];
+  const q = path.questions[S.qi];
+  const total = path.questions.length;
+  document.getElementById('q-label').textContent = `Pregunta ${S.qi + 1} de ${total}`;
+  document.getElementById('q-text').textContent = q.q;
+  const optContainer = document.getElementById('q-options');
+  optContainer.className = 'options';
+  optContainer.innerHTML = q.options.map(o =>
+    `<div class="opt" onclick="selectOption(this, ${o.score})">
+      <div class="opt-check"></div>
+      <div class="opt-content">
+        <div class="opt-label">${o.label}</div>
+        ${o.detail ? `<div class="opt-detail">${o.detail}</div>` : ''}
+      </div>
+    </div>`
+  ).join('');
+  const nextBtn = document.getElementById('next-btn');
+  nextBtn.disabled = true;
+  nextBtn.textContent = S.qi < total - 1 ? 'Continuar →' : 'Ver Mis Resultados →';
+  updateProgress();
+}
+function selectOption(el, score) {
+  document.querySelectorAll('#q-options .opt').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+  S._pendingScore = score;
+  document.getElementById('next-btn').disabled = false;
+}
+function nextQuestion() {
+  if (S._pendingScore === undefined) return;
+  S.answers[S.qi] = S._pendingScore;
+  S._pendingScore = undefined;
+  const path = PATHS[S.path];
+  if (S.qi < path.questions.length - 1) {
+    S.qi++;
+    loadQuestion();
+    const screen = document.getElementById('s-question');
+    screen.classList.remove('active');
+    void screen.offsetWidth;
+    screen.classList.add('active');
+  } else {
+    showResults();
+  }
+}
+
+// ── Resultados ──
+function showResults() {
+  const path = PATHS[S.path];
+  const rawScore = path.score(S.answers);
+  document.getElementById('result-content').innerHTML = path.result(rawScore, S.answers, path.questions);
+  goTo('s-results');
+}
+
+// ── Email ──
+function submitEmail(path) {
+  const input   = document.getElementById('cta-email');
+  const email   = input?.value?.trim();
+  const row     = document.querySelector('.email-row');
+  const note    = document.querySelector('.privacy-note');
+  const success = document.getElementById('email-success');
+  const btn     = row?.querySelector('button');
+  if (!email || !email.includes('@')) {
+    input.style.borderColor = 'var(--red)';
+    setTimeout(() => input.style.borderColor = '', 1500);
+    return;
+  }
+  if (btn) { btn.disabled = true; btn.textContent = 'Enviando…'; }
+  fetch('https://api.web3forms.com/submit', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+    body: JSON.stringify({
+      access_key: WEB3FORMS_KEY,
+      subject:    `Solicitud de Acceso Anticipado — ${PRODUCT_LABELS[path] || path}`,
+      from_name:  'Stadiora Labs Website (ES)',
+      replyto:    email,
+      email:      email,
+      product:    PRODUCT_LABELS[path] || path,
+      message:    `Nueva solicitud de acceso anticipado\n\nCorreo: ${email}\nProducto de interés: ${PRODUCT_LABELS[path] || path}\nIdioma: Español`
+    })
+  })
+  .then(r => r.json())
+  .then(() => {
+    if (row)     row.style.display     = 'none';
+    if (note)    note.style.display    = 'none';
+    if (success) success.style.display = 'block';
+  })
+  .catch(() => {
+    if (btn) { btn.disabled = false; btn.textContent = 'Intentar de Nuevo'; }
+  });
+}
+
+updateProgress();
+</script>
+</body>
+</html>

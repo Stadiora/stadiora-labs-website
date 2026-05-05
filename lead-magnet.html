@@ -75,6 +75,26 @@
     text-transform: uppercase;
     color: var(--gray);
   }
+  .lang-toggle {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+  }
+  .lang-btn {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    padding: 5px 11px;
+    border-radius: 6px;
+    border: 1px solid rgba(255,255,255,.1);
+    color: rgba(255,255,255,.35);
+    background: transparent;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all .2s;
+  }
+  .lang-btn:hover { color: var(--white); border-color: rgba(255,255,255,.3); }
+  .lang-btn.active { color: var(--teal); border-color: rgba(0,212,255,.4); background: rgba(0,212,255,.07); }
 
   /* ── Main wrapper ── */
   #app {
@@ -577,6 +597,10 @@
 
 <div id="topnav">
   <div class="logo">Stadiora Labs</div>
+  <div class="lang-toggle">
+    <span class="lang-btn active">EN</span>
+    <a href="./lead-magnet-es.html" class="lang-btn">ES</a>
+  </div>
   <div id="step-counter"></div>
 </div>
 
