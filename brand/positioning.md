@@ -122,8 +122,8 @@ Every claim we make is grounded in physiology, real data, or validated methodolo
 **Direct and outcome-first.**
 Lead with what the user gets, not with what we built. "Know who is ready" beats "our AI synthesizes biometric signals." The output is what matters.
 
-**Culturally rooted.**
-We are building from the Caribbean for the world. Our regional identity is a strength — not a limitation and not a novelty. We speak with Caribbean Pride without making it a costume. It shows up in who we partner with, which markets we enter first, and the athletes we build alongside.
+**Rooted in the markets we serve.**
+Stadiora Labs is based across Latin America (Costa Rica) and the United States. Our primary target markets are the Caribbean, West Africa, and emerging athletic markets worldwide — across both track & field and football. The Caribbean and West Africa are where elite talent exists without elite infrastructure. That is the gap we are building for. Our proximity to that problem is a strategic advantage, not a backstory. It shows up in which markets we enter first, who we partner with, and the athletes we build alongside.
 
 **What the voice is NOT:**
 - Corporate or clinical
