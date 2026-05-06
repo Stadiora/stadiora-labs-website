@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="robots" content="noindex, nofollow, noarchive, nosnippet">
-<title>Stadiora Labs — Investor Overview</title>
+<title>Stadiora Labs — Resumen para Inversores</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -37,7 +37,6 @@ body::before{
 
 .container{width:100%;max-width:1100px;margin:0 auto;padding:0 48px}
 
-/* ── GRADIENT TEXT ── */
 .g-cyan{background:linear-gradient(90deg,var(--cyan),#5ee8ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
 .g-mint{background:linear-gradient(90deg,var(--mint),#6effd0);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
 .g-multi{background:linear-gradient(90deg,var(--cyan),var(--mint));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
@@ -52,6 +51,12 @@ body::before{
 .eyebrow.mint{color:var(--mint)}
 .eyebrow.violet{color:var(--violet)}
 .eyebrow.amber{color:var(--amber)}
+
+/* Language toggle */
+.lang-toggle{display:flex;gap:4px;align-items:center}
+.lang-btn{font-size:11px;font-weight:700;letter-spacing:1.5px;padding:5px 11px;border-radius:6px;border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.35);background:transparent;cursor:pointer;text-decoration:none;transition:all .2s}
+.lang-btn.active{color:var(--amber);border-color:rgba(245,158,11,.4);background:rgba(245,158,11,.07)}
+.lang-btn:hover:not(.active){color:rgba(255,255,255,.65);border-color:rgba(255,255,255,.25)}
 
 /* ══════════════════════
    PASSWORD GATE
@@ -188,14 +193,10 @@ section + section{border-top:1px solid var(--border)}
   display:flex;gap:0;border:1px solid var(--border2);border-radius:16px;
   overflow:hidden;max-width:640px;
 }
-.inv-stat{
-  flex:1;padding:24px 28px;
-  border-right:1px solid var(--border);
-}
+.inv-stat{flex:1;padding:24px 28px;border-right:1px solid var(--border)}
 .inv-stat:last-child{border-right:none}
 .inv-stat-n{
-  font-family:'Bebas Neue',sans-serif;font-size:42px;letter-spacing:1px;line-height:1;
-  margin-bottom:4px;
+  font-family:'Bebas Neue',sans-serif;font-size:42px;letter-spacing:1px;line-height:1;margin-bottom:4px;
 }
 .inv-stat-n.c-cyan{color:var(--cyan)}
 .inv-stat-n.c-mint{color:var(--mint)}
@@ -244,16 +245,9 @@ section + section{border-top:1px solid var(--border)}
 }
 .metric-num{
   font-family:'Bebas Neue',sans-serif;
-  font-size:clamp(52px,6vw,80px);letter-spacing:2px;line-height:1;
-  margin-bottom:6px;
+  font-size:clamp(52px,6vw,80px);letter-spacing:2px;line-height:1;margin-bottom:6px;
 }
 .metric-label{font-size:12px;color:rgba(255,255,255,.3);font-weight:600;letter-spacing:.5px}
-
-/* Language toggle */
-.lang-toggle{display:flex;gap:4px;align-items:center}
-.lang-btn{font-size:11px;font-weight:700;letter-spacing:1.5px;padding:5px 11px;border-radius:6px;border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.35);background:transparent;cursor:pointer;text-decoration:none;transition:all .2s}
-.lang-btn.active{color:var(--amber);border-color:rgba(245,158,11,.4);background:rgba(245,158,11,.07)}
-.lang-btn:hover:not(.active){color:rgba(255,255,255,.65);border-color:rgba(255,255,255,.25)}
 
 /* Founder cards */
 .founder-card{
@@ -261,18 +255,18 @@ section + section{border-top:1px solid var(--border)}
   border:1px solid var(--border);border-radius:0;
   position:relative;overflow:hidden;
 }
+.founder-card::before{
+  content:'';position:absolute;top:-60px;right:-60px;
+  width:200px;height:200px;border-radius:50%;
+  background:radial-gradient(circle,rgba(139,92,246,.08) 0%,transparent 65%);
+  pointer-events:none;
+}
 .founder-photo{
   width:88px;height:88px;border-radius:50%;
   object-fit:cover;object-position:top center;
   border:2px solid rgba(139,92,246,.3);
   margin-bottom:20px;display:block;
   background:rgba(139,92,246,.08);
-}
-.founder-card::before{
-  content:'';position:absolute;top:-60px;right:-60px;
-  width:200px;height:200px;border-radius:50%;
-  background:radial-gradient(circle,rgba(139,92,246,.08) 0%,transparent 65%);
-  pointer-events:none;
 }
 .founder-name{font-size:20px;font-weight:700;margin-bottom:4px}
 .founder-role{
@@ -331,7 +325,7 @@ section + section{border-top:1px solid var(--border)}
   letter-spacing:3px;line-height:1.05;max-width:900px;margin:0 auto;
 }
 
-/* Two-col text layout */
+/* Two-col */
 .two-col{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:start}
 .prose h3{font-family:'Bebas Neue',sans-serif;font-size:clamp(28px,3.5vw,44px);letter-spacing:2px;line-height:1;margin-bottom:16px}
 .prose p{font-size:15px;color:var(--muted);line-height:1.85;margin-bottom:14px}
@@ -372,37 +366,33 @@ section + section{border-top:1px solid var(--border)}
 </head>
 <body>
 
-<!-- ══════════════════════════════
-     PASSWORD GATE
-══════════════════════════════ -->
+<!-- ══ PUERTA DE ACCESO ══ -->
 <div id="gate">
   <div class="gate-box">
     <div class="gate-logo">STADIORA <span>LABS</span></div>
-    <div class="gate-title">Investor Access</div>
-    <p class="gate-sub">This document is confidential.<br>Enter your access password to continue.</p>
+    <div class="gate-title">Acceso para Inversores</div>
+    <p class="gate-sub">Este documento es confidencial.<br>Ingresa tu contraseña para continuar.</p>
     <div class="gate-input-wrap">
-      <input id="gateInput" class="gate-input" type="password" placeholder="Password"
+      <input id="gateInput" class="gate-input" type="password" placeholder="Contraseña"
         autocomplete="off" autocorrect="off" spellcheck="false"
         onkeydown="if(event.key==='Enter')checkPass()">
-      <button class="gate-toggle" onclick="toggleVis()" id="visToggle" aria-label="Show/hide password">
+      <button class="gate-toggle" onclick="toggleVis()" id="visToggle" aria-label="Mostrar/ocultar contraseña">
         <svg id="eyeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
         </svg>
       </button>
     </div>
     <div class="gate-error" id="gateError"></div>
-    <button class="gate-btn" onclick="checkPass()">Enter</button>
-    <p class="gate-hint">Confidential – Not for public distribution</p>
+    <button class="gate-btn" onclick="checkPass()">Entrar</button>
+    <p class="gate-hint">Confidencial – No para distribución pública</p>
   </div>
 </div>
 
-<!-- ══════════════════════════════
-     MAIN CONTENT (hidden until unlocked)
-══════════════════════════════ -->
+<!-- ══ CONTENIDO PRINCIPAL ══ -->
 <div id="mainContent" style="display:none">
 
-<!-- Confidential Banner -->
-<div id="conf-banner">Confidential – Not for public distribution</div>
+<!-- Banner Confidencial -->
+<div id="conf-banner">Confidencial – No para distribución pública</div>
 
 <!-- Nav -->
 <nav id="inv-nav">
@@ -414,10 +404,10 @@ section + section{border-top:1px solid var(--border)}
         <span class="inv-nav-logo-text" style="display:none">STADIORA LABS</span>
       </div>
       <div style="display:flex;align-items:center;gap:16px">
-        <div class="inv-nav-badge">Investor Overview · 2026</div>
+        <div class="inv-nav-badge">Resumen para Inversores · 2026</div>
         <div class="lang-toggle">
-          <span class="lang-btn active">EN</span>
-          <a href="./investors-es.html" class="lang-btn">ES</a>
+          <a href="./investors.html" class="lang-btn">EN</a>
+          <span class="lang-btn active">ES</span>
         </div>
       </div>
     </div>
@@ -431,51 +421,51 @@ section + section{border-top:1px solid var(--border)}
     <div class="inv-hero-content">
       <div class="inv-hero-tag" data-reveal>
         <span class="bdot"></span>
-        Investor Overview · Confidential
+        Resumen para Inversores · Confidencial
       </div>
       <h1 class="inv-h1" data-reveal data-reveal-delay="1">
-        The AI Layer<br>
-        <span class="g-multi">For Athletic</span><br>
-        Performance.
+        La Capa de IA<br>
+        <span class="g-multi">Para el Rendimiento</span><br>
+        Atlético.
       </h1>
       <p class="inv-sub" data-reveal data-reveal-delay="2">
-        Stadiora Labs is building the intelligence infrastructure that converts multi-signal athlete data into one clear decision — for athletes, coaches, and teams across every sport, at every level.
+        Stadiora Labs construye la infraestructura de inteligencia que convierte datos multi-señal de atletas en una decisión clara — para atletas, entrenadores y equipos en cada deporte, a cada nivel.
       </p>
       <div class="inv-hero-stats" data-reveal data-reveal-delay="3">
         <div class="inv-stat">
           <div class="inv-stat-n c-cyan">$5M</div>
-          <div class="inv-stat-l">Post-Money Valuation</div>
+          <div class="inv-stat-l">Valoración Post-Money</div>
         </div>
         <div class="inv-stat">
           <div class="inv-stat-n c-mint">$100K</div>
-          <div class="inv-stat-l">Current Round</div>
+          <div class="inv-stat-l">Ronda Actual</div>
         </div>
         <div class="inv-stat">
           <div class="inv-stat-n c-violet">2%</div>
-          <div class="inv-stat-l">Equity Offered</div>
+          <div class="inv-stat-l">Participación Ofrecida</div>
         </div>
         <div class="inv-stat">
           <div class="inv-stat-n" style="color:var(--white)">60+</div>
-          <div class="inv-stat-l">Active Testers</div>
+          <div class="inv-stat-l">Testers Activos</div>
         </div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ── WHY NOW ── -->
+<!-- ── POR QUÉ AHORA ── -->
 <section>
   <div class="container">
-    <div class="section-label" data-reveal>Why Now</div>
+    <div class="section-label" data-reveal>Por Qué Ahora</div>
     <div class="two-col" style="margin-bottom:64px">
       <div class="prose" data-reveal>
-        <h3>The Window Is<br><span class="g-cyan">Open Now.</span></h3>
-        <p>AI maturity, behavioral shifts in athlete data adoption, and a fragmented market have created a narrow window to build the category-defining platform for athletic intelligence.</p>
-        <p>No one has built the unified layer. That is the opportunity.</p>
+        <h3>La Ventana Está<br><span class="g-cyan">Abierta Ahora.</span></h3>
+        <p>La madurez de la IA, los cambios de comportamiento en la adopción de datos por atletas, y un mercado fragmentado han creado una ventana estrecha para construir la plataforma definitoria de la inteligencia atlética.</p>
+        <p>Nadie ha construido la capa unificada. Esa es la oportunidad.</p>
       </div>
       <div data-reveal data-reveal-delay="1">
         <p style="font-size:14px;color:var(--muted);line-height:2;margin-bottom:0">
-          The sports performance tech market is projected to reach <strong style="color:var(--white)">$10B+ by 2030</strong>. The dominant platforms today serve the top 1% — Premier League clubs, Olympic programs, NFL franchises — where budgets are unlimited. The other 99% of organized sport operates without any decision intelligence. That is the gap Stadiora Labs is building for.
+          Se proyecta que el mercado de tecnología de rendimiento deportivo alcance <strong style="color:var(--white)">más de $10B para 2030</strong>. Las plataformas dominantes de hoy sirven al 1% — clubes de la Premier League, programas olímpicos, franquicias de la NFL — donde los presupuestos son ilimitados. El otro 99% del deporte organizado opera sin ninguna inteligencia de decisión. Esa es la brecha para la que Stadiora Labs está construyendo.
         </p>
       </div>
     </div>
@@ -484,83 +474,83 @@ section + section{border-top:1px solid var(--border)}
         <div class="inv-card-icon ico-cyan">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
         </div>
-        <div class="inv-card-title">AI Maturity</div>
-        <div class="inv-card-body">LLMs and real-time inference now make it possible to synthesise multi-signal athletic data into a single decision — at consumer cost. This wasn't viable three years ago.</div>
+        <div class="inv-card-title">Madurez de la IA</div>
+        <div class="inv-card-body">Los LLMs y la inferencia en tiempo real ahora permiten sintetizar datos atléticos multi-señal en una sola decisión — a costo de consumo. Esto no era viable hace tres años.</div>
       </div>
       <div class="inv-card icard-mint">
         <div class="inv-card-icon ico-mint">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
         </div>
-        <div class="inv-card-title">Data Adoption Shift</div>
-        <div class="inv-card-body">Athletes across all levels are tracking training, sleep, HRV, and wellness — but getting nothing actionable back. The data is there. The decision layer is missing.</div>
+        <div class="inv-card-title">Cambio en Adopción de Datos</div>
+        <div class="inv-card-body">Atletas de todos los niveles están registrando entrenamiento, sueño, VFC y bienestar — pero sin recibir nada accionable a cambio. Los datos están ahí. La capa de decisión falta.</div>
       </div>
       <div class="inv-card icard-violet">
         <div class="inv-card-icon ico-violet">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>
         </div>
-        <div class="inv-card-title">Total Fragmentation</div>
-        <div class="inv-card-body">The market is dominated by siloed, single-signal tools — GPS trackers, sleep monitors, load management apps — that don't talk to each other. No platform unifies them into a decision.</div>
+        <div class="inv-card-title">Fragmentación Total</div>
+        <div class="inv-card-body">El mercado está dominado por herramientas aisladas de una sola señal — rastreadores GPS, monitores de sueño, apps de gestión de carga — que no se comunican entre sí. Ninguna plataforma las unifica en una decisión.</div>
       </div>
       <div class="inv-card icard-amber">
         <div class="inv-card-icon ico-amber">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 010 20M12 2a15.3 15.3 0 000 20"/></svg>
         </div>
-        <div class="inv-card-title">Global Multi-Sport Scale</div>
-        <div class="inv-card-body">Track & field and football are entry points. The decision engine is sport-configurable. Rugby, basketball, cricket, swimming — the same infrastructure scales to any sport globally.</div>
+        <div class="inv-card-title">Escala Multi-Deporte Global</div>
+        <div class="inv-card-body">El atletismo y el fútbol son los puntos de entrada. El motor de decisión es configurable por deporte. Rugby, baloncesto, críquet, natación — la misma infraestructura escala a cualquier deporte globalmente.</div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ── PROBLEM + SOLUTION ── -->
+<!-- ── PROBLEMA + SOLUCIÓN ── -->
 <section>
   <div class="container">
-    <div class="section-label" data-reveal>Problem & Solution</div>
+    <div class="section-label" data-reveal>Problema y Solución</div>
     <div class="two-col">
       <div data-reveal>
-        <div class="eyebrow">The Problem</div>
+        <div class="eyebrow">El Problema</div>
         <h2 style="font-family:'Bebas Neue',sans-serif;font-size:clamp(30px,4vw,52px);letter-spacing:2px;line-height:.97;margin-bottom:20px">
-          Performance training is<br><span style="color:rgba(255,255,255,.25)">fragmented, manual,</span><br>and unintelligent.
+          El entrenamiento es<br><span style="color:rgba(255,255,255,.25)">fragmentado, manual</span><br>e ininteligente.
         </h2>
         <p style="font-size:14px;color:var(--muted);line-height:1.85;margin-bottom:16px">
-          Coaches are managing athletes with spreadsheets, gut feel, and disconnected apps. Athletes are logging data into tools that return charts — not answers.
+          Los entrenadores gestionan atletas con hojas de cálculo, intuición y apps desconectadas. Los atletas registran datos en herramientas que devuelven gráficos — no respuestas.
         </p>
         <p style="font-size:14px;color:var(--muted);line-height:1.85;margin-bottom:16px">
-          The result: overtraining, undertraining, preventable injuries, and missed performance peaks. The cost of a wrong decision in sport is measured in careers.
+          El resultado: sobreentrenamiento, subentrenamiento, lesiones prevenibles y picos de rendimiento perdidos. El costo de una decisión equivocada en el deporte se mide en carreras.
         </p>
         <p style="font-size:14px;color:var(--muted);line-height:1.85">
-          Elite clubs spend $200K–$500K/year on performance staff to solve this problem. Everyone else guesses.
+          Los clubes de élite gastan $200K–$500K/año en personal de rendimiento para resolver este problema. Los demás adivinan.
         </p>
       </div>
       <div data-reveal data-reveal-delay="1">
-        <div class="eyebrow mint">The Solution</div>
+        <div class="eyebrow mint">La Solución</div>
         <h2 style="font-family:'Bebas Neue',sans-serif;font-size:clamp(30px,4vw,52px);letter-spacing:2px;line-height:.97;margin-bottom:20px">
-          One engine.<br><span class="g-mint">Every signal.</span><br>One decision.
+          Un motor.<br><span class="g-mint">Cada señal.</span><br>Una decisión.
         </h2>
         <p style="font-size:14px;color:var(--muted);line-height:1.85;margin-bottom:16px">
-          Aria Intelligence synthesises training load, recovery, sleep, HRV, wellness, and contextual signals into a single actionable output — not a score to interpret, but a decision to act on.
+          Aria Intelligence sintetiza carga de entrenamiento, recuperación, sueño, VFC, bienestar y señales contextuales en una salida accionable única — no un puntaje a interpretar, sino una decisión sobre la cual actuar.
         </p>
         <p style="font-size:14px;color:var(--muted);line-height:1.85;margin-bottom:16px">
-          Full training. Modified. Recovery only. Unavailable. Coaching recommendation attached. Confidence score included. No guesswork.
+          Entrenamiento completo. Modificado. Solo recuperación. No disponible. Recomendación del entrenador incluida. Puntaje de confianza adjunto. Sin adivinanzas.
         </p>
         <p style="font-size:14px;color:var(--muted);line-height:1.85">
-          The same intelligence layer powers all four products — and is available to any developer through the Aria Intelligence API.
+          La misma capa de inteligencia impulsa los cuatro productos — y está disponible para cualquier desarrollador a través de la API Aria Intelligence.
         </p>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ── PLATFORM ── -->
+<!-- ── PLATAFORMA ── -->
 <section>
   <div class="container">
-    <div class="section-label" data-reveal>The Platform</div>
+    <div class="section-label" data-reveal>La Plataforma</div>
     <div style="margin-bottom:56px" data-reveal>
       <h2 style="font-family:'Bebas Neue',sans-serif;font-size:clamp(36px,5vw,68px);letter-spacing:2px;line-height:.95;margin-bottom:16px">
-        One Engine. <span class="g-cyan">Four Products.</span>
+        Un Motor. <span class="g-cyan">Cuatro Productos.</span>
       </h2>
       <p style="font-size:16px;color:var(--muted);max-width:580px;line-height:1.8">
-        The Aria Intelligence engine is the core infrastructure. Each product is a purpose-built application on top of it — targeting a distinct user, sport, and use case.
+        El motor Aria Intelligence es la infraestructura central. Cada producto es una aplicación construida sobre él — dirigida a un usuario, deporte y caso de uso distinto.
       </p>
     </div>
     <div class="inv-grid" data-reveal>
@@ -568,44 +558,44 @@ section + section{border-top:1px solid var(--border)}
         <div class="inv-card-icon ico-violet">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="3"/><path d="M9 9l2 2 4-4"/></svg>
         </div>
-        <div class="inv-card-title">Aria Intelligence API</div>
-        <div class="inv-card-body">The core infrastructure layer. Six decision endpoints available to any developer building sports products — availability scoring, injury risk, sprint readiness, return-to-play, coach attention queue, and player passport. Hardware-agnostic. Sport-configurable. No rate limits.</div>
+        <div class="inv-card-title">API Aria Intelligence</div>
+        <div class="inv-card-body">La capa de infraestructura central. Seis endpoints de decisión disponibles para cualquier desarrollador que construya productos deportivos — disponibilidad, riesgo de lesión, preparación al sprint, retorno al juego, cola de atención del entrenador y pasaporte del jugador. Agnóstico al hardware. Configurable por deporte. Sin límites de tasa.</div>
       </div>
       <div class="inv-card icard-cyan">
         <div class="inv-card-icon ico-cyan">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
         </div>
-        <div class="inv-card-title">Aria — Track & Field Athlete App</div>
-        <div class="inv-card-body">iOS and Android app for track and field athletes. Synthesises training load, recovery, readiness, and mental state into one daily session decision. Elite-level intelligence in every athlete's pocket. Currently in testing with 60+ users.</div>
+        <div class="inv-card-title">Aria — App para Atletas de Atletismo</div>
+        <div class="inv-card-body">App iOS y Android para atletas de atletismo. Sintetiza carga de entrenamiento, recuperación, preparación y estado mental en una decisión diaria de sesión. Inteligencia de élite en el bolsillo de cada atleta. Actualmente en pruebas con más de 60 usuarios.</div>
       </div>
       <div class="inv-card icard-mint">
         <div class="inv-card-icon ico-mint">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
         </div>
-        <div class="inv-card-title">Aria XI — Football Availability Intelligence</div>
-        <div class="inv-card-body">Converts existing squad data into one daily decision per player — full training, modified, recovery, or unavailable. Coaches stop guessing. Players stop hiding pain. Software-first deployment. No wearable purchase required.</div>
+        <div class="inv-card-title">Aria XI — Inteligencia de Disponibilidad Futbolística</div>
+        <div class="inv-card-body">Convierte los datos existentes del plantel en una decisión diaria por jugador — entrenamiento completo, modificado, recuperación o no disponible. Los entrenadores dejan de adivinar. Los jugadores dejan de ocultar el dolor. Despliegue centrado en software. Sin compra de wearables requerida.</div>
       </div>
       <div class="inv-card icard-cyan">
         <div class="inv-card-icon ico-cyan">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18m0 0h10a2 2 0 002-2V9M9 21H5a2 2 0 01-2-2V9m0 0h18"/></svg>
         </div>
-        <div class="inv-card-title">Stadiora — Coaching Intelligence Platform</div>
-        <div class="inv-card-body">Athlete management and readiness monitoring at scale for track and field coaches and academies. A full sports science operation — athlete passport, attention queue, squad readiness — without the sports science headcount.</div>
+        <div class="inv-card-title">Stadiora — Plataforma de Inteligencia para Entrenadores</div>
+        <div class="inv-card-body">Gestión de atletas y monitoreo de preparación a escala para entrenadores y academias de atletismo. Una operación completa de ciencia deportiva — pasaporte del atleta, cola de atención, preparación del equipo — sin el personal de ciencia deportiva.</div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ── WHY STADIORA WINS ── -->
+<!-- ── POR QUÉ GANA STADIORA ── -->
 <section>
   <div class="container">
-    <div class="section-label" data-reveal>Competitive Advantage</div>
+    <div class="section-label" data-reveal>Ventaja Competitiva</div>
     <div style="margin-bottom:56px" data-reveal>
       <h2 style="font-family:'Bebas Neue',sans-serif;font-size:clamp(36px,5vw,68px);letter-spacing:2px;line-height:.95;margin-bottom:16px">
-        Why Stadiora <span class="g-violet">Wins.</span>
+        Por Qué Gana <span class="g-violet">Stadiora.</span>
       </h2>
       <p style="font-size:16px;color:var(--muted);max-width:540px;line-height:1.8">
-        The moat is not a single feature. It's the combination of decision-layer infrastructure, ecosystem lock-in, and market positioning that no single-sport or single-signal competitor can replicate.
+        El foso no es una sola función. Es la combinación de infraestructura de capa de decisión, bloqueo del ecosistema y posicionamiento de mercado que ningún competidor de un solo deporte o señal puede replicar.
       </p>
     </div>
     <div class="inv-grid inv-grid-3" data-reveal>
@@ -613,152 +603,152 @@ section + section{border-top:1px solid var(--border)}
         <div class="inv-card-icon ico-violet">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
         </div>
-        <div class="inv-card-title">Decision Layer, Not Data Layer</div>
-        <div class="inv-card-body">Every competitor returns data. We return a decision. That's a categorically different product — and a significantly higher perceived value ceiling.</div>
+        <div class="inv-card-title">Capa de Decisión, No de Datos</div>
+        <div class="inv-card-body">Cada competidor devuelve datos. Nosotros devolvemos una decisión. Eso es un producto categóricamente diferente — y un techo de valor percibido significativamente más alto.</div>
       </div>
       <div class="inv-card icard-cyan">
         <div class="inv-card-icon ico-cyan">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 010 20M12 2a15.3 15.3 0 000 20"/></svg>
         </div>
-        <div class="inv-card-title">Dual-Sided Ecosystem</div>
-        <div class="inv-card-body">Athletes and coaches both live inside the platform. Athlete data improves coach decisions. Coach feedback improves athlete models. Network effects compound with every user added.</div>
+        <div class="inv-card-title">Ecosistema de Dos Lados</div>
+        <div class="inv-card-body">Atletas y entrenadores viven dentro de la plataforma. Los datos del atleta mejoran las decisiones del entrenador. El feedback del entrenador mejora los modelos del atleta. Los efectos de red se acumulan con cada usuario agregado.</div>
       </div>
       <div class="inv-card icard-mint">
         <div class="inv-card-icon ico-mint">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
         </div>
-        <div class="inv-card-title">Production-Ready Infrastructure</div>
-        <div class="inv-card-body">Cloud-native, production-deployed architecture built by a team with enterprise-scale AI experience. Not a prototype. A platform that can scale to millions of athletes on existing infrastructure.</div>
+        <div class="inv-card-title">Infraestructura Lista para Producción</div>
+        <div class="inv-card-body">Arquitectura nativa en la nube, desplegada en producción, construida por un equipo con experiencia en IA a escala empresarial. No un prototipo. Una plataforma que puede escalar a millones de atletas en la infraestructura existente.</div>
       </div>
       <div class="inv-card icard-amber">
         <div class="inv-card-icon ico-amber">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
         </div>
-        <div class="inv-card-title">Hardware-Agnostic Design</div>
-        <div class="inv-card-body">No wearable purchase required. Works with any data source — GPS exports, manual input, third-party integrations. Zero hardware dependency eliminates the biggest adoption barrier in emerging markets.</div>
+        <div class="inv-card-title">Diseño Agnóstico al Hardware</div>
+        <div class="inv-card-body">Sin necesidad de comprar wearables. Funciona con cualquier fuente de datos — exportaciones GPS, entrada manual, integraciones de terceros. Cero dependencia de hardware elimina la mayor barrera de adopción en mercados emergentes.</div>
       </div>
       <div class="inv-card icard-violet">
         <div class="inv-card-icon ico-violet">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
         </div>
-        <div class="inv-card-title">Science Validation</div>
-        <div class="inv-card-body">Every model is validated by our performance and rehabilitation team. University research partnership. Not generic ML — sport-science-grounded methodology that earns coach trust and drives retention.</div>
+        <div class="inv-card-title">Validación Científica</div>
+        <div class="inv-card-body">Cada modelo es validado por nuestro equipo de rendimiento y rehabilitación. Asociación de investigación universitaria. No ML genérico — metodología fundamentada en ciencia deportiva que genera confianza y retención.</div>
       </div>
       <div class="inv-card icard-cyan">
         <div class="inv-card-icon ico-cyan">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
         </div>
-        <div class="inv-card-title">Founder-Market Fit</div>
-        <div class="inv-card-body">Built by practitioners. Cloud AI infrastructure expertise from Microsoft at scale, combined with deep sport science domain knowledge. The product exists because the founders know the problem from the inside.</div>
+        <div class="inv-card-title">Ajuste Fundador-Mercado</div>
+        <div class="inv-card-body">Construido por practicantes. Experiencia en infraestructura de IA en la nube a escala empresarial desde Microsoft, combinada con profundo conocimiento de dominio en deporte de rendimiento. El producto existe porque los fundadores conocen el problema desde adentro.</div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ── TRACTION ── -->
+<!-- ── TRACCIÓN ── -->
 <section>
   <div class="container">
-    <div class="section-label" data-reveal>Traction</div>
+    <div class="section-label" data-reveal>Tracción</div>
     <div style="margin-bottom:48px" data-reveal>
       <h2 style="font-family:'Bebas Neue',sans-serif;font-size:clamp(36px,5vw,68px);letter-spacing:2px;line-height:.95;margin-bottom:12px">
-        Early. Real. <span class="g-mint">Moving Fast.</span>
+        Temprano. Real. <span class="g-mint">Avanzando Rápido.</span>
       </h2>
-      <p style="font-size:15px;color:var(--muted);line-height:1.8">Built, deployed, and in the hands of real athletes and coaches before raising.</p>
+      <p style="font-size:15px;color:var(--muted);line-height:1.8">Construido, desplegado y en manos de atletas y entrenadores reales antes de levantar capital.</p>
     </div>
     <div class="inv-grid" data-reveal>
       <div class="metric-card">
         <div class="metric-num g-cyan">60+</div>
-        <div class="metric-label">Active Beta Testers</div>
-        <p style="font-size:13px;color:rgba(255,255,255,.3);margin-top:8px;line-height:1.6">Athletes and coaches testing Aria and Stadiora across track & field and football</p>
+        <div class="metric-label">Testers Beta Activos</div>
+        <p style="font-size:13px;color:rgba(255,255,255,.3);margin-top:8px;line-height:1.6">Atletas y entrenadores probando Aria y Stadiora en atletismo y fútbol</p>
       </div>
       <div class="metric-card">
         <div class="metric-num g-mint">2</div>
-        <div class="metric-label">Apps Live in Production</div>
-        <p style="font-size:13px;color:rgba(255,255,255,.3);margin-top:8px;line-height:1.6">Aria (iOS & Android) and Stadiora — deployed, functional, collecting real usage data</p>
+        <div class="metric-label">Apps en Producción</div>
+        <p style="font-size:13px;color:rgba(255,255,255,.3);margin-top:8px;line-height:1.6">Aria (iOS y Android) y Stadiora — desplegadas, funcionales, recopilando datos de uso real</p>
       </div>
       <div class="metric-card">
         <div class="metric-num g-violet">1</div>
-        <div class="metric-label">AI Engine in Production</div>
-        <p style="font-size:13px;color:rgba(255,255,255,.3);margin-top:8px;line-height:1.6">Aria Intelligence engine deployed and powering live decisions across the product suite</p>
+        <div class="metric-label">Motor de IA en Producción</div>
+        <p style="font-size:13px;color:rgba(255,255,255,.3);margin-top:8px;line-height:1.6">Motor Aria Intelligence desplegado e impulsando decisiones en vivo en toda la suite de productos</p>
       </div>
       <div class="metric-card">
         <div class="metric-num" style="color:var(--amber)">1</div>
-        <div class="metric-label">University Research Pilot</div>
-        <p style="font-size:13px;color:rgba(255,255,255,.3);margin-top:8px;line-height:1.6">Active partnership with a university athletics program validating model accuracy and methodology</p>
+        <div class="metric-label">Piloto de Investigación Universitaria</div>
+        <p style="font-size:13px;color:rgba(255,255,255,.3);margin-top:8px;line-height:1.6">Asociación activa con un programa atlético universitario que valida la precisión del modelo y la metodología</p>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ── INVESTMENT ── -->
+<!-- ── INVERSIÓN ── -->
 <section>
   <div class="container">
-    <div class="section-label" data-reveal>The Investment</div>
+    <div class="section-label" data-reveal>La Inversión</div>
     <div style="margin-bottom:48px" data-reveal>
       <h2 style="font-family:'Bebas Neue',sans-serif;font-size:clamp(36px,5vw,68px);letter-spacing:2px;line-height:.95;margin-bottom:12px">
-        Current Round. <span class="g-cyan">Clear Terms.</span>
+        Ronda Actual. <span class="g-cyan">Términos Claros.</span>
       </h2>
     </div>
     <div class="inv-callout" data-reveal>
       <div class="callout-item">
         <div class="callout-num g-cyan">$5M</div>
-        <div class="callout-lbl">Post-Money Valuation</div>
-        <div class="callout-note">Pre-revenue, seed stage</div>
+        <div class="callout-lbl">Valoración Post-Money</div>
+        <div class="callout-note">Pre-ingresos, etapa semilla</div>
       </div>
       <div class="callout-item">
         <div class="callout-num g-mint">$100K</div>
-        <div class="callout-lbl">Current Round Size</div>
-        <div class="callout-note">Convertible or direct equity</div>
+        <div class="callout-lbl">Tamaño de Ronda Actual</div>
+        <div class="callout-note">Convertible o equity directo</div>
       </div>
       <div class="callout-item">
         <div class="callout-num g-violet">2%</div>
-        <div class="callout-lbl">Equity for $100K</div>
-        <div class="callout-note">Pro-rata rights available</div>
+        <div class="callout-lbl">Equity por $100K</div>
+        <div class="callout-note">Derechos pro-rata disponibles</div>
       </div>
     </div>
     <div style="margin-top:48px;display:grid;grid-template-columns:1fr 1fr;gap:2px" data-reveal>
       <div class="inv-card icard-cyan">
-        <div class="inv-card-title" style="margin-bottom:14px">Use of Funds</div>
+        <div class="inv-card-title" style="margin-bottom:14px">Uso de los Fondos</div>
         <div style="display:flex;flex-direction:column;gap:10px">
           <div style="display:flex;justify-content:space-between;align-items:center;font-size:14px">
-            <span style="color:var(--muted)">Product development &amp; engineering</span>
+            <span style="color:var(--muted)">Desarrollo de producto e ingeniería</span>
             <span style="font-weight:700;color:var(--cyan)">50%</span>
           </div>
           <div style="height:1px;background:var(--border)"></div>
           <div style="display:flex;justify-content:space-between;align-items:center;font-size:14px">
-            <span style="color:var(--muted)">Go-to-market &amp; user acquisition</span>
+            <span style="color:var(--muted)">Go-to-market y adquisición de usuarios</span>
             <span style="font-weight:700;color:var(--cyan)">25%</span>
           </div>
           <div style="height:1px;background:var(--border)"></div>
           <div style="display:flex;justify-content:space-between;align-items:center;font-size:14px">
-            <span style="color:var(--muted)">Operations &amp; infrastructure</span>
+            <span style="color:var(--muted)">Operaciones e infraestructura</span>
             <span style="font-weight:700;color:var(--cyan)">15%</span>
           </div>
           <div style="height:1px;background:var(--border)"></div>
           <div style="display:flex;justify-content:space-between;align-items:center;font-size:14px">
-            <span style="color:var(--muted)">Research &amp; partnerships</span>
+            <span style="color:var(--muted)">Investigación y alianzas</span>
             <span style="font-weight:700;color:var(--cyan)">10%</span>
           </div>
         </div>
       </div>
       <div class="inv-card icard-mint">
-        <div class="inv-card-title" style="margin-bottom:14px">18-Month Milestones</div>
+        <div class="inv-card-title" style="margin-bottom:14px">Hitos a 18 Meses</div>
         <div style="display:flex;flex-direction:column;gap:12px">
           <div style="display:flex;gap:12px;align-items:flex-start">
             <div style="width:6px;height:6px;border-radius:50%;background:var(--mint);margin-top:7px;flex-shrink:0"></div>
-            <span style="font-size:14px;color:var(--muted)">500+ paying athletes &amp; coaches on platform</span>
+            <span style="font-size:14px;color:var(--muted)">500+ atletas y entrenadores pagando en la plataforma</span>
           </div>
           <div style="display:flex;gap:12px;align-items:flex-start">
             <div style="width:6px;height:6px;border-radius:50%;background:var(--mint);margin-top:7px;flex-shrink:0"></div>
-            <span style="font-size:14px;color:var(--muted)">Aria Intelligence API in production with 3+ external developer partners</span>
+            <span style="font-size:14px;color:var(--muted)">API Aria Intelligence en producción con 3+ socios desarrolladores externos</span>
           </div>
           <div style="display:flex;gap:12px;align-items:flex-start">
             <div style="width:6px;height:6px;border-radius:50%;background:var(--mint);margin-top:7px;flex-shrink:0"></div>
-            <span style="font-size:14px;color:var(--muted)">2 signed institutional partnerships (academy or federation level)</span>
+            <span style="font-size:14px;color:var(--muted)">2 alianzas institucionales firmadas (nivel academia o federación)</span>
           </div>
           <div style="display:flex;gap:12px;align-items:flex-start">
             <div style="width:6px;height:6px;border-radius:50%;background:var(--mint);margin-top:7px;flex-shrink:0"></div>
-            <span style="font-size:14px;color:var(--muted)">Seed round positioned at $15M–$20M valuation</span>
+            <span style="font-size:14px;color:var(--muted)">Ronda semilla posicionada en valoración de $15M–$20M</span>
           </div>
         </div>
       </div>
@@ -766,59 +756,59 @@ section + section{border-top:1px solid var(--border)}
   </div>
 </section>
 
-<!-- ── FOUNDERS ── -->
+<!-- ── FUNDADORES ── -->
 <section>
   <div class="container">
-    <div class="section-label" data-reveal>The Team</div>
+    <div class="section-label" data-reveal>El Equipo</div>
     <div style="margin-bottom:48px" data-reveal>
       <h2 style="font-family:'Bebas Neue',sans-serif;font-size:clamp(36px,5vw,68px);letter-spacing:2px;line-height:.95;margin-bottom:12px">
-        Built by <span class="g-violet">Practitioners.</span>
+        Construido por <span class="g-violet">Practicantes.</span>
       </h2>
       <p style="font-size:15px;color:var(--muted);line-height:1.8;max-width:540px">
-        The founders have the rare combination of enterprise-scale AI infrastructure experience and domain expertise in performance sport — the exact skill set the problem demands.
+        Los fundadores tienen la combinación única de experiencia en infraestructura de IA a escala empresarial y conocimiento de dominio en deporte de rendimiento — exactamente el conjunto de habilidades que el problema exige.
       </p>
     </div>
     <div class="inv-grid" data-reveal>
       <div class="founder-card">
         <img src="./stadioralabs info/Anthony Rugama.jpg" alt="Anthony Rugama" class="founder-photo">
         <div class="founder-name">Anthony Rugama</div>
-        <div class="founder-role">Co-Founder &amp; CEO</div>
-        <p class="founder-bio">Cloud Solution Architect at Microsoft with 7+ years designing and deploying enterprise-scale AI and cloud infrastructure. Founder of Afro Professionals Network. Based in Latin America (Costa Rica) and the United States — directly embedded in the markets Stadiora is building for.</p>
+        <div class="founder-role">Co-Fundador y CEO</div>
+        <p class="founder-bio">Arquitecto de Soluciones en la Nube en Microsoft con más de 7 años diseñando y desplegando infraestructura de IA y nube a escala empresarial. Fundador de Afro Professionals Network. Basado en América Latina (Costa Rica) y los Estados Unidos — directamente inmerso en los mercados para los que Stadiora está construyendo.</p>
         <div class="founder-tags">
           <span class="founder-tag">Microsoft</span>
           <span class="founder-tag">Cloud AI</span>
-          <span class="founder-tag">Enterprise Scale</span>
-          <span class="founder-tag">Latin America</span>
+          <span class="founder-tag">Escala Empresarial</span>
+          <span class="founder-tag">América Latina</span>
         </div>
       </div>
       <div class="founder-card">
         <img src="./stadioralabs info/ian Rowe.jpeg" alt="Ian Rowe" class="founder-photo">
         <div class="founder-name">Ian Rowe</div>
-        <div class="founder-role">Co-Founder &amp; CTO</div>
-        <p class="founder-bio">AI researcher and former Microsoft intern specialising in large language models, NLP, and scalable production systems. Deep technical expertise in the exact stack that powers Aria Intelligence — building what others are only describing.</p>
+        <div class="founder-role">Co-Fundador y CTO</div>
+        <p class="founder-bio">Investigador de IA y ex interno de Microsoft especializado en modelos de lenguaje de gran escala, NLP y sistemas de producción escalables. Experiencia técnica profunda en el stack exacto que impulsa Aria Intelligence — construyendo lo que otros solo describen.</p>
         <div class="founder-tags">
           <span class="founder-tag">LLMs</span>
           <span class="founder-tag">NLP</span>
           <span class="founder-tag">Microsoft</span>
-          <span class="founder-tag">Research</span>
+          <span class="founder-tag">Investigación</span>
         </div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ── VISION ── -->
+<!-- ── VISIÓN ── -->
 <div class="vision-box">
   <div class="vision-glow"></div>
   <div class="container">
     <div style="text-align:center;position:relative;z-index:1" data-reveal>
-      <div class="eyebrow mint" style="justify-content:center;margin-bottom:28px">The Vision</div>
+      <div class="eyebrow mint" style="justify-content:center;margin-bottom:28px">La Visión</div>
       <div class="vision-text">
-        To become the intelligence layer<br>
-        <span class="g-multi">powering global athletic performance.</span>
+        Convertirnos en la capa de inteligencia<br>
+        <span class="g-multi">que impulsa el rendimiento atlético global.</span>
       </div>
       <p style="font-size:16px;color:rgba(255,255,255,.4);max-width:580px;margin:28px auto 0;line-height:1.8">
-        Every athlete. Every coach. Every sport. One decision engine underneath — making the gap between elite and emerging a problem of the past.
+        Cada atleta. Cada entrenador. Cada deporte. Un motor de decisión debajo — haciendo que la brecha entre élite y emergente sea un problema del pasado.
       </p>
     </div>
   </div>
@@ -828,9 +818,9 @@ section + section{border-top:1px solid var(--border)}
 <div class="inv-footer">
   <div class="container">
     <div class="inv-footer-inner">
-      <span class="inv-footer-copy">© 2026 Stadiora Labs. All rights reserved.</span>
-      <span class="inv-footer-conf">Confidential · Not for distribution · Investor use only</span>
-      <span class="inv-footer-copy">Contact: <a href="mailto:investors@stadioralabs.com" style="color:rgba(255,255,255,.35)">investors@stadioralabs.com</a></span>
+      <span class="inv-footer-copy">© 2026 Stadiora Labs. Todos los derechos reservados.</span>
+      <span class="inv-footer-conf">Confidencial · No para distribución · Solo uso de inversores</span>
+      <span class="inv-footer-copy">Contacto: <a href="mailto:investors@stadioralabs.com" style="color:rgba(255,255,255,.35)">investors@stadioralabs.com</a></span>
     </div>
   </div>
 </div>
@@ -857,7 +847,7 @@ section + section{border-top:1px solid var(--border)}
     if (val === PASS) {
       unlock();
     } else {
-      err.textContent = 'Incorrect password. Please try again.';
+      err.textContent = 'Contraseña incorrecta. Por favor intenta de nuevo.';
       const inp = document.getElementById('gateInput');
       inp.classList.remove('shake');
       void inp.offsetWidth;
