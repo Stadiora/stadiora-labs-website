@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="Aria Intelligence API — The sports AI decision engine for developers. Embed readiness, availability, and injury risk intelligence into any application, across any sport.">
-<title>Aria Intelligence API — Stadiora Labs</title>
+<meta name="description" content="API Aria Intelligence — El motor de decisión IA deportiva para desarrolladores. Integra inteligencia de preparación, disponibilidad y riesgo de lesión en cualquier aplicación, en cualquier deporte.">
+<title>API Aria Intelligence — Stadiora Labs</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
@@ -38,14 +38,12 @@ a{text-decoration:none;color:inherit}
 
 .container{width:100%;max-width:1240px;margin:0 auto;padding:0 48px}
 
-/* ── GRAIN ── */
 body::before{
   content:'';position:fixed;inset:0;pointer-events:none;z-index:9999;
   background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
   opacity:.5;
 }
 
-/* ── NAV ── */
 #nav{
   position:fixed;top:0;left:0;right:0;z-index:100;
   padding:20px 0;
@@ -80,7 +78,6 @@ body::before{
 .mobile-close{position:absolute;top:24px;right:24px;background:none;border:none;color:var(--white);font-size:28px;cursor:pointer}
 .mobile-menu.open{display:flex}
 
-/* ── HERO ── */
 #hero{
   position:relative;min-height:100vh;display:flex;align-items:center;
   overflow:hidden;padding:160px 0 120px;
@@ -143,7 +140,6 @@ body::before{
 }
 .hstat-label{font-size:12px;color:var(--muted);margin-top:4px;letter-spacing:.5px}
 
-/* ── DIFF BANNER ── */
 #diff{
   background:var(--navy);padding:100px 0;
   border-top:1px solid rgba(139,92,246,.15);
@@ -175,7 +171,6 @@ body::before{
   border:1px solid rgba(139,92,246,.3);border-radius:100px;white-space:nowrap;
 }
 
-/* ── CAPABILITIES ── */
 #capabilities{padding:120px 0;background:var(--black)}
 .section-header{text-align:center;max-width:680px;margin:0 auto 80px}
 .section-header h2{
@@ -220,7 +215,6 @@ body::before{
   border:1px solid rgba(139,92,246,.15);padding:4px 10px;border-radius:4px;
 }
 
-/* ── CODE BLOCK ── */
 #code-demo{background:var(--navy);padding:120px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
 .code-wrap{display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:start}
 .code-copy h2{
@@ -264,7 +258,6 @@ pre{
 .t-tag{color:#f59e0b}
 .t-val{color:rgba(255,255,255,.65)}
 
-/* ── EDGE CASES (NO LIMITS) ── */
 #no-limits{padding:120px 0;background:var(--black);position:relative;overflow:hidden}
 #no-limits::before{
   content:'';position:absolute;right:-200px;top:50%;transform:translateY(-50%);
@@ -296,7 +289,6 @@ pre{
 .nl-feat-title{font-size:14px;font-weight:700;margin-bottom:6px}
 .nl-feat-desc{font-size:12px;color:var(--muted);line-height:1.6}
 
-/* ── USE CASES ── */
 #use-cases{
   background:var(--navy);padding:120px 0;
   border-top:1px solid var(--border);
@@ -319,7 +311,6 @@ pre{
   color:rgba(139,92,246,.8);
 }
 
-/* ── SPORTS ── */
 #sports{padding:100px 0;background:var(--black);border-top:1px solid var(--border)}
 .sports-inner{text-align:center}
 .sports-inner h2{
@@ -339,7 +330,6 @@ pre{
 .sport-dot{width:7px;height:7px;border-radius:50%;background:var(--violet)}
 .sports-note{margin-top:28px;font-size:13px;color:rgba(255,255,255,.25);font-style:italic}
 
-/* ── CTA ── */
 #api-cta{
   padding:140px 0;background:var(--navy);
   border-top:1px solid rgba(139,92,246,.2);
@@ -360,7 +350,6 @@ pre{
 .cta-btns{display:flex;gap:16px;justify-content:center;flex-wrap:wrap}
 .cta-note{margin-top:24px;font-size:13px;color:rgba(255,255,255,.22)}
 
-/* ── FOOTER ── */
 footer{background:var(--black);border-top:1px solid var(--border);padding:80px 0 40px}
 .foot-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:48px;margin-bottom:64px}
 .fb-name{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:3px;margin:16px 0 4px}
@@ -383,14 +372,12 @@ footer{background:var(--black);border-top:1px solid var(--border);padding:80px 0
 .foot-legal a{font-size:12px;color:rgba(255,255,255,.2);transition:color .2s}
 .foot-legal a:hover{color:var(--muted)}
 
-/* ── REVEAL ── */
 [data-reveal]{opacity:0;transform:translateY(28px);transition:opacity .7s ease,transform .7s ease}
 [data-reveal].revealed{opacity:1;transform:none}
 [data-reveal][data-reveal-delay="1"]{transition-delay:.12s}
 [data-reveal][data-reveal-delay="2"]{transition-delay:.24s}
 [data-reveal][data-reveal-delay="3"]{transition-delay:.36s}
 
-/* ── RESPONSIVE ── */
 @media(max-width:960px){
   .container{padding:0 24px}
   .nav-links{display:none}
@@ -423,26 +410,26 @@ footer{background:var(--black);border-top:1px solid var(--border);padding:80px 0
 <nav id="nav">
   <div class="container">
     <div class="nav-inner">
-      <a href="./index.html" class="nav-logo">
+      <a href="./index-es.html" class="nav-logo">
         <img src="./stadioralabs info/stadiora_labs_logo - white.png" alt="Stadiora Labs"
           onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
         <span class="nav-logo-fallback" style="display:none">STADIORA LABS</span>
       </a>
       <ul class="nav-links">
-        <li><a href="#capabilities">Capabilities</a></li>
-        <li><a href="#code-demo">How It Works</a></li>
-        <li><a href="#use-cases">Use Cases</a></li>
-        <li><a href="./index.html">← Back to Stadiora Labs</a></li>
+        <li><a href="#capabilities">Capacidades</a></li>
+        <li><a href="#code-demo">Cómo Funciona</a></li>
+        <li><a href="#use-cases">Casos de Uso</a></li>
+        <li><a href="./index-es.html">← Volver a Stadiora Labs</a></li>
       </ul>
       <a href="#api-cta" class="nav-pill">
-        Request Access
+        Solicitar Acceso
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
       </a>
       <div class="lang-toggle">
-        <span class="lang-btn active">EN</span>
-        <a href="./api-es.html" class="lang-btn">ES</a>
+        <a href="./api.html" class="lang-btn">EN</a>
+        <span class="lang-btn active">ES</span>
       </div>
-      <button class="hamburger" onclick="openMenu()" aria-label="Open menu">
+      <button class="hamburger" onclick="openMenu()" aria-label="Abrir menú">
         <span></span><span></span><span></span>
       </button>
     </div>
@@ -452,11 +439,11 @@ footer{background:var(--black);border-top:1px solid var(--border);padding:80px 0
 <!-- Mobile -->
 <div class="mobile-menu" id="mobileMenu">
   <button class="mobile-close" onclick="closeMenu()">&#215;</button>
-  <a href="#capabilities" onclick="closeMenu()">Capabilities</a>
-  <a href="#code-demo"    onclick="closeMenu()">How It Works</a>
-  <a href="#use-cases"    onclick="closeMenu()">Use Cases</a>
-  <a href="./index.html"  onclick="closeMenu()">← Stadiora Labs</a>
-  <a href="#api-cta"      onclick="closeMenu()" style="color:var(--violet)">Request Access</a>
+  <a href="#capabilities" onclick="closeMenu()">Capacidades</a>
+  <a href="#code-demo"    onclick="closeMenu()">Cómo Funciona</a>
+  <a href="#use-cases"    onclick="closeMenu()">Casos de Uso</a>
+  <a href="./index-es.html" onclick="closeMenu()">← Stadiora Labs</a>
+  <a href="#api-cta"     onclick="closeMenu()" style="color:var(--violet)">Solicitar Acceso</a>
 </div>
 
 <!-- ══ HERO ══ -->
@@ -470,103 +457,103 @@ footer{background:var(--black);border-top:1px solid var(--border);padding:80px 0
 
   <div class="container">
     <div class="hero-content" data-reveal>
-      <div class="eyebrow">Aria Intelligence API</div>
+      <div class="eyebrow">API Aria Intelligence</div>
       <h1 class="hero-h1">
-        The Decision<br>Engine.<br>
-        <span class="accent">Now Open.</span>
+        El Motor de<br>Decisión.<br>
+        <span class="accent">Ahora Abierto.</span>
       </h1>
       <p class="hero-sub">
-        Aria Intelligence is the sports AI layer that converts multi-signal athlete data into one clear, actionable decision. Now available to any developer building sports products — across any sport, on any platform, with no proprietary hardware required.
+        Aria Intelligence es la capa de IA deportiva que convierte datos multi-señal de atletas en una decisión clara y accionable. Ahora disponible para cualquier desarrollador que construya productos deportivos — en cualquier deporte, en cualquier plataforma, sin hardware propietario.
       </p>
       <div class="hero-ctas">
         <a href="#api-cta" class="btn btn-primary">
-          Request Developer Access
+          Solicitar Acceso de Desarrollador
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
         </a>
-        <a href="#code-demo" class="btn btn-ghost">See It In Action</a>
+        <a href="#code-demo" class="btn btn-ghost">Verlo en Acción</a>
       </div>
 
       <div class="hero-stats">
         <div>
           <div class="hstat-num"><span>6</span></div>
-          <div class="hstat-label">Decision Endpoints</div>
+          <div class="hstat-label">Endpoints de Decisión</div>
         </div>
         <div>
-          <div class="hstat-num"><span>Any</span></div>
-          <div class="hstat-label">Sport. No Lock-In.</div>
+          <div class="hstat-num"><span>Cualquier</span></div>
+          <div class="hstat-label">Deporte. Sin Ataduras.</div>
         </div>
         <div>
           <div class="hstat-num"><span>0</span></div>
-          <div class="hstat-label">Proprietary Hardware Required</div>
+          <div class="hstat-label">Hardware Propio Requerido</div>
         </div>
         <div>
           <div class="hstat-num"><span>1</span></div>
-          <div class="hstat-label">Output. A Decision.</div>
+          <div class="hstat-label">Salida. Una Decisión.</div>
         </div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ══ DIFFERENTIATOR ══ -->
+<!-- ══ DIFERENCIADOR ══ -->
 <section id="diff">
   <div class="container">
     <div style="text-align:center;margin-bottom:64px" data-reveal>
-      <div class="eyebrow" style="justify-content:center">The Core Difference</div>
+      <div class="eyebrow" style="justify-content:center">La Diferencia Central</div>
       <h2 style="font-family:'Bebas Neue',sans-serif;font-size:clamp(36px,4.5vw,60px);letter-spacing:2px">
-        Most APIs return data.<br><span class="g-violet">Ours returns a decision.</span>
+        La mayoría de las APIs devuelven datos.<br><span class="g-violet">La nuestra devuelve una decisión.</span>
       </h2>
     </div>
     <div class="diff-inner" data-reveal>
       <div class="diff-col">
-        <div class="diff-label dim">What other APIs give you</div>
+        <div class="diff-label dim">Lo que otras APIs te dan</div>
         <div class="diff-items">
           <div class="diff-item">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-            Raw biometric numbers
+            Números biométricos en bruto
           </div>
           <div class="diff-item">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-            Siloed data streams
+            Flujos de datos aislados
           </div>
           <div class="diff-item">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-            Visualisation, not synthesis
+            Visualización, no síntesis
           </div>
           <div class="diff-item">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-            You interpret. You decide.
+            Tú interpretas. Tú decides.
           </div>
           <div class="diff-item">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-            Locked to one sport or device
+            Limitado a un deporte o dispositivo
           </div>
         </div>
       </div>
       <div class="diff-divider"></div>
       <div class="diff-col" style="position:relative">
         <div class="diff-center">vs</div>
-        <div class="diff-label bright">What Aria Intelligence gives you</div>
+        <div class="diff-label bright">Lo que Aria Intelligence te da</div>
         <div class="diff-items">
           <div class="diff-item v-item">
             <svg viewBox="0 0 24 24" fill="none" stroke="#8B5CF6" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-            Multi-signal synthesis in one call
+            Síntesis multi-señal en una llamada
           </div>
           <div class="diff-item v-item">
             <svg viewBox="0 0 24 24" fill="none" stroke="#8B5CF6" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-            One unified readiness output
+            Una salida de preparación unificada
           </div>
           <div class="diff-item v-item">
             <svg viewBox="0 0 24 24" fill="none" stroke="#8B5CF6" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-            A classification + a recommendation
+            Una clasificación + una recomendación
           </div>
           <div class="diff-item v-item">
             <svg viewBox="0 0 24 24" fill="none" stroke="#8B5CF6" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-            Coach and athlete act immediately
+            El entrenador y el atleta actúan de inmediato
           </div>
           <div class="diff-item v-item">
             <svg viewBox="0 0 24 24" fill="none" stroke="#8B5CF6" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-            Configurable across any sport
+            Configurable para cualquier deporte
           </div>
         </div>
       </div>
@@ -574,13 +561,13 @@ footer{background:var(--black);border-top:1px solid var(--border);padding:80px 0
   </div>
 </section>
 
-<!-- ══ CAPABILITIES ══ -->
+<!-- ══ CAPACIDADES ══ -->
 <section id="capabilities">
   <div class="container">
     <div class="section-header" data-reveal>
-      <div class="eyebrow" style="justify-content:center">What the API Does</div>
-      <h2>Six Endpoints.<br><span class="g-violet">One Intelligence Layer.</span></h2>
-      <p>Every endpoint is built on the same sport-science-validated methodology that powers Aria, Stadiora, and Aria XI. Not a generic wellness score — a sport-specific decision engine.</p>
+      <div class="eyebrow" style="justify-content:center">Lo que Hace la API</div>
+      <h2>Seis Endpoints.<br><span class="g-violet">Una Capa de Inteligencia.</span></h2>
+      <p>Cada endpoint está construido sobre la misma metodología validada por ciencia deportiva que impulsa Aria, Stadiora y Aria XI. No un puntaje de bienestar genérico — un motor de decisión específico para cada deporte.</p>
     </div>
 
     <div class="cap-grid">
@@ -593,8 +580,8 @@ footer{background:var(--black);border-top:1px solid var(--border);padding:80px 0
             <polyline points="12 6 12 12 16 14"/>
           </svg>
         </div>
-        <div class="cap-name">Availability Index</div>
-        <div class="cap-desc">Synthesises training load, recovery, wellness, and contextual signals into a 0–100 availability score with a four-tier classification: Full Training, Modified, Recovery Only, or Unavailable. One number. One call. One decision.</div>
+        <div class="cap-name">Índice de Disponibilidad</div>
+        <div class="cap-desc">Sintetiza carga de entrenamiento, recuperación, bienestar y señales contextuales en un puntaje de disponibilidad de 0–100 con clasificación en cuatro niveles: Entrenamiento Completo, Modificado, Solo Recuperación o No Disponible. Un número. Una llamada. Una decisión.</div>
         <span class="cap-tag">POST /athlete/availability</span>
       </div>
 
@@ -605,8 +592,8 @@ footer{background:var(--black);border-top:1px solid var(--border);padding:80px 0
             <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
           </svg>
         </div>
-        <div class="cap-name">Sprint Readiness Score</div>
-        <div class="cap-desc">Multi-factor readiness assessment combining neuromuscular status, fatigue load, sleep quality, and training history. Returns a session-specific output — what type of session this athlete can perform today, at what intensity, and why.</div>
+        <div class="cap-name">Puntuación de Preparación al Sprint</div>
+        <div class="cap-desc">Evaluación de preparación multifactorial que combina estado neuromuscular, carga de fatiga, calidad del sueño e historial de entrenamiento. Devuelve una salida específica de sesión — qué tipo de sesión puede hacer este atleta hoy, a qué intensidad y por qué.</div>
         <span class="cap-tag">POST /athlete/readiness</span>
       </div>
 
@@ -618,8 +605,8 @@ footer{background:var(--black);border-top:1px solid var(--border);padding:80px 0
             <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
           </svg>
         </div>
-        <div class="cap-name">Injury Risk Signal</div>
-        <div class="cap-desc">Early-warning detection from training load spikes, recovery gaps, HRV trends, and wellness patterns — flagged before the athlete recognises the signal themselves. Returns a risk tier, contributing factors, and a recommended intervention.</div>
+        <div class="cap-name">Señal de Riesgo de Lesión</div>
+        <div class="cap-desc">Detección temprana de advertencia a partir de picos de carga de entrenamiento, brechas de recuperación, tendencias de VFC y patrones de bienestar — identificados antes de que el atleta reconozca la señal. Devuelve un nivel de riesgo, factores contribuyentes y una intervención recomendada.</div>
         <span class="cap-tag">POST /athlete/injury-risk</span>
       </div>
 
@@ -631,8 +618,8 @@ footer{background:var(--black);border-top:1px solid var(--border);padding:80px 0
             <polyline points="17 6 23 6 23 12"/>
           </svg>
         </div>
-        <div class="cap-name">Return-to-Play Protocol</div>
-        <div class="cap-desc">Structured progression scoring for athlete rehabilitation. Tracks stage completion, load tolerance thresholds, and phase-gate readiness criteria. Returns a current stage classification and a clear go/no-go for progression — removing guesswork from one of sport's highest-risk decisions.</div>
+        <div class="cap-name">Protocolo de Retorno al Juego</div>
+        <div class="cap-desc">Puntuación de progresión estructurada para la rehabilitación de atletas. Rastrea la finalización de etapas, umbrales de tolerancia a la carga y criterios de preparación por fase. Devuelve una clasificación de etapa actual y una decisión clara de avanzar o no — eliminando la incertidumbre de una de las decisiones de mayor riesgo en el deporte.</div>
         <span class="cap-tag">POST /athlete/return-to-play</span>
       </div>
 
@@ -645,8 +632,8 @@ footer{background:var(--black);border-top:1px solid var(--border);padding:80px 0
             <path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/>
           </svg>
         </div>
-        <div class="cap-name">Coach Attention Queue</div>
-        <div class="cap-desc">Cross-athlete intelligence that generates a priority-ranked queue of athletes requiring immediate coach review. Synthesises readiness deltas, threshold breaches, and trend anomalies across an entire squad — so the coach's attention goes exactly where it's needed first.</div>
+        <div class="cap-name">Cola de Atención del Entrenador</div>
+        <div class="cap-desc">Inteligencia multi-atleta que genera una cola priorizada de atletas que requieren revisión inmediata del entrenador. Sintetiza deltas de preparación, brechas de umbral y anomalías de tendencias en todo un equipo — para que la atención del entrenador vaya exactamente donde más se necesita.</div>
         <span class="cap-tag">POST /squad/attention-queue</span>
       </div>
 
@@ -659,8 +646,8 @@ footer{background:var(--black);border-top:1px solid var(--border);padding:80px 0
             <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/>
           </svg>
         </div>
-        <div class="cap-name">Player Passport</div>
-        <div class="cap-desc">Longitudinal intelligence profile per athlete. Historical readiness baselines, load tolerance curves, injury history context, and long-term availability trend — all queryable in a single response. Build features that understand the athlete over time, not just today.</div>
+        <div class="cap-name">Pasaporte del Jugador</div>
+        <div class="cap-desc">Perfil de inteligencia longitudinal por atleta. Líneas de base históricas de preparación, curvas de tolerancia a la carga, contexto del historial de lesiones y tendencia de disponibilidad a largo plazo — todo consultable en una sola respuesta. Construye funciones que entienden al atleta a lo largo del tiempo, no solo hoy.</div>
         <span class="cap-tag">GET /athlete/passport</span>
       </div>
 
@@ -668,19 +655,19 @@ footer{background:var(--black);border-top:1px solid var(--border);padding:80px 0
   </div>
 </section>
 
-<!-- ══ CODE DEMO ══ -->
+<!-- ══ DEMO DE CÓDIGO ══ -->
 <section id="code-demo">
   <div class="container">
     <div class="code-wrap">
       <div class="code-copy" data-reveal>
-        <div class="eyebrow">How It Works</div>
-        <h2>One call.<br><span class="g-violet">One decision.</span><br>Immediately actionable.</h2>
-        <p>Send what you have. Receive a decision. Aria Intelligence handles the synthesis — no data science team required on your end.</p>
+        <div class="eyebrow">Cómo Funciona</div>
+        <h2>Una llamada.<br><span class="g-violet">Una decisión.</span><br>Inmediatamente accionable.</h2>
+        <p>Envía lo que tienes. Recibe una decisión. Aria Intelligence maneja la síntesis — sin necesidad de un equipo de ciencia de datos de tu parte.</p>
         <ul>
-          <li>Works with any combination of signals — you don't need all of them</li>
-          <li>Returns a classification, a recommendation, and a confidence score</li>
-          <li>Flags which signals drove the decision, so coaches understand the output</li>
-          <li>Explainable by design — no black-box outputs</li>
+          <li>Funciona con cualquier combinación de señales — no necesitas todas</li>
+          <li>Devuelve una clasificación, una recomendación y un puntaje de confianza</li>
+          <li>Indica qué señales impulsaron la decisión, para que los entrenadores entiendan la salida</li>
+          <li>Explicable por diseño — sin salidas de caja negra</li>
         </ul>
       </div>
       <div class="code-block" data-reveal data-reveal-delay="1">
@@ -688,8 +675,8 @@ footer{background:var(--black);border-top:1px solid var(--border);padding:80px 0
           <div class="code-dot"></div><div class="code-dot"></div><div class="code-dot"></div>
         </div>
         <div class="code-tab">
-          <div class="code-tab-item active">Request</div>
-          <div class="code-tab-item">Response</div>
+          <div class="code-tab-item active">Solicitud</div>
+          <div class="code-tab-item">Respuesta</div>
         </div>
         <pre id="code-display"><span class="t-comment">// POST /v1/athlete/readiness</span>
 {
@@ -710,23 +697,23 @@ footer{background:var(--black);border-top:1px solid var(--border);padding:80px 0
   </div>
 </section>
 
-<!-- ══ NO LIMITS ══ -->
+<!-- ══ SIN LÍMITES ══ -->
 <section id="no-limits">
   <div class="container">
     <div class="nl-grid">
       <div class="nl-copy" data-reveal>
-        <div class="eyebrow">Built Without Ceilings</div>
-        <h2>No rate limits.<br><span class="g-violet">No hardware walls.<br>No sport lock-in.</span></h2>
-        <p>The infrastructure that powers elite sports intelligence should not have artificial constraints built into it. Aria Intelligence API is designed to scale with your product — from a solo developer to a platform serving thousands of athletes.</p>
+        <div class="eyebrow">Construido Sin Límites</div>
+        <h2>Sin límites de tasa.<br><span class="g-violet">Sin barreras de hardware.<br>Sin dependencia de deporte.</span></h2>
+        <p>La infraestructura que impulsa la inteligencia deportiva de élite no debe tener restricciones artificiales. La API Aria Intelligence está diseñada para escalar con tu producto — desde un desarrollador individual hasta una plataforma que sirve a miles de atletas.</p>
         <div class="nl-pills">
-          <div class="nl-pill">No rate limits on decision calls</div>
-          <div class="nl-pill">Hardware-agnostic data ingestion</div>
-          <div class="nl-pill">Sport-configurable parameters</div>
-          <div class="nl-pill">Any wellness data format</div>
-          <div class="nl-pill">Individual &amp; squad endpoints</div>
-          <div class="nl-pill">Science-validated methodology</div>
-          <div class="nl-pill">Explainable outputs</div>
-          <div class="nl-pill">Longitudinal athlete memory</div>
+          <div class="nl-pill">Sin límites en llamadas de decisión</div>
+          <div class="nl-pill">Ingesta de datos agnóstica al hardware</div>
+          <div class="nl-pill">Parámetros configurables por deporte</div>
+          <div class="nl-pill">Cualquier formato de datos de bienestar</div>
+          <div class="nl-pill">Endpoints individuales y de equipo</div>
+          <div class="nl-pill">Metodología validada científicamente</div>
+          <div class="nl-pill">Salidas explicables</div>
+          <div class="nl-pill">Memoria longitudinal del atleta</div>
         </div>
       </div>
       <div class="nl-features" data-reveal data-reveal-delay="1">
@@ -734,117 +721,117 @@ footer{background:var(--black);border-top:1px solid var(--border);padding:80px 0
           <div class="nl-feat-icon">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
           </div>
-          <div class="nl-feat-title">Hardware-Agnostic</div>
-          <div class="nl-feat-desc">GPS exports, wearable data, manual wellness forms, coach observations — any source, any format. No device purchase required.</div>
+          <div class="nl-feat-title">Agnóstico al Hardware</div>
+          <div class="nl-feat-desc">Exportaciones GPS, datos de wearables, formularios de bienestar manuales, observaciones del entrenador — cualquier fuente, cualquier formato. Sin necesidad de comprar dispositivos.</div>
         </div>
         <div class="nl-feat">
           <div class="nl-feat-icon">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 010 20M12 2a15.3 15.3 0 000 20"/></svg>
           </div>
-          <div class="nl-feat-title">Any Sport</div>
-          <div class="nl-feat-desc">Configure sport-specific parameters at the API level. Built for track & field and football — adaptable to any sport you're building for.</div>
+          <div class="nl-feat-title">Cualquier Deporte</div>
+          <div class="nl-feat-desc">Configura parámetros específicos del deporte a nivel de API. Construido para atletismo y fútbol — adaptable a cualquier deporte para el que estés desarrollando.</div>
         </div>
         <div class="nl-feat">
           <div class="nl-feat-icon">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
           </div>
-          <div class="nl-feat-title">Science-Validated</div>
-          <div class="nl-feat-desc">Every decision model is validated by Stadiora Labs' performance and rehabilitation team. Not a generic ML model — sport-science methodology at its core.</div>
+          <div class="nl-feat-title">Validado Científicamente</div>
+          <div class="nl-feat-desc">Cada modelo de decisión es validado por el equipo de rendimiento y rehabilitación de Stadiora Labs. No un modelo de ML genérico — metodología de ciencia deportiva en su núcleo.</div>
         </div>
         <div class="nl-feat">
           <div class="nl-feat-icon">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
           </div>
-          <div class="nl-feat-title">Scales With You</div>
-          <div class="nl-feat-desc">From a single athlete profile to an entire academy roster. Individual and squad-level endpoints. Designed to grow as your product grows.</div>
+          <div class="nl-feat-title">Crece Contigo</div>
+          <div class="nl-feat-desc">Desde un perfil de atleta individual hasta un roster completo de academia. Endpoints individuales y a nivel de equipo. Diseñado para crecer a medida que crece tu producto.</div>
         </div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ══ USE CASES ══ -->
+<!-- ══ CASOS DE USO ══ -->
 <section id="use-cases">
   <div class="container">
     <div class="section-header" data-reveal>
-      <div class="eyebrow" style="justify-content:center">Use Cases</div>
-      <h2>Built for<br><span class="g-violet">Builders.</span></h2>
-      <p>Any product that touches athlete performance, team management, or fitness intelligence can embed Aria Intelligence and return decisions instead of data.</p>
+      <div class="eyebrow" style="justify-content:center">Casos de Uso</div>
+      <h2>Construido para<br><span class="g-violet">Creadores.</span></h2>
+      <p>Cualquier producto que toque el rendimiento de atletas, la gestión de equipos o la inteligencia de fitness puede integrar Aria Intelligence y devolver decisiones en lugar de datos.</p>
     </div>
     <div class="uc-grid">
       <div class="uc-card" data-reveal>
         <div class="uc-icon">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
         </div>
-        <div class="uc-title">Fitness & Training Apps</div>
-        <div class="uc-desc">Replace generic session suggestions with sport-specific decision intelligence. Tell athletes exactly what their body is ready to do today — and why — instead of showing them a chart they have to interpret themselves.</div>
-        <div class="uc-tags"><span class="uc-tag">Readiness</span><span class="uc-tag">Session Rec</span></div>
+        <div class="uc-title">Apps de Fitness y Entrenamiento</div>
+        <div class="uc-desc">Reemplaza las sugerencias genéricas de sesión con inteligencia de decisión específica para cada deporte. Di a los atletas exactamente lo que su cuerpo está listo para hacer hoy — y por qué — en lugar de mostrarles un gráfico que tienen que interpretar ellos mismos.</div>
+        <div class="uc-tags"><span class="uc-tag">Preparación</span><span class="uc-tag">Recomendación</span></div>
       </div>
       <div class="uc-card" data-reveal data-reveal-delay="1">
         <div class="uc-icon">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
         </div>
-        <div class="uc-title">Club Management Platforms</div>
-        <div class="uc-desc">Add availability intelligence to any team management tool. Coaches get a daily squad readiness picture — who is available, who needs modification, who needs attention — without switching platforms.</div>
-        <div class="uc-tags"><span class="uc-tag">Availability</span><span class="uc-tag">Squad View</span></div>
+        <div class="uc-title">Plataformas de Gestión de Clubes</div>
+        <div class="uc-desc">Añade inteligencia de disponibilidad a cualquier herramienta de gestión de equipos. Los entrenadores obtienen una imagen diaria de preparación del plantel — quién está disponible, quién necesita modificación, quién necesita atención — sin cambiar de plataforma.</div>
+        <div class="uc-tags"><span class="uc-tag">Disponibilidad</span><span class="uc-tag">Vista de Equipo</span></div>
       </div>
       <div class="uc-card" data-reveal data-reveal-delay="2">
         <div class="uc-icon">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="7"/><path d="M12 10v4l2 2"/></svg>
         </div>
-        <div class="uc-title">Wearable Companies</div>
-        <div class="uc-desc">Your device captures the signal. Aria Intelligence converts it into a decision. Add a layer of actionable output on top of biometric data without building the synthesis infrastructure from scratch.</div>
-        <div class="uc-tags"><span class="uc-tag">Biometric</span><span class="uc-tag">Synthesis</span></div>
+        <div class="uc-title">Empresas de Wearables</div>
+        <div class="uc-desc">Tu dispositivo captura la señal. Aria Intelligence la convierte en una decisión. Añade una capa de salida accionable sobre los datos biométricos sin construir la infraestructura de síntesis desde cero.</div>
+        <div class="uc-tags"><span class="uc-tag">Biométrico</span><span class="uc-tag">Síntesis</span></div>
       </div>
       <div class="uc-card" data-reveal>
         <div class="uc-icon">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
         </div>
-        <div class="uc-title">Sports Medicine & Rehab</div>
-        <div class="uc-desc">Embed Return-to-Play Protocol scoring into rehabilitation platforms. Give physiotherapists and medical staff a structured, data-informed progression output — replacing gut feel with a validated decision at every stage.</div>
-        <div class="uc-tags"><span class="uc-tag">RTP Protocol</span><span class="uc-tag">Risk Signal</span></div>
+        <div class="uc-title">Medicina Deportiva y Rehabilitación</div>
+        <div class="uc-desc">Integra la puntuación del Protocolo de Retorno al Juego en plataformas de rehabilitación. Da a fisioterapeutas y personal médico una salida de progresión estructurada e informada por datos — reemplazando el instinto con una decisión validada en cada etapa.</div>
+        <div class="uc-tags"><span class="uc-tag">Protocolo RTP</span><span class="uc-tag">Señal de Riesgo</span></div>
       </div>
       <div class="uc-card" data-reveal data-reveal-delay="1">
         <div class="uc-icon">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
         </div>
-        <div class="uc-title">Performance Analytics Platforms</div>
-        <div class="uc-desc">Move beyond dashboards. Add a decision output layer to existing analytics products so coaches don't just see what happened — they see what to do about it.</div>
-        <div class="uc-tags"><span class="uc-tag">Analytics</span><span class="uc-tag">Decisions</span></div>
+        <div class="uc-title">Plataformas de Analíticas de Rendimiento</div>
+        <div class="uc-desc">Más allá de los dashboards. Añade una capa de salida de decisión a los productos analíticos existentes para que los entrenadores no solo vean lo que pasó — sino lo que deben hacer al respecto.</div>
+        <div class="uc-tags"><span class="uc-tag">Analíticas</span><span class="uc-tag">Decisiones</span></div>
       </div>
       <div class="uc-card" data-reveal data-reveal-delay="2">
         <div class="uc-icon">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg>
         </div>
-        <div class="uc-title">Academies & Education Platforms</div>
-        <div class="uc-desc">Build athlete monitoring into academy management tools. Give coaches at development programs the same quality of readiness and injury risk intelligence that senior professional clubs use — at the right price point.</div>
-        <div class="uc-tags"><span class="uc-tag">Academy</span><span class="uc-tag">Development</span></div>
+        <div class="uc-title">Academias y Plataformas Educativas</div>
+        <div class="uc-desc">Integra el monitoreo de atletas en herramientas de gestión de academias. Da a los entrenadores en programas de desarrollo la misma calidad de inteligencia de preparación y riesgo de lesión que usan los clubes profesionales de élite — al precio correcto.</div>
+        <div class="uc-tags"><span class="uc-tag">Academia</span><span class="uc-tag">Desarrollo</span></div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ══ SPORTS ══ -->
+<!-- ══ DEPORTES ══ -->
 <section id="sports">
   <div class="container">
     <div class="sports-inner" data-reveal>
-      <div class="eyebrow" style="justify-content:center">Sport Coverage</div>
-      <h2>Configurable Across<br><span class="g-violet">Any Sport.</span></h2>
-      <p>Aria Intelligence is not an endurance-sport platform or a football-only tool. The decision engine is sport-configurable — parameters, thresholds, and readiness models adapt to the sport you are building for.</p>
+      <div class="eyebrow" style="justify-content:center">Cobertura Deportiva</div>
+      <h2>Configurable para<br><span class="g-violet">Cualquier Deporte.</span></h2>
+      <p>Aria Intelligence no es una plataforma de deportes de resistencia ni una herramienta exclusiva para fútbol. El motor de decisión es configurable por deporte — los parámetros, umbrales y modelos de preparación se adaptan al deporte para el que estás construyendo.</p>
       <div class="sports-grid">
-        <div class="sport-chip"><div class="sport-dot"></div>Track &amp; Field</div>
-        <div class="sport-chip"><div class="sport-dot"></div>Football / Soccer</div>
-        <div class="sport-chip"><div class="sport-dot"></div>Basketball</div>
+        <div class="sport-chip"><div class="sport-dot"></div>Atletismo</div>
+        <div class="sport-chip"><div class="sport-dot"></div>Fútbol</div>
+        <div class="sport-chip"><div class="sport-dot"></div>Baloncesto</div>
         <div class="sport-chip"><div class="sport-dot"></div>Rugby</div>
-        <div class="sport-chip"><div class="sport-dot"></div>Cricket</div>
-        <div class="sport-chip"><div class="sport-dot"></div>Swimming</div>
-        <div class="sport-chip"><div class="sport-dot"></div>Cycling</div>
-        <div class="sport-chip"><div class="sport-dot"></div>Combat Sports</div>
-        <div class="sport-chip"><div class="sport-dot"></div>American Football</div>
-        <div class="sport-chip"><div class="sport-dot"></div>Volleyball</div>
-        <div class="sport-chip"><div class="sport-dot" style="background:rgba(255,255,255,.2)"></div>+ Any Sport</div>
+        <div class="sport-chip"><div class="sport-dot"></div>Críquet</div>
+        <div class="sport-chip"><div class="sport-dot"></div>Natación</div>
+        <div class="sport-chip"><div class="sport-dot"></div>Ciclismo</div>
+        <div class="sport-chip"><div class="sport-dot"></div>Deportes de Combate</div>
+        <div class="sport-chip"><div class="sport-dot"></div>Fútbol Americano</div>
+        <div class="sport-chip"><div class="sport-dot"></div>Voleibol</div>
+        <div class="sport-chip"><div class="sport-dot" style="background:rgba(255,255,255,.2)"></div>+ Cualquier Deporte</div>
       </div>
-      <p class="sports-note">Sport-specific parameter sets are configured at the API level. Custom sport configurations available on request.</p>
+      <p class="sports-note">Los conjuntos de parámetros específicos por deporte se configuran a nivel de API. Configuraciones de deporte personalizadas disponibles bajo solicitud.</p>
     </div>
   </div>
 </section>
@@ -852,20 +839,20 @@ footer{background:var(--black);border-top:1px solid var(--border);padding:80px 0
 <!-- ══ CTA ══ -->
 <section id="api-cta">
   <div class="cta-inner" data-reveal>
-    <div class="eyebrow" style="justify-content:center;color:var(--violet)">Get Access</div>
+    <div class="eyebrow" style="justify-content:center;color:var(--violet)">Obtener Acceso</div>
     <h2>
-      Build Something<br>
-      <span class="g-violet">That Decides.</span>
+      Construye Algo<br>
+      <span class="g-violet">Que Decida.</span>
     </h2>
-    <p>Aria Intelligence API is currently available to select development partners. Apply for early access and we'll be in touch within 48 hours.</p>
+    <p>La API Aria Intelligence está actualmente disponible para socios de desarrollo seleccionados. Solicita acceso anticipado y nos pondremos en contacto en 48 horas.</p>
     <div class="cta-btns">
       <a href="mailto:api@stadioralabs.com" class="btn btn-primary">
-        Request Developer Access
+        Solicitar Acceso de Desarrollador
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
       </a>
-      <a href="./index.html" class="btn btn-ghost">← Back to Stadiora Labs</a>
+      <a href="./index-es.html" class="btn btn-ghost">← Volver a Stadiora Labs</a>
     </div>
-    <p class="cta-note">No proprietary hardware. No lock-in. Sport-configurable from day one.</p>
+    <p class="cta-note">Sin hardware propio. Sin ataduras. Configurable por deporte desde el primer día.</p>
   </div>
 </section>
 
@@ -876,8 +863,8 @@ footer{background:var(--black);border-top:1px solid var(--border);padding:80px 0
       <div class="fb">
         <img src="./stadioralabs info/stadiora_labs_logo - white.png" alt="Stadiora Labs" onerror="this.style.display='none'">
         <div class="fb-name">STADIORA LABS</div>
-        <div class="fb-tag">One Ecosystem. Intelligently Connected.</div>
-        <p class="fb-desc">The sports AI infrastructure company — building the intelligence layer that converts athlete data into decisions for athletes, coaches, and teams worldwide.</p>
+        <div class="fb-tag">Un Ecosistema. Inteligentemente Conectado.</div>
+        <p class="fb-desc">La empresa de infraestructura de IA deportiva — construyendo la capa de inteligencia que convierte datos de atletas en decisiones para atletas, entrenadores y equipos en todo el mundo.</p>
         <div class="fb-social">
           <a href="https://www.linkedin.com/company/stadioralabs" target="_blank" rel="noopener" class="fb-slink" aria-label="LinkedIn">
             <svg viewBox="0 0 24 24" fill="currentColor">
@@ -888,77 +875,73 @@ footer{background:var(--black);border-top:1px solid var(--border);padding:80px 0
         </div>
       </div>
       <div>
-        <div class="fc-title">API Endpoints</div>
+        <div class="fc-title">Endpoints de la API</div>
         <ul class="fc-links">
-          <li><a href="#capabilities">Availability Index</a></li>
-          <li><a href="#capabilities">Sprint Readiness</a></li>
-          <li><a href="#capabilities">Injury Risk Signal</a></li>
-          <li><a href="#capabilities">Return-to-Play</a></li>
-          <li><a href="#capabilities">Coach Attention Queue</a></li>
-          <li><a href="#capabilities">Player Passport</a></li>
+          <li><a href="#capabilities">Índice de Disponibilidad</a></li>
+          <li><a href="#capabilities">Preparación al Sprint</a></li>
+          <li><a href="#capabilities">Señal de Riesgo de Lesión</a></li>
+          <li><a href="#capabilities">Retorno al Juego</a></li>
+          <li><a href="#capabilities">Cola de Atención</a></li>
+          <li><a href="#capabilities">Pasaporte del Jugador</a></li>
         </ul>
       </div>
       <div>
-        <div class="fc-title">Products</div>
+        <div class="fc-title">Productos</div>
         <ul class="fc-links">
           <li><a href="https://runwitharia.com" target="_blank" rel="noopener">Aria</a></li>
-          <li><a href="./index.html#ecosystem">Aria XI</a></li>
-          <li><a href="./index.html#ecosystem">Stadiora</a></li>
-          <li><a href="./api.html">Aria Intelligence API</a></li>
+          <li><a href="./index-es.html#ecosystem">Aria XI</a></li>
+          <li><a href="./index-es.html#ecosystem">Stadiora</a></li>
+          <li><a href="./api-es.html">API Aria Intelligence</a></li>
         </ul>
       </div>
       <div>
-        <div class="fc-title">Company</div>
+        <div class="fc-title">Empresa</div>
         <ul class="fc-links">
-          <li><a href="./index.html#mission">Our Mission</a></li>
-          <li><a href="./index.html#engine">The Engine</a></li>
-          <li><a href="./index.html">Stadiora Labs</a></li>
-          <li><a href="mailto:api@stadioralabs.com">Contact</a></li>
+          <li><a href="./index-es.html#mission">Nuestra Misión</a></li>
+          <li><a href="./index-es.html#engine">El Motor</a></li>
+          <li><a href="./index-es.html">Stadiora Labs</a></li>
+          <li><a href="mailto:api@stadioralabs.com">Contacto</a></li>
         </ul>
       </div>
     </div>
     <div class="foot-btm">
-      <p class="foot-copy">© 2026 Stadiora Labs. All rights reserved. Built in Latin America & the United States.</p>
+      <p class="foot-copy">© 2026 Stadiora Labs. Todos los derechos reservados. Construido en América Latina y los Estados Unidos.</p>
       <div class="foot-legal">
-        <a href="#">Privacy Policy</a>
-        <a href="#">Terms of Use</a>
+        <a href="./privacy.html">Política de Privacidad</a>
+        <a href="./terms.html">Términos de Uso</a>
       </div>
     </div>
   </div>
 </footer>
 
 <script>
-// Nav scroll
 const nav = document.getElementById('nav');
 window.addEventListener('scroll', () => {
   nav.classList.toggle('scrolled', window.scrollY > 40);
 });
 
-// Mobile menu
 function openMenu()  { document.getElementById('mobileMenu').classList.add('open'); document.body.style.overflow='hidden'; }
 function closeMenu() { document.getElementById('mobileMenu').classList.remove('open'); document.body.style.overflow=''; }
 
-// Reveal on scroll
 const revealObs = new IntersectionObserver(entries => {
   entries.forEach(e => { if(e.isIntersecting) { e.target.classList.add('revealed'); revealObs.unobserve(e.target); } });
 }, { threshold: 0.12 });
 document.querySelectorAll('[data-reveal]').forEach(el => revealObs.observe(el));
 
-// Code tab toggle — request / response
 const tabs = document.querySelectorAll('.code-tab-item');
 const codeDisplay = document.getElementById('code-display');
 const request = codeDisplay.innerHTML;
-const response = `<span class="t-comment">// 200 OK — Aria Intelligence Decision</span>
+const response = `<span class="t-comment">// 200 OK — Decisión de Aria Intelligence</span>
 {
   <span class="t-key">"athlete_id"</span>: <span class="t-str">"ATH_8821"</span>,
   <span class="t-key">"availability"</span>: <span class="t-tag">"MODIFIED"</span>,
   <span class="t-key">"readiness_index"</span>: <span class="t-num">54</span>,
-  <span class="t-key">"classification"</span>: <span class="t-str">"Reduced Load Session"</span>,
-  <span class="t-key">"recommendation"</span>: <span class="t-str">"Technical work only. Cap volume at 60%. No max-intensity efforts today."</span>,
+  <span class="t-key">"classification"</span>: <span class="t-str">"Sesión de Carga Reducida"</span>,
+  <span class="t-key">"recommendation"</span>: <span class="t-str">"Solo trabajo técnico. Limitar volumen al 60%. Sin esfuerzos de máxima intensidad hoy."</span>,
   <span class="t-key">"flags"</span>: [
-    <span class="t-str">"elevated_cumulative_load"</span>,
-    <span class="t-str">"hrv_below_7d_baseline"</span>,
-    <span class="t-str">"sleep_deficit_detected"</span>
+    <span class="t-str">"carga_acumulada_elevada"</span>,
+    <span class="t-str">"vfc_bajo_referencia_7d"</span>,
+    <span class="t-str">"deficit_de_sueno_detectado"</span>
   ],
   <span class="t-key">"coach_attention"</span>: <span class="t-tag">true</span>,
   <span class="t-key">"confidence"</span>: <span class="t-num">0.91</span>,
@@ -973,7 +956,6 @@ tabs.forEach((tab, i) => {
   });
 });
 
-// Smooth scroll
 document.querySelectorAll('a[href^="#"]').forEach(a => {
   a.addEventListener('click', e => {
     const t = document.querySelector(a.getAttribute('href'));
