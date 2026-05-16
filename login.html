@@ -45,7 +45,7 @@
     <section class="panel panel-pad">
       <div class="kicker">Platform login</div>
       <h2>Choose your workspace</h2>
-      <p class="help">This is a front-end routing prototype. Later we can connect it to Supabase/Auth0 and persist institution, sport, and role in the user profile.</p>
+      <p class="help">This is a front-end routing prototype. The production version should use Microsoft Entra External ID or Microsoft Entra ID, Azure App Service or Azure Static Web Apps authentication, and an Azure-hosted data layer.</p>
       <form class="form-grid" onsubmit="routeLogin(event)">
         <div class="field">
           <label for="institution">Institution / Club</label>
@@ -69,7 +69,7 @@
         </div>
         <button class="btn btn-primary btn-wide" type="submit">Continue to workspace</button>
       </form>
-      <div class="callout">Recommendation: keep one identity system, but route users into separate sport modules: <strong>Stadiora Track</strong> and <strong>Stadiora Football</strong>.</div>
+      <div class="callout">Recommendation: keep one Azure identity foundation, but route users into separate sport modules: <strong>Stadiora Track</strong> and <strong>Stadiora Football</strong>.</div>
     </section>
   </div>
 </main>
