@@ -15,10 +15,10 @@ Use this naming model consistently:
 - **Stadiora Labs**: company / umbrella brand.
 - **Aria**: athlete-facing app.
 - **Aria for Coaches**: coach, academy, club, and institution-facing product.
-- **Aria XI**: football/soccer intelligence layer inside the Aria ecosystem.
+- **Aria XII**: football/soccer intelligence layer inside the Aria ecosystem.
 - **Aria Intelligence API**: shared decision engine and developer layer.
 
-Do not use **Stadiora** as the product name for the coach app going forward. Existing files or URLs that contain `stadiora` may remain only as compatibility aliases until they can be safely redirected.
+Do not use **Stadiora** as the product name for the coach app going forward. Existing files or URLs that contain `stadiora` may remain only as compatibility aliases until they can be safely redirected. Existing URLs that contain `aria-xi` should redirect to the canonical `aria-xii` page.
 
 ## Recommended Azure stack
 
@@ -175,7 +175,7 @@ Core modules:
 - Competition calendar
 - Aria athlete app sync
 
-### Aria for Coaches Football / Aria XI
+### Aria for Coaches Football / Aria XII
 
 Primary question:
 
