@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<link rel="icon" type="image/png" href="./stadioralabs info/favicon.png">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="Punto de entrada de Stadiora Labs para instituciones, coaches, academias y portales deportivos de Aria for Coaches.">
+<title>Login — Aria for Coaches Platform</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="./platform.css">
+</head>
+<body>
+<nav class="nav">
+  <div class="shell nav-inner">
+    <a class="brand" href="./index-es.html"><span class="brand-mark"></span><span>Stadiora Labs</span></a>
+    <div class="nav-actions">
+      <a class="nav-link" href="./coaches-track.html">Aria for Coaches Track</a>
+      <a class="nav-link" href="./coaches-soccer.html">Aria for Coaches Football</a>
+      <a class="nav-link" href="./login.html">EN</a>
+      <a class="btn" href="./index-es.html">Volver al sitio</a>
+    </div>
+  </div>
+</nav>
+
+<main class="hero">
+  <div class="shell hero-grid">
+    <section>
+      <div class="kicker">Acceso institucional</div>
+      <h1>Un login.<br><span class="gradient">Inteligencia por deporte.</span></h1>
+      <p class="lede">Aria for Coaches no debe mezclar atletismo y fútbol dentro de una experiencia genérica. La institución inicia sesión una vez y luego elige el contexto deportivo, roster y rol.</p>
+      <div class="chips">
+        <span class="chip cyan">Institución</span><span class="chip">Academia</span><span class="chip">Coach</span><span class="chip mint">Fútbol / Soccer</span><span class="chip cyan">Atletismo</span>
+      </div>
+      <div class="cards">
+        <div class="card"><div class="stat">01</div><div class="stat-label">Institución</div><p>Autenticar primero la universidad, club, academia u organización.</p></div>
+        <div class="card"><div class="stat">02</div><div class="stat-label">Deporte</div><p>Mantener fútbol y atletismo separados, reutilizando Aria Intelligence.</p></div>
+        <div class="card"><div class="stat">03</div><div class="stat-label">Rol</div><p>Enviar al usuario al espacio correcto según su función.</p></div>
+      </div>
+    </section>
+
+    <section class="panel panel-pad">
+      <div class="kicker">Login Aria for Coaches</div>
+      <h2>Elige tu workspace</h2>
+      <p class="help">Este es un prototipo de front-end. La versión productiva debería usar Microsoft Entra External ID o Microsoft Entra ID, Azure App Service o Azure Static Web Apps, y una capa de datos alojada en Azure.</p>
+      <form class="form-grid" onsubmit="routeLogin(event)">
+        <div class="field"><label for="institution">Institución / Club</label><input id="institution" name="institution" placeholder="Ej. Universidad, Academia, Club" required></div>
+        <div class="field"><label for="sport">Deporte</label><select id="sport" name="sport" required><option value="track">Atletismo / Track & Field</option><option value="soccer">Fútbol / Soccer</option></select></div>
+        <div class="field"><label for="role">Rol</label><select id="role" name="role" required><option value="coach">Coach</option><option value="performance">Staff de rendimiento</option><option value="admin">Administrador institucional</option><option value="athlete">Atleta</option></select></div>
+        <button class="btn btn-primary btn-wide" type="submit">Continuar al workspace</button>
+      </form>
+      <div class="callout">Recomendación: mantener una base de identidad en Azure y enrutar a módulos separados: <strong>Aria for Coaches Track</strong> y <strong>Aria for Coaches Football</strong>.</div>
+    </section>
+  </div>
+</main>
+
+<footer class="shell footer-note">© 2026 Stadiora Labs. Prototipo de entrada institucional para Aria for Coaches.</footer>
+<script>
+function routeLogin(event){event.preventDefault();const sport=document.getElementById('sport').value;const role=document.getElementById('role').value;const institution=encodeURIComponent(document.getElementById('institution').value.trim());const base=sport==='soccer'?'./coaches-soccer.html':'./coaches-track.html';window.location.href=`${base}?institution=${institution}&role=${role}`;}
+</script>
+</body>
+</html>
