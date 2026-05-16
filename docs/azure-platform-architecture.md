@@ -6,6 +6,20 @@ Stadiora Labs should use an Azure-native architecture for the production platfor
 
 Supabase/Auth0 should not be treated as the default direction because the current Stadiora/Aria infrastructure is already Azure-first. The product can still use static HTML prototypes for visual exploration, but the production authentication, API, database, and AI layers should align to Azure.
 
+## Naming decision
+
+The coaching application is now named **Aria for Coaches**.
+
+Use this naming model consistently:
+
+- **Stadiora Labs**: company / umbrella brand.
+- **Aria**: athlete-facing app.
+- **Aria for Coaches**: coach, academy, club, and institution-facing product.
+- **Aria XI**: football/soccer intelligence layer inside the Aria ecosystem.
+- **Aria Intelligence API**: shared decision engine and developer layer.
+
+Do not use **Stadiora** as the product name for the coach app going forward. Existing files or URLs that contain `stadiora` may remain only as compatibility aliases until they can be safely redirected.
+
 ## Recommended Azure stack
 
 ### Frontend
@@ -43,7 +57,7 @@ User signs in
 → Workspace route
 ```
 
-Workspace routes:
+Current prototype workspace routes:
 
 ```text
 /coaches-track.html
@@ -53,8 +67,8 @@ Workspace routes:
 Future app routes:
 
 ```text
-/app/track/dashboard
-/app/football/dashboard
+/app/aria-for-coaches/track/dashboard
+/app/aria-for-coaches/football/dashboard
 /app/admin/institution
 /app/athlete
 ```
@@ -74,7 +88,7 @@ Recommended production data layer:
 - Azure Database for PostgreSQL Flexible Server if the product needs relational data and PostgreSQL compatibility.
 - Azure Cosmos DB if the product needs highly flexible document-style data, global distribution, or event-heavy user state.
 
-Suggested first choice for Stadiora:
+Suggested first choice for Aria for Coaches:
 
 ```text
 Azure Database for PostgreSQL Flexible Server
@@ -141,9 +155,9 @@ Separated by sport:
 - Workflow modules
 - Recommendation templates
 
-## Sport separation
+## Sport separation inside Aria for Coaches
 
-### Stadiora Track
+### Aria for Coaches Track
 
 Primary question:
 
@@ -161,7 +175,7 @@ Core modules:
 - Competition calendar
 - Aria athlete app sync
 
-### Stadiora Football / Aria XI
+### Aria for Coaches Football / Aria XI
 
 Primary question:
 
@@ -186,8 +200,8 @@ Phase 1 should stay simple:
 1. Institution login prototype
 2. Sport selection
 3. Role selection
-4. Track coach portal
-5. Football coach portal
+4. Aria for Coaches Track portal
+5. Aria for Coaches Football portal
 6. Static mock data
 7. Later connection to Azure authentication and Azure-hosted API
 
