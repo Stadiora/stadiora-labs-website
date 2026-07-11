@@ -245,9 +245,9 @@ const WEB3FORMS_KEY = 'PASTE_ACCESS_KEY_HERE';
 
 const PRODUCT_LABELS = {
   'athlete-tf':     'Aria — Atleta de Atletismo',
-  'athlete-soccer': 'Aria XI — Atleta de Fútbol',
-  'coach-tf':       'Stadiora — Entrenador/a de Atletismo',
-  'coach-soccer':   'Aria XI — Entrenador/a de Fútbol'
+  'athlete-soccer': 'Aria 12 — Atleta de Fútbol',
+  'coach-tf':       'Aria for Coaches — Entrenador/a de Atletismo',
+  'coach-soccer':   'Aria 12 — Entrenador/a de Fútbol'
 };
 
 const PATHS = {
@@ -347,7 +347,7 @@ const PATHS = {
   // ── Atleta + Fútbol ─────────────────────────
   'athlete-soccer': {
     label: 'Verificación de Disponibilidad del Jugador',
-    product: 'Aria XI',
+    product: 'Aria 12',
     questions: [
       { q: '¿Cuántas horas dormiste anoche?', options: [ { label: 'Menos de 6 horas', detail: 'Déficit de sueño significativo', score: 0, weak: 'El sueño inferior a 6 horas deteriora notablemente el tiempo de reacción y la capacidad de sprint' }, { label: '6 a 7 horas', detail: 'Levemente por debajo del óptimo', score: 1, weak: 'Leve restricción de sueño — los esfuerzos de alta intensidad pueden sentirse más difíciles hoy' }, { label: '7 a 9 horas', detail: 'Ventana de recuperación completa', score: 3 }, { label: 'Más de 9 horas', detail: 'Puede indicar fatiga acumulada', score: 2 } ] },
       { q: '¿Cómo se sienten tus piernas ahora mismo?', options: [ { label: 'Pesadas y fatigadas', detail: 'Carga residual de partido o entrenamiento', score: 0, weak: 'La pesadez en piernas indica recuperación muscular incompleta' }, { label: 'Un poco adoloridas o rígidas', detail: 'Agujetas o fatiga leve', score: 1, weak: 'El dolor muscular notable sugiere que tus músculos aún están en fase de reparación' }, { label: 'Normal, sin fatiga particular', detail: 'Sin fatiga específica', score: 2 }, { label: 'Frescas y listas', detail: 'Recuperación completa', score: 3 } ] },
@@ -381,7 +381,7 @@ const PATHS = {
   // ── Entrenador + Atletismo ───────────────────
   'coach-tf': {
     label: 'Resumen de Preparación del Equipo',
-    product: 'Stadiora',
+    product: 'Aria for Coaches',
     questions: [
       { q: '¿Cuántos atletas estás gestionando actualmente?', options: [ { label: '1 a 5 atletas', detail: 'Grupo pequeño o entrenamiento individual', score: 0, ctx: 'small' }, { label: '6 a 15 atletas', detail: 'Programa mediano', score: 1, ctx: 'medium' }, { label: '16 a 30 atletas', detail: 'Grupo completo', score: 2, ctx: 'large' }, { label: 'Más de 30', detail: 'Academia o programa multidisciplinar', score: 3, ctx: 'xlarge' } ] },
       { q: '¿Qué porcentaje de tu grupo completó todas las sesiones planificadas esta semana?', options: [ { label: 'Menos de la mitad', detail: 'Brecha de cumplimiento significativa', score: 0, weak: 'El bajo cumplimiento de sesiones es una señal temprana de advertencia — fatiga, motivación o problemas de carga de trabajo' }, { label: 'Aproximadamente la mitad al 70%', detail: 'Cumplimiento moderado', score: 1, weak: 'Cumplimiento por debajo del promedio — vale la pena investigar la causa' }, { label: '70 al 85%', detail: 'Buen cumplimiento con algunas lagunas', score: 2 }, { label: '85% o más', detail: 'Fuerte adherencia al programa', score: 3 } ] },
@@ -418,7 +418,7 @@ const PATHS = {
   // ── Entrenador + Fútbol ──────────────────────
   'coach-soccer': {
     label: 'Verificador de Disponibilidad de Jugadores',
-    product: 'Aria XI',
+    product: 'Aria 12',
     questions: [
       { q: '¿Cuántos jugadores hay en tu plantilla?', options: [ { label: 'Menos de 15', detail: 'Plantilla pequeña', score: 0 }, { label: '15 a 25 jugadores', detail: 'Plantilla estándar', score: 1 }, { label: '26 a 40 jugadores', detail: 'Plantilla ampliada', score: 2 }, { label: 'Más de 40', detail: 'Academia o múltiples equipos', score: 3 } ] },
       { q: 'Después de tu última sesión o partido, ¿cuántos jugadores reportaron fatiga o dolor?', options: [ { label: 'Más de la mitad de la plantilla', detail: 'Fatiga generalizada', score: 0, weak: 'La fatiga post-sesión generalizada indica que la plantilla puede haber superado la carga de entrenamiento óptima' }, { label: 'Aproximadamente un tercio', detail: 'Fatiga significativa extendida', score: 1, weak: 'Un tercio de la plantilla señalando fatiga justifica un ajuste de carga antes de la próxima sesión' }, { label: 'Solo unos pocos jugadores', detail: 'Casos de fatiga aislados', score: 2 }, { label: 'Ninguno reportó', detail: 'La plantilla se siente recuperada', score: 3 } ] },
