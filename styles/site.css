@@ -9,7 +9,7 @@
      4. Layout
      5. Typography helpers
      6. Buttons
-     7. Nav bar and language toggle
+     7. Nav bar, mobile drawer and language toggle
      8. Cards
      9. Store badge row
     10. Footer
@@ -36,11 +36,12 @@
   --sl-ink-600: #0a1428;
   --sl-ink-500: #101d38;
 
-  /* Text */
+  /* Text. The first three are safe for text on any ink surface, all clear
+     WCAG AA 4.5:1. --sl-text-ghost is decoration only, never live copy. */
   --sl-white: #ffffff;
   --sl-text: rgba(255, 255, 255, 0.92);
   --sl-text-muted: rgba(255, 255, 255, 0.62);
-  --sl-text-faint: rgba(255, 255, 255, 0.38);
+  --sl-text-faint: rgba(255, 255, 255, 0.58);
   --sl-text-ghost: rgba(255, 255, 255, 0.22);
 
   /* Cyan accent, the primary brand colour */
@@ -49,7 +50,9 @@
   --sl-cyan-soft: rgba(0, 184, 212, 0.14);
   --sl-cyan-line: rgba(0, 184, 212, 0.38);
 
-  /* Restrained violet, partner and secondary accents only */
+  /* Restrained violet, partner and secondary accents only.
+     --sl-violet is a surface and border colour. White text on it measures
+     4.23:1, under AA, so buttons use --sl-ink-900 as their label colour. */
   --sl-violet: #8b5cf6;
   --sl-violet-soft: rgba(139, 92, 246, 0.14);
   --sl-violet-line: rgba(139, 92, 246, 0.36);
@@ -112,9 +115,10 @@
   --sl-gutter: clamp(20px, 5vw, 40px);
   --sl-nav-h: 72px;
 
-  /* Layers */
-  --sl-z-nav: 100;
+  /* Layers. The nav sits above the drawer so its close control stays
+     reachable while the drawer is open. */
   --sl-z-menu: 200;
+  --sl-z-nav: 300;
 }
 
 /* ---------- 3. Reset and base --------------------------------------------- */
@@ -132,7 +136,6 @@ body {
   font-size: var(--sl-text-body);
   line-height: var(--sl-leading-body);
   font-weight: 400;
-  overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -230,7 +233,8 @@ h1, h2, h3, h4 { margin: 0; font-family: var(--sl-font-display); font-weight: 60
 .sl-accent { color: var(--sl-cyan-bright); }
 .sl-accent-violet { color: var(--sl-violet); }
 
-/* Middot separator motif */
+/* Middot separator motif. The separator trails its own item so a wrapped
+   line never opens with an orphan dot. */
 .sl-dotlist {
   display: flex;
   flex-wrap: wrap;
@@ -242,9 +246,10 @@ h1, h2, h3, h4 { margin: 0; font-family: var(--sl-font-display); font-weight: 60
   text-transform: uppercase;
   color: var(--sl-text-faint);
 }
-.sl-dotlist > * + *::before {
+.sl-dotlist > * { white-space: nowrap; }
+.sl-dotlist > *:not(:last-child)::after {
   content: '\00b7';
-  margin-right: var(--sl-space-3);
+  margin-left: var(--sl-space-3);
   color: var(--sl-cyan);
 }
 
@@ -284,14 +289,14 @@ h1, h2, h3, h4 { margin: 0; font-family: var(--sl-font-display); font-weight: 60
 }
 .sl-btn--ghost:hover { border-color: var(--sl-cyan-line); color: var(--sl-cyan-bright); }
 
-.sl-btn--violet { background: var(--sl-violet); color: var(--sl-white); font-weight: 700; }
+.sl-btn--violet { background: var(--sl-violet); color: var(--sl-ink-900); font-weight: 700; }
 .sl-btn--violet:hover { transform: translateY(-1px); }
 
 .sl-btn--block { width: 100%; }
 
 .sl-btn-row { display: flex; flex-wrap: wrap; gap: var(--sl-space-3); }
 
-/* ---------- 7. Nav bar and language toggle --------------------------------- */
+/* ---------- 7. Nav bar, mobile drawer and language toggle ------------------ */
 .sl-nav {
   position: fixed;
   inset: 0 0 auto 0;
@@ -325,11 +330,13 @@ h1, h2, h3, h4 { margin: 0; font-family: var(--sl-font-display); font-weight: 60
 .sl-nav__links a[aria-current='page'] { color: var(--sl-cyan-bright); }
 
 .sl-nav__actions { display: flex; align-items: center; gap: var(--sl-space-3); }
+.sl-nav__actions .sl-btn { flex: none; white-space: nowrap; }
 
 .sl-nav__toggle {
   display: none;
   width: 40px;
   height: 40px;
+  flex: none;
   align-items: center;
   justify-content: center;
   border: 1px solid var(--sl-border);
@@ -337,9 +344,56 @@ h1, h2, h3, h4 { margin: 0; font-family: var(--sl-font-display); font-weight: 60
   color: var(--sl-text);
 }
 .sl-nav__toggle svg { width: 20px; height: 20px; }
+.sl-nav__toggle .sl-nav__icon-close { display: none; }
+.sl-nav__toggle[aria-expanded='true'] .sl-nav__icon-close { display: block; }
+.sl-nav__toggle[aria-expanded='true'] .sl-nav__icon-open { display: none; }
 
-/* Page content clears the fixed bar */
+/* Mobile drawer. Closed by default, opened by toggling .is-open, which
+   scripts/nav.js does. Above the breakpoint it is never rendered. */
+.sl-nav__menu {
+  position: fixed;
+  inset: 0;
+  z-index: var(--sl-z-menu);
+  display: none;
+  flex-direction: column;
+  gap: var(--sl-space-5);
+  padding: calc(var(--sl-nav-h) + var(--sl-space-6)) var(--sl-gutter) var(--sl-space-7);
+  background: var(--sl-ink-900);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  opacity: 0;
+  transform: translateY(-8px);
+  visibility: hidden;
+  transition: opacity var(--sl-speed) var(--sl-ease),
+              transform var(--sl-speed) var(--sl-ease),
+              visibility var(--sl-speed) var(--sl-ease);
+}
+.sl-nav__menu.is-open { opacity: 1; transform: none; visibility: visible; }
+
+.sl-nav__menu-links { display: grid; gap: var(--sl-space-2); }
+.sl-nav__menu-links a {
+  display: block;
+  padding: var(--sl-space-3) 0;
+  font-family: var(--sl-font-display);
+  font-size: clamp(26px, 8vw, 34px);
+  font-weight: 600;
+  letter-spacing: var(--sl-tracking-display);
+  color: var(--sl-text-muted);
+  border-bottom: 1px solid var(--sl-border);
+  transition: color var(--sl-speed) var(--sl-ease);
+}
+.sl-nav__menu-links a:hover,
+.sl-nav__menu-links a[aria-current='page'] { color: var(--sl-cyan-bright); }
+.sl-nav__menu-foot { margin-top: auto; display: grid; gap: var(--sl-space-4); }
+
+/* Body scroll lock while the drawer is open */
+body.sl-menu-open { overflow: hidden; }
+
+/* Page content clears the fixed bar. The second rule keeps a section's own
+   vertical rhythm instead of replacing it, since both selectors would
+   otherwise have equal weight and the offset would win. */
 .sl-nav-offset { padding-top: var(--sl-nav-h); }
+.sl-section.sl-nav-offset { padding-top: calc(var(--sl-nav-h) + var(--sl-section-y)); }
 
 .sl-lang { display: inline-flex; align-items: center; gap: var(--sl-space-1); }
 .sl-lang__btn {
@@ -485,14 +539,30 @@ h1, h2, h3, h4 { margin: 0; font-family: var(--sl-font-display); font-weight: 60
 }
 
 @media (max-width: 860px) {
-  .sl-nav__links { display: none; }
-  .sl-nav__toggle { display: inline-flex; margin-left: auto; }
   .sl-footer__grid { grid-template-columns: 1fr 1fr; }
+
+  /* With the shared script present the links move into the drawer that the
+     toggle opens. See scripts/nav.js. */
+  .sl-js .sl-nav__links { display: none; }
+  .sl-js .sl-nav__toggle { display: inline-flex; margin-left: auto; }
+  .sl-js .sl-nav__menu { display: flex; }
+  /* Opt an individual bar control out at mobile and put it in the drawer
+     foot instead, so no control appears in both places. */
+  .sl-js .sl-nav__collapse { display: none; }
+
+  /* Without the script nothing can open a drawer, so the bar stops being
+     fixed and the links wrap under the logo where they stay reachable. */
+  html:not(.sl-js) .sl-nav { position: static; }
+  html:not(.sl-js) .sl-nav__inner { flex-wrap: wrap; row-gap: var(--sl-space-3); padding-block: var(--sl-space-3); }
+  html:not(.sl-js) .sl-nav__links { margin-left: 0; flex-wrap: wrap; gap: var(--sl-space-4); }
+  html:not(.sl-js) .sl-nav-offset,
+  html:not(.sl-js) .sl-section.sl-nav-offset { padding-top: var(--sl-section-y); }
 }
 
 @media (max-width: 560px) {
   .sl-footer__grid { grid-template-columns: 1fr; gap: var(--sl-space-6); }
-  .sl-btn { width: 100%; }
+  /* Stacking is the button row's job, so a lone button keeps its own width.
+     Use .sl-btn--block when a full-width button is what you want. */
   .sl-btn-row { flex-direction: column; align-items: stretch; }
   .sl-store { width: 100%; }
 }

@@ -41,7 +41,12 @@ These are hard rules and they apply to English and Spanish equally.
 Store links, used wherever an app is mentioned:
 
 - App Store `https://apps.apple.com/us/app/run-with-aria/id6760048203`
-- Google Play `https://play.google.com/store/apps/details?id=com.aria.mobile`
+- Google Play `https://play.google.com/store/apps/details?id=com.runwitharia.mobile`
+
+The Play URL in the body of issue #2 uses package `com.aria.mobile`, which returns
+404. The package above is the live listing, verified and recorded on issue #2 at
+https://github.com/Stadiora/stadiora-labs-website/issues/2#issuecomment-5485744146.
+Treat that comment as part of the facts pack until the issue body is corrected.
 
 ---
 
@@ -54,13 +59,21 @@ Store links, used wherever an app is mentioned:
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap">
 <link rel="stylesheet" href="./styles/site.css">
+<script src="./scripts/nav.js" defer></script>
 ```
 
 The stylesheet also carries an `@import` for the same Google Fonts URL, so it works
 standalone. Keeping the `<link>` tags in `<head>` is still preferred because the fonts
 start downloading earlier.
 
+`scripts/nav.js` drives the shared mobile drawer. Any page with a nav loads it. See
+section 4 for the markup contract and the no-script fallback.
+
 Bebas Neue and DM Sans are retired. Do not reintroduce them.
+
+The shared base deliberately does not set `overflow-x: hidden` on `body`. That rule hides
+horizontal overflow instead of preventing it, which would silently pass the 390px check
+that every slice has to clear. If a page overflows, fix the element that overflows.
 
 ---
 
@@ -86,8 +99,12 @@ hex values, so a palette change stays a one-line edit.
 | `--sl-white` | `#ffffff` | Headlines, numbers |
 | `--sl-text` | `rgba(255,255,255,.92)` | Default body text |
 | `--sl-text-muted` | `rgba(255,255,255,.62)` | Supporting paragraphs |
-| `--sl-text-faint` | `rgba(255,255,255,.38)` | Labels, captions |
-| `--sl-text-ghost` | `rgba(255,255,255,.22)` | Watermarks, disabled |
+| `--sl-text-faint` | `rgba(255,255,255,.58)` | Labels, captions |
+| `--sl-text-ghost` | `rgba(255,255,255,.22)` | Watermarks, disabled, decoration only |
+
+Contrast, measured over `--sl-ink-900` and `--sl-ink-700`. The first four clear WCAG AA
+at 4.5:1 on both surfaces, so any of them is safe for live copy. `--sl-text-ghost` sits
+at about 1.9:1 and must never carry text a reader needs.
 
 ### Accents
 
@@ -103,6 +120,10 @@ hex values, so a palette change stays a one-line edit.
 
 Violet is restrained by design. One violet element per screen at most, reserved for
 partner or secondary signals. Everything else is cyan.
+
+White text on `--sl-violet` measures 4.23:1, under AA at the 14px bold that buttons use,
+so `.sl-btn--violet` takes `--sl-ink-900` as its label colour. Keep that rule if you build
+any other violet-filled control.
 
 ### Surfaces and borders
 
@@ -142,19 +163,73 @@ colliding with its own legacy styles. Blocks use `sl-block`, elements use
 
 | Component | Classes |
 | --- | --- |
-| Page frame | `.sl-container`, `.sl-section`, `.sl-section--alt`, `.sl-grid` with `--2` `--3` `--4` |
+| Page frame | `.sl-container`, `.sl-section` plus `--alt` and `--tight`, `.sl-grid` with `--2` `--3` `--4` |
 | Nav bar | `.sl-nav`, `.sl-nav__inner`, `.sl-nav__logo`, `.sl-nav__links`, `.sl-nav__actions`, `.sl-nav__toggle`, `.sl-nav-offset` on the first section |
+| Mobile drawer | `.sl-nav__menu`, `.sl-nav__menu-links`, `.sl-nav__menu-foot`, `.sl-nav__collapse`, open state `.is-open`, icon swap `.sl-nav__icon-open` and `.sl-nav__icon-close` |
 | Language toggle | `.sl-lang`, `.sl-lang__btn`, active state `.is-active` or `aria-current="true"` |
 | Eyebrow | `.sl-eyebrow` |
 | Headings | `.sl-display`, `.sl-h1`, `.sl-h2`, `.sl-h3`, `.sl-lead` |
+| Inline text | `.sl-accent` (cyan word inside a headline), `.sl-accent-violet`, `.sl-muted`, `.sl-small` |
 | Labels and numbers | `.sl-label`, `.sl-stat-num`, `.sl-stat-label`, `.sl-dotlist` |
 | Buttons | `.sl-btn` plus `--primary`, `--ghost`, `--violet`, `--block`, grouped in `.sl-btn-row` |
 | Card | `.sl-card` plus `--link`, `--flush`, `--violet`, with `.sl-card__icon`, `.sl-card__title`, `.sl-card__body` |
-| Store badges | `.sl-stores`, `.sl-store`, `.sl-store__kicker`, `.sl-store__name` |
-| Footer | `.sl-footer`, `.sl-footer__grid`, `.sl-footer__brand`, `.sl-footer__title`, `.sl-footer__links`, `.sl-footer__social`, `.sl-footer__bottom`, `.sl-footer__legal` |
-| Utilities | `.sl-center`, `.sl-stack`, `.sl-flow`, `.sl-rule`, `.sl-hide`, `.sl-sr-only` |
+| Store badges | `.sl-stores`, `.sl-store`, `.sl-store__text`, `.sl-store__kicker`, `.sl-store__name` |
+| Footer | `.sl-footer`, `.sl-footer__grid`, `.sl-footer__brand`, `.sl-footer__tag`, `.sl-footer__title`, `.sl-footer__links`, `.sl-footer__social`, `.sl-footer__bottom`, `.sl-footer__legal` |
+| Utilities | `.sl-center`, `.sl-stack` plus `--lg`, `.sl-flow`, `.sl-rule`, `.sl-hide`, `.sl-sr-only` |
+
+Colour a word inside a headline with `.sl-accent`, never with an inline `style` attribute.
 
 ### Patterns
+
+Nav with the mobile drawer. The drawer is the only interactive component in the system,
+so it ships with a script. Load `scripts/nav.js` once per page, in `<head>` with `defer`.
+The script wires every `.sl-nav__toggle` that carries an `aria-controls` pointing at a
+`.sl-nav__menu`, handles `aria-expanded`, the Escape key, closing on link click and on
+resize past 860px, and locks body scroll while open. It also adds `.sl-js` to `<html>`.
+Without the script the stylesheet keeps the nav links visible and wrapping below 860px,
+so a page is never left with a button that opens nothing.
+
+```html
+<nav class="sl-nav">
+  <div class="sl-container">
+    <div class="sl-nav__inner">
+      <a class="sl-nav__logo" href="./index.html"><img src="..." alt="Stadiora Labs"></a>
+      <ul class="sl-nav__links">
+        <li><a href="./index.html" aria-current="page">Home</a></li>
+        <li><a href="./investors.html">Investors</a></li>
+      </ul>
+      <div class="sl-nav__actions">
+        <a class="sl-btn sl-btn--primary sl-nav__collapse" href="./lead-magnet.html">Free check</a>
+        <div class="sl-lang"><!-- language toggle, stays in the bar --></div>
+      </div>
+      <button class="sl-nav__toggle" type="button" aria-controls="sl-menu" aria-label="Open menu">
+        <svg class="sl-nav__icon-open" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+        <svg class="sl-nav__icon-close" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<div class="sl-nav__menu" id="sl-menu">
+  <ul class="sl-nav__menu-links">
+    <li><a href="./index.html" aria-current="page">Home</a></li>
+    <li><a href="./investors.html">Investors</a></li>
+  </ul>
+  <div class="sl-nav__menu-foot">
+    <a class="sl-btn sl-btn--primary sl-btn--block" href="./lead-magnet.html">Free check</a>
+  </div>
+</div>
+
+<main class="sl-section sl-nav-offset"><!-- first section --></main>
+```
+
+Keep the drawer links in step with `.sl-nav__links`. Both lists are visible to search
+engines, so they must say the same thing.
+
+Never put the same control in the bar and the drawer at once. Add `.sl-nav__collapse` to
+a bar control to hide it below 860px, then place it in `.sl-nav__menu-foot`. Leave the
+language toggle in the bar. EN and ES parity is a hard rule, so the route to the Spanish
+twin should not sit behind a tap.
 
 Store badge row.
 
@@ -195,11 +270,16 @@ in `stadioralabs info/`, wherever both exist.
 | `anthony_c.png` | Anthony Rugama headshot |
 | `karla_c.png` | Karla Scott headshot |
 | `joel_c.png` | Joel Campbell headshot |
-| `qr_ios.png` | QR code to the App Store listing |
-| `qr_android.png` | QR code to the Google Play listing |
+| `qr_ios.png` | QR code, decodes to the App Store listing |
+| `qr_android.png` | QR code, decodes to `https://runwitharia.com`, not to a store listing. Do not label it as a Google Play code |
 | `brand_icon.png` | Brand icon |
 
 Every image needs alt text. Decorative images get `alt=""` and `aria-hidden="true"`.
+
+The eight photographic PNGs total about 3.6 MB and none of them is sized for the web.
+The largest headshot is 773 KB at 600 by 600, and the three app screenshots are 1179 by
+2326. Resize and convert to WebP or AVIF in whichever slice first puts one on a page.
+Do not point an `<img src>` straight at the raw file.
 
 ---
 
@@ -207,7 +287,10 @@ Every image needs alt text. Decorative images get `alt=""` and `aria-hidden="tru
 
 Before a page slice ships:
 
-- No horizontal scroll at 390px wide.
+- No horizontal scroll at 390px. Measure it, do not add `overflow-x: hidden` to make the
+  measurement pass.
+- The mobile drawer opens, closes on Escape, on a link click and on the toggle, and every
+  link in `.sl-nav__links` also appears in `.sl-nav__menu`.
 - Every link resolves, internal and external. External links carry
   `target="_blank" rel="noopener"`.
 - The Spanish twin has full content parity with the English page.
