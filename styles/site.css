@@ -36,7 +36,7 @@
   --sl-ink-600: #0a1428;
   --sl-ink-500: #101d38;
 
-  /* Text. The first three are safe for text on any ink surface, all clear
+  /* Text. The first four are safe for text on any ink surface, all clear
      WCAG AA 4.5:1. --sl-text-ghost is decoration only, never live copy. */
   --sl-white: #ffffff;
   --sl-text: rgba(255, 255, 255, 0.92);
@@ -364,11 +364,21 @@ h1, h2, h3, h4 { margin: 0; font-family: var(--sl-font-display); font-weight: 60
   opacity: 0;
   transform: translateY(-8px);
   visibility: hidden;
+  /* visibility flips as a step, never as an interpolation. Opening makes it
+     visible on the same frame so the first link can take focus right away,
+     closing holds it visible until the fade finishes. */
   transition: opacity var(--sl-speed) var(--sl-ease),
               transform var(--sl-speed) var(--sl-ease),
-              visibility var(--sl-speed) var(--sl-ease);
+              visibility 0s linear var(--sl-speed);
 }
-.sl-nav__menu.is-open { opacity: 1; transform: none; visibility: visible; }
+.sl-nav__menu.is-open {
+  opacity: 1;
+  transform: none;
+  visibility: visible;
+  transition: opacity var(--sl-speed) var(--sl-ease),
+              transform var(--sl-speed) var(--sl-ease),
+              visibility 0s linear 0s;
+}
 
 .sl-nav__menu-links { display: grid; gap: var(--sl-space-2); }
 .sl-nav__menu-links a {
@@ -386,7 +396,8 @@ h1, h2, h3, h4 { margin: 0; font-family: var(--sl-font-display); font-weight: 60
 .sl-nav__menu-links a[aria-current='page'] { color: var(--sl-cyan-bright); }
 .sl-nav__menu-foot { margin-top: auto; display: grid; gap: var(--sl-space-4); }
 
-/* Body scroll lock while the drawer is open */
+/* Body scroll lock while the drawer is open. scripts/nav.js owns this class,
+   so do not reuse the name for a page's own body state. */
 body.sl-menu-open { overflow: hidden; }
 
 /* Page content clears the fixed bar. The second rule keeps a section's own

@@ -59,8 +59,16 @@ Treat that comment as part of the facts pack until the issue body is corrected.
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap">
 <link rel="stylesheet" href="./styles/site.css">
+<script>document.documentElement.className += ' sl-js';</script>
 <script src="./scripts/nav.js" defer></script>
 ```
+
+Copy that inline line exactly, and keep it in `<head>`. It is the whole reason the
+mobile nav does not flash. `.sl-js` decides which nav layout the stylesheet draws, so it
+has to be on `<html>` before the first paint. Setting it from the deferred script instead
+paints the no-script bar first and then jumps, which measured a CLS of 0.214 at 390px.
+With the inline line the same page measures 0. `nav.js` also sets the class, as a safety
+net for a page that drops the line, but that path repaints.
 
 The stylesheet also carries an `@import` for the same Google Fonts URL, so it works
 standalone. Keeping the `<link>` tags in `<head>` is still preferred because the fonts
@@ -165,7 +173,7 @@ colliding with its own legacy styles. Blocks use `sl-block`, elements use
 | --- | --- |
 | Page frame | `.sl-container`, `.sl-section` plus `--alt` and `--tight`, `.sl-grid` with `--2` `--3` `--4` |
 | Nav bar | `.sl-nav`, `.sl-nav__inner`, `.sl-nav__logo`, `.sl-nav__links`, `.sl-nav__actions`, `.sl-nav__toggle`, `.sl-nav-offset` on the first section |
-| Mobile drawer | `.sl-nav__menu`, `.sl-nav__menu-links`, `.sl-nav__menu-foot`, `.sl-nav__collapse`, open state `.is-open`, icon swap `.sl-nav__icon-open` and `.sl-nav__icon-close` |
+| Mobile drawer | `.sl-nav__menu`, `.sl-nav__menu-links`, `.sl-nav__menu-foot`, `.sl-nav__collapse`, open state `.is-open`, icon swap `.sl-nav__icon-open` and `.sl-nav__icon-close`. `scripts/nav.js` also owns `body.sl-menu-open`, so do not reuse that name |
 | Language toggle | `.sl-lang`, `.sl-lang__btn`, active state `.is-active` or `aria-current="true"` |
 | Eyebrow | `.sl-eyebrow` |
 | Headings | `.sl-display`, `.sl-h1`, `.sl-h2`, `.sl-h3`, `.sl-lead` |
@@ -182,12 +190,22 @@ Colour a word inside a headline with `.sl-accent`, never with an inline `style` 
 ### Patterns
 
 Nav with the mobile drawer. The drawer is the only interactive component in the system,
-so it ships with a script. Load `scripts/nav.js` once per page, in `<head>` with `defer`.
-The script wires every `.sl-nav__toggle` that carries an `aria-controls` pointing at a
-`.sl-nav__menu`, handles `aria-expanded`, the Escape key, closing on link click and on
-resize past 860px, and locks body scroll while open. It also adds `.sl-js` to `<html>`.
-Without the script the stylesheet keeps the nav links visible and wrapping below 860px,
-so a page is never left with a button that opens nothing.
+so it ships with a script. Load `scripts/nav.js` once per page as shown in section 2,
+alongside the inline `.sl-js` line. The script wires every `.sl-nav__toggle` that carries
+an `aria-controls` pointing at a `.sl-nav__menu`, handles `aria-expanded`, the Escape key,
+closing on link click and on resize past 860px, keeps Tab inside the drawer while it is
+open, restores focus when it closes, marks the panel as a modal dialog, and locks body
+scroll. The toggle doubles as the close control, so it is the last stop in the Tab cycle
+even though it sits in the bar rather than in the panel. Without the script the stylesheet
+keeps the nav links visible and wrapping below 860px, so a page is never left with a
+button that opens nothing.
+
+The toggle needs a name in both states, and both come from the page, so an ES twin never
+announces English. Write the closed name in `aria-label`, then give the script both
+strings in `data-label-open` and `data-label-close`. The script writes the name only when
+both data attributes are present, so an authored `aria-label` on its own is never
+overwritten. It also borrows `data-label-open` as the drawer's own `aria-label` unless you
+set one.
 
 ```html
 <nav class="sl-nav">
@@ -202,7 +220,8 @@ so a page is never left with a button that opens nothing.
         <a class="sl-btn sl-btn--primary sl-nav__collapse" href="./lead-magnet.html">Free check</a>
         <div class="sl-lang"><!-- language toggle, stays in the bar --></div>
       </div>
-      <button class="sl-nav__toggle" type="button" aria-controls="sl-menu" aria-label="Open menu">
+      <button class="sl-nav__toggle" type="button" aria-controls="sl-menu"
+              aria-label="Open menu" data-label-open="Open menu" data-label-close="Close menu">
         <svg class="sl-nav__icon-open" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
         <svg class="sl-nav__icon-close" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
       </button>
@@ -221,6 +240,14 @@ so a page is never left with a button that opens nothing.
 </div>
 
 <main class="sl-section sl-nav-offset"><!-- first section --></main>
+```
+
+On the Spanish twin the three label attributes carry Spanish, and nothing else about the
+nav changes.
+
+```html
+<button class="sl-nav__toggle" type="button" aria-controls="sl-menu"
+        aria-label="Abrir menú" data-label-open="Abrir menú" data-label-close="Cerrar menú">
 ```
 
 Keep the drawer links in step with `.sl-nav__links`. Both lists are visible to search
@@ -289,8 +316,13 @@ Before a page slice ships:
 
 - No horizontal scroll at 390px. Measure it, do not add `overflow-x: hidden` to make the
   measurement pass.
-- The mobile drawer opens, closes on Escape, on a link click and on the toggle, and every
-  link in `.sl-nav__links` also appears in `.sl-nav__menu`.
+- The mobile drawer opens, closes on Escape, on a link click and on the toggle, keeps Tab
+  inside itself while open, returns focus where it came from, and every link in
+  `.sl-nav__links` also appears in `.sl-nav__menu`.
+- The nav does not shift on load. `.sl-js` is set by the inline line in `<head>`, not by
+  the deferred script.
+- The toggle announces its state in the page's own language, through `aria-label`,
+  `data-label-open` and `data-label-close`.
 - Every link resolves, internal and external. External links carry
   `target="_blank" rel="noopener"`.
 - The Spanish twin has full content parity with the English page.
