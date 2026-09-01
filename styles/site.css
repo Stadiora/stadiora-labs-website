@@ -1,0 +1,590 @@
+/* ==========================================================================
+   Stadiora Labs shared stylesheet
+   Brand foundation for stadioralabs.com. Every rebuilt page links this file.
+
+   Sections
+     1. Fonts
+     2. Tokens
+     3. Reset and base
+     4. Layout
+     5. Typography helpers
+     6. Buttons
+     7. Nav bar, mobile drawer and language toggle
+     8. Cards
+     9. Store badge row
+    10. Footer
+    11. Utilities
+    12. Motion and accessibility
+
+   Class prefix: every shared class is namespaced "sl-" so a page can be
+   migrated one block at a time without colliding with its own legacy styles.
+   ========================================================================== */
+
+/* ---------- 1. Fonts ------------------------------------------------------
+   Space Grotesk carries display and body. Space Mono carries labels,
+   eyebrows and numbers. Pages may instead preconnect and <link> the same
+   URL in <head>, which loads earlier. See STYLE.md.
+   -------------------------------------------------------------------------- */
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap');
+
+/* ---------- 2. Tokens ----------------------------------------------------- */
+:root {
+  /* Ink scale, darkest first. Page sits on --sl-ink-900. */
+  --sl-ink-900: #010812;
+  --sl-ink-800: #040c1c;
+  --sl-ink-700: #060e20;
+  --sl-ink-600: #0a1428;
+  --sl-ink-500: #101d38;
+
+  /* Text. The first four are safe for text on any ink surface, all clear
+     WCAG AA 4.5:1. --sl-text-ghost is decoration only, never live copy. */
+  --sl-white: #ffffff;
+  --sl-text: rgba(255, 255, 255, 0.92);
+  --sl-text-muted: rgba(255, 255, 255, 0.62);
+  --sl-text-faint: rgba(255, 255, 255, 0.58);
+  --sl-text-ghost: rgba(255, 255, 255, 0.22);
+
+  /* Cyan accent, the primary brand colour */
+  --sl-cyan: #00b8d4;
+  --sl-cyan-bright: #00e5ff;
+  --sl-cyan-soft: rgba(0, 184, 212, 0.14);
+  --sl-cyan-line: rgba(0, 184, 212, 0.38);
+
+  /* Restrained violet, partner and secondary accents only.
+     --sl-violet is a surface and border colour. White text on it measures
+     4.23:1, under AA, so buttons use --sl-ink-900 as their label colour. */
+  --sl-violet: #8b5cf6;
+  --sl-violet-soft: rgba(139, 92, 246, 0.14);
+  --sl-violet-line: rgba(139, 92, 246, 0.36);
+
+  /* Surfaces and lines */
+  --sl-surface: rgba(255, 255, 255, 0.025);
+  --sl-surface-raised: rgba(255, 255, 255, 0.045);
+  --sl-border: rgba(255, 255, 255, 0.08);
+  --sl-border-strong: rgba(255, 255, 255, 0.16);
+
+  /* Type families */
+  --sl-font-display: 'Space Grotesk', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  --sl-font-body: 'Space Grotesk', 'Segoe UI', system-ui, -apple-system, sans-serif;
+  --sl-font-mono: 'Space Mono', ui-monospace, 'SFMono-Regular', 'Consolas', monospace;
+
+  /* Type scale, fluid where it needs to be */
+  --sl-text-display: clamp(42px, 6vw, 84px);
+  --sl-text-h1: clamp(36px, 5vw, 64px);
+  --sl-text-h2: clamp(28px, 3.6vw, 46px);
+  --sl-text-h3: clamp(21px, 2.2vw, 28px);
+  --sl-text-lead: clamp(17px, 1.5vw, 20px);
+  --sl-text-body: 16px;
+  --sl-text-small: 14px;
+  --sl-text-label: 11px;
+
+  --sl-leading-tight: 1.04;
+  --sl-leading-snug: 1.25;
+  --sl-leading-body: 1.65;
+  --sl-tracking-label: 0.18em;
+  --sl-tracking-display: -0.02em;
+
+  /* Spacing scale */
+  --sl-space-1: 4px;
+  --sl-space-2: 8px;
+  --sl-space-3: 12px;
+  --sl-space-4: 16px;
+  --sl-space-5: 24px;
+  --sl-space-6: 32px;
+  --sl-space-7: 48px;
+  --sl-space-8: 64px;
+  --sl-space-9: 96px;
+  --sl-section-y: clamp(64px, 9vw, 128px);
+
+  /* Shape */
+  --sl-radius-sm: 6px;
+  --sl-radius: 12px;
+  --sl-radius-lg: 20px;
+  --sl-radius-pill: 999px;
+
+  /* Depth */
+  --sl-shadow-card: 0 18px 46px rgba(0, 0, 0, 0.42);
+  --sl-shadow-glow: 0 0 32px rgba(0, 184, 212, 0.28);
+
+  /* Motion */
+  --sl-ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --sl-speed: 0.22s;
+
+  /* Frame */
+  --sl-container: 1200px;
+  --sl-gutter: clamp(20px, 5vw, 40px);
+  --sl-nav-h: 72px;
+
+  /* Layers. The nav sits above the drawer so its close control stays
+     reachable while the drawer is open. */
+  --sl-z-menu: 200;
+  --sl-z-nav: 300;
+}
+
+/* ---------- 3. Reset and base --------------------------------------------- */
+*,
+*::before,
+*::after { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+
+body {
+  margin: 0;
+  background: var(--sl-ink-900);
+  color: var(--sl-text);
+  font-family: var(--sl-font-body);
+  font-size: var(--sl-text-body);
+  line-height: var(--sl-leading-body);
+  font-weight: 400;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+img, svg, video { max-width: 100%; height: auto; display: block; }
+svg { fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; }
+svg[data-filled] { fill: currentColor; stroke: none; }
+
+a { color: inherit; text-decoration: none; }
+button { font: inherit; color: inherit; background: none; border: 0; cursor: pointer; }
+ul, ol { margin: 0; padding: 0; list-style: none; }
+p { margin: 0 0 var(--sl-space-4); }
+h1, h2, h3, h4 { margin: 0; font-family: var(--sl-font-display); font-weight: 600; }
+
+::selection { background: var(--sl-cyan); color: var(--sl-ink-900); }
+
+:focus-visible {
+  outline: 2px solid var(--sl-cyan-bright);
+  outline-offset: 3px;
+  border-radius: var(--sl-radius-sm);
+}
+
+/* ---------- 4. Layout ------------------------------------------------------ */
+.sl-container {
+  width: 100%;
+  max-width: var(--sl-container);
+  margin: 0 auto;
+  padding-inline: var(--sl-gutter);
+}
+
+.sl-section { padding-block: var(--sl-section-y); }
+.sl-section--tight { padding-block: var(--sl-space-8); }
+.sl-section--alt { background: var(--sl-ink-800); }
+
+.sl-grid { display: grid; gap: var(--sl-space-5); }
+.sl-grid--2 { grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
+.sl-grid--3 { grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+.sl-grid--4 { grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
+
+.sl-rule { height: 1px; border: 0; margin: 0; background: var(--sl-border); }
+
+/* ---------- 5. Typography helpers ------------------------------------------ */
+.sl-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sl-space-2);
+  font-family: var(--sl-font-mono);
+  font-size: var(--sl-text-label);
+  font-weight: 700;
+  letter-spacing: var(--sl-tracking-label);
+  text-transform: uppercase;
+  color: var(--sl-cyan);
+  margin-bottom: var(--sl-space-4);
+}
+.sl-eyebrow::before {
+  content: '';
+  width: 22px;
+  height: 1px;
+  background: var(--sl-cyan-line);
+}
+
+.sl-display {
+  font-family: var(--sl-font-display);
+  font-size: var(--sl-text-display);
+  font-weight: 700;
+  line-height: var(--sl-leading-tight);
+  letter-spacing: var(--sl-tracking-display);
+}
+.sl-h1 { font-size: var(--sl-text-h1); font-weight: 700; line-height: var(--sl-leading-tight); letter-spacing: var(--sl-tracking-display); }
+.sl-h2 { font-size: var(--sl-text-h2); font-weight: 600; line-height: var(--sl-leading-snug); letter-spacing: var(--sl-tracking-display); }
+.sl-h3 { font-size: var(--sl-text-h3); font-weight: 600; line-height: var(--sl-leading-snug); }
+
+.sl-lead { font-size: var(--sl-text-lead); color: var(--sl-text-muted); max-width: 62ch; }
+.sl-muted { color: var(--sl-text-muted); }
+.sl-small { font-size: var(--sl-text-small); }
+
+/* Space Mono for labels and numbers */
+.sl-label {
+  font-family: var(--sl-font-mono);
+  font-size: var(--sl-text-label);
+  font-weight: 700;
+  letter-spacing: var(--sl-tracking-label);
+  text-transform: uppercase;
+  color: var(--sl-text-faint);
+}
+.sl-stat-num {
+  font-family: var(--sl-font-mono);
+  font-size: clamp(34px, 4.4vw, 56px);
+  font-weight: 700;
+  line-height: 1;
+  color: var(--sl-white);
+}
+.sl-stat-label { margin-top: var(--sl-space-2); }
+
+.sl-accent { color: var(--sl-cyan-bright); }
+.sl-accent-violet { color: var(--sl-violet); }
+
+/* Middot separator motif. The separator trails its own item so a wrapped
+   line never opens with an orphan dot. */
+.sl-dotlist {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--sl-space-3);
+  font-family: var(--sl-font-mono);
+  font-size: var(--sl-text-label);
+  letter-spacing: var(--sl-tracking-label);
+  text-transform: uppercase;
+  color: var(--sl-text-faint);
+}
+.sl-dotlist > * { white-space: nowrap; }
+.sl-dotlist > *:not(:last-child)::after {
+  content: '\00b7';
+  margin-left: var(--sl-space-3);
+  color: var(--sl-cyan);
+}
+
+/* ---------- 6. Buttons ----------------------------------------------------- */
+.sl-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sl-space-2);
+  padding: 13px 24px;
+  border-radius: var(--sl-radius-pill);
+  border: 1px solid transparent;
+  font-family: var(--sl-font-body);
+  font-size: var(--sl-text-small);
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  text-align: center;
+  cursor: pointer;
+  transition: background var(--sl-speed) var(--sl-ease),
+              border-color var(--sl-speed) var(--sl-ease),
+              color var(--sl-speed) var(--sl-ease),
+              transform var(--sl-speed) var(--sl-ease);
+}
+.sl-btn svg { width: 16px; height: 16px; flex: none; }
+
+.sl-btn--primary {
+  background: var(--sl-cyan);
+  color: var(--sl-ink-900);
+  font-weight: 700;
+}
+.sl-btn--primary:hover { background: var(--sl-cyan-bright); transform: translateY(-1px); }
+
+.sl-btn--ghost {
+  background: transparent;
+  border-color: var(--sl-border-strong);
+  color: var(--sl-text);
+}
+.sl-btn--ghost:hover { border-color: var(--sl-cyan-line); color: var(--sl-cyan-bright); }
+
+.sl-btn--violet { background: var(--sl-violet); color: var(--sl-ink-900); font-weight: 700; }
+.sl-btn--violet:hover { transform: translateY(-1px); }
+
+.sl-btn--block { width: 100%; }
+
+.sl-btn-row { display: flex; flex-wrap: wrap; gap: var(--sl-space-3); }
+
+/* ---------- 7. Nav bar, mobile drawer and language toggle ------------------ */
+.sl-nav {
+  position: fixed;
+  inset: 0 0 auto 0;
+  z-index: var(--sl-z-nav);
+  min-height: var(--sl-nav-h);
+  display: flex;
+  align-items: center;
+  background: rgba(1, 8, 18, 0.82);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--sl-border);
+}
+.sl-nav__inner {
+  display: flex;
+  align-items: center;
+  gap: var(--sl-space-5);
+  min-height: var(--sl-nav-h);
+}
+.sl-nav__logo { display: flex; align-items: center; gap: var(--sl-space-2); }
+.sl-nav__logo img { height: 26px; width: auto; }
+.sl-nav__links {
+  display: flex;
+  align-items: center;
+  gap: var(--sl-space-5);
+  margin-left: auto;
+  font-size: var(--sl-text-small);
+  color: var(--sl-text-muted);
+}
+.sl-nav__links a { transition: color var(--sl-speed) var(--sl-ease); }
+.sl-nav__links a:hover,
+.sl-nav__links a[aria-current='page'] { color: var(--sl-cyan-bright); }
+
+.sl-nav__actions { display: flex; align-items: center; gap: var(--sl-space-3); }
+.sl-nav__actions .sl-btn { flex: none; white-space: nowrap; }
+
+.sl-nav__toggle {
+  display: none;
+  width: 40px;
+  height: 40px;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--sl-border);
+  border-radius: var(--sl-radius-sm);
+  color: var(--sl-text);
+}
+.sl-nav__toggle svg { width: 20px; height: 20px; }
+.sl-nav__toggle .sl-nav__icon-close { display: none; }
+.sl-nav__toggle[aria-expanded='true'] .sl-nav__icon-close { display: block; }
+.sl-nav__toggle[aria-expanded='true'] .sl-nav__icon-open { display: none; }
+
+/* Mobile drawer. Closed by default, opened by toggling .is-open, which
+   scripts/nav.js does. Above the breakpoint it is never rendered. */
+.sl-nav__menu {
+  position: fixed;
+  inset: 0;
+  z-index: var(--sl-z-menu);
+  display: none;
+  flex-direction: column;
+  gap: var(--sl-space-5);
+  padding: calc(var(--sl-nav-h) + var(--sl-space-6)) var(--sl-gutter) var(--sl-space-7);
+  background: var(--sl-ink-900);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  opacity: 0;
+  transform: translateY(-8px);
+  visibility: hidden;
+  /* visibility flips as a step, never as an interpolation. Opening makes it
+     visible on the same frame so the first link can take focus right away,
+     closing holds it visible until the fade finishes. */
+  transition: opacity var(--sl-speed) var(--sl-ease),
+              transform var(--sl-speed) var(--sl-ease),
+              visibility 0s linear var(--sl-speed);
+}
+.sl-nav__menu.is-open {
+  opacity: 1;
+  transform: none;
+  visibility: visible;
+  transition: opacity var(--sl-speed) var(--sl-ease),
+              transform var(--sl-speed) var(--sl-ease),
+              visibility 0s linear 0s;
+}
+
+.sl-nav__menu-links { display: grid; gap: var(--sl-space-2); }
+.sl-nav__menu-links a {
+  display: block;
+  padding: var(--sl-space-3) 0;
+  font-family: var(--sl-font-display);
+  font-size: clamp(26px, 8vw, 34px);
+  font-weight: 600;
+  letter-spacing: var(--sl-tracking-display);
+  color: var(--sl-text-muted);
+  border-bottom: 1px solid var(--sl-border);
+  transition: color var(--sl-speed) var(--sl-ease);
+}
+.sl-nav__menu-links a:hover,
+.sl-nav__menu-links a[aria-current='page'] { color: var(--sl-cyan-bright); }
+.sl-nav__menu-foot { margin-top: auto; display: grid; gap: var(--sl-space-4); }
+
+/* Body scroll lock while the drawer is open. scripts/nav.js owns this class,
+   so do not reuse the name for a page's own body state. */
+body.sl-menu-open { overflow: hidden; }
+
+/* Page content clears the fixed bar. The second rule keeps a section's own
+   vertical rhythm instead of replacing it, since both selectors would
+   otherwise have equal weight and the offset would win. */
+.sl-nav-offset { padding-top: var(--sl-nav-h); }
+.sl-section.sl-nav-offset { padding-top: calc(var(--sl-nav-h) + var(--sl-section-y)); }
+
+.sl-lang { display: inline-flex; align-items: center; gap: var(--sl-space-1); }
+.sl-lang__btn {
+  font-family: var(--sl-font-mono);
+  font-size: var(--sl-text-label);
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  padding: 5px 11px;
+  border-radius: var(--sl-radius-sm);
+  border: 1px solid var(--sl-border);
+  color: var(--sl-text-faint);
+  transition: color var(--sl-speed) var(--sl-ease), border-color var(--sl-speed) var(--sl-ease), background var(--sl-speed) var(--sl-ease);
+}
+.sl-lang__btn:hover { color: var(--sl-text); border-color: var(--sl-border-strong); }
+.sl-lang__btn.is-active,
+.sl-lang__btn[aria-current='true'] {
+  color: var(--sl-cyan-bright);
+  border-color: var(--sl-cyan-line);
+  background: var(--sl-cyan-soft);
+}
+
+/* ---------- 8. Cards ------------------------------------------------------- */
+.sl-card {
+  background: var(--sl-ink-700);
+  border: 1px solid var(--sl-border);
+  border-radius: var(--sl-radius-lg);
+  padding: var(--sl-space-6);
+  transition: border-color var(--sl-speed) var(--sl-ease), transform var(--sl-speed) var(--sl-ease);
+}
+.sl-card--link:hover { border-color: var(--sl-cyan-line); transform: translateY(-2px); }
+.sl-card--flush { padding: 0; overflow: hidden; }
+.sl-card--violet { border-color: var(--sl-violet-line); background: linear-gradient(180deg, var(--sl-violet-soft), transparent 62%), var(--sl-ink-700); }
+
+.sl-card__icon {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--sl-cyan-line);
+  border-radius: var(--sl-radius-sm);
+  color: var(--sl-cyan);
+  margin-bottom: var(--sl-space-4);
+}
+.sl-card__icon svg { width: 20px; height: 20px; }
+.sl-card__title { font-family: var(--sl-font-display); font-size: var(--sl-text-h3); font-weight: 600; margin-bottom: var(--sl-space-2); color: var(--sl-white); }
+.sl-card__body { color: var(--sl-text-muted); margin: 0; }
+
+/* ---------- 9. Store badge row --------------------------------------------- */
+.sl-stores { display: flex; flex-wrap: wrap; gap: var(--sl-space-3); align-items: center; }
+.sl-store {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sl-space-3);
+  padding: 10px 18px;
+  border: 1px solid var(--sl-border-strong);
+  border-radius: var(--sl-radius);
+  background: var(--sl-surface);
+  transition: border-color var(--sl-speed) var(--sl-ease), background var(--sl-speed) var(--sl-ease);
+}
+.sl-store:hover { border-color: var(--sl-cyan-line); background: var(--sl-cyan-soft); }
+.sl-store svg { width: 22px; height: 22px; color: var(--sl-white); flex: none; }
+.sl-store__text { display: flex; flex-direction: column; line-height: 1.2; }
+.sl-store__kicker {
+  font-family: var(--sl-font-mono);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: var(--sl-tracking-label);
+  text-transform: uppercase;
+  color: var(--sl-text-faint);
+}
+.sl-store__name { font-size: var(--sl-text-small); font-weight: 600; color: var(--sl-white); }
+
+/* ---------- 10. Footer ------------------------------------------------------ */
+.sl-footer {
+  background: var(--sl-ink-800);
+  border-top: 1px solid var(--sl-border);
+  padding-block: var(--sl-space-8) var(--sl-space-6);
+}
+.sl-footer__grid {
+  display: grid;
+  gap: var(--sl-space-7);
+  grid-template-columns: minmax(240px, 1.6fr) repeat(auto-fit, minmax(150px, 1fr));
+}
+.sl-footer__brand img { height: 28px; width: auto; margin-bottom: var(--sl-space-4); }
+.sl-footer__tag { color: var(--sl-text-muted); max-width: 46ch; }
+.sl-footer__title {
+  font-family: var(--sl-font-mono);
+  font-size: var(--sl-text-label);
+  font-weight: 700;
+  letter-spacing: var(--sl-tracking-label);
+  text-transform: uppercase;
+  color: var(--sl-white);
+  margin-bottom: var(--sl-space-4);
+}
+.sl-footer__links { display: grid; gap: var(--sl-space-3); font-size: var(--sl-text-small); color: var(--sl-text-muted); }
+.sl-footer__links a { transition: color var(--sl-speed) var(--sl-ease); }
+.sl-footer__links a:hover { color: var(--sl-cyan-bright); }
+.sl-footer__social { display: flex; gap: var(--sl-space-3); margin-top: var(--sl-space-5); }
+.sl-footer__social a {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--sl-border);
+  border-radius: var(--sl-radius-sm);
+  color: var(--sl-text-muted);
+  transition: color var(--sl-speed) var(--sl-ease), border-color var(--sl-speed) var(--sl-ease);
+}
+.sl-footer__social a:hover { color: var(--sl-cyan-bright); border-color: var(--sl-cyan-line); }
+.sl-footer__social svg { width: 18px; height: 18px; }
+.sl-footer__bottom {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sl-space-4);
+  justify-content: space-between;
+  align-items: center;
+  margin-top: var(--sl-space-8);
+  padding-top: var(--sl-space-5);
+  border-top: 1px solid var(--sl-border);
+  font-size: var(--sl-text-small);
+  color: var(--sl-text-faint);
+}
+.sl-footer__legal { display: flex; flex-wrap: wrap; gap: var(--sl-space-5); }
+.sl-footer__legal a:hover { color: var(--sl-cyan-bright); }
+
+/* ---------- 11. Utilities --------------------------------------------------- */
+.sl-center { text-align: center; }
+.sl-center .sl-lead { margin-inline: auto; }
+.sl-stack { display: grid; gap: var(--sl-space-4); }
+.sl-stack--lg { gap: var(--sl-space-6); }
+.sl-flow > * + * { margin-top: var(--sl-space-4); }
+.sl-hide { display: none; }
+.sl-sr-only {
+  position: absolute;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (max-width: 860px) {
+  .sl-footer__grid { grid-template-columns: 1fr 1fr; }
+
+  /* With the shared script present the links move into the drawer that the
+     toggle opens. See scripts/nav.js. */
+  .sl-js .sl-nav__links { display: none; }
+  .sl-js .sl-nav__toggle { display: inline-flex; margin-left: auto; }
+  .sl-js .sl-nav__menu { display: flex; }
+  /* Opt an individual bar control out at mobile and put it in the drawer
+     foot instead, so no control appears in both places. */
+  .sl-js .sl-nav__collapse { display: none; }
+
+  /* Without the script nothing can open a drawer, so the bar stops being
+     fixed and the links wrap under the logo where they stay reachable. */
+  html:not(.sl-js) .sl-nav { position: static; }
+  html:not(.sl-js) .sl-nav__inner { flex-wrap: wrap; row-gap: var(--sl-space-3); padding-block: var(--sl-space-3); }
+  html:not(.sl-js) .sl-nav__links { margin-left: 0; flex-wrap: wrap; gap: var(--sl-space-4); }
+  html:not(.sl-js) .sl-nav-offset,
+  html:not(.sl-js) .sl-section.sl-nav-offset { padding-top: var(--sl-section-y); }
+}
+
+@media (max-width: 560px) {
+  .sl-footer__grid { grid-template-columns: 1fr; gap: var(--sl-space-6); }
+  /* Stacking is the button row's job, so a lone button keeps its own width.
+     Use .sl-btn--block when a full-width button is what you want. */
+  .sl-btn-row { flex-direction: column; align-items: stretch; }
+  .sl-store { width: 100%; }
+}
+
+/* ---------- 12. Motion and accessibility ------------------------------------ */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
