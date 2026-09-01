@@ -153,8 +153,10 @@
 
 /* ---- Lists ---- */
 .iv-list { display: grid; gap: var(--sl-space-3); }
-.iv-list li { display: flex; gap: var(--sl-space-3); align-items: flex-start; color: var(--sl-text-muted); }
-.iv-list svg { width: 18px; height: 18px; flex: none; margin-top: 4px; color: var(--sl-cyan); }
+.iv-list li,
+.iv-checks li { display: flex; gap: var(--sl-space-3); align-items: flex-start; color: var(--sl-text-muted); }
+.iv-list svg,
+.iv-checks svg { width: 18px; height: 18px; flex: none; margin-top: 4px; color: var(--sl-cyan); }
 
 .iv-rows { display: grid; gap: 0; }
 .iv-rows__row {
@@ -346,10 +348,10 @@
 <section class="sl-section sl-section--alt" id="traction">
   <div class="sl-container">
     <p class="sl-eyebrow">Tracción</p>
-    <h2 class="sl-h2">Construido, en vivo y en uso</h2>
+    <h2 class="sl-h2">Ya en manos de los atletas</h2>
     <p class="sl-lead" style="margin-bottom:var(--sl-space-7)">
-      Dos productos están en producción y un tercero abre un segundo deporte. Todo lo que sigue funciona hoy, nada de
-      esto es una promesa de roadmap.
+      Run with Aria y Aria for Coaches están en vivo, y lo que esta página dice de esos dos funciona hoy y no es una
+      promesa para después. Aria 12 lleva el mismo motor al fútbol.
     </p>
 
     <div class="iv-split iv-split--media">
@@ -437,11 +439,7 @@
         <div class="iv-rows">
           <div class="iv-rows__row">
             <span class="sl-muted">Suscripción mensual</span>
-            <span class="iv-rows__val iv-rows__val--accent">$7.99</span>
-          </div>
-          <div class="iv-rows__row">
-            <span class="sl-muted">Suscripción mensual</span>
-            <span class="iv-rows__val iv-rows__val--accent">$14.99</span>
+            <span class="iv-rows__val iv-rows__val--accent">$7.99 y $14.99</span>
           </div>
         </div>
       </div>
@@ -534,8 +532,7 @@
           en las personas que Aria reemplaza. Suma hacia arriba en lugar de dividir hacia abajo.
         </p>
         <p class="sl-muted">
-          Nada de recortar el pronóstico de otro, nada de un porcentaje de un titular sobre tecnología deportiva. Si una
-          línea del modelo está mal, puedes señalar cuál.
+          Si una línea del modelo está mal, puedes señalar cuál.
         </p>
       </div>
     </div>
@@ -551,25 +548,25 @@
     <div class="iv-team">
       <div class="sl-card">
         <img class="iv-team__photo" src="./assets/deck-v2/ian_c.webp" width="320" height="320" alt="Ian Rowe">
-        <p class="iv-team__name">Ian Rowe</p>
+        <h3 class="iv-team__name">Ian Rowe</h3>
         <p class="iv-team__role">Cofundador y CTO</p>
         <p class="sl-card__body">Ex-Microsoft, trabajó en Copilot Notebooks. Construyó el producto.</p>
       </div>
       <div class="sl-card">
         <img class="iv-team__photo" src="./assets/deck-v2/anthony_c.webp" width="320" height="320" alt="Anthony Rugama">
-        <p class="iv-team__name">Anthony Rugama</p>
+        <h3 class="iv-team__name">Anthony Rugama</h3>
         <p class="iv-team__role">Cofundador y CEO</p>
         <p class="sl-card__body">Microsoft Cloud &amp; AI Architect (GTM y ventas). Fundador de RedAfro y velocista. 4.º del mundo M40, plusmarquista de Centroamérica e Iberoamérica.</p>
       </div>
       <div class="sl-card">
         <img class="iv-team__photo" src="./assets/deck-v2/karla_c.webp" width="320" height="320" alt="Karla Scott">
-        <p class="iv-team__name">Karla Scott</p>
+        <h3 class="iv-team__name">Karla Scott</h3>
         <p class="iv-team__role">CMO</p>
         <p class="sl-card__body">Periodista y estratega de marketing digital, ventas y comunicación con más de 8 años de experiencia.</p>
       </div>
       <div class="sl-card">
         <img class="iv-team__photo" src="./assets/deck-v2/joel_c.webp" width="320" height="320" alt="Joel Campbell">
-        <p class="iv-team__name">Joel Campbell</p>
+        <h3 class="iv-team__name">Joel Campbell</h3>
         <p class="iv-team__role">Socio estratégico de capital</p>
         <p class="sl-card__body">Abre el fútbol para Aria 12.</p>
       </div>
@@ -617,15 +614,33 @@
 
     <div class="iv-panel iv-panel--plain">
       <p class="sl-label" style="margin-bottom:var(--sl-space-5)">Sala de datos segura de Stadiora Labs</p>
-      <div class="iv-checks" style="margin-bottom:var(--sl-space-7)">
-        <p class="sl-muted" style="margin:0">Finanzas y proyecciones</p>
-        <p class="sl-muted" style="margin:0">Roadmap de producto y demos</p>
-        <p class="sl-muted" style="margin:0">Cap table y documentos legales</p>
-        <p class="sl-muted" style="margin:0">Tracción y métricas de uso</p>
-        <p class="sl-muted" style="margin:0">Arquitectura técnica</p>
-        <p class="sl-muted" style="margin:0">Perfiles del equipo y asesores</p>
-      </div>
-      <a class="sl-btn sl-btn--primary" href="https://stadioralabs.sharepoint.com/:f:/g/IgBlPwdR1nCcQKtLbTRflUrZAf_lhRnxCLbCvnfhQzi_ShU?e=uixffd" target="_blank" rel="noopener">
+      <ul class="iv-checks" style="margin-bottom:var(--sl-space-7)">
+        <li>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>
+          <span>Finanzas y proyecciones</span>
+        </li>
+        <li>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>
+          <span>Roadmap de producto y demos</span>
+        </li>
+        <li>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>
+          <span>Cap table y documentos legales</span>
+        </li>
+        <li>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>
+          <span>Tracción y métricas de uso</span>
+        </li>
+        <li>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>
+          <span>Arquitectura técnica</span>
+        </li>
+        <li>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>
+          <span>Perfiles del equipo y asesores</span>
+        </li>
+      </ul>
+      <a class="sl-btn sl-btn--primary" href="https://stadioralabs.sharepoint.com/:f:/g/IgBlPwdR1nCcQKtLbTRflUrZAf_lhRnxCLbCvnfhQzi_ShU?e=uixffd" target="_blank" rel="noopener noreferrer">
         <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>
         Acceder a la sala de datos
       </a>
