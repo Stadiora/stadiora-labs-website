@@ -33,7 +33,13 @@ const APP_STORE = 'https://apps.apple.com/us/app/run-with-aria/id6760048203';
 const GOOGLE_PLAY = 'https://play.google.com/store/apps/details?id=com.runwitharia.mobile';
 const LINKEDIN = 'https://www.linkedin.com/company/stadioralabs';
 const CONTACT = 'mailto:info@stadioralabs.com';
-const LOGO = './stadioralabs%20info/stadiora_labs_logo%20-%20white.png';
+/* The 1276x298 PNG source is 87 KB and renders at 26 to 28px tall, twice per page,
+   on every page. This 360x84 WebP derivative is 11 KB and covers 3x density at the
+   largest render. Intrinsic width and height are on the tag so the browser reserves
+   the right box before the file arrives, per STYLE.md rule 5. */
+const LOGO = './stadioralabs%20info/stadiora_labs_logo%20-%20white.webp';
+const LOGO_W = 360;
+const LOGO_H = 84;
 
 /* Stroke icons, per STYLE.md rule 6. The Apple glyph is the one exception the
    system already makes, it reads as a solid mark at 22px. */
@@ -219,7 +225,7 @@ const navBlock = (page) => {
   <div class="sl-container">
     <div class="sl-nav__inner">
       <a class="sl-nav__logo" href="${t.home}">
-        <img src="${LOGO}" alt="Stadiora Labs">
+        <img src="${LOGO}" width="${LOGO_W}" height="${LOGO_H}" decoding="async" alt="Stadiora Labs">
       </a>
       <ul class="sl-nav__links">
 ${list('        ')}
@@ -255,7 +261,7 @@ const footerBlock = (page) => {
   <div class="sl-container">
     <div class="sl-footer__grid">
       <div class="sl-footer__brand">
-        <img src="${LOGO}" alt="Stadiora Labs">
+        <img src="${LOGO}" width="${LOGO_W}" height="${LOGO_H}" loading="lazy" decoding="async" alt="Stadiora Labs">
         <p class="sl-footer__tag">${f.tag}</p>
         <div class="sl-stores">
           <a class="sl-store" href="${APP_STORE}" target="_blank" rel="noopener">

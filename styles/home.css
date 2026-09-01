@@ -134,7 +134,7 @@
   color: var(--sl-cyan-bright);
   margin-bottom: var(--sl-space-4);
 }
-.home-pill--violet { border-color: var(--sl-violet-line); background: var(--sl-violet-soft); color: var(--sl-violet); }
+.home-pill--violet { border-color: var(--sl-violet-line); background: var(--sl-violet-soft); color: var(--sl-violet-bright); }
 .home-pill svg { width: 13px; height: 13px; }
 
 /* ---------- Ecosystem cards --------------------------------------------------- */
@@ -242,9 +242,9 @@
 
 /* Empty anchor that keeps an old inbound fragment landing on the right section
    after the section itself was renamed. api.html and api-es.html still link to
-   index.html#mission, so #mission has to keep answering until slice #6 lands. */
+   index.html#mission, so #mission has to keep answering until slice #6 lands.
+   The offset that clears the fixed bar comes from the shared [id] rule. */
 .home-anchor {
   display: block;
   height: 0;
-  scroll-margin-top: var(--sl-nav-h);
 }

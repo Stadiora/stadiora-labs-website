@@ -1,0 +1,16 @@
+{
+  "name": "stadiora-labs-website",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Static site for stadioralabs.com. Node is only used by the tooling in scripts/, never to build the site.",
+  "license": "UNLICENSED",
+  "type": "module",
+  "scripts": {
+    "chrome:check": "node scripts/chrome.mjs --check",
+    "chrome:write": "node scripts/chrome.mjs --write",
+    "og": "node scripts/make-og.mjs"
+  },
+  "devDependencies": {
+    "puppeteer": "24.10.2"
+  }
+}

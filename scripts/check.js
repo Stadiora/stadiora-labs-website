@@ -174,6 +174,13 @@
 
   /* ---- role and sport --------------------------------------------------- */
 
+  /* The 180ms pause lets the selected state register before the screen moves.
+     A second tap inside that window used to schedule a second advance, so the
+     quiz jumped two screens and the reader's next Back press did nothing
+     visible. Holding the timer means the last tap wins, which also keeps a
+     genuine change of mind working. */
+  var chooseTimer = 0;
+
   function choose(group, value, nextScreen) {
     var buttons = document.querySelectorAll('[data-' + group + ']');
     for (var i = 0; i < buttons.length; i++) {
@@ -181,7 +188,8 @@
       buttons[i].classList.toggle('is-selected', on);
       buttons[i].setAttribute('aria-pressed', on ? 'true' : 'false');
     }
-    window.setTimeout(nextScreen, 180);
+    window.clearTimeout(chooseTimer);
+    chooseTimer = window.setTimeout(nextScreen, 180);
   }
 
   /* ---- questions -------------------------------------------------------- */
