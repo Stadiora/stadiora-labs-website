@@ -2,985 +2,242 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<link rel="icon" type="image/png" href="./stadioralabs info/favicon.png">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="Aria Intelligence API — The sports AI decision engine for developers. Embed readiness, availability, and injury risk intelligence into any application, across any sport.">
-<title>Aria Intelligence API — Stadiora Labs</title>
+<link rel="icon" type="image/png" href="./stadioralabs%20info/favicon.png">
+<meta name="description" content="Aria Intelligence is the decision engine behind the Aria apps. Programmatic access is planned, not live. Early access for teams and platforms that want to build on it.">
+<title>Aria Intelligence · Stadiora Labs</title>
+<link rel="alternate" hreflang="en" href="https://stadioralabs.com/api.html">
+<link rel="alternate" hreflang="es" href="https://stadioralabs.com/api-es.html">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap">
+<link rel="stylesheet" href="./styles/site.css">
+<script>document.documentElement.className += ' sl-js';</script>
+<script src="./scripts/nav.js" defer></script>
 <style>
-
-/* Language toggle */
-.lang-toggle{display:flex;gap:4px;align-items:center}
-.lang-btn{font-size:11px;font-weight:700;letter-spacing:1.5px;padding:5px 11px;border-radius:6px;border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.35);background:transparent;cursor:pointer;text-decoration:none;transition:all .2s}
-.lang-btn.active{color:var(--violet);border-color:rgba(139,92,246,.4);background:rgba(139,92,246,.07)}
-.lang-btn:hover:not(.active){color:rgba(255,255,255,.65);border-color:rgba(255,255,255,.25)}
-
-:root {
-  --black:   #010812;
-  --navy:    #040c1c;
-  --card:    #060e20;
-  --cyan:    #00BEF3;
-  --mint:    #34D399;
-  --violet:  #8B5CF6;
-  --violet2: #6D28D9;
-  --white:   #ffffff;
-  --muted:   rgba(255,255,255,0.38);
-  --dim:     rgba(255,255,255,0.12);
-  --border:  rgba(255,255,255,0.07);
-  --border2: rgba(255,255,255,0.13);
-}
-
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-html{scroll-behavior:smooth}
-body{background:var(--black);color:var(--white);font-family:'DM Sans',sans-serif;overflow-x:hidden;line-height:1.6}
-img{max-width:100%;display:block}
-a{text-decoration:none;color:inherit}
-
-.container{width:100%;max-width:1240px;margin:0 auto;padding:0 48px}
-
-/* ── GRAIN ── */
-body::before{
-  content:'';position:fixed;inset:0;pointer-events:none;z-index:9999;
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
-  opacity:.5;
-}
-
-/* ── NAV ── */
-#nav{
-  position:fixed;top:0;left:0;right:0;z-index:100;
-  padding:20px 0;
-  background:linear-gradient(to bottom,rgba(1,8,18,.95) 0%,rgba(1,8,18,.0) 100%);
-  transition:background .3s;
-}
-#nav.scrolled{background:rgba(1,8,18,.97);border-bottom:1px solid var(--border)}
-.nav-inner{display:flex;align-items:center;gap:40px}
-.nav-logo{display:flex;align-items:center;gap:10px;margin-right:auto}
-.nav-logo img{height:48px;width:auto}
-.nav-logo-fallback{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:3px}
-.nav-links{display:flex;gap:32px;list-style:none}
-.nav-links a{font-size:13px;font-weight:500;color:var(--muted);transition:color .2s}
-.nav-links a:hover{color:var(--white)}
-.nav-pill{
-  display:flex;align-items:center;gap:6px;
-  padding:9px 20px;border-radius:100px;
-  background:rgba(139,92,246,.15);border:1px solid rgba(139,92,246,.35);
-  font-size:13px;font-weight:600;color:var(--violet);
-  transition:all .2s;white-space:nowrap;
-}
-.nav-pill:hover{background:rgba(139,92,246,.25);border-color:rgba(139,92,246,.6)}
-.nav-pill svg{width:14px;height:14px}
-.hamburger{display:none;flex-direction:column;gap:5px;background:none;border:none;cursor:pointer;padding:4px}
-.hamburger span{display:block;width:22px;height:2px;background:var(--white);border-radius:2px;transition:.3s}
-.mobile-menu{
-  display:none;position:fixed;inset:0;background:rgba(1,8,18,.98);z-index:200;
-  flex-direction:column;align-items:center;justify-content:center;gap:36px;
-}
-.mobile-menu a{font-family:'Bebas Neue',sans-serif;font-size:36px;letter-spacing:4px;color:var(--muted);transition:color .2s}
-.mobile-menu a:hover{color:var(--white)}
-.mobile-close{position:absolute;top:24px;right:24px;background:none;border:none;color:var(--white);font-size:28px;cursor:pointer}
-.mobile-menu.open{display:flex}
-
-/* ── HERO ── */
-#hero{
-  position:relative;min-height:100vh;display:flex;align-items:center;
-  overflow:hidden;padding:160px 0 120px;
-}
-.hero-vid-wrap{position:absolute;inset:0;overflow:hidden}
-.hero-vid{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.22}
-.hero-vid-overlay{
-  position:absolute;inset:0;
-  background:
-    linear-gradient(to bottom,rgba(1,8,18,.5) 0%,rgba(1,8,18,.2) 40%,rgba(1,8,18,.85) 100%),
-    linear-gradient(135deg,rgba(139,92,246,.12) 0%,transparent 60%);
-}
-.hero-content{position:relative;z-index:2;max-width:820px}
-.eyebrow{
-  display:inline-flex;align-items:center;gap:8px;
-  font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;
-  color:var(--violet);margin-bottom:28px;
-}
-.eyebrow::before{content:'';display:block;width:24px;height:1px;background:var(--violet)}
-.hero-h1{
-  font-family:'Bebas Neue',sans-serif;
-  font-size:clamp(64px,10vw,130px);
-  line-height:.92;letter-spacing:2px;
-  margin-bottom:32px;
-}
-.hero-h1 .accent{
-  background:linear-gradient(90deg,var(--violet),var(--cyan));
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
-}
-.hero-sub{
-  font-size:clamp(16px,2vw,20px);color:rgba(255,255,255,.6);
-  line-height:1.7;max-width:600px;margin-bottom:48px;
-}
-.hero-ctas{display:flex;gap:16px;flex-wrap:wrap;align-items:center}
-.btn{
-  display:inline-flex;align-items:center;gap:8px;
-  padding:14px 32px;border-radius:100px;
-  font-size:14px;font-weight:600;transition:all .25s;
-}
-.btn svg{width:16px;height:16px}
-.btn-primary{
-  background:linear-gradient(135deg,var(--violet),var(--violet2));
-  color:var(--white);border:none;
-  box-shadow:0 0 40px rgba(139,92,246,.25);
-}
-.btn-primary:hover{box-shadow:0 0 60px rgba(139,92,246,.45);transform:translateY(-1px)}
-.btn-ghost{
-  background:transparent;border:1px solid var(--border2);color:rgba(255,255,255,.7);
-}
-.btn-ghost:hover{border-color:rgba(255,255,255,.3);color:var(--white)}
-
-.hero-stats{
-  display:flex;gap:48px;margin-top:64px;padding-top:48px;
-  border-top:1px solid var(--border);flex-wrap:wrap;
-}
-.hstat-num{font-family:'Bebas Neue',sans-serif;font-size:48px;letter-spacing:2px;line-height:1}
-.hstat-num span{
-  background:linear-gradient(90deg,var(--violet),var(--cyan));
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
-}
-.hstat-label{font-size:12px;color:var(--muted);margin-top:4px;letter-spacing:.5px}
-
-/* ── DIFF BANNER ── */
-#diff{
-  background:var(--navy);padding:100px 0;
-  border-top:1px solid rgba(139,92,246,.15);
-  border-bottom:1px solid rgba(139,92,246,.15);
-  position:relative;overflow:hidden;
-}
-#diff::before{
-  content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
-  width:800px;height:400px;
-  background:radial-gradient(ellipse,rgba(139,92,246,.08) 0%,transparent 65%);
-  pointer-events:none;
-}
-.diff-inner{display:grid;grid-template-columns:1fr 1px 1fr;gap:0;align-items:center;position:relative;z-index:1}
-.diff-divider{background:linear-gradient(to bottom,transparent,rgba(139,92,246,.3),transparent);align-self:stretch}
-.diff-col{padding:0 64px}
-.diff-col:first-child{text-align:right}
-.diff-label{font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;margin-bottom:20px}
-.diff-label.dim{color:rgba(255,255,255,.2)}
-.diff-label.bright{color:var(--violet)}
-.diff-items{display:flex;flex-direction:column;gap:12px}
-.diff-item{font-size:15px;color:rgba(255,255,255,.35);display:flex;align-items:center;gap:10px}
-.diff-col:first-child .diff-item{flex-direction:row-reverse}
-.diff-item.v-item{color:rgba(255,255,255,.85)}
-.diff-item svg{width:16px;height:16px;flex-shrink:0}
-.diff-center{
-  position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
-  font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:4px;
-  color:var(--violet);background:var(--navy);padding:8px 18px;
-  border:1px solid rgba(139,92,246,.3);border-radius:100px;white-space:nowrap;
-}
-
-/* ── CAPABILITIES ── */
-#capabilities{padding:120px 0;background:var(--black)}
-.section-header{text-align:center;max-width:680px;margin:0 auto 80px}
-.section-header h2{
-  font-family:'Bebas Neue',sans-serif;
-  font-size:clamp(40px,5.5vw,72px);
-  letter-spacing:2px;line-height:.95;margin-bottom:20px;
-}
-.section-header p{font-size:16px;color:var(--muted);line-height:1.8}
-.g-violet{
-  background:linear-gradient(90deg,var(--violet),var(--cyan));
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
-}
-
-.cap-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px}
-.cap-card{
-  background:var(--card);padding:40px 36px;position:relative;overflow:hidden;
-  transition:background .3s;
-}
-.cap-card:hover{background:rgba(8,16,34,1)}
-.cap-card::before{
-  content:'';position:absolute;top:0;left:0;right:0;height:2px;
-  background:linear-gradient(90deg,transparent,var(--violet),transparent);
-  opacity:0;transition:opacity .3s;
-}
-.cap-card:hover::before{opacity:1}
-.cap-num{
-  font-family:'Bebas Neue',sans-serif;font-size:11px;letter-spacing:4px;
-  color:rgba(139,92,246,.4);margin-bottom:20px;
-}
-.cap-icon{
-  width:48px;height:48px;border-radius:12px;
-  background:rgba(139,92,246,.1);border:1px solid rgba(139,92,246,.2);
-  display:flex;align-items:center;justify-content:center;margin-bottom:20px;
-}
-.cap-icon svg{width:22px;height:22px;color:var(--violet)}
-.cap-name{font-size:17px;font-weight:700;margin-bottom:10px;line-height:1.3}
-.cap-desc{font-size:14px;color:var(--muted);line-height:1.75}
-.cap-tag{
-  display:inline-block;margin-top:16px;
-  font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;
-  color:rgba(139,92,246,.7);background:rgba(139,92,246,.08);
-  border:1px solid rgba(139,92,246,.15);padding:4px 10px;border-radius:4px;
-}
-
-/* ── CODE BLOCK ── */
-#code-demo{background:var(--navy);padding:120px 0;border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
-.code-wrap{display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:start}
-.code-copy h2{
-  font-family:'Bebas Neue',sans-serif;
-  font-size:clamp(36px,4vw,58px);letter-spacing:2px;line-height:.95;margin-bottom:20px;
-}
-.code-copy p{font-size:15px;color:var(--muted);line-height:1.8;margin-bottom:32px}
-.code-copy ul{list-style:none;display:flex;flex-direction:column;gap:12px}
-.code-copy li{
-  display:flex;align-items:flex-start;gap:12px;font-size:14px;color:rgba(255,255,255,.7);
-}
-.code-copy li::before{
-  content:'';display:block;width:6px;height:6px;border-radius:50%;
-  background:var(--violet);margin-top:7px;flex-shrink:0;
-}
-.code-block{
-  background:#080f1e;border:1px solid rgba(139,92,246,.2);border-radius:16px;overflow:hidden;
-}
-.code-tab{
-  display:flex;gap:0;border-bottom:1px solid rgba(139,92,246,.15);
-}
-.code-tab-item{
-  padding:12px 20px;font-size:11px;font-weight:700;letter-spacing:1.5px;
-  text-transform:uppercase;color:var(--muted);border-bottom:2px solid transparent;
-  cursor:pointer;transition:.2s;
-}
-.code-tab-item.active{color:var(--violet);border-bottom-color:var(--violet)}
-.code-dots{display:flex;gap:6px;padding:14px 16px;border-bottom:1px solid rgba(139,92,246,.1)}
-.code-dot{width:10px;height:10px;border-radius:50%}
-.code-dot:nth-child(1){background:#ff5f57}
-.code-dot:nth-child(2){background:#febc2e}
-.code-dot:nth-child(3){background:#28c840}
-pre{
-  padding:28px;font-family:'JetBrains Mono',monospace;font-size:13px;
-  line-height:1.7;overflow-x:auto;color:rgba(255,255,255,.8);
-}
-.t-key{color:#8B5CF6}
-.t-str{color:#34D399}
-.t-num{color:#00BEF3}
-.t-comment{color:rgba(255,255,255,.28);font-style:italic}
-.t-tag{color:#f59e0b}
-.t-val{color:rgba(255,255,255,.65)}
-
-/* ── EDGE CASES (NO LIMITS) ── */
-#no-limits{padding:120px 0;background:var(--black);position:relative;overflow:hidden}
-#no-limits::before{
-  content:'';position:absolute;right:-200px;top:50%;transform:translateY(-50%);
-  width:700px;height:700px;
-  background:radial-gradient(ellipse,rgba(139,92,246,.07) 0%,transparent 65%);
-  pointer-events:none;
-}
-.nl-grid{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center}
-.nl-copy h2{
-  font-family:'Bebas Neue',sans-serif;
-  font-size:clamp(40px,5vw,68px);letter-spacing:2px;line-height:.95;margin-bottom:24px;
-}
-.nl-copy p{font-size:16px;color:var(--muted);line-height:1.8;margin-bottom:40px}
-.nl-pills{display:flex;flex-wrap:wrap;gap:10px}
-.nl-pill{
-  padding:8px 16px;border-radius:100px;font-size:12px;font-weight:600;
-  background:rgba(139,92,246,.08);border:1px solid rgba(139,92,246,.2);color:rgba(255,255,255,.7);
-}
-.nl-features{display:grid;grid-template-columns:1fr 1fr;gap:3px}
-.nl-feat{
-  background:var(--card);padding:28px 24px;position:relative;
-}
-.nl-feat-icon{
-  width:36px;height:36px;border-radius:8px;
-  background:rgba(139,92,246,.1);border:1px solid rgba(139,92,246,.15);
-  display:flex;align-items:center;justify-content:center;margin-bottom:14px;
-}
-.nl-feat-icon svg{width:16px;height:16px;color:var(--violet)}
-.nl-feat-title{font-size:14px;font-weight:700;margin-bottom:6px}
-.nl-feat-desc{font-size:12px;color:var(--muted);line-height:1.6}
-
-/* ── USE CASES ── */
-#use-cases{
-  background:var(--navy);padding:120px 0;
-  border-top:1px solid var(--border);
-}
-.uc-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;margin-top:64px}
-.uc-card{
-  background:var(--card);padding:36px 32px;
-  border-top:2px solid transparent;transition:.3s;
-}
-.uc-card:hover{border-top-color:var(--violet)}
-.uc-icon{width:48px;height:48px;border-radius:12px;background:rgba(139,92,246,.1);border:1px solid rgba(139,92,246,.2);display:flex;align-items:center;justify-content:center;margin-bottom:20px}
-.uc-icon svg{width:22px;height:22px;color:var(--violet)}
-.uc-title{font-size:16px;font-weight:700;margin-bottom:10px}
-.uc-desc{font-size:13px;color:var(--muted);line-height:1.75}
-.uc-tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:18px}
-.uc-tag{
-  font-size:10px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;
-  padding:3px 8px;border-radius:3px;
-  background:rgba(139,92,246,.08);border:1px solid rgba(139,92,246,.15);
-  color:rgba(139,92,246,.8);
-}
-
-/* ── SPORTS ── */
-#sports{padding:100px 0;background:var(--black);border-top:1px solid var(--border)}
-.sports-inner{text-align:center}
-.sports-inner h2{
-  font-family:'Bebas Neue',sans-serif;
-  font-size:clamp(36px,4.5vw,64px);letter-spacing:2px;line-height:.95;margin-bottom:16px;
-}
-.sports-inner p{font-size:16px;color:var(--muted);max-width:560px;margin:0 auto 48px}
-.sports-grid{display:flex;justify-content:center;flex-wrap:wrap;gap:12px}
-.sport-chip{
-  display:flex;align-items:center;gap:8px;
-  padding:10px 20px;border-radius:100px;
-  background:var(--card);border:1px solid var(--border2);
-  font-size:13px;font-weight:500;color:rgba(255,255,255,.7);
-  transition:.2s;
-}
-.sport-chip:hover{border-color:rgba(139,92,246,.4);color:var(--white)}
-.sport-dot{width:7px;height:7px;border-radius:50%;background:var(--violet)}
-.sports-note{margin-top:28px;font-size:13px;color:rgba(255,255,255,.25);font-style:italic}
-
-/* ── CTA ── */
-#api-cta{
-  padding:140px 0;background:var(--navy);
-  border-top:1px solid rgba(139,92,246,.2);
-  position:relative;overflow:hidden;text-align:center;
-}
-#api-cta::before{
-  content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
-  width:900px;height:500px;
-  background:radial-gradient(ellipse,rgba(139,92,246,.12) 0%,rgba(0,190,243,.05) 45%,transparent 70%);
-  pointer-events:none;
-}
-.cta-inner{position:relative;z-index:1}
-.cta-inner h2{
-  font-family:'Bebas Neue',sans-serif;
-  font-size:clamp(48px,7vw,96px);letter-spacing:2px;line-height:.92;margin-bottom:24px;
-}
-.cta-inner p{font-size:18px;color:var(--muted);max-width:540px;margin:0 auto 48px;line-height:1.7}
-.cta-btns{display:flex;gap:16px;justify-content:center;flex-wrap:wrap}
-.cta-note{margin-top:24px;font-size:13px;color:rgba(255,255,255,.22)}
-
-/* ── FOOTER ── */
-footer{background:var(--black);border-top:1px solid var(--border);padding:80px 0 40px}
-.foot-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:48px;margin-bottom:64px}
-.fb-name{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:3px;margin:16px 0 4px}
-.fb-tag{font-size:11px;color:rgba(255,255,255,.3);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:16px}
-.fb-desc{font-size:13px;color:var(--muted);line-height:1.8;max-width:280px;margin-bottom:24px}
-.fb-social{display:flex;gap:12px}
-.fb-slink{
-  width:36px;height:36px;border-radius:8px;border:1px solid var(--border2);
-  display:flex;align-items:center;justify-content:center;color:var(--muted);transition:.2s;
-}
-.fb-slink:hover{border-color:rgba(255,255,255,.25);color:var(--white)}
-.fb-slink svg{width:16px;height:16px}
-.fc-title{font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,.3);margin-bottom:20px}
-.fc-links{list-style:none;display:flex;flex-direction:column;gap:12px}
-.fc-links a{font-size:13px;color:var(--muted);transition:color .2s}
-.fc-links a:hover{color:var(--white)}
-.foot-btm{display:flex;justify-content:space-between;align-items:center;padding-top:32px;border-top:1px solid var(--border);flex-wrap:wrap;gap:16px}
-.foot-copy{font-size:12px;color:rgba(255,255,255,.2)}
-.foot-legal{display:flex;gap:24px}
-.foot-legal a{font-size:12px;color:rgba(255,255,255,.2);transition:color .2s}
-.foot-legal a:hover{color:var(--muted)}
-
-/* ── REVEAL ── */
-[data-reveal]{opacity:0;transform:translateY(28px);transition:opacity .7s ease,transform .7s ease}
-[data-reveal].revealed{opacity:1;transform:none}
-[data-reveal][data-reveal-delay="1"]{transition-delay:.12s}
-[data-reveal][data-reveal-delay="2"]{transition-delay:.24s}
-[data-reveal][data-reveal-delay="3"]{transition-delay:.36s}
-
-/* ── RESPONSIVE ── */
-@media(max-width:960px){
-  .container{padding:0 24px}
-  .nav-links{display:none}
-  .nav-pill{display:none}
-  .hamburger{display:flex}
-  .diff-inner{grid-template-columns:1fr;gap:0}
-  .diff-divider{display:none}
-  .diff-col{padding:32px 0;text-align:left}
-  .diff-col:first-child{text-align:left}
-  .diff-col:first-child .diff-item{flex-direction:row}
-  .diff-center{display:none}
-  .cap-grid{grid-template-columns:1fr 1fr}
-  .code-wrap{grid-template-columns:1fr}
-  .nl-grid{grid-template-columns:1fr}
-  .uc-grid{grid-template-columns:1fr 1fr}
-  .foot-grid{grid-template-columns:1fr 1fr}
-}
-@media(max-width:600px){
-  .cap-grid{grid-template-columns:1fr}
-  .nl-features{grid-template-columns:1fr}
-  .uc-grid{grid-template-columns:1fr}
-  .hero-stats{gap:32px}
-}
-
+  /* Page-local layout only. Everything visual comes from styles/site.css. */
+  .api-split { align-items: center; }
+  .api-shot { max-width: 300px; margin-inline: auto; border-radius: var(--sl-radius-lg); border: 1px solid var(--sl-border); }
+  .api-note { font-family: var(--sl-font-mono); font-size: var(--sl-text-label); letter-spacing: var(--sl-tracking-label); text-transform: uppercase; color: var(--sl-text-muted); }
 </style>
 </head>
 <body>
 
-<!-- ══ NAV ══ -->
-<nav id="nav">
-  <div class="container">
-    <div class="nav-inner">
-      <a href="./index.html" class="nav-logo">
-        <img src="./stadioralabs info/stadiora_labs_logo - white.png" alt="Stadiora Labs"
-          onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
-        <span class="nav-logo-fallback" style="display:none">STADIORA LABS</span>
+<nav class="sl-nav">
+  <div class="sl-container">
+    <div class="sl-nav__inner">
+      <a class="sl-nav__logo" href="./index.html">
+        <img src="./stadioralabs%20info/stadiora_labs_logo%20-%20white.png" alt="Stadiora Labs">
       </a>
-      <ul class="nav-links">
-        <li><a href="#capabilities">Capabilities</a></li>
-        <li><a href="#code-demo">How It Works</a></li>
-        <li><a href="#use-cases">Use Cases</a></li>
-        <li><a href="./index.html">← Back to Stadiora Labs</a></li>
+      <ul class="sl-nav__links">
+        <li><a href="./index.html">Home</a></li>
+        <li><a href="./investors.html">Investors</a></li>
+        <li><a href="./api.html" aria-current="page">Aria Intelligence</a></li>
       </ul>
-      <a href="#api-cta" class="nav-pill">
-        Request Access
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-      </a>
-      <div class="lang-toggle">
-        <span class="lang-btn active">EN</span>
-        <a href="./api-es.html" class="lang-btn">ES</a>
+      <div class="sl-nav__actions">
+        <a class="sl-btn sl-btn--primary sl-nav__collapse" href="#early-access">Early access</a>
+        <div class="sl-lang">
+          <span class="sl-lang__btn is-active" aria-current="true">EN</span>
+          <a class="sl-lang__btn" href="./api-es.html" hreflang="es">ES</a>
+        </div>
       </div>
-      <button class="hamburger" onclick="openMenu()" aria-label="Open menu">
-        <span></span><span></span><span></span>
+      <button class="sl-nav__toggle" type="button" aria-controls="sl-menu"
+              aria-label="Open menu" data-label-open="Open menu" data-label-close="Close menu">
+        <svg class="sl-nav__icon-open" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+        <svg class="sl-nav__icon-close" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
       </button>
     </div>
   </div>
 </nav>
 
-<!-- Mobile -->
-<div class="mobile-menu" id="mobileMenu">
-  <button class="mobile-close" onclick="closeMenu()">&#215;</button>
-  <a href="#capabilities" onclick="closeMenu()">Capabilities</a>
-  <a href="#code-demo"    onclick="closeMenu()">How It Works</a>
-  <a href="#use-cases"    onclick="closeMenu()">Use Cases</a>
-  <a href="./index.html"  onclick="closeMenu()">← Stadiora Labs</a>
-  <a href="#api-cta"      onclick="closeMenu()" style="color:var(--violet)">Request Access</a>
+<div class="sl-nav__menu" id="sl-menu">
+  <ul class="sl-nav__menu-links">
+    <li><a href="./index.html">Home</a></li>
+    <li><a href="./investors.html">Investors</a></li>
+    <li><a href="./api.html" aria-current="page">Aria Intelligence</a></li>
+  </ul>
+  <div class="sl-nav__menu-foot">
+    <a class="sl-btn sl-btn--primary sl-btn--block" href="#early-access">Early access</a>
+  </div>
 </div>
 
-<!-- ══ HERO ══ -->
-<section id="hero">
-  <div class="hero-vid-wrap">
-    <video class="hero-vid" autoplay muted loop playsinline>
-      <source src="./videos/api.mp4" type="video/mp4">
-    </video>
-    <div class="hero-vid-overlay"></div>
-  </div>
+<main>
 
-  <div class="container">
-    <div class="hero-content" data-reveal>
-      <div class="eyebrow">Aria Intelligence API</div>
-      <h1 class="hero-h1">
-        The Decision<br>Engine.<br>
-        <span class="accent">Now Open.</span>
-      </h1>
-      <p class="hero-sub">
-        Aria Intelligence is the sports AI layer that converts multi-signal athlete data into one clear, actionable decision. Now available to any developer building sports products — across any sport, on any platform, with no proprietary hardware required.
-      </p>
-      <div class="hero-ctas">
-        <a href="#api-cta" class="btn btn-primary">
-          Request Developer Access
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-        </a>
-        <a href="#code-demo" class="btn btn-ghost">See It In Action</a>
+  <section class="sl-section sl-nav-offset">
+    <div class="sl-container">
+      <div class="sl-stack sl-stack--lg" style="max-width:760px">
+        <div class="sl-stack">
+          <p class="sl-eyebrow">Aria Intelligence</p>
+          <h1 class="sl-h1">The decision engine <span class="sl-accent">behind Aria</span></h1>
+          <p class="sl-lead">Aria Intelligence turns the signals an athlete already produces into one call for the day. It runs inside Run with Aria, Aria for Coaches and Aria 12. There is no public API yet, and this page is where that conversation starts.</p>
+        </div>
+        <p class="sl-dotlist"><span>Live in the apps</span><span>150+ athletes</span><span>On both stores</span></p>
+        <div class="sl-btn-row">
+          <a class="sl-btn sl-btn--primary" href="#early-access">
+            Talk to us about early access
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </a>
+          <a class="sl-btn sl-btn--ghost" href="./index.html">Back to Stadiora Labs</a>
+        </div>
       </div>
+    </div>
+  </section>
 
-      <div class="hero-stats">
+  <section class="sl-section sl-section--alt">
+    <div class="sl-container">
+      <div class="sl-stack sl-stack--lg">
+        <div class="sl-stack">
+          <p class="sl-eyebrow">What it does</p>
+          <h2 class="sl-h2">One engine under three products</h2>
+          <p class="sl-lead">Stadiora Labs builds the Aria Intelligence engine and the products that run on top of it. Run with Aria for track and field athletes, Aria for Coaches for the people who train them, and Aria 12 for soccer.</p>
+        </div>
+        <div class="sl-grid sl-grid--3">
+          <article class="sl-card">
+            <span class="sl-card__icon">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12h4l2.5-6 4 12 2.5-6h5"/></svg>
+            </span>
+            <h3 class="sl-card__title">Reads what an athlete already logs</h3>
+            <p class="sl-card__body">Recovery, training load, physical signals and how an athlete says they feel, read together instead of sitting apart in four different places.</p>
+          </article>
+          <article class="sl-card">
+            <span class="sl-card__icon">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v4M12 17v4M3 12h4M17 12h4"/><circle cx="12" cy="12" r="4.2"/></svg>
+            </span>
+            <h3 class="sl-card__title">Returns one call for the day</h3>
+            <p class="sl-card__body">The output is something an athlete or a coach can act on before the session starts, not another chart to interpret first.</p>
+          </article>
+          <article class="sl-card">
+            <span class="sl-card__icon">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4.5C6.9 4.5 3.2 9 2.4 12c.8 3 4.5 7.5 9.6 7.5s8.8-4.5 9.6-7.5c-.8-3-4.5-7.5-9.6-7.5z"/><circle cx="12" cy="12" r="2.6"/></svg>
+            </span>
+            <h3 class="sl-card__title">Shows the signals behind it</h3>
+            <p class="sl-card__body">Each call comes with what drove it, so it can be questioned rather than taken on faith by whoever has to act on it.</p>
+          </article>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sl-section">
+    <div class="sl-container">
+      <div class="sl-grid sl-grid--2 api-split">
         <div>
-          <div class="hstat-num"><span>6</span></div>
-          <div class="hstat-label">Decision Endpoints</div>
+          <img class="api-shot" src="./assets/deck-v2/shot_intelligence.webp" width="600" height="1184"
+               alt="The Aria intelligence screen, showing the engine's daily call for an athlete" loading="lazy" decoding="async">
         </div>
-        <div>
-          <div class="hstat-num"><span>Any</span></div>
-          <div class="hstat-label">Sport. No Lock-In.</div>
-        </div>
-        <div>
-          <div class="hstat-num"><span>0</span></div>
-          <div class="hstat-label">Proprietary Hardware Required</div>
-        </div>
-        <div>
-          <div class="hstat-num"><span>1</span></div>
-          <div class="hstat-label">Output. A Decision.</div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ══ DIFFERENTIATOR ══ -->
-<section id="diff">
-  <div class="container">
-    <div style="text-align:center;margin-bottom:64px" data-reveal>
-      <div class="eyebrow" style="justify-content:center">The Core Difference</div>
-      <h2 style="font-family:'Bebas Neue',sans-serif;font-size:clamp(36px,4.5vw,60px);letter-spacing:2px">
-        Most APIs return data.<br><span class="g-violet">Ours returns a decision.</span>
-      </h2>
-    </div>
-    <div class="diff-inner" data-reveal>
-      <div class="diff-col">
-        <div class="diff-label dim">What other APIs give you</div>
-        <div class="diff-items">
-          <div class="diff-item">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-            Raw biometric numbers
+        <div class="sl-stack sl-stack--lg">
+          <div class="sl-stack">
+            <p class="sl-eyebrow">Today</p>
+            <h2 class="sl-h2">The engine already ships to athletes</h2>
+            <p class="sl-lead">Every athlete on Run with Aria is using Aria Intelligence, they just reach it through the app rather than through a request. The intelligence screen is the engine's output. It is live on both stores now.</p>
           </div>
-          <div class="diff-item">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-            Siloed data streams
-          </div>
-          <div class="diff-item">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-            Visualisation, not synthesis
-          </div>
-          <div class="diff-item">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-            You interpret. You decide.
-          </div>
-          <div class="diff-item">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-            Locked to one sport or device
-          </div>
-        </div>
-      </div>
-      <div class="diff-divider"></div>
-      <div class="diff-col" style="position:relative">
-        <div class="diff-center">vs</div>
-        <div class="diff-label bright">What Aria Intelligence gives you</div>
-        <div class="diff-items">
-          <div class="diff-item v-item">
-            <svg viewBox="0 0 24 24" fill="none" stroke="#8B5CF6" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-            Multi-signal synthesis in one call
-          </div>
-          <div class="diff-item v-item">
-            <svg viewBox="0 0 24 24" fill="none" stroke="#8B5CF6" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-            One unified readiness output
-          </div>
-          <div class="diff-item v-item">
-            <svg viewBox="0 0 24 24" fill="none" stroke="#8B5CF6" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-            A classification + a recommendation
-          </div>
-          <div class="diff-item v-item">
-            <svg viewBox="0 0 24 24" fill="none" stroke="#8B5CF6" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-            Coach and athlete act immediately
-          </div>
-          <div class="diff-item v-item">
-            <svg viewBox="0 0 24 24" fill="none" stroke="#8B5CF6" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-            Configurable across any sport
+          <div class="sl-stores">
+            <a class="sl-store" href="https://apps.apple.com/us/app/run-with-aria/id6760048203" target="_blank" rel="noopener">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16.4 1.7c.1 1.1-.4 2.2-1.1 2.9-.8.8-1.9 1.4-2.9 1.3-.1-1.1.4-2.2 1.1-3 .8-.8 1.9-1.3 2.9-1.2z"/><path d="M20.4 17c-.4 1.1-.7 1.6-1.3 2.6-.9 1.4-2.1 3.1-3.6 3.1-1.3 0-1.7-.9-3.5-.9s-2.2.9-3.5.9c-1.5 0-2.7-1.5-3.6-2.9-2.4-3.8-2.6-8.3-1.1-10.7 1-1.7 2.7-2.7 4.2-2.7 1.6 0 2.6.9 3.9.9s2-.9 3.9-.9c1.4 0 2.8.8 3.8 2.1-3.4 1.9-2.8 6.8.8 8.5z"/></svg>
+              <span class="sl-store__text">
+                <span class="sl-store__kicker">Download on the</span>
+                <span class="sl-store__name">App Store</span>
+              </span>
+            </a>
+            <a class="sl-store" href="https://play.google.com/store/apps/details?id=com.runwitharia.mobile" target="_blank" rel="noopener">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 2.7v18.6c0 .5.5.8.9.6l14-9.3c.4-.3.4-.9 0-1.2l-14-9.3c-.4-.2-.9.1-.9.6z"/><path d="M4.9 2.1l10.4 9.9-10.4 9.9"/></svg>
+              <span class="sl-store__text">
+                <span class="sl-store__kicker">Get it on</span>
+                <span class="sl-store__name">Google Play</span>
+              </span>
+            </a>
           </div>
         </div>
       </div>
     </div>
-  </div>
-</section>
+  </section>
 
-<!-- ══ CAPABILITIES ══ -->
-<section id="capabilities">
-  <div class="container">
-    <div class="section-header" data-reveal>
-      <div class="eyebrow" style="justify-content:center">What the API Does</div>
-      <h2>Six Endpoints.<br><span class="g-violet">One Intelligence Layer.</span></h2>
-      <p>Every endpoint is built on the same sport-science-validated methodology that powers Aria, Aria for Coaches, and Aria 12. Not a generic wellness score — a sport-specific decision engine.</p>
-    </div>
-
-    <div class="cap-grid">
-
-      <div class="cap-card" data-reveal>
-        <div class="cap-num">01</div>
-        <div class="cap-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-            <circle cx="12" cy="12" r="10"/>
-            <polyline points="12 6 12 12 16 14"/>
-          </svg>
+  <section class="sl-section sl-section--alt">
+    <div class="sl-container">
+      <div class="sl-stack sl-stack--lg">
+        <div class="sl-stack" style="max-width:760px">
+          <p class="sl-eyebrow">Status</p>
+          <h2 class="sl-h2">Programmatic access is planned, not live</h2>
+          <p class="sl-lead">There is no public API today. No endpoints, no keys, no documentation and nothing to sign up for. We would rather say that plainly than publish a specification for something you cannot call.</p>
+          <p class="sl-muted">What we are doing instead is talking to the teams, clubs and platforms that want the decision layer inside their own product. Those conversations decide what gets built first, so the earlier you tell us what you need the engine to answer, the more of it you shape.</p>
         </div>
-        <div class="cap-name">Availability Index</div>
-        <div class="cap-desc">Synthesises training load, recovery, wellness, and contextual signals into a 0–100 availability score with a four-tier classification: Full Training, Modified, Recovery Only, or Unavailable. One number. One call. One decision.</div>
-        <span class="cap-tag">POST /athlete/availability</span>
-      </div>
-
-      <div class="cap-card" data-reveal data-reveal-delay="1">
-        <div class="cap-num">02</div>
-        <div class="cap-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
-          </svg>
-        </div>
-        <div class="cap-name">Sprint Readiness Score</div>
-        <div class="cap-desc">Multi-factor readiness assessment combining neuromuscular status, fatigue load, sleep quality, and training history. Returns a session-specific output — what type of session this athlete can perform today, at what intensity, and why.</div>
-        <span class="cap-tag">POST /athlete/readiness</span>
-      </div>
-
-      <div class="cap-card" data-reveal data-reveal-delay="2">
-        <div class="cap-num">03</div>
-        <div class="cap-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
-            <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
-          </svg>
-        </div>
-        <div class="cap-name">Injury Risk Signal</div>
-        <div class="cap-desc">Early-warning detection from training load spikes, recovery gaps, HRV trends, and wellness patterns — flagged before the athlete recognises the signal themselves. Returns a risk tier, contributing factors, and a recommended intervention.</div>
-        <span class="cap-tag">POST /athlete/injury-risk</span>
-      </div>
-
-      <div class="cap-card" data-reveal>
-        <div class="cap-num">04</div>
-        <div class="cap-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-            <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/>
-            <polyline points="17 6 23 6 23 12"/>
-          </svg>
-        </div>
-        <div class="cap-name">Return-to-Play Protocol</div>
-        <div class="cap-desc">Structured progression scoring for athlete rehabilitation. Tracks stage completion, load tolerance thresholds, and phase-gate readiness criteria. Returns a current stage classification and a clear go/no-go for progression — removing guesswork from one of sport's highest-risk decisions.</div>
-        <span class="cap-tag">POST /athlete/return-to-play</span>
-      </div>
-
-      <div class="cap-card" data-reveal data-reveal-delay="1">
-        <div class="cap-num">05</div>
-        <div class="cap-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/>
-            <circle cx="9" cy="7" r="4"/>
-            <path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/>
-          </svg>
-        </div>
-        <div class="cap-name">Coach Attention Queue</div>
-        <div class="cap-desc">Cross-athlete intelligence that generates a priority-ranked queue of athletes requiring immediate coach review. Synthesises readiness deltas, threshold breaches, and trend anomalies across an entire squad — so the coach's attention goes exactly where it's needed first.</div>
-        <span class="cap-tag">POST /squad/attention-queue</span>
-      </div>
-
-      <div class="cap-card" data-reveal data-reveal-delay="2">
-        <div class="cap-num">06</div>
-        <div class="cap-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-            <ellipse cx="12" cy="5" rx="9" ry="3"/>
-            <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/>
-            <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/>
-          </svg>
-        </div>
-        <div class="cap-name">Player Passport</div>
-        <div class="cap-desc">Longitudinal intelligence profile per athlete. Historical readiness baselines, load tolerance curves, injury history context, and long-term availability trend — all queryable in a single response. Build features that understand the athlete over time, not just today.</div>
-        <span class="cap-tag">GET /athlete/passport</span>
-      </div>
-
-    </div>
-  </div>
-</section>
-
-<!-- ══ CODE DEMO ══ -->
-<section id="code-demo">
-  <div class="container">
-    <div class="code-wrap">
-      <div class="code-copy" data-reveal>
-        <div class="eyebrow">How It Works</div>
-        <h2>One call.<br><span class="g-violet">One decision.</span><br>Immediately actionable.</h2>
-        <p>Send what you have. Receive a decision. Aria Intelligence handles the synthesis — no data science team required on your end.</p>
-        <ul>
-          <li>Works with any combination of signals — you don't need all of them</li>
-          <li>Returns a classification, a recommendation, and a confidence score</li>
-          <li>Flags which signals drove the decision, so coaches understand the output</li>
-          <li>Explainable by design — no black-box outputs</li>
-        </ul>
-      </div>
-      <div class="code-block" data-reveal data-reveal-delay="1">
-        <div class="code-dots">
-          <div class="code-dot"></div><div class="code-dot"></div><div class="code-dot"></div>
-        </div>
-        <div class="code-tab">
-          <div class="code-tab-item active">Request</div>
-          <div class="code-tab-item">Response</div>
-        </div>
-        <pre id="code-display"><span class="t-comment">// POST /v1/athlete/readiness</span>
-{
-  <span class="t-key">"athlete_id"</span>: <span class="t-str">"ATH_8821"</span>,
-  <span class="t-key">"sport"</span>: <span class="t-str">"track_field"</span>,
-  <span class="t-key">"signals"</span>: {
-    <span class="t-key">"training_load_7d"</span>: <span class="t-num">84</span>,
-    <span class="t-key">"recovery_score"</span>: <span class="t-num">58</span>,
-    <span class="t-key">"sleep_hours"</span>: <span class="t-num">6.4</span>,
-    <span class="t-key">"wellness_score"</span>: <span class="t-num">6</span>,
-    <span class="t-key">"hrv_delta"</span>: <span class="t-num">-6.2</span>,
-    <span class="t-key">"session_rpe_last"</span>: <span class="t-num">8.5</span>,
-    <span class="t-key">"days_since_rest"</span>: <span class="t-num">5</span>
-  }
-}</pre>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ══ NO LIMITS ══ -->
-<section id="no-limits">
-  <div class="container">
-    <div class="nl-grid">
-      <div class="nl-copy" data-reveal>
-        <div class="eyebrow">Built Without Ceilings</div>
-        <h2>No rate limits.<br><span class="g-violet">No hardware walls.<br>No sport lock-in.</span></h2>
-        <p>The infrastructure that powers elite sports intelligence should not have artificial constraints built into it. Aria Intelligence API is designed to scale with your product — from a solo developer to a platform serving thousands of athletes.</p>
-        <div class="nl-pills">
-          <div class="nl-pill">No rate limits on decision calls</div>
-          <div class="nl-pill">Hardware-agnostic data ingestion</div>
-          <div class="nl-pill">Sport-configurable parameters</div>
-          <div class="nl-pill">Any wellness data format</div>
-          <div class="nl-pill">Individual &amp; squad endpoints</div>
-          <div class="nl-pill">Science-validated methodology</div>
-          <div class="nl-pill">Explainable outputs</div>
-          <div class="nl-pill">Longitudinal athlete memory</div>
-        </div>
-      </div>
-      <div class="nl-features" data-reveal data-reveal-delay="1">
-        <div class="nl-feat">
-          <div class="nl-feat-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
-          </div>
-          <div class="nl-feat-title">Hardware-Agnostic</div>
-          <div class="nl-feat-desc">GPS exports, wearable data, manual wellness forms, coach observations — any source, any format. No device purchase required.</div>
-        </div>
-        <div class="nl-feat">
-          <div class="nl-feat-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 010 20M12 2a15.3 15.3 0 000 20"/></svg>
-          </div>
-          <div class="nl-feat-title">Any Sport</div>
-          <div class="nl-feat-desc">Configure sport-specific parameters at the API level. Built for track & field and football — adaptable to any sport you're building for.</div>
-        </div>
-        <div class="nl-feat">
-          <div class="nl-feat-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-          </div>
-          <div class="nl-feat-title">Science-Validated</div>
-          <div class="nl-feat-desc">Every decision model is validated by Stadiora Labs' performance and rehabilitation team. Not a generic ML model — sport-science methodology at its core.</div>
-        </div>
-        <div class="nl-feat">
-          <div class="nl-feat-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-          </div>
-          <div class="nl-feat-title">Scales With You</div>
-          <div class="nl-feat-desc">From a single athlete profile to an entire academy roster. Individual and squad-level endpoints. Designed to grow as your product grows.</div>
+        <div class="sl-grid sl-grid--2">
+          <article class="sl-card">
+            <h3 class="sl-card__title">Teams and clubs</h3>
+            <p class="sl-card__body">Tell us how you settle availability today, who makes the call and what you are working from when you make it. Aria for Coaches is live, so there is already something to try while the interface is being designed.</p>
+          </article>
+          <article class="sl-card sl-card--violet">
+            <h3 class="sl-card__title">Platforms and developers</h3>
+            <p class="sl-card__body">Tell us what you would ask the engine and what you would do with the answer. That list is what the first version gets built from, and it is short enough right now that yours would count.</p>
+          </article>
         </div>
       </div>
     </div>
-  </div>
-</section>
+  </section>
 
-<!-- ══ USE CASES ══ -->
-<section id="use-cases">
-  <div class="container">
-    <div class="section-header" data-reveal>
-      <div class="eyebrow" style="justify-content:center">Use Cases</div>
-      <h2>Built for<br><span class="g-violet">Builders.</span></h2>
-      <p>Any product that touches athlete performance, team management, or fitness intelligence can embed Aria Intelligence and return decisions instead of data.</p>
-    </div>
-    <div class="uc-grid">
-      <div class="uc-card" data-reveal>
-        <div class="uc-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+  <section class="sl-section" id="early-access">
+    <div class="sl-container">
+      <div class="sl-center sl-stack sl-stack--lg">
+        <div class="sl-stack">
+          <p class="sl-eyebrow" style="justify-content:center">Early access</p>
+          <h2 class="sl-h2">Early access starts with a conversation</h2>
+          <p class="sl-lead">Write to us with the shape of what you are building and what you would want Aria Intelligence to decide inside it. We will tell you honestly where that sits against what exists.</p>
         </div>
-        <div class="uc-title">Fitness & Training Apps</div>
-        <div class="uc-desc">Replace generic session suggestions with sport-specific decision intelligence. Tell athletes exactly what their body is ready to do today — and why — instead of showing them a chart they have to interpret themselves.</div>
-        <div class="uc-tags"><span class="uc-tag">Readiness</span><span class="uc-tag">Session Rec</span></div>
-      </div>
-      <div class="uc-card" data-reveal data-reveal-delay="1">
-        <div class="uc-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+        <div class="sl-btn-row" style="justify-content:center">
+          <a class="sl-btn sl-btn--primary" href="mailto:api@stadioralabs.com">
+            Email the team
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6.5h18v11H3z"/><path d="M3 7l9 6.5L21 7"/></svg>
+          </a>
+          <a class="sl-btn sl-btn--ghost" href="./index.html">See the products</a>
         </div>
-        <div class="uc-title">Club Management Platforms</div>
-        <div class="uc-desc">Add availability intelligence to any team management tool. Coaches get a daily squad readiness picture — who is available, who needs modification, who needs attention — without switching platforms.</div>
-        <div class="uc-tags"><span class="uc-tag">Availability</span><span class="uc-tag">Squad View</span></div>
-      </div>
-      <div class="uc-card" data-reveal data-reveal-delay="2">
-        <div class="uc-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="7"/><path d="M12 10v4l2 2"/></svg>
-        </div>
-        <div class="uc-title">Wearable Companies</div>
-        <div class="uc-desc">Your device captures the signal. Aria Intelligence converts it into a decision. Add a layer of actionable output on top of biometric data without building the synthesis infrastructure from scratch.</div>
-        <div class="uc-tags"><span class="uc-tag">Biometric</span><span class="uc-tag">Synthesis</span></div>
-      </div>
-      <div class="uc-card" data-reveal>
-        <div class="uc-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
-        </div>
-        <div class="uc-title">Sports Medicine & Rehab</div>
-        <div class="uc-desc">Embed Return-to-Play Protocol scoring into rehabilitation platforms. Give physiotherapists and medical staff a structured, data-informed progression output — replacing gut feel with a validated decision at every stage.</div>
-        <div class="uc-tags"><span class="uc-tag">RTP Protocol</span><span class="uc-tag">Risk Signal</span></div>
-      </div>
-      <div class="uc-card" data-reveal data-reveal-delay="1">
-        <div class="uc-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
-        </div>
-        <div class="uc-title">Performance Analytics Platforms</div>
-        <div class="uc-desc">Move beyond dashboards. Add a decision output layer to existing analytics products so coaches don't just see what happened — they see what to do about it.</div>
-        <div class="uc-tags"><span class="uc-tag">Analytics</span><span class="uc-tag">Decisions</span></div>
-      </div>
-      <div class="uc-card" data-reveal data-reveal-delay="2">
-        <div class="uc-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg>
-        </div>
-        <div class="uc-title">Academies & Education Platforms</div>
-        <div class="uc-desc">Build athlete monitoring into academy management tools. Give coaches at development programs the same quality of readiness and injury risk intelligence that senior professional clubs use — at the right price point.</div>
-        <div class="uc-tags"><span class="uc-tag">Academy</span><span class="uc-tag">Development</span></div>
+        <p class="api-note">api@stadioralabs.com</p>
       </div>
     </div>
-  </div>
-</section>
+  </section>
 
-<!-- ══ SPORTS ══ -->
-<section id="sports">
-  <div class="container">
-    <div class="sports-inner" data-reveal>
-      <div class="eyebrow" style="justify-content:center">Sport Coverage</div>
-      <h2>Configurable Across<br><span class="g-violet">Any Sport.</span></h2>
-      <p>Aria Intelligence is not an endurance-sport platform or a football-only tool. The decision engine is sport-configurable — parameters, thresholds, and readiness models adapt to the sport you are building for.</p>
-      <div class="sports-grid">
-        <div class="sport-chip"><div class="sport-dot"></div>Track &amp; Field</div>
-        <div class="sport-chip"><div class="sport-dot"></div>Football / Soccer</div>
-        <div class="sport-chip"><div class="sport-dot"></div>Basketball</div>
-        <div class="sport-chip"><div class="sport-dot"></div>Rugby</div>
-        <div class="sport-chip"><div class="sport-dot"></div>Cricket</div>
-        <div class="sport-chip"><div class="sport-dot"></div>Swimming</div>
-        <div class="sport-chip"><div class="sport-dot"></div>Cycling</div>
-        <div class="sport-chip"><div class="sport-dot"></div>Combat Sports</div>
-        <div class="sport-chip"><div class="sport-dot"></div>American Football</div>
-        <div class="sport-chip"><div class="sport-dot"></div>Volleyball</div>
-        <div class="sport-chip"><div class="sport-dot" style="background:rgba(255,255,255,.2)"></div>+ Any Sport</div>
-      </div>
-      <p class="sports-note">Sport-specific parameter sets are configured at the API level. Custom sport configurations available on request.</p>
-    </div>
-  </div>
-</section>
+</main>
 
-<!-- ══ CTA ══ -->
-<section id="api-cta">
-  <div class="cta-inner" data-reveal>
-    <div class="eyebrow" style="justify-content:center;color:var(--violet)">Get Access</div>
-    <h2>
-      Build Something<br>
-      <span class="g-violet">That Decides.</span>
-    </h2>
-    <p>Aria Intelligence API is currently available to select development partners. Apply for early access and we'll be in touch within 48 hours.</p>
-    <div class="cta-btns">
-      <a href="mailto:api@stadioralabs.com" class="btn btn-primary">
-        Request Developer Access
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-      </a>
-      <a href="./index.html" class="btn btn-ghost">← Back to Stadiora Labs</a>
-    </div>
-    <p class="cta-note">No proprietary hardware. No lock-in. Sport-configurable from day one.</p>
-  </div>
-</section>
-
-<!-- ══ FOOTER ══ -->
-<footer id="footer">
-  <div class="container">
-    <div class="foot-grid">
-      <div class="fb">
-        <img src="./stadioralabs info/stadiora_labs_logo - white.png" alt="Stadiora Labs" onerror="this.style.display='none'">
-        <div class="fb-name">STADIORA LABS</div>
-        <div class="fb-tag">One Ecosystem. Intelligently Connected.</div>
-        <p class="fb-desc">The sports AI infrastructure company — building the intelligence layer that converts athlete data into decisions for athletes, coaches, and teams worldwide.</p>
-        <div class="fb-social">
-          <a href="https://www.linkedin.com/company/stadioralabs" target="_blank" rel="noopener" class="fb-slink" aria-label="LinkedIn">
-            <svg viewBox="0 0 24 24" fill="currentColor">
-              <path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2z"/>
-              <circle cx="4" cy="4" r="2"/>
-            </svg>
+<footer class="sl-footer">
+  <div class="sl-container">
+    <div class="sl-footer__grid">
+      <div class="sl-footer__brand">
+        <img src="./stadioralabs%20info/stadiora_labs_logo%20-%20white.png" alt="Stadiora Labs">
+        <p class="sl-footer__tag">We build the Aria Intelligence engine and the apps that run on it, for athletes, coaches and teams.</p>
+        <div class="sl-footer__social">
+          <a href="https://www.linkedin.com/company/stadioralabs" target="_blank" rel="noopener" aria-label="Stadiora Labs on LinkedIn">
+            <svg viewBox="0 0 24 24" data-filled aria-hidden="true"><path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2z"/><circle cx="4" cy="4" r="2"/></svg>
           </a>
         </div>
       </div>
       <div>
-        <div class="fc-title">API Endpoints</div>
-        <ul class="fc-links">
-          <li><a href="#capabilities">Availability Index</a></li>
-          <li><a href="#capabilities">Sprint Readiness</a></li>
-          <li><a href="#capabilities">Injury Risk Signal</a></li>
-          <li><a href="#capabilities">Return-to-Play</a></li>
-          <li><a href="#capabilities">Coach Attention Queue</a></li>
-          <li><a href="#capabilities">Player Passport</a></li>
+        <p class="sl-footer__title">Products</p>
+        <ul class="sl-footer__links">
+          <li><a href="https://apps.apple.com/us/app/run-with-aria/id6760048203" target="_blank" rel="noopener">Run with Aria on the App Store</a></li>
+          <li><a href="https://play.google.com/store/apps/details?id=com.runwitharia.mobile" target="_blank" rel="noopener">Run with Aria on Google Play</a></li>
+          <li><a href="./index.html">Aria for Coaches</a></li>
+          <li><a href="./index.html">Aria 12</a></li>
+          <li><a href="./api.html">Aria Intelligence</a></li>
         </ul>
       </div>
       <div>
-        <div class="fc-title">Products</div>
-        <ul class="fc-links">
-          <li><a href="https://runwitharia.com" target="_blank" rel="noopener">Aria</a></li>
-          <li><a href="./index.html#ecosystem">Aria 12</a></li>
-          <li><a href="./index.html#ecosystem">Aria for Coaches</a></li>
-          <li><a href="./api.html">Aria Intelligence API</a></li>
-        </ul>
-      </div>
-      <div>
-        <div class="fc-title">Company</div>
-        <ul class="fc-links">
-          <li><a href="./index.html#mission">Our Mission</a></li>
-          <li><a href="./index.html#engine">The Engine</a></li>
-          <li><a href="./index.html">Stadiora Labs</a></li>
+        <p class="sl-footer__title">Company</p>
+        <ul class="sl-footer__links">
+          <li><a href="./index.html">Home</a></li>
+          <li><a href="./investors.html">Investors</a></li>
+          <li><a href="./lead-magnet.html">Free readiness check</a></li>
           <li><a href="mailto:api@stadioralabs.com">Contact</a></li>
         </ul>
       </div>
     </div>
-    <div class="foot-btm">
-      <p class="foot-copy">© 2026 Stadiora Labs. All rights reserved. Built in Latin America & the United States.</p>
-      <div class="foot-legal">
-        <a href="#">Privacy Policy</a>
-        <a href="#">Terms of Use</a>
+    <div class="sl-footer__bottom">
+      <p class="sl-small sl-muted">© 2026 Stadiora Labs. All rights reserved. Built in Latin America and the United States.</p>
+      <div class="sl-footer__legal sl-small sl-muted">
+        <a href="./privacy.html">Privacy Policy</a>
+        <a href="./terms.html">Terms of Use</a>
       </div>
     </div>
   </div>
 </footer>
 
-<script>
-// Nav scroll
-const nav = document.getElementById('nav');
-window.addEventListener('scroll', () => {
-  nav.classList.toggle('scrolled', window.scrollY > 40);
-});
-
-// Mobile menu
-function openMenu()  { document.getElementById('mobileMenu').classList.add('open'); document.body.style.overflow='hidden'; }
-function closeMenu() { document.getElementById('mobileMenu').classList.remove('open'); document.body.style.overflow=''; }
-
-// Reveal on scroll
-const revealObs = new IntersectionObserver(entries => {
-  entries.forEach(e => { if(e.isIntersecting) { e.target.classList.add('revealed'); revealObs.unobserve(e.target); } });
-}, { threshold: 0.12 });
-document.querySelectorAll('[data-reveal]').forEach(el => revealObs.observe(el));
-
-// Code tab toggle — request / response
-const tabs = document.querySelectorAll('.code-tab-item');
-const codeDisplay = document.getElementById('code-display');
-const request = codeDisplay.innerHTML;
-const response = `<span class="t-comment">// 200 OK — Aria Intelligence Decision</span>
-{
-  <span class="t-key">"athlete_id"</span>: <span class="t-str">"ATH_8821"</span>,
-  <span class="t-key">"availability"</span>: <span class="t-tag">"MODIFIED"</span>,
-  <span class="t-key">"readiness_index"</span>: <span class="t-num">54</span>,
-  <span class="t-key">"classification"</span>: <span class="t-str">"Reduced Load Session"</span>,
-  <span class="t-key">"recommendation"</span>: <span class="t-str">"Technical work only. Cap volume at 60%. No max-intensity efforts today."</span>,
-  <span class="t-key">"flags"</span>: [
-    <span class="t-str">"elevated_cumulative_load"</span>,
-    <span class="t-str">"hrv_below_7d_baseline"</span>,
-    <span class="t-str">"sleep_deficit_detected"</span>
-  ],
-  <span class="t-key">"coach_attention"</span>: <span class="t-tag">true</span>,
-  <span class="t-key">"confidence"</span>: <span class="t-num">0.91</span>,
-  <span class="t-key">"primary_signal"</span>: <span class="t-str">"hrv_delta"</span>
-}`;
-
-tabs.forEach((tab, i) => {
-  tab.addEventListener('click', () => {
-    tabs.forEach(t => t.classList.remove('active'));
-    tab.classList.add('active');
-    codeDisplay.innerHTML = i === 0 ? request : response;
-  });
-});
-
-// Smooth scroll
-document.querySelectorAll('a[href^="#"]').forEach(a => {
-  a.addEventListener('click', e => {
-    const t = document.querySelector(a.getAttribute('href'));
-    if(t) { e.preventDefault(); t.scrollIntoView({ behavior:'smooth', block:'start' }); }
-  });
-});
-</script>
 </body>
 </html>
