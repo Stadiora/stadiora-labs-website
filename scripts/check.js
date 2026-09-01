@@ -22,7 +22,7 @@
      yellow       score at or above which the result is the yellow tier
      questions    [{ q, options: [{ label, detail, score, weak, vars }] }]
      tiers        { green|yellow|red: { label, headline, sub, rec, urgency } }
-     strong       insights shown when no weak signal was picked
+     strong       insights shown on a green result
      cta          { kicker, headline, body, storeLabel, note, secondary }
 
    Placeholders. A tier string may contain {name}. The engine fills it from
@@ -58,7 +58,7 @@
     answers: [],
     qi: 0,
     pending: null,
-    history: ['s-intro'],
+    history: [{ id: 's-intro', qi: 0 }],
     screen: 's-intro'
   };
 
@@ -101,12 +101,16 @@
 
   /* ---- screens ---------------------------------------------------------- */
 
+  /* History entries are {id, qi}. The question stage reuses one element for
+     every question, so the entry has to carry the question index or Back
+     cannot tell question 5 from question 1. */
   function show(id, push) {
     var current = document.querySelector('.check__screen.is-active');
     if (current) current.classList.remove('is-active');
     var next = el(id);
+    void next.offsetWidth;
     next.classList.add('is-active');
-    if (push !== false) S.history.push(id);
+    if (push !== false) S.history.push({ id: id, qi: S.qi });
     S.screen = id;
     updateMeta();
     updateBack();
@@ -117,7 +121,23 @@
   function back() {
     if (S.history.length <= 1) return;
     S.history.pop();
-    show(S.history[S.history.length - 1], false);
+    var entry = S.history[S.history.length - 1];
+    if (entry.id === 's-question') {
+      S.qi = entry.qi;
+      loadQuestion();
+      restoreAnswer();
+    }
+    show(entry.id, false);
+  }
+
+  /* Back into a question the visitor already answered puts their answer back
+     on screen and re-enables Continue, so Back reads as "change this answer"
+     rather than "lose it". */
+  function restoreAnswer() {
+    var index = S.answers[S.qi];
+    if (typeof index !== 'number') return;
+    var options = el('check-options').querySelectorAll('.check__opt');
+    if (options[index]) pick(options[index]);
   }
 
   function updateBack() {
@@ -210,12 +230,8 @@
     if (S.qi < path.questions.length - 1) {
       S.qi++;
       loadQuestion();
-      var screen = el('s-question');
-      screen.classList.remove('is-active');
-      void screen.offsetWidth;
-      screen.classList.add('is-active');
-      screen.focus({ preventScroll: true });
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      restoreAnswer();
+      show('s-question');
     } else {
       results();
     }
@@ -274,13 +290,20 @@
       var w = picked[scored[i]].weak;
       if (w) weak.push(w);
     }
-    var insights = weak.length
-      ? weak.slice(0, 3).map(function (text) {
-          return '<li class="check__insight check__insight--' + tierName + '">' + ICON_WARN + '<span>' + esc(text) + '</span></li>';
-        })
-      : (path.strong || []).slice(0, 3).map(function (text) {
-          return '<li class="check__insight check__insight--green">' + ICON_OK + '<span>' + esc(text) + '</span></li>';
-        });
+    /* Icon, colour and tier have to agree. A green card says the signals line
+       up, so it only ever lists strong signals. A yellow or red card only
+       lists the weak ones it actually found, and drops the list rather than
+       borrowing green ticks when the visitor tripped no weak signal. */
+    var insights = [];
+    if (tierName === 'green') {
+      insights = (path.strong || []).slice(0, 3).map(function (text) {
+        return '<li class="check__insight check__insight--green">' + ICON_OK + '<span>' + esc(text) + '</span></li>';
+      });
+    } else if (weak.length) {
+      insights = weak.slice(0, 3).map(function (text) {
+        return '<li class="check__insight check__insight--' + tierName + '">' + ICON_WARN + '<span>' + esc(text) + '</span></li>';
+      });
+    }
 
     var cta = path.cta;
     var secondary = cta.secondary
