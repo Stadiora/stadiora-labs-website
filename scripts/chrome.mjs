@@ -181,7 +181,7 @@ const PAGES = [
      the chrome stays identical, and it routes to the Spanish home page. */
   { file: 'privacy.html', lang: 'en', current: '', twin: './index-es.html', twinLang: 'es' },
   { file: 'terms.html', lang: 'en', current: '', twin: './index-es.html', twinLang: 'es' },
-  { file: '404.html', lang: 'en', current: '', twin: './index-es.html', twinLang: 'es' },
+  { file: '404.html', lang: 'en', current: '', twin: '/index-es.html', twinLang: 'es', rootAbsolute: true },
 ];
 
 const cur = (page, key) => (page.current === key ? ' aria-current="page"' : '');
@@ -324,6 +324,29 @@ const region = (name) => ({
   close: `<!-- /sl-chrome:${name} -->`,
 });
 
+/* 404.html is the one page that cannot use ./ paths.
+ *
+ * GitHub Pages serves 404.html for any unmatched path, in place, without a
+ * redirect. The browser therefore resolves relative URLs against the path the
+ * visitor asked for, not against the file. On /investors/ a ./ reference
+ * becomes /investors/styles/site.css, which does not exist, and the visitor
+ * gets unstyled HTML with every link pointing into a directory that is not
+ * there. Only the root-level case works, which is the easy case to miss.
+ *
+ * Root-absolute paths fix it at every depth. They are used instead of a
+ * <base href> because <base> needs the production origin hardcoded, which
+ * would make the page load live assets when served from a local static
+ * server or any preview host. The site is served from the root of a domain,
+ * so a leading / always resolves the same way.
+ *
+ * Rewriting here rather than in a second template keeps 404.html on the same
+ * generated chrome as the other ten pages. --check applies the same rewrite,
+ * so drift is still caught byte for byte. If a page is ever added that is
+ * also served from an unpredictable path, give it rootAbsolute too, and keep
+ * its own head references root-absolute by hand.
+ */
+const rootAbsolute = (block) => block.replace(/(href|src)="\.\//g, '$1="/');
+
 const replaceRegion = (html, name, body) => {
   const { open, close } = region(name);
   const start = html.indexOf(open);
@@ -362,6 +385,10 @@ const run = async () => {
     const path = join(root, page.file);
     const html = await readFile(path, 'utf8');
     const want = { nav: navBlock(page), footer: footerBlock(page) };
+    if (page.rootAbsolute) {
+      want.nav = rootAbsolute(want.nav);
+      want.footer = rootAbsolute(want.footer);
+    }
 
     if (mode === 'write') {
       let next = html;

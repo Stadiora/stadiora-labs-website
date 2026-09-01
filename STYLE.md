@@ -263,6 +263,13 @@ twin should not sit behind a tap.
 
 Store badge row.
 
+The current `ICON_APPLE` and `ICON_PLAY` glyphs in `scripts/chrome.mjs` are hand-drawn
+approximations paired with hand-set kickers in Space Mono. Apple's Marketing Resources
+and the Google Play brand guidelines both require their supplied badge artwork to be used
+unmodified, with locked proportions, colour and lockup, so this markup does not meet
+either. Swapping in the official downloads is an open task. They drop straight into the
+existing `.sl-store` slot. Keep the trademark attribution line in the footer either way.
+
 ```html
 <div class="sl-stores">
   <a class="sl-store" href="https://apps.apple.com/us/app/run-with-aria/id6760048203" target="_blank" rel="noopener">
@@ -389,6 +396,10 @@ Commands:
 - `node scripts/chrome.mjs --check` fails if any page has drifted, and fails if a root
   `.html` file is missing from the `PAGES` array. Run it before opening a PR.
 
+`--check` compares byte for byte, so it also catches line endings. On a Windows clone with
+`core.autocrlf=true`, git rewrites every file to CRLF on checkout and all 22 regions fail
+at once. Clone with `core.autocrlf=false` before running it.
+
 The rendered HTML stays committed, so GitHub Pages still serves a plain static site with
 no build step. The script is a tool, not a dependency.
 
@@ -476,10 +487,38 @@ font preconnects. Nothing here is optional except `robots`.
 - Legal pages use `og:type` `article`. Everything else uses `website`.
 - `investors.html` and `investors-es.html` keep
   `robots` `noindex, nofollow, noarchive, nosnippet` and stay out of `sitemap.xml`.
-  `robots.txt` disallows them as well.
+  They are deliberately **not** disallowed in `robots.txt`. `Disallow` blocks crawling,
+  not indexing, so a crawler that obeys it never fetches the page and never sees the
+  `noindex`. A shared URL could then still be indexed as a bare link with the strongest
+  signal on the page discarded. Letting crawlers read the page is what makes the
+  `noindex` bind. Do not add them back.
+- Both investors pages carry a neutral `<title>`, description and share description.
+  The raise number, the athlete count and the rest of the deck facts live in the gated
+  body only. An unfurler fetches the head without a passcode, so anything in the head
+  travels into every chat client the link is pasted into.
 - `404.html` uses `noindex, follow` and carries no canonical.
+- Every page carries `og:image:alt` and `twitter:image:alt`. They are the same string.
 - `sitemap.xml` lists the public pages with `xhtml:link` alternates that match the page
   tags. Add a page to it in the same commit that creates the page.
+
+### 404.html paths
+
+`404.html` is the only page that must not use `./` paths. Use root-absolute paths, with a
+leading `/`, for every reference in its head and body.
+
+GitHub Pages serves `404.html` for any unmatched path, in place, without redirecting. The
+browser resolves relative URLs against the path the visitor asked for, not against the
+file, so on `stadioralabs.com/investors/` a `./styles/site.css` becomes
+`/investors/styles/site.css` and 404s. The visitor gets unstyled HTML with every link
+pointing into a directory that does not exist. Only the root-level case works, which is
+the easy case to test and miss.
+
+`scripts/chrome.mjs` handles the generated regions through the `rootAbsolute` flag on the
+`PAGES` entry. Anything you add to `404.html` by hand needs the leading `/` yourself.
+
+Test it against a server that mimics Pages, serving the file if it exists and returning
+`404.html` with a 404 otherwise, then load a nested path such as `/investors/` and confirm
+the stylesheet applies and the logo loads.
 
 ---
 
@@ -492,9 +531,13 @@ font preconnects. Nothing here is optional except `robots`.
   `rights-grid`, `notice` and the rest.
 - Three page-scoped signal colours live there, `--lg-warn`, `--lg-alert`, `--lg-ok`.
   They are not site tokens and no other page may use them.
-- The body copy still contains em dashes. That is a known copy-rule violation, left in
-  place because editing legal text is a substance change. Anything that changes a clause
-  needs legal review, not a style pass.
+- The body copy still contains em dashes, 18 in each document. That is a known copy-rule
+  violation, left in place because editing a clause is a substance change. Anything that
+  changes a clause needs legal review, not a style pass. Headings and notice titles are
+  display copy rather than operative statements, so those were cleared.
+- Inline `style` attributes are not allowed on these pages either. `styles/legal.css`
+  carries `.doc-footnote` for the closing disclaimers and `.is-flush` for a notice that
+  opens a section.
 - There is no Spanish twin. Translating a legal instrument changes it.
 - If a clause contradicts a current product fact, report it on the issue. Do not fix it
   in the markup.

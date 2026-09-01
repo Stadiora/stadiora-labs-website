@@ -302,7 +302,24 @@
 .fw-ccpa { background: var(--lg-ok-soft); border: 1px solid var(--lg-ok-line); color: var(--lg-ok); }
 .fw-health { background: var(--lg-warn-soft); border: 1px solid var(--lg-warn-line); color: var(--lg-warn); }
 .fw-title { font-size: var(--sl-text-small); font-weight: 700; color: var(--sl-white); margin-bottom: var(--sl-space-1); }
-.fw-desc { font-size: 13px; color: var(--sl-text-muted); line-height: var(--sl-leading-body); }
+.fw-desc { font-size: var(--sl-text-small); color: var(--sl-text-muted); line-height: var(--sl-leading-body); }
+
+/* ---------- Document utilities ---------------------------------------------
+   Two classes that replace the last four inline style attributes these
+   documents carried over from the old stylesheet. Everything they set comes
+   off the token scale, so a retune of the ink palette or the type scale moves
+   them with the rest of the site. */
+
+/* The closing disclaimer under the contact block on both documents. */
+.doc-footnote {
+  margin-top: var(--sl-space-4);
+  font-size: var(--sl-text-small);
+  color: var(--sl-text-faint);
+  line-height: var(--sl-leading-body);
+}
+
+/* A notice that opens a section, so it needs no leading gap above it. */
+.is-flush { margin-top: 0; }
 
 /* ---------- Responsive ------------------------------------------------------ */
 @media (max-width: 900px) {
