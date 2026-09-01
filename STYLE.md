@@ -310,9 +310,10 @@ The largest headshot is 773 KB at 600 by 600, and the three app screenshots are 
 Do not point an `<img src>` straight at the raw file. Name the derivative after the
 source, next to it, so the next slice finds it before making a second copy.
 
-Videos live in `videos/`. `videos/aria-12.mp4` is the Aria 12 tile clip, renamed from
-`aria-xi.mp4` in slice #6. `videos/api.mp4` sold the API as a live developer product and
-no page should use it again.
+Videos live in `videos/`. `videos/aria-12.mp4` is the Aria 12 tile clip. `videos/aria-xi.mp4`
+is the same clip under its retired name, kept only until the homepage rebuild points at the
+new path, then deleted. Point new work at `aria-12.mp4`. `videos/api.mp4` sold the API as a
+live developer product and no page should use it again.
 
 ---
 
