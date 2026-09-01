@@ -22,7 +22,7 @@ JOBS = [
     ("anthony_c", 320, True),
     ("karla_c", 320, True),
     ("joel_c", 320, True),
-    ("shot_home", 640, False),
+    ("shot_home", 1184, False),
 ]
 
 

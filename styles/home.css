@@ -1,0 +1,251 @@
+/* ==========================================================================
+   Homepage layout
+   Page-level blocks for index.html and index-es.html. Everything here builds
+   on the tokens and components in styles/site.css, which loads first. Class
+   prefix "home-" keeps these out of the shared namespace.
+   ========================================================================== */
+
+/* ---------- Two column split, used by the hero and the engine -------------- */
+.home-split {
+  display: grid;
+  gap: var(--sl-space-7);
+  align-items: center;
+}
+@media (min-width: 900px) {
+  .home-split { grid-template-columns: 1.05fr 0.95fr; gap: var(--sl-space-8); }
+  .home-split--flip .home-split__visual { order: -1; }
+}
+
+.home-split__visual { justify-self: center; width: 100%; display: flex; justify-content: center; }
+
+/* ---------- Phone frame around an app screenshot --------------------------- */
+.home-phone {
+  position: relative;
+  width: min(320px, 76vw);
+  padding: 10px;
+  border: 1px solid var(--sl-border-strong);
+  border-radius: 40px;
+  background: linear-gradient(160deg, rgba(255, 255, 255, 0.09), rgba(255, 255, 255, 0.02) 46%, transparent);
+  box-shadow: var(--sl-shadow-card);
+}
+.home-phone::before {
+  /* Cyan halo behind the device. Decoration, sits under the screenshot. */
+  content: '';
+  position: absolute;
+  inset: 12% -14% -8%;
+  background: radial-gradient(60% 50% at 50% 50%, rgba(0, 184, 212, 0.22), transparent 70%);
+  filter: blur(28px);
+  z-index: -1;
+}
+.home-phone img { width: 100%; border-radius: 30px; }
+
+/* ---------- Hero ----------------------------------------------------------- */
+.home-hero__meta { margin-top: var(--sl-space-6); }
+.home-hero .sl-stores { margin-top: var(--sl-space-6); }
+.home-hero__secondary { margin-top: var(--sl-space-4); }
+
+.home-textlink {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sl-space-2);
+  font-size: var(--sl-text-small);
+  font-weight: 600;
+  color: var(--sl-cyan);
+  transition: color var(--sl-speed) var(--sl-ease);
+}
+.home-textlink svg { width: 16px; height: 16px; }
+.home-textlink:hover { color: var(--sl-cyan-bright); }
+
+/* ---------- Traction strip -------------------------------------------------- */
+.home-stats {
+  display: grid;
+  gap: var(--sl-space-6);
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+}
+.home-stat {
+  position: relative;
+  /* Every stat reserves the qualifier line, so the one stat that carries a
+     qualifier keeps its number on the same baseline as the rest of the row. */
+  padding-top: 18px;
+  padding-left: var(--sl-space-4);
+  border-left: 2px solid var(--sl-cyan-line);
+}
+.home-stat__label { color: var(--sl-text-muted); font-size: var(--sl-text-small); margin-top: var(--sl-space-2); }
+/* Qualifier in front of a stat number, so a ceiling never reads as a measured
+   result. */
+.home-stat__qual {
+  position: absolute;
+  top: 0;
+  left: var(--sl-space-4);
+  font-family: var(--sl-font-mono);
+  font-size: var(--sl-text-label);
+  font-weight: 700;
+  line-height: 18px;
+  letter-spacing: var(--sl-tracking-label);
+  text-transform: uppercase;
+  color: var(--sl-text-faint);
+}
+
+/* ---------- Signal list ------------------------------------------------------ */
+.home-signals { display: grid; gap: var(--sl-space-4); margin-top: var(--sl-space-6); }
+.home-signal { display: flex; gap: var(--sl-space-4); align-items: flex-start; }
+.home-signal__icon {
+  width: 38px;
+  height: 38px;
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--sl-cyan-line);
+  border-radius: var(--sl-radius-sm);
+  background: var(--sl-cyan-soft);
+  color: var(--sl-cyan);
+}
+.home-signal__icon svg { width: 19px; height: 19px; }
+.home-signal__name { font-weight: 600; color: var(--sl-white); }
+.home-signal__body { color: var(--sl-text-muted); font-size: var(--sl-text-small); margin: 0; }
+
+.home-outcome {
+  margin-top: var(--sl-space-6);
+  padding: var(--sl-space-5);
+  border: 1px solid var(--sl-cyan-line);
+  border-radius: var(--sl-radius);
+  background: var(--sl-cyan-soft);
+}
+.home-outcome p { margin: var(--sl-space-2) 0 0; color: var(--sl-text); }
+
+/* ---------- Status pill ------------------------------------------------------ */
+.home-pill {
+  display: inline-flex;
+  /* The pill sits directly in .home-product, which is a flex column, so it is
+     blockified and would stretch the full card width without this. */
+  align-self: flex-start;
+  align-items: center;
+  gap: var(--sl-space-2);
+  padding: 5px 12px;
+  border-radius: var(--sl-radius-pill);
+  border: 1px solid var(--sl-cyan-line);
+  background: var(--sl-cyan-soft);
+  font-family: var(--sl-font-mono);
+  font-size: var(--sl-text-label);
+  font-weight: 700;
+  letter-spacing: var(--sl-tracking-label);
+  text-transform: uppercase;
+  color: var(--sl-cyan-bright);
+  margin-bottom: var(--sl-space-4);
+}
+.home-pill--violet { border-color: var(--sl-violet-line); background: var(--sl-violet-soft); color: var(--sl-violet); }
+.home-pill svg { width: 13px; height: 13px; }
+
+/* ---------- Ecosystem cards --------------------------------------------------- */
+.home-product { display: flex; flex-direction: column; }
+.home-product .sl-card__body { margin-bottom: var(--sl-space-5); }
+.home-product__foot { margin-top: auto; }
+.home-product__note {
+  display: flex;
+  gap: var(--sl-space-3);
+  align-items: flex-start;
+  padding-top: var(--sl-space-4);
+  border-top: 1px solid var(--sl-border);
+  color: var(--sl-text-muted);
+  font-size: var(--sl-text-small);
+}
+.home-product__note svg { width: 18px; height: 18px; flex: none; color: var(--sl-violet); }
+
+/* Middot spec line, used where the facts pack only supports naming what the
+   product is rather than describing it. */
+.home-product__specs { padding-top: var(--sl-space-4); border-top: 1px solid var(--sl-border); }
+
+/* ---------- Value story --------------------------------------------------------- */
+.home-roles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sl-space-2);
+  margin-top: var(--sl-space-5);
+}
+.home-role {
+  padding: 7px 14px;
+  border: 1px solid var(--sl-border);
+  border-radius: var(--sl-radius-pill);
+  background: var(--sl-surface);
+  font-size: var(--sl-text-small);
+  color: var(--sl-text);
+}
+
+.home-compare {
+  display: grid;
+  gap: var(--sl-space-4);
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  margin-top: var(--sl-space-6);
+}
+.home-compare__cell {
+  padding: var(--sl-space-5);
+  border: 1px solid var(--sl-border);
+  border-radius: var(--sl-radius);
+  background: var(--sl-ink-700);
+}
+.home-compare__cell--aria { border-color: var(--sl-cyan-line); background: linear-gradient(180deg, var(--sl-cyan-soft), transparent 70%), var(--sl-ink-700); }
+.home-compare__num { font-family: var(--sl-font-mono); font-size: clamp(28px, 3.4vw, 40px); font-weight: 700; line-height: 1; color: var(--sl-white); }
+.home-compare__cell--aria .home-compare__num { color: var(--sl-cyan-bright); }
+.home-compare__label { margin-top: var(--sl-space-3); color: var(--sl-text-muted); font-size: var(--sl-text-small); }
+
+.home-multiple {
+  margin-top: var(--sl-space-6);
+  padding: var(--sl-space-5);
+  border: 1px solid var(--sl-border);
+  border-radius: var(--sl-radius);
+  background: var(--sl-ink-700);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--sl-space-4);
+}
+.home-multiple__num { font-family: var(--sl-font-mono); font-size: clamp(32px, 4vw, 46px); font-weight: 700; line-height: 1; color: var(--sl-cyan-bright); }
+.home-multiple__text { color: var(--sl-text-muted); margin: 0; flex: 1 1 240px; }
+
+/* ---------- Team ------------------------------------------------------------------ */
+.home-team {
+  display: grid;
+  gap: var(--sl-space-5);
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+}
+.home-member__photo {
+  width: 88px;
+  height: 88px;
+  object-fit: cover;
+  border-radius: var(--sl-radius-pill);
+  border: 1px solid var(--sl-border-strong);
+  background: var(--sl-ink-600);
+  margin-bottom: var(--sl-space-4);
+}
+.home-member__name { font-family: var(--sl-font-display); font-size: var(--sl-text-h3); font-weight: 600; color: var(--sl-white); }
+.home-member__role {
+  font-family: var(--sl-font-mono);
+  font-size: var(--sl-text-label);
+  font-weight: 700;
+  letter-spacing: var(--sl-tracking-label);
+  text-transform: uppercase;
+  color: var(--sl-cyan);
+  margin: var(--sl-space-2) 0 var(--sl-space-3);
+}
+.home-member__bio { color: var(--sl-text-muted); font-size: var(--sl-text-small); margin: 0; }
+
+/* ---------- Closing call to action -------------------------------------------------- */
+.home-cta { text-align: center; }
+.home-cta .sl-stores { justify-content: center; margin-top: var(--sl-space-6); }
+.home-cta .home-textlink { margin-top: var(--sl-space-5); }
+
+/* ---------- Small helpers ------------------------------------------------------------ */
+/* Section lead paragraph to the grid below it. */
+.home-mt { margin-top: var(--sl-space-7); }
+
+.home-copy { margin: 0; }
+
+/* Empty anchor that keeps an old inbound fragment landing on the right section
+   after the section itself was renamed. api.html and api-es.html still link to
+   index.html#mission, so #mission has to keep answering until slice #6 lands. */
+.home-anchor {
+  display: block;
+  height: 0;
+  scroll-margin-top: var(--sl-nav-h);
+}
