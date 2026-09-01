@@ -1,0 +1,22 @@
+# Slice #9 wired this up. scripts/chrome.mjs generates the nav and footer for every
+# page; if a page is hand-edited out of step with the generator the site ships two
+# different navs, which is exactly the drift the earlier slices kept catching by hand.
+# The check needs no dependencies, so it runs on a bare checkout.
+name: QA
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+
+jobs:
+  chrome:
+    name: Nav and footer match the generator
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Check generated chrome
+        run: node scripts/chrome.mjs --check

@@ -1,0 +1,17 @@
+# The site is a set of static files that ship exactly as they are committed, and
+# scripts/chrome.mjs --check compares the generated nav and footer byte for byte.
+# Without this file a Windows clone with core.autocrlf=true rewrites every page to
+# CRLF on checkout and all 22 chrome regions fail at once, on a clean tree.
+# Pinning the working tree to LF makes the check give the same answer everywhere,
+# including in CI.
+* text=auto eol=lf
+
+# Binary assets, never touched.
+*.png binary
+*.webp binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.mp4 binary
+*.pdf binary
