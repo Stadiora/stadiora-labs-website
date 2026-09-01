@@ -52,8 +52,11 @@
 
   /* Restrained violet, partner and secondary accents only.
      --sl-violet is a surface and border colour. White text on it measures
-     4.23:1, under AA, so buttons use --sl-ink-900 as their label colour. */
+     4.23:1, under AA, so buttons use --sl-ink-900 as their label colour.
+     Violet text on a dark surface uses --sl-violet-bright, which clears AA
+     on ink-900, ink-800, ink-700 and ink-600; --sl-violet does not. */
   --sl-violet: #8b5cf6;
+  --sl-violet-bright: #a78bfa;
   --sl-violet-soft: rgba(139, 92, 246, 0.14);
   --sl-violet-line: rgba(139, 92, 246, 0.36);
 
@@ -127,6 +130,11 @@
 *::after { box-sizing: border-box; }
 
 html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+
+/* Every anchor target on every page clears the fixed bar. Without this a
+   jump lands the section heading underneath the nav, which at 390px hides
+   the first line of the section the reader just asked for. */
+[id] { scroll-margin-top: calc(var(--sl-nav-h) + var(--sl-space-4)); }
 
 body {
   margin: 0;
@@ -231,7 +239,7 @@ h1, h2, h3, h4 { margin: 0; font-family: var(--sl-font-display); font-weight: 60
 .sl-stat-label { margin-top: var(--sl-space-2); }
 
 .sl-accent { color: var(--sl-cyan-bright); }
-.sl-accent-violet { color: var(--sl-violet); }
+.sl-accent-violet { color: var(--sl-violet-bright); }
 
 /* Middot separator motif. The separator trails its own item so a wrapped
    line never opens with an orphan dot. */

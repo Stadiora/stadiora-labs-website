@@ -122,7 +122,8 @@ at about 1.9:1 and must never carry text a reader needs.
 | `--sl-cyan-bright` | `#00e5ff` | Hover, highlighted words, focus ring |
 | `--sl-cyan-soft` | `rgba(0,184,212,.14)` | Tinted backgrounds |
 | `--sl-cyan-line` | `rgba(0,184,212,.38)` | Accent borders |
-| `--sl-violet` | `#8b5cf6` | Partner and secondary accents only |
+| `--sl-violet` | `#8b5cf6` | Partner surfaces, borders and filled controls |
+| `--sl-violet-bright` | `#a78bfa` | Violet text and icons on a dark surface |
 | `--sl-violet-soft` | `rgba(139,92,246,.14)` | Partner card tint |
 | `--sl-violet-line` | `rgba(139,92,246,.36)` | Partner card border |
 
@@ -132,6 +133,12 @@ partner or secondary signals. Everything else is cyan.
 White text on `--sl-violet` measures 4.23:1, under AA at the 14px bold that buttons use,
 so `.sl-btn--violet` takes `--sl-ink-900` as its label colour. Keep that rule if you build
 any other violet-filled control.
+
+Violet as a *text* colour is the mirror problem. `--sl-violet` on `--sl-violet-soft` over
+`--sl-ink-700` measures 3.97:1, so slice #9 moved every violet text token to
+`--sl-violet-bright`, which measures 6.18:1 on ink-700 and 5.84:1 on ink-600. Use
+`--sl-violet-bright` for any violet word, label or pill text. `--sl-violet` stays on
+fills, borders and non-text icons, where the 3:1 bar for UI components applies.
 
 ### Surfaces and borders
 
@@ -340,10 +347,12 @@ The largest headshot is 773 KB at 600 by 600, and the three app screenshots are 
 Do not point an `<img src>` straight at the raw file. Name the derivative after the
 source, next to it, so the next slice finds it before making a second copy.
 
-Videos live in `videos/`. `videos/aria-12.mp4` is the Aria 12 tile clip. `videos/aria-xi.mp4`
-is the same clip under its retired name, kept only until the homepage rebuild points at the
-new path, then deleted. Point new work at `aria-12.mp4`. `videos/api.mp4` sold the API as a
-live developer product and no page should use it again.
+Videos live in `videos/`. `videos/aria-12.mp4` is the Aria 12 tile clip and is the only
+one new work should point at. `videos/aria-xi.mp4` was the same clip under the retired
+name and was deleted in slice #9 once the homepage rebuild had landed. `videos/api.mp4`
+sold the API as a live developer product and was deleted in the same slice. The remaining
+legacy clips (`aria.mp4`, `hero.mp4`, `stadiora.mp4`) are unreferenced and still under
+review.
 
 ---
 
@@ -396,9 +405,15 @@ Commands:
 - `node scripts/chrome.mjs --check` fails if any page has drifted, and fails if a root
   `.html` file is missing from the `PAGES` array. Run it before opening a PR.
 
-`--check` compares byte for byte, so it also catches line endings. On a Windows clone with
-`core.autocrlf=true`, git rewrites every file to CRLF on checkout and all 22 regions fail
-at once. Clone with `core.autocrlf=false` before running it.
+`--check` compares byte for byte, so it also catches line endings. `.gitattributes` pins the
+whole tree to LF (`* text=auto eol=lf`), which is what makes the check give the same answer
+on Windows, on macOS and in CI. Before that file existed, a Windows clone with
+`core.autocrlf=true` rewrote every file to CRLF on checkout and all 22 regions failed at
+once. If you see that failure, your clone predates `.gitattributes`: run
+`git add --renormalize .` to pick it up.
+
+`.github/workflows/qa.yml` runs `--check` on every push and pull request, so drift between
+a page and the generator is caught before review rather than after merge.
 
 The rendered HTML stays committed, so GitHub Pages still serves a plain static site with
 no build step. The script is a tool, not a dependency.

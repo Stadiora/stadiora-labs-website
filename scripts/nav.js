@@ -81,16 +81,46 @@
       if (!moveFocus) return;
       if (open) {
         lastFocus = document.activeElement;
-        /* Flush the style change first. The panel is visibility hidden until
-           .is-open lands, and a hidden element cannot take focus. */
-        void menu.offsetHeight;
-        var first = cycle()[0];
-        if (first) first.focus();
+        /* The links inside the panel are visibility hidden until the .is-open
+           transition lands, and a hidden element refuses focus. A layout flush
+           is not enough: it settles geometry, not the pending visibility flip,
+           so focusing here leaves the caret on the toggle, outside an
+           aria-modal dialog. Wait for the first link to be focusable. */
+        whenFocusable(cycle()[0]);
       } else {
-        var back = lastFocus && document.contains(lastFocus) ? lastFocus : toggle;
+        /* body is not a real restore target. Safari does not focus a button on
+           click, so the element recorded when the drawer opened can be the body
+           itself, and restoring to it drops the keyboard position instead of
+           returning it. Treat that as no target and go back to the toggle. */
+        var back = lastFocus && lastFocus !== document.body && document.contains(lastFocus)
+          ? lastFocus
+          : toggle;
         lastFocus = null;
         if (back && back.focus) back.focus();
       }
+    }
+
+    /* Focuses the element once it is actually able to take focus. The panel and
+       the links inside it do not turn visible on the same frame: the panel
+       resolves first and the inherited value reaches the links a frame later,
+       so watching the panel means focusing a link that is still hidden, which
+       the browser refuses. Watch the target itself. Reading the computed value
+       rather than listening for transitionend keeps this right under
+       prefers-reduced-motion, where there is no transition and no event. The
+       cap stops the loop if the panel is closed again mid-open. */
+    function whenFocusable(el) {
+      var raf = window.requestAnimationFrame || function (fn) { return window.setTimeout(fn, 16); };
+      var tries = 0;
+
+      (function step() {
+        if (!el || !menu.classList.contains('is-open') || !document.contains(el)) return;
+        if (tries > 30 || window.getComputedStyle(el).visibility === 'visible') {
+          el.focus();
+          return;
+        }
+        tries++;
+        raf(step);
+      })();
     }
 
     /* Tab is driven entirely from the cycle rather than left to the DOM. The
