@@ -300,13 +300,20 @@ in `stadioralabs info/`, wherever both exist.
 | `qr_ios.png` | QR code, decodes to the App Store listing |
 | `qr_android.png` | QR code, decodes to `https://runwitharia.com`, not to a store listing. Do not label it as a Google Play code |
 | `brand_icon.png` | Brand icon |
+| `shot_intelligence.webp` | Web-sized derivative of `shot_intelligence.png`, 600 by 1184, 53 KB. Built in slice #6, reuse it rather than the PNG |
 
 Every image needs alt text. Decorative images get `alt=""` and `aria-hidden="true"`.
 
 The eight photographic PNGs total about 3.6 MB and none of them is sized for the web.
 The largest headshot is 773 KB at 600 by 600, and the three app screenshots are 1179 by
 2326. Resize and convert to WebP or AVIF in whichever slice first puts one on a page.
-Do not point an `<img src>` straight at the raw file.
+Do not point an `<img src>` straight at the raw file. Name the derivative after the
+source, next to it, so the next slice finds it before making a second copy.
+
+Videos live in `videos/`. `videos/aria-12.mp4` is the Aria 12 tile clip. `videos/aria-xi.mp4`
+is the same clip under its retired name, kept only until the homepage rebuild points at the
+new path, then deleted. Point new work at `aria-12.mp4`. `videos/api.mp4` sold the API as a
+live developer product and no page should use it again.
 
 ---
 
