@@ -2,1080 +2,444 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<link rel="icon" type="image/png" href="./stadioralabs info/favicon.png">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="Stadiora Labs construye la capa de inteligencia IA que convierte datos de atletas en decisiones. Un ecosistema. Inteligentemente conectado.">
-<title>Stadiora Labs — Infraestructura de IA Deportiva</title>
+<title>Stadiora Labs, entrenamiento con IA para atletas</title>
+<meta name="description" content="Run with Aria lee tu entrenamiento, tu recuperación, tus dispositivos y tu alimentación, y te devuelve una sola decisión para hoy. Ya está en el App Store y en Google Play, con más de 150 atletas en la plataforma.">
+<link rel="icon" type="image/png" href="./stadioralabs info/favicon.png">
+<link rel="canonical" href="https://stadioralabs.com/index-es.html">
+<link rel="alternate" hreflang="en" href="https://stadioralabs.com/">
+<link rel="alternate" hreflang="es" href="https://stadioralabs.com/index-es.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Stadiora Labs">
+<meta property="og:locale" content="es_ES">
+<meta property="og:locale:alternate" content="en_US">
+<meta property="og:url" content="https://stadioralabs.com/index-es.html">
+<meta property="og:title" content="Stadiora Labs, entrenamiento con IA para atletas">
+<meta property="og:description" content="Run with Aria lee tu entrenamiento, tu recuperación, tus dispositivos y tu alimentación, y te devuelve una sola decisión para hoy. Ya está en el App Store y en Google Play.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<style>
-
-/* Language toggle */
-.lang-toggle{display:flex;gap:4px;align-items:center}
-.lang-btn{font-size:11px;font-weight:700;letter-spacing:1.5px;padding:5px 11px;border-radius:6px;border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.35);background:transparent;cursor:pointer;text-decoration:none;transition:all .2s}
-.lang-btn.active{color:var(--cyan);border-color:rgba(0,190,243,.4);background:rgba(0,190,243,.07)}
-.lang-btn:hover:not(.active){color:rgba(255,255,255,.65);border-color:rgba(255,255,255,.25)}
-
-:root {
-  --black:   #010812;
-  --navy:    #040c1c;
-  --card:    #060e20;
-  --cyan:    #00BEF3;
-  --mint:    #34D399;
-  --violet:  #8B5CF6;
-  --white:   #ffffff;
-  --muted:   rgba(255,255,255,0.38);
-  --dim:     rgba(255,255,255,0.12);
-  --border:  rgba(255,255,255,0.07);
-  --border2: rgba(255,255,255,0.13);
-}
-
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-html{scroll-behavior:smooth}
-body{background:var(--black);color:var(--white);font-family:'DM Sans',sans-serif;overflow-x:hidden;line-height:1.6}
-img{max-width:100%;display:block}
-a{text-decoration:none;color:inherit}
-
-body::before{
-  content:'';position:fixed;inset:0;
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)'/%3E%3C/svg%3E");
-  opacity:.02;pointer-events:none;z-index:9998;
-}
-
-.container{width:100%;max-width:1240px;margin:0 auto;padding:0 48px}
-
-[data-reveal]{opacity:0;transform:translateY(32px);transition:opacity .7s cubic-bezier(.22,1,.36,1),transform .7s cubic-bezier(.22,1,.36,1)}
-[data-reveal].on{opacity:1;transform:none}
-[data-reveal-delay="1"]{transition-delay:.1s}
-[data-reveal-delay="2"]{transition-delay:.2s}
-[data-reveal-delay="3"]{transition-delay:.3s}
-[data-reveal-delay="4"]{transition-delay:.42s}
-
-.bb{font-family:'Bebas Neue',sans-serif;letter-spacing:2px}
-.eyebrow{
-  display:inline-flex;align-items:center;gap:12px;
-  font-size:10px;font-weight:700;letter-spacing:3.5px;text-transform:uppercase;
-  color:var(--cyan);margin-bottom:20px;
-}
-.eyebrow::before{content:'';width:16px;height:1px;background:currentColor;flex-shrink:0}
-.eyebrow.mint{color:var(--mint)}.eyebrow.dim{color:rgba(255,255,255,0.28)}
-.eyebrow.center{display:flex;justify-content:center}
-
-.g-cyan{background:linear-gradient(90deg,var(--cyan),#5ee8ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-.g-mint{background:linear-gradient(90deg,var(--mint),#6effd0);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-.g-multi{background:linear-gradient(90deg,var(--cyan) 0%,var(--mint) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-
-.btn{
-  display:inline-flex;align-items:center;gap:10px;
-  padding:15px 30px;border-radius:10px;border:none;
-  font-family:'DM Sans',sans-serif;font-size:14px;font-weight:700;
-  cursor:pointer;transition:all .22s ease;white-space:nowrap;
-  text-decoration:none;position:relative;overflow:hidden;
-}
-.btn svg{width:16px;height:16px;flex-shrink:0;transition:transform .22s}
-.btn:hover svg{transform:translateX(4px)}
-.btn-lg{padding:18px 40px;font-size:15px;border-radius:12px}
-
-.btn-primary{
-  background:linear-gradient(135deg,#00BEF3,#00d8b4);
-  color:#010812;font-weight:800;
-}
-.btn-primary::after{
-  content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;
-  background:linear-gradient(90deg,transparent,rgba(255,255,255,.28),transparent);
-  animation:shimmer 3.5s ease infinite;
-}
-.btn-primary:hover{transform:translateY(-2px);box-shadow:0 16px 48px rgba(0,190,243,.4),0 0 0 1px rgba(0,190,243,.25)}
-.btn-ghost{background:rgba(255,255,255,.05);color:var(--white);border:1px solid var(--border2)}
-.btn-ghost:hover{background:rgba(255,255,255,.08);border-color:rgba(0,190,243,.4);color:var(--cyan);transform:translateY(-2px)}
-
-@keyframes shimmer{0%{left:-100%}60%,100%{left:100%}}
-
-#nav{
-  position:fixed;top:0;left:0;right:0;z-index:1000;
-  padding:22px 0;transition:all .3s ease;
-}
-#nav.scrolled{
-  background:rgba(1,8,18,.9);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
-  padding:13px 0;border-bottom:1px solid var(--border);
-}
-.nav-inner{display:flex;align-items:center;justify-content:space-between;gap:20px}
-.nav-logo{display:flex;align-items:center;gap:10px;flex-shrink:0}
-.nav-logo img{height:48px;width:auto}
-.nav-logo-fallback{
-  font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:4px;
-  background:linear-gradient(90deg,var(--white),rgba(255,255,255,.6));
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
-}
-.nav-links{display:flex;align-items:center;gap:38px;list-style:none}
-.nav-links a{font-size:13px;font-weight:600;color:rgba(255,255,255,.42);transition:color .2s}
-.nav-links a:hover{color:var(--white)}
-.nav-pill{
-  display:inline-flex;align-items:center;gap:8px;
-  background:rgba(0,190,243,.08);border:1px solid rgba(0,190,243,.22);
-  border-radius:100px;padding:8px 20px;font-size:13px;font-weight:700;color:var(--cyan);
-  transition:all .22s;text-decoration:none;
-}
-.nav-pill svg{width:13px;height:13px;transition:transform .22s}
-.nav-pill:hover{background:rgba(0,190,243,.15);border-color:rgba(0,190,243,.4)}
-.nav-pill:hover svg{transform:translateX(3px)}
-
-.hamburger{display:none;flex-direction:column;gap:5px;background:none;border:none;cursor:pointer;padding:4px}
-.hamburger span{display:block;width:22px;height:1.5px;background:var(--white);border-radius:2px;transition:all .3s}
-.mobile-menu{display:none;position:fixed;inset:0;background:var(--black);z-index:999;flex-direction:column;align-items:center;justify-content:center;gap:32px}
-.mobile-menu.open{display:flex}
-.mobile-menu a{font-family:'Bebas Neue',sans-serif;font-size:46px;letter-spacing:3px;color:rgba(255,255,255,.38);transition:color .2s}
-.mobile-menu a:hover{color:var(--white)}
-.mobile-close{position:absolute;top:24px;right:32px;background:none;border:none;color:rgba(255,255,255,.3);font-size:28px;cursor:pointer}
-
-#hero{
-  position:relative;min-height:100vh;
-  display:flex;align-items:center;
-  overflow:hidden;padding:140px 0 100px;
-  background:var(--black);
-}
-.hero-vid-wrap{position:absolute;inset:0;overflow:hidden}
-.hero-vid{
-  position:absolute;inset:0;width:100%;height:100%;
-  object-fit:cover;opacity:.32;
-}
-.hero-vid-overlay{
-  position:absolute;inset:0;
-  background:
-    linear-gradient(to right, rgba(1,8,18,.96) 38%, rgba(1,8,18,.65) 75%, rgba(1,8,18,.82) 100%),
-    linear-gradient(to bottom, rgba(1,8,18,.2) 0%, rgba(1,8,18,.6) 100%);
-}
-.hero-atm{
-  position:absolute;inset:0;pointer-events:none;
-  background:
-    radial-gradient(ellipse 80% 65% at 90% 15%, rgba(0,190,243,.15) 0%, transparent 58%),
-    radial-gradient(ellipse 55% 50% at 8% 90%,  rgba(139,92,246,.11) 0%, transparent 58%),
-    radial-gradient(ellipse 45% 40% at 55% 55%, rgba(52,211,153,.05) 0%, transparent 60%);
-}
-.hero-grid{
-  position:absolute;inset:0;pointer-events:none;
-  background-image:
-    linear-gradient(rgba(255,255,255,.02) 1px,transparent 1px),
-    linear-gradient(90deg,rgba(255,255,255,.02) 1px,transparent 1px);
-  background-size:100px 100px;
-  mask-image:radial-gradient(ellipse 100% 80% at 80% 0%,rgba(0,0,0,.7) 0%,transparent 70%);
-}
-.hero-sweep{
-  position:absolute;inset:0;pointer-events:none;
-  background:linear-gradient(118deg,transparent 38%,rgba(0,190,243,.05) 50%,transparent 62%);
-  animation:sweep 10s ease-in-out infinite;
-}
-@keyframes sweep{0%,100%{opacity:0;transform:translateX(-30%)} 40%{opacity:1} 55%{opacity:0;transform:translateX(130%)}}
-
-.orb{position:absolute;border-radius:50%;pointer-events:none;animation:orbFloat 12s ease-in-out infinite}
-.orb-1{width:800px;height:800px;background:radial-gradient(circle,rgba(0,190,243,.13) 0%,transparent 65%);top:-250px;right:-200px;filter:blur(70px);animation-delay:0s}
-.orb-2{width:500px;height:500px;background:radial-gradient(circle,rgba(139,92,246,.1) 0%,transparent 65%);bottom:-150px;left:-80px;filter:blur(90px);animation-delay:-6s}
-@keyframes orbFloat{0%,100%{transform:translate(0,0) scale(1)} 33%{transform:translate(20px,-28px) scale(1.03)} 66%{transform:translate(-16px,18px) scale(.97)}}
-
-.hero-inner{
-  position:relative;z-index:1;
-  display:flex;align-items:center;gap:64px;width:100%;
-}
-.hero-content{flex:1;min-width:0}
-
-.hero-badge{
-  display:inline-flex;align-items:center;gap:10px;
-  background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.09);
-  border-radius:100px;padding:7px 18px;margin-bottom:32px;
-  font-size:11px;font-weight:600;letter-spacing:2.5px;text-transform:uppercase;
-  color:rgba(255,255,255,.42);
-}
-.bdot{width:6px;height:6px;border-radius:50%;background:var(--mint);animation:bdotPulse 2.6s ease-in-out infinite}
-@keyframes bdotPulse{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(52,211,153,0)} 50%{opacity:.7;box-shadow:0 0 0 5px rgba(52,211,153,.14)}}
-
-.hero-h1{
-  font-family:'Bebas Neue',sans-serif;
-  font-size:clamp(64px,10.5vw,136px);
-  letter-spacing:2px;line-height:.86;margin-bottom:32px;
-}
-.h1-l1{display:block;color:var(--white)}
-.h1-l2{display:block;color:rgba(255,255,255,.22)}
-.h1-l3{
-  display:block;
-  background:linear-gradient(90deg,var(--cyan) 0%,var(--mint) 60%);
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
-}
-
-.hero-sub{
-  font-size:clamp(15px,1.9vw,18px);color:rgba(255,255,255,.55);
-  max-width:520px;line-height:1.85;margin-bottom:44px;
-}
-
-.hero-ctas{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:60px}
-
-.hero-stats{display:flex;align-items:stretch;border-top:1px solid var(--border);padding-top:36px;max-width:500px}
-.hstat{flex:1}
-.hstat+.hstat{padding-left:28px;border-left:1px solid var(--border)}
-.hstat-n{font-family:'Bebas Neue',sans-serif;font-size:44px;letter-spacing:1px;line-height:1;margin-bottom:4px;color:var(--white)}
-.hstat-n .c{color:var(--cyan)}
-.hstat-l{font-size:11px;color:rgba(255,255,255,.3);font-weight:600;letter-spacing:.3px}
-
-.hero-scroll{position:absolute;bottom:34px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:10px;z-index:1}
-.scroll-line{width:1px;height:52px;background:linear-gradient(to bottom,rgba(255,255,255,0),rgba(255,255,255,.2),rgba(255,255,255,0));animation:scrollAnim 2.4s ease-in-out infinite}
-.scroll-lbl{font-size:9px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,.18)}
-@keyframes scrollAnim{0%{transform:scaleY(0);transform-origin:top;opacity:0} 30%{opacity:1} 50%{transform:scaleY(1);transform-origin:top} 51%{transform:scaleY(1);transform-origin:bottom} 100%{transform:scaleY(0);transform-origin:bottom;opacity:0}}
-
-.hero-widget{
-  width:340px;flex-shrink:0;
-  background:rgba(0,190,243,.04);
-  border:1px solid rgba(0,190,243,.18);
-  border-radius:20px;padding:30px;
-  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
-  position:relative;overflow:hidden;
-}
-.hero-widget::before{
-  content:'';position:absolute;top:-60px;right:-60px;
-  width:180px;height:180px;border-radius:50%;
-  background:radial-gradient(circle,rgba(0,190,243,.14) 0%,transparent 65%);
-  pointer-events:none;
-}
-.hw-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px}
-.hw-title{font-size:9px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,.35)}
-.hw-live{display:flex;align-items:center;gap:6px;font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--mint)}
-.hw-live::before{content:'';width:5px;height:5px;border-radius:50%;background:var(--mint);animation:bdotPulse 2s ease-in-out infinite}
-
-.hw-ring-wrap{display:flex;justify-content:center;margin-bottom:26px;position:relative}
-.hw-svg{width:148px;height:148px;transform:rotate(-90deg)}
-.ring-bg{fill:none;stroke:rgba(255,255,255,.05);stroke-width:8}
-.ring-fill{
-  fill:none;stroke:url(#rg);stroke-width:8;stroke-linecap:round;
-  stroke-dasharray:220;stroke-dashoffset:220;
-  animation:ringFill 2.2s cubic-bezier(.4,0,.2,1) .6s forwards;
-}
-@keyframes ringFill{to{stroke-dashoffset:17.6}}
-.ring-num{
-  position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
-  text-align:center;
-}
-.ring-num-val{font-family:'Bebas Neue',sans-serif;font-size:52px;letter-spacing:2px;line-height:1;color:var(--white)}
-.ring-num-lbl{font-size:9px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:var(--cyan)}
-
-.hw-bars{display:flex;flex-direction:column;gap:13px;margin-bottom:20px}
-.hwb{display:flex;align-items:center;gap:10px}
-.hwb-lbl{font-size:11px;color:rgba(255,255,255,.38);width:70px;flex-shrink:0}
-.hwb-track{flex:1;height:3px;background:rgba(255,255,255,.07);border-radius:2px;overflow:hidden}
-.hwb-fill{height:100%;border-radius:2px;background:linear-gradient(90deg,var(--cyan),var(--mint));width:0;transition:width 1.5s cubic-bezier(.4,0,.2,1)}
-.hwb-val{font-size:11px;font-weight:700;color:rgba(255,255,255,.55);width:28px;text-align:right;flex-shrink:0}
-
-.hw-footer{
-  display:flex;align-items:center;justify-content:space-between;
-  padding-top:16px;border-top:1px solid var(--border);
-}
-.hw-footer-lbl{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,.25)}
-.hw-footer-dot{
-  width:22px;height:22px;border-radius:50%;
-  background:rgba(0,190,243,.12);border:1px solid rgba(0,190,243,.25);
-  display:flex;align-items:center;justify-content:center;
-  animation:bdotPulse 3s ease-in-out infinite;
-}
-.hw-footer-dot::after{content:'';width:7px;height:7px;border-radius:50%;background:var(--cyan)}
-
-.marquee-wrap{
-  border-top:1px solid var(--border);border-bottom:1px solid var(--border);
-  padding:15px 0;overflow:hidden;background:rgba(255,255,255,.012);
-}
-.marquee-track{display:flex;animation:marqScroll 30s linear infinite;white-space:nowrap}
-.marq-item{
-  display:flex;align-items:center;gap:32px;padding:0 40px;
-  font-size:10px;font-weight:700;letter-spacing:4px;text-transform:uppercase;
-  color:rgba(255,255,255,.18);flex-shrink:0;
-}
-.marq-item .ma{color:var(--cyan);font-size:14px;letter-spacing:0;line-height:1}
-@keyframes marqScroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
-
-#engine{background:var(--navy);position:relative;overflow:hidden;padding:120px 0}
-#engine::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(0,190,243,.5),transparent)}
-#engine::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(0,190,243,.15),transparent)}
-.engine-amb{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:700px;height:460px;background:radial-gradient(ellipse,rgba(0,190,243,.07) 0%,transparent 65%);pointer-events:none}
-
-.engine-intro{text-align:center;max-width:640px;margin:0 auto 90px}
-.engine-intro h2{font-family:'Bebas Neue',sans-serif;font-size:clamp(40px,5.5vw,76px);letter-spacing:2px;line-height:.97;margin-bottom:18px}
-.engine-intro p{font-size:16px;color:rgba(255,255,255,.5);line-height:1.85}
-
-.flow{display:grid;grid-template-columns:230px 280px 230px;align-items:center;gap:0 0;max-width:960px;margin:0 auto;position:relative;z-index:1}
-.flow-col{display:flex;flex-direction:column;gap:10px;width:230px}
-.flow-col.inputs{align-items:stretch}
-.flow-col.outputs{align-items:stretch}
-
-.fpill{padding:11px 16px;border-radius:9px;font-size:12px;font-weight:600;white-space:normal;text-align:center;line-height:1.35;width:100%;box-sizing:border-box}
-.fpill-in{background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.07);color:rgba(255,255,255,.36)}
-.fpill-out{border:1px solid;font-weight:700}
-.fp-cyan  {border-color:rgba(0,190,243,.38); background:rgba(0,190,243,.08); color:var(--cyan)}
-.fp-mint  {border-color:rgba(52,211,153,.38);background:rgba(52,211,153,.08);color:var(--mint)}
-.fp-amber {border-color:rgba(245,158,11,.38);background:rgba(245,158,11,.08);color:#f59e0b}
-.fp-violet{border-color:rgba(139,92,246,.38);background:rgba(139,92,246,.08);color:var(--violet)}
-
-.flow-center{display:flex;flex-direction:column;align-items:center;padding:0 24px;position:relative}
-.flow-center::before,.flow-center::after{content:'';position:absolute;top:50%;height:1px;width:24px;border-top:1px dashed rgba(0,190,243,.25)}
-.flow-center::before{right:100%}.flow-center::after{left:100%}
-
-.engine-box{
-  background:linear-gradient(155deg,rgba(0,190,243,.1) 0%,rgba(0,190,243,.03) 100%);
-  border:1px solid rgba(0,190,243,.28);border-radius:20px;
-  padding:40px 28px;text-align:center;width:100%;position:relative;
-  animation:ePulse 5s ease-in-out infinite;
-}
-@keyframes ePulse{0%,100%{box-shadow:0 0 50px rgba(0,190,243,.08),inset 0 0 30px rgba(0,190,243,.03)} 50%{box-shadow:0 0 110px rgba(0,190,243,.2),inset 0 0 60px rgba(0,190,243,.08)}}
-.ering{position:absolute;border-radius:inherit;pointer-events:none}
-.er1{inset:-18px;border:1px solid rgba(0,190,243,.1);border-radius:30px;animation:erBreath 5s ease-in-out infinite}
-.er2{inset:-36px;border:1px solid rgba(0,190,243,.05);border-radius:38px;animation:erBreath 5s ease-in-out infinite .6s}
-@keyframes erBreath{0%,100%{opacity:.4;transform:scale(1)} 50%{opacity:1;transform:scale(1.02)}}
-.e-icon{width:56px;height:56px;border-radius:14px;background:rgba(0,190,243,.1);border:1px solid rgba(0,190,243,.2);display:flex;align-items:center;justify-content:center;margin:0 auto 16px}
-.e-icon svg{width:26px;height:26px;color:var(--cyan)}
-.e-name{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:3px;color:var(--white);margin-bottom:5px}
-.e-sub{font-size:10px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:var(--cyan);opacity:.8}
-
-.engine-verdict{text-align:center;margin-top:80px;font-family:'Bebas Neue',sans-serif;font-size:clamp(26px,3.5vw,46px);letter-spacing:4px}
-.ev-dim{color:rgba(255,255,255,.18)}
-.ev-accent{background:linear-gradient(90deg,var(--cyan),var(--mint));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-
-#statement{
-  background:var(--black);position:relative;overflow:hidden;
-  padding:0;display:flex;align-items:center;justify-content:center;
-  min-height:420px;
-  border-top:1px solid rgba(255,255,255,.05);
-  border-bottom:1px solid rgba(255,255,255,.05);
-}
-.stmt-glow{
-  position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
-  width:900px;height:360px;
-  background:radial-gradient(ellipse,rgba(0,190,243,.09) 0%,rgba(139,92,246,.05) 45%,transparent 70%);
-  pointer-events:none;
-}
-.stmt-inner{position:relative;z-index:1;text-align:center;padding:80px 40px}
-.stmt-pre{
-  font-family:'Bebas Neue',sans-serif;
-  font-size:clamp(22px,3vw,38px);letter-spacing:6px;
-  color:rgba(255,255,255,.18);margin-bottom:12px;
-}
-.stmt-main{
-  font-family:'Bebas Neue',sans-serif;
-  font-size:clamp(80px,15vw,200px);letter-spacing:4px;line-height:.85;
-  background:linear-gradient(90deg,var(--cyan) 0%,var(--mint) 100%);
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
-}
-
-#ecosystem{background:var(--black);padding:120px 0}
-.eco-intro{text-align:center;max-width:560px;margin:0 auto 80px}
-.eco-intro h2{font-family:'Bebas Neue',sans-serif;font-size:clamp(40px,5.5vw,76px);letter-spacing:2px;line-height:.97;margin-bottom:18px}
-.eco-intro p{font-size:16px;color:rgba(255,255,255,.5);line-height:1.85}
-
-.ptiles{display:grid;grid-template-columns:1fr 1fr;gap:2px;background:rgba(255,255,255,.05);border-radius:22px;overflow:hidden}
-
-.ptile{
-  background:var(--card);
-  padding:60px 52px;min-height:480px;
-  position:relative;overflow:hidden;
-  display:flex;flex-direction:column;justify-content:flex-end;
-  transition:background .4s ease;
-}
-.ptile:hover{background:#070f22}
-
-.ptile-video{
-  position:absolute;inset:0;width:100%;height:100%;
-  object-fit:cover;opacity:0;z-index:0;
-  transition:opacity .6s ease;
-}
-.ptile-video.vloaded{opacity:.28}
-.ptile:hover .ptile-video.vloaded{opacity:.42}
-.ptile-overlay{
-  position:absolute;inset:0;z-index:1;pointer-events:none;
-  background:linear-gradient(160deg,rgba(6,14,32,.92) 0%,rgba(6,14,32,.6) 42%,rgba(6,14,32,.92) 100%);
-}
-
-.ptile::before{
-  content:attr(data-bg);
-  font-family:'Bebas Neue',sans-serif;
-  font-size:220px;letter-spacing:-4px;line-height:1;
-  position:absolute;bottom:-20px;right:-10px;
-  color:var(--white);opacity:.03;
-  pointer-events:none;user-select:none;
-  transition:opacity .4s;z-index:2;
-}
-.ptile:hover::before{opacity:.06}
-
-.ptile::after{
-  content:'';position:absolute;top:-80px;right:-80px;
-  width:250px;height:250px;border-radius:50%;pointer-events:none;
-  transition:opacity .4s;opacity:.8;z-index:2;
-}
-.ptile.tc::after{background:radial-gradient(circle,rgba(0,190,243,.14) 0%,transparent 65%)}
-.ptile.tm::after{background:radial-gradient(circle,rgba(52,211,153,.12) 0%,transparent 65%)}
-.ptile.tv::after{background:radial-gradient(circle,rgba(139,92,246,.12) 0%,transparent 65%)}
-.ptile:hover::after{opacity:1}
-
-.ptile-line{position:absolute;top:0;left:0;right:0;height:2px;pointer-events:none;z-index:3}
-.tc .ptile-line{background:linear-gradient(90deg,var(--cyan),transparent 70%)}
-.tm .ptile-line{background:linear-gradient(90deg,var(--mint),transparent 70%)}
-.tv .ptile-line{background:linear-gradient(90deg,var(--violet),transparent 70%)}
-
-.ptile-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:auto;padding-bottom:40px;position:relative;z-index:3}
-.ptile-logo{height:34px;width:auto;object-fit:contain}
-.ptile-icon{width:34px;height:34px;flex-shrink:0}
-.ptile-badge{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:5px 12px;border-radius:100px;flex-shrink:0}
-.pb-c{background:rgba(0,190,243,.1); color:var(--cyan);  border:1px solid rgba(0,190,243,.22)}
-.pb-m{background:rgba(52,211,153,.1);color:var(--mint);  border:1px solid rgba(52,211,153,.22)}
-.pb-v{background:rgba(139,92,246,.1);color:var(--violet);border:1px solid rgba(139,92,246,.22)}
-
-.ptile-body{position:relative;z-index:3}
-.ptile-name{font-family:'Bebas Neue',sans-serif;font-size:52px;letter-spacing:2px;line-height:1;margin-bottom:6px}
-.ptile-tag{font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:16px}
-.tt-c{color:var(--cyan)}.tt-m{color:var(--mint)}.tt-v{color:var(--violet)}
-.ptile-desc{font-size:14px;color:rgba(255,255,255,.48);line-height:1.78;margin-bottom:28px;max-width:360px}
-.ptile-link{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:700;transition:gap .22s}
-.ptile-link:hover{gap:14px}
-.ptile-link svg{width:14px;height:14px}
-.pl-c{color:var(--cyan)}.pl-m{color:var(--mint)}.pl-v{color:var(--violet)}
-
-#mission{background:var(--navy);position:relative;overflow:hidden;padding:120px 0}
-#mission::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(52,211,153,.35),transparent)}
-.miss-amb{position:absolute;top:-80px;right:-200px;width:700px;height:700px;background:radial-gradient(circle,rgba(52,211,153,.055) 0%,transparent 65%);pointer-events:none}
-.miss-amb2{position:absolute;bottom:-80px;left:-100px;width:400px;height:400px;background:radial-gradient(circle,rgba(139,92,246,.05) 0%,transparent 65%);pointer-events:none}
-
-.miss-grid{display:grid;grid-template-columns:1fr 1fr;gap:100px;align-items:center;position:relative;z-index:1}
-.miss-hed{font-family:'Bebas Neue',sans-serif;font-size:clamp(42px,5.5vw,70px);letter-spacing:2px;line-height:.95;margin-bottom:28px}
-.miss-hed .md{color:rgba(255,255,255,.2)}
-.miss-body{font-size:15px;color:rgba(255,255,255,.5);line-height:1.9;max-width:460px}
-
-.pillars{display:flex;flex-direction:column;gap:40px}
-.pillar{display:flex;gap:22px;align-items:flex-start}
-.p-icon{width:46px;height:46px;border-radius:12px;flex-shrink:0;display:flex;align-items:center;justify-content:center;border:1px solid}
-.p-icon svg{width:20px;height:20px}
-.pi-c{background:rgba(0,190,243,.07); border-color:rgba(0,190,243,.2); color:var(--cyan)}
-.pi-m{background:rgba(52,211,153,.07);border-color:rgba(52,211,153,.2);color:var(--mint)}
-.pi-v{background:rgba(139,92,246,.07);border-color:rgba(139,92,246,.2);color:var(--violet)}
-.p-title{font-size:15px;font-weight:700;color:var(--white);margin-bottom:7px;letter-spacing:.1px}
-.p-desc{font-size:13px;color:rgba(255,255,255,.42);line-height:1.75}
-
-#lm-cta{background:var(--black);position:relative;overflow:hidden;padding:120px 0}
-#lm-cta::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(0,190,243,.35),transparent)}
-.cta-glow{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:900px;height:560px;background:radial-gradient(ellipse,rgba(0,190,243,.1) 0%,rgba(139,92,246,.06) 45%,transparent 70%);pointer-events:none}
-.cta-inner{position:relative;z-index:1;text-align:center;max-width:740px;margin:0 auto}
-.cta-inner h2{font-family:'Bebas Neue',sans-serif;font-size:clamp(40px,5.5vw,76px);letter-spacing:2px;line-height:.97;margin:20px 0 26px}
-.cta-inner p{font-size:16px;color:rgba(255,255,255,.48);line-height:1.85;margin-bottom:44px}
-.cta-chips{display:flex;align-items:center;justify-content:center;gap:28px;margin-top:24px;flex-wrap:wrap}
-.cta-chip{display:flex;align-items:center;gap:7px;font-size:12px;color:rgba(255,255,255,.28);font-weight:500}
-.cta-chip svg{width:14px;height:14px;color:var(--mint);opacity:.6}
-
-#footer{background:#020810;padding:76px 0 40px;border-top:1px solid var(--border)}
-.foot-grid{display:grid;grid-template-columns:2.2fr 1fr 1fr 1fr;gap:56px;margin-bottom:64px}
-.fb img{height:34px;width:auto;margin-bottom:16px}
-.fb-name{font-family:'Bebas Neue',sans-serif;font-size:19px;letter-spacing:4px;margin-bottom:6px}
-.fb-tag{font-size:10px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:rgba(255,255,255,.2);margin-bottom:16px}
-.fb-desc{font-size:13px;color:rgba(255,255,255,.26);line-height:1.78;max-width:280px}
-.fb-social{display:flex;gap:10px;margin-top:26px}
-.fb-slink{width:36px;height:36px;border-radius:8px;background:rgba(255,255,255,.03);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.26);transition:all .22s}
-.fb-slink:hover{background:rgba(0,190,243,.08);border-color:rgba(0,190,243,.3);color:var(--cyan)}
-.fb-slink svg{width:16px;height:16px}
-.fc-title{font-size:10px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:rgba(255,255,255,.2);margin-bottom:20px}
-.fc-links{list-style:none;display:flex;flex-direction:column;gap:14px}
-.fc-links a{font-size:14px;color:rgba(255,255,255,.32);transition:color .2s}
-.fc-links a:hover{color:var(--white)}
-.foot-btm{padding-top:32px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
-.foot-copy{font-size:12px;color:rgba(255,255,255,.18)}
-.foot-legal{display:flex;gap:24px}
-.foot-legal a{font-size:12px;color:rgba(255,255,255,.18);transition:color .2s}
-.foot-legal a:hover{color:rgba(255,255,255,.5)}
-
-@media(max-width:1024px){
-  .hero-widget{width:300px}
-  .hero-inner{gap:40px}
-}
-@media(max-width:900px){
-  .container{padding:0 24px}
-  #nav .nav-links,.nav-pill{display:none}
-  .hamburger{display:flex}
-  .hero-inner{flex-direction:column;gap:48px;padding:140px 0 80px}
-  .hero-h1{font-size:clamp(56px,13vw,90px)}
-  .hero-widget{width:100%;max-width:420px}
-  .flow{grid-template-columns:1fr;gap:36px}
-  .flow-col.inputs,.flow-col.outputs{align-items:stretch}
-  .flow-center{padding:0}
-  .flow-center::before,.flow-center::after{display:none}
-  .ptiles{grid-template-columns:1fr;border-radius:16px}
-  .miss-grid{grid-template-columns:1fr;gap:56px}
-  .foot-grid{grid-template-columns:1fr 1fr;gap:36px}
-  .fb{grid-column:1/-1}
-  .stmt-main{font-size:clamp(60px,13vw,120px)}
-}
-@media(max-width:600px){
-  .hero-ctas{flex-direction:column;align-items:flex-start}
-  .hero-stats{flex-direction:column}
-  .hstat{padding:0;border:none}
-  .hstat+.hstat{padding:0;border:none;border-top:1px solid var(--border);padding-top:20px;margin-top:4px}
-  .ptile{padding:40px 28px;min-height:400px}
-  .ptile::before{font-size:140px}
-  .foot-grid{grid-template-columns:1fr}
-  .foot-btm{flex-direction:column;align-items:flex-start}
-  .cta-chips{flex-direction:column;gap:14px}
-}
-
-</style>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap">
+<link rel="stylesheet" href="./styles/site.css">
+<link rel="stylesheet" href="./styles/home.css">
+<script>document.documentElement.className += ' sl-js';</script>
+<script src="./scripts/nav.js" defer></script>
 </head>
 <body>
 
-<!-- ══ NAV ══ -->
-<nav id="nav">
-  <div class="container">
-    <div class="nav-inner">
-      <a href="#" class="nav-logo">
-        <img src="./stadioralabs info/stadiora_labs_logo - white.png" alt="Stadiora Labs"
-          onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
-        <span class="nav-logo-fallback" style="display:none">STADIORA LABS</span>
+<!-- ============================ NAV ============================ -->
+<nav class="sl-nav">
+  <div class="sl-container">
+    <div class="sl-nav__inner">
+      <a class="sl-nav__logo" href="./index-es.html">
+        <img src="./stadioralabs info/stadiora_labs_logo - white.png" alt="Stadiora Labs">
       </a>
-      <ul class="nav-links">
-        <li><a href="#engine">El Motor</a></li>
-        <li><a href="#ecosystem">Productos</a></li>
-        <li><a href="#mission">Misión</a></li>
+      <ul class="sl-nav__links">
+        <li><a href="#engine">El motor</a></li>
+        <li><a href="#ecosystem">Ecosistema</a></li>
+        <li><a href="#team">Equipo</a></li>
+        <li><a href="./investors-es.html">Inversores</a></li>
       </ul>
-      <a href="lead-magnet-es.html" class="nav-pill">
-        Diagnóstico Gratis
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-      </a>
-      <div class="lang-toggle">
-        <a href="./index.html" class="lang-btn">EN</a>
-        <span class="lang-btn active">ES</span>
+      <div class="sl-nav__actions">
+        <a class="sl-btn sl-btn--primary sl-nav__collapse" href="./lead-magnet-es.html">Chequeo gratis</a>
+        <div class="sl-lang">
+          <a class="sl-lang__btn" href="./index.html" hreflang="en">EN</a>
+          <span class="sl-lang__btn is-active" aria-current="true">ES</span>
+        </div>
       </div>
-      <button class="hamburger" onclick="openMenu()" aria-label="Abrir menú">
-        <span></span><span></span><span></span>
+      <button class="sl-nav__toggle" type="button" aria-controls="sl-menu"
+              aria-label="Abrir menú" data-label-open="Abrir menú" data-label-close="Cerrar menú">
+        <svg class="sl-nav__icon-open" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+        <svg class="sl-nav__icon-close" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
       </button>
     </div>
   </div>
 </nav>
 
-<!-- Mobile -->
-<div class="mobile-menu" id="mobileMenu">
-  <button class="mobile-close" onclick="closeMenu()">&#215;</button>
-  <a href="#engine"    onclick="closeMenu()">El Motor</a>
-  <a href="#ecosystem" onclick="closeMenu()">Productos</a>
-  <a href="#mission"   onclick="closeMenu()">Misión</a>
-  <a href="lead-magnet-es.html" onclick="closeMenu()" style="color:var(--cyan)">Diagnóstico Gratis</a>
-</div>
-
-<!-- ══ HERO ══ -->
-<section id="hero">
-  <div class="hero-vid-wrap">
-    <video class="hero-vid" autoplay muted loop playsinline>
-      <source src="./videos/hero.mp4" type="video/mp4">
-    </video>
-    <div class="hero-vid-overlay"></div>
-  </div>
-
-  <div class="hero-atm"></div>
-  <div class="hero-grid"></div>
-  <div class="hero-sweep"></div>
-  <div class="orb orb-1"></div>
-  <div class="orb orb-2"></div>
-
-  <div class="container">
-    <div class="hero-inner">
-
-      <div class="hero-content">
-        <div class="hero-badge" data-reveal>
-          <span class="bdot"></span>
-          Infraestructura de IA Deportiva
-        </div>
-
-        <h1 class="hero-h1" data-reveal data-reveal-delay="1">
-          <span class="h1-l1">El Deporte Tiene</span>
-          <span class="h1-l2">Demasiados Datos.</span>
-          <span class="h1-l3">Nosotros Lo Resolvimos.</span>
-        </h1>
-
-        <p class="hero-sub" data-reveal data-reveal-delay="2">
-          Aria Intelligence conecta cada señal que generan tus atletas — carga de entrenamiento, recuperación, riesgo de lesión, preparación, nutrición, clima — y las convierte en una decisión clara. No un gráfico. No un puntaje.
-        </p>
-
-        <div class="hero-ctas" data-reveal data-reveal-delay="3">
-          <a href="#ecosystem" class="btn btn-primary btn-lg">
-            Explorar el Ecosistema
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-          </a>
-          <a href="lead-magnet-es.html" class="btn btn-ghost btn-lg">
-            Diagnóstico Gratis
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-          </a>
-        </div>
-
-        <div class="hero-stats" data-reveal data-reveal-delay="4">
-          <div class="hstat">
-            <div class="hstat-n"><span class="c">4</span></div>
-            <div class="hstat-l">Productos en el Ecosistema</div>
-          </div>
-          <div class="hstat">
-            <div class="hstat-n"><span class="c">47+</span></div>
-            <div class="hstat-l">Fuentes de Señal</div>
-          </div>
-          <div class="hstat">
-            <div class="hstat-n"><span class="c">1</span></div>
-            <div class="hstat-l">Decisión Entregada</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Widget -->
-      <div class="hero-widget" data-reveal data-reveal-delay="3">
-        <svg width="0" height="0" style="position:absolute">
-          <defs>
-            <linearGradient id="rg" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stop-color="#00BEF3"/>
-              <stop offset="100%" stop-color="#34D399"/>
-            </linearGradient>
-          </defs>
-        </svg>
-
-        <div class="hw-header">
-          <span class="hw-title">Puntuación de Preparación</span>
-          <span class="hw-live">En Vivo</span>
-        </div>
-
-        <div class="hw-ring-wrap">
-          <svg class="hw-svg" viewBox="0 0 100 100">
-            <circle class="ring-bg"   cx="50" cy="50" r="35"/>
-            <circle class="ring-fill" cx="50" cy="50" r="35"/>
-          </svg>
-          <div class="ring-num">
-            <div class="ring-num-val">92</div>
-            <div class="ring-num-lbl">Óptimo</div>
-          </div>
-        </div>
-
-        <div class="hw-bars" id="hwBars">
-          <div class="hwb">
-            <span class="hwb-lbl">Sueño</span>
-            <div class="hwb-track"><div class="hwb-fill" data-w="95%"></div></div>
-            <span class="hwb-val">95%</span>
-          </div>
-          <div class="hwb">
-            <span class="hwb-lbl">Recuperación</span>
-            <div class="hwb-track"><div class="hwb-fill" data-w="88%"></div></div>
-            <span class="hwb-val">88%</span>
-          </div>
-          <div class="hwb">
-            <span class="hwb-lbl">VFC</span>
-            <div class="hwb-track"><div class="hwb-fill" data-w="92%"></div></div>
-            <span class="hwb-val">92%</span>
-          </div>
-          <div class="hwb">
-            <span class="hwb-lbl">Carga</span>
-            <div class="hwb-track"><div class="hwb-fill" data-w="85%"></div></div>
-            <span class="hwb-val">85%</span>
-          </div>
-        </div>
-
-        <div class="hw-footer">
-          <span class="hw-footer-lbl">Aria Intelligence</span>
-          <div class="hw-footer-dot"></div>
-        </div>
-      </div>
-
-    </div>
-  </div>
-
-  <div class="hero-scroll">
-    <div class="scroll-line"></div>
-    <span class="scroll-lbl">Bajar</span>
-  </div>
-</section>
-
-<!-- ══ MARQUEE ══ -->
-<div class="marquee-wrap">
-  <div class="marquee-track">
-    <div class="marq-item">Atleta Primero <span class="ma">·</span></div>
-    <div class="marq-item">Ciencia Sobre Hype <span class="ma">·</span></div>
-    <div class="marq-item">Datos a Decisiones <span class="ma">·</span></div>
-    <div class="marq-item">Construir Con, No Para <span class="ma">·</span></div>
-    <div class="marq-item">La Brecha Es Nuestro Mercado <span class="ma">·</span></div>
-    <div class="marq-item">Aria Intelligence <span class="ma">·</span></div>
-    <div class="marq-item">Disponibilidad Futbolística <span class="ma">·</span></div>
-    <div class="marq-item">Preparación al Sprint <span class="ma">·</span></div>
-    <div class="marq-item">Para Cada Nivel <span class="ma">·</span></div>
-    <div class="marq-item">Atleta Primero <span class="ma">·</span></div>
-    <div class="marq-item">Ciencia Sobre Hype <span class="ma">·</span></div>
-    <div class="marq-item">Datos a Decisiones <span class="ma">·</span></div>
-    <div class="marq-item">Construir Con, No Para <span class="ma">·</span></div>
-    <div class="marq-item">La Brecha Es Nuestro Mercado <span class="ma">·</span></div>
-    <div class="marq-item">Aria Intelligence <span class="ma">·</span></div>
-    <div class="marq-item">Disponibilidad Futbolística <span class="ma">·</span></div>
-    <div class="marq-item">Preparación al Sprint <span class="ma">·</span></div>
-    <div class="marq-item">Para Cada Nivel <span class="ma">·</span></div>
+<div class="sl-nav__menu" id="sl-menu">
+  <ul class="sl-nav__menu-links">
+    <li><a href="#engine">El motor</a></li>
+    <li><a href="#ecosystem">Ecosistema</a></li>
+    <li><a href="#team">Equipo</a></li>
+    <li><a href="./investors-es.html">Inversores</a></li>
+  </ul>
+  <div class="sl-nav__menu-foot">
+    <a class="sl-btn sl-btn--primary sl-btn--block" href="./lead-magnet-es.html">Chequeo gratis</a>
   </div>
 </div>
 
-<!-- ══ ENGINE ══ -->
-<section id="engine">
-  <div class="engine-amb"></div>
-  <div class="container">
+<main>
 
-    <div class="engine-intro" data-reveal>
-      <div class="eyebrow center">El Motor de Inteligencia</div>
-      <h2>Un Cerebro.<br><span class="g-cyan">Cada Señal. Una Decisión.</span></h2>
-      <p>Aria Intelligence es el motor de decisión IA detrás de cada producto de Stadiora Labs. No visualiza tus datos — los traduce en una salida clara y accionable.</p>
-    </div>
+  <!-- ============================ 1. HERO ============================ -->
+  <section class="sl-section sl-nav-offset">
+    <div class="sl-container">
+      <div class="home-split home-hero">
+        <div>
+          <p class="sl-eyebrow">Entrenamiento con IA para atletas</p>
+          <h1 class="sl-h1">El deporte entierra al atleta en datos. Aria los convierte en <span class="sl-accent">la decisión de hoy</span>.</h1>
+          <p class="sl-lead">Run with Aria lee tu entrenamiento, tu sueño, tu recuperación, tus dispositivos y lo que comes, y después te dice qué hacer hoy y por qué. Ya está disponible en iPhone y en Android.</p>
 
-    <div class="flow">
-      <div class="flow-col inputs" data-reveal>
-        <div class="fpill fpill-in">Carga de Entrenamiento</div>
-        <div class="fpill fpill-in">Recuperación y Sueño</div>
-        <div class="fpill fpill-in">Señales de Riesgo de Lesión</div>
-        <div class="fpill fpill-in">Preparación Mental</div>
-        <div class="fpill fpill-in">Contexto del Ciclo</div>
-        <div class="fpill fpill-in">Entrada del Entrenador</div>
-      </div>
-
-      <div class="flow-center" data-reveal data-reveal-delay="2">
-        <div class="engine-box">
-          <div class="ering er1"></div>
-          <div class="ering er2"></div>
-          <div class="e-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M12 2L2 7l10 5 10-5-10-5z"/>
-              <path d="M2 17l10 5 10-5"/>
-              <path d="M2 12l10 5 10-5"/>
-            </svg>
+          <div class="sl-stores">
+            <a class="sl-store" href="https://apps.apple.com/us/app/run-with-aria/id6760048203" target="_blank" rel="noopener">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16.9 13.2c0-2.3 1.9-3.4 2-3.5-1.1-1.6-2.8-1.8-3.4-1.8-1.4-.2-2.8.9-3.5.9-.7 0-1.9-.9-3.1-.8-1.6 0-3 .9-3.8 2.4-1.6 2.8-.4 7 1.2 9.3.8 1.1 1.7 2.4 2.9 2.3 1.2 0 1.6-.7 3.1-.7 1.4 0 1.8.7 3.1.7 1.3 0 2.1-1.1 2.8-2.3.9-1.3 1.3-2.6 1.3-2.7-.1 0-2.6-1-2.6-3.8z"/><path d="M14.6 6.3c.6-.8 1.1-1.9 1-3-.9 0-2.1.6-2.8 1.4-.6.7-1.2 1.8-1 2.9 1 .1 2.1-.5 2.8-1.3z"/></svg>
+              <span class="sl-store__text">
+                <span class="sl-store__kicker">Descárgala en el</span>
+                <span class="sl-store__name">App Store</span>
+              </span>
+            </a>
+            <a class="sl-store" href="https://play.google.com/store/apps/details?id=com.runwitharia.mobile" target="_blank" rel="noopener">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5.6 3.4l12.9 8.6-12.9 8.6z"/></svg>
+              <span class="sl-store__text">
+                <span class="sl-store__kicker">Consíguela en</span>
+                <span class="sl-store__name">Google Play</span>
+              </span>
+            </a>
           </div>
-          <div class="e-name">Aria Intelligence</div>
-          <div class="e-sub">Motor de Decisión IA</div>
-        </div>
-      </div>
 
-      <div class="flow-col outputs" data-reveal data-reveal-delay="3">
-        <div class="fpill fpill-out fp-cyan">Índice de Disponibilidad</div>
-        <div class="fpill fpill-out fp-mint">Cola de Atención del Entrenador</div>
-        <div class="fpill fpill-out fp-amber">Puntuación al Sprint</div>
-        <div class="fpill fpill-out fp-mint">Guía de Retorno al Juego</div>
-        <div class="fpill fpill-out fp-cyan">Pasaporte del Jugador</div>
-        <div class="fpill fpill-out fp-violet">Salida de Decisión API</div>
+          <p class="home-hero__secondary">
+            <a class="home-textlink" href="#ecosystem">
+              Mira el ecosistema completo
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+            </a>
+          </p>
+
+          <ul class="sl-dotlist home-hero__meta">
+            <li>Más de 150 atletas</li>
+            <li>iOS y Android</li>
+            <li>Desde $7.99 al mes</li>
+          </ul>
+        </div>
+
+        <div class="home-split__visual">
+          <div class="home-phone">
+            <img src="./assets/deck-v2/shot_home.webp" width="600" height="1184"
+                 alt="Pantalla de inicio de Run with Aria, con la señal de disposición del día, las cifras de sueño y frecuencia cardíaca, y un mensaje de entrenamiento.">
+          </div>
+        </div>
       </div>
     </div>
+  </section>
 
-    <div class="engine-verdict" data-reveal>
-      <span class="ev-dim">No un gráfico.&nbsp;&nbsp;&nbsp;No un puntaje.&nbsp;&nbsp;&nbsp;</span>
-      <span class="ev-accent">Una decisión.</span>
+  <!-- ============================ 2. TRACCIÓN ============================ -->
+  <section class="sl-section sl-section--tight sl-section--alt">
+    <div class="sl-container">
+      <p class="sl-eyebrow">Dónde estamos hoy</p>
+      <div class="home-stats">
+        <div class="home-stat">
+          <div class="sl-stat-num">150+</div>
+          <p class="home-stat__label">Atletas en la plataforma</p>
+        </div>
+        <div class="home-stat">
+          <div class="sl-stat-num">2</div>
+          <p class="home-stat__label">Tiendas activas, Apple y Google</p>
+        </div>
+        <div class="home-stat">
+          <div class="sl-stat-num">$7.99</div>
+          <p class="home-stat__label">Donde arranca la membresía cada mes</p>
+        </div>
+        <div class="home-stat">
+          <div class="sl-stat-num"><span class="home-stat__qual">Hasta</span> 111x</div>
+          <p class="home-stat__label">Valor entregado frente a lo que paga el atleta</p>
+        </div>
+      </div>
     </div>
+  </section>
 
-  </div>
-</section>
+  <!-- ============================ 3. EL MOTOR ============================ -->
+  <section class="sl-section" id="engine">
+    <div class="sl-container">
+      <div class="home-split home-split--flip">
+        <div>
+          <p class="sl-eyebrow">El motor</p>
+          <h2 class="sl-h2">Entran señales. Sale una decisión.</h2>
+          <p class="sl-lead">Un atleta genera en una semana más números de los que alguien alcanza a leer. Aria los lee, los pesa contra el plan y contra el calendario, y responde lo único que importa, qué hacer hoy.</p>
 
-<!-- ══ STATEMENT ══ -->
-<section id="statement" data-reveal>
-  <div class="stmt-glow"></div>
-  <div class="stmt-inner">
-    <div class="stmt-pre">El Deporte Tiene Demasiados Datos.</div>
-    <div class="stmt-main">Dominamos<br>La Brecha.</div>
-  </div>
-</section>
+          <ul class="home-signals">
+            <li class="home-signal">
+              <span class="home-signal__icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9v6M18 9v6M3 11v2M21 11v2M6 12h12"/></svg></span>
+              <span>
+                <span class="home-signal__name">Entrenamiento</span>
+                <p class="home-signal__body">Sesiones hechas, carga acumulada y cómo va la semana frente a la anterior.</p>
+              </span>
+            </li>
+            <li class="home-signal">
+              <span class="home-signal__icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20.5 14.5A8.5 8.5 0 019.5 3.5a8.5 8.5 0 1011 11z"/></svg></span>
+              <span>
+                <span class="home-signal__name">Sueño y recuperación</span>
+                <p class="home-signal__body">Horas de sueño, hacia dónde se mueve esa tendencia y si el cuerpo ya absorbió el trabajo.</p>
+              </span>
+            </li>
+            <li class="home-signal">
+              <span class="home-signal__icon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="7" y="5" width="10" height="14" rx="3"/><path d="M9 2.5h6M9 21.5h6M3 12h3M9 12h1.5l1-2 1.5 4 1-2H15"/></svg></span>
+              <span>
+                <span class="home-signal__name">Dispositivos</span>
+                <p class="home-signal__body">Frecuencia cardíaca, frecuencia en reposo y variabilidad desde el reloj que ya llevas puesto.</p>
+              </span>
+            </li>
+            <li class="home-signal">
+              <span class="home-signal__icon"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="6" width="12" height="12" rx="2"/><path d="M15 10l6-3v10l-6-3z"/></svg></span>
+              <span>
+                <span class="home-signal__name">Video</span>
+                <p class="home-signal__body">Clips de tu técnica, leídos junto a todo lo demás que pasó esa semana.</p>
+              </span>
+            </li>
+            <li class="home-signal">
+              <span class="home-signal__icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 8.5c1.5-3 5-3.5 6.5-1.5 2 2.7-.5 8.5-3.5 12-1.5 1.7-4.5 1.7-6 0C6 15.5 3.5 9.7 5.5 7c1.5-2 5-1.5 6.5 1.5z"/><path d="M12 8.5V5c0-1.1.9-2 2-2"/></svg></span>
+              <span>
+                <span class="home-signal__name">Nutrición</span>
+                <p class="home-signal__body">Combustible e hidratación alrededor del trabajo que de verdad hiciste, no un plan genérico.</p>
+              </span>
+            </li>
+          </ul>
 
-<!-- ══ PRODUCTS ══ -->
-<section id="ecosystem">
-  <div class="container">
+          <div class="home-outcome">
+            <span class="sl-label">Lo que recibes</span>
+            <p>Una decisión para el día, en lenguaje claro y con el razonamiento incluido. Si no estás de acuerdo, se lo preguntas a Aria y te responde.</p>
+          </div>
+        </div>
 
-    <div class="eco-intro" data-reveal>
-      <div class="eyebrow mint center">El Ecosistema</div>
-      <h2>Un Motor.<br><span class="g-mint">Cuatro Productos.</span></h2>
-      <p>La misma capa de inteligencia impulsa cada producto. Distintos deportes, distintos roles — un motor de decisión debajo.</p>
+        <div class="home-split__visual">
+          <div class="home-phone">
+            <img src="./assets/deck-v2/shot_intelligence.webp" width="600" height="1184" loading="lazy"
+                 alt="Pantalla de Aria Intelligence, con la señal del día, un foco de entrenamiento escrito en lenguaje claro y una propuesta de recuperación que el atleta puede aceptar o descartar.">
+          </div>
+        </div>
+      </div>
     </div>
+  </section>
 
-    <div class="ptiles">
+  <!-- ============================ 4. ECOSISTEMA ============================ -->
+  <section class="sl-section sl-section--alt" id="ecosystem">
+    <div class="sl-container">
+      <p class="sl-eyebrow">El ecosistema</p>
+      <h2 class="sl-h2">Tres apps, un mismo motor</h2>
+      <p class="sl-lead">La misma inteligencia llega al atleta, al entrenador y, con Aria 12, a la cancha de fútbol.</p>
 
-      <!-- Aria -->
-      <div class="ptile tc" data-bg="ARIA" data-reveal>
-        <video class="ptile-video" muted loop playsinline preload="none" poster="./videos/posters/aria.jpg">
-          <source src="./videos/aria.mp4" type="video/mp4">
-        </video>
-        <div class="ptile-overlay"></div>
-        <div class="ptile-line"></div>
-        <div class="ptile-top">
-          <img src="./stadioralabs info/aria_logo.png" alt="Aria" class="ptile-logo"
-            onerror="this.outerHTML='<svg class=\'ptile-icon\' viewBox=\'0 0 34 34\' fill=\'none\'><path d=\'M17 2L3 17l6 3 3 10 5-8 6 5-2-10 6-3L17 2z\' fill=\'%2300BEF3\' opacity=\'.9\'/></svg>'">
-          <span class="ptile-badge pb-c">Para Atletas</span>
-        </div>
-        <div class="ptile-body">
-          <div class="ptile-name">Aria</div>
-          <div class="ptile-tag tt-c">Inteligencia de Entrenamiento IA</div>
-          <p class="ptile-desc">El compañero de entrenamiento IA para atletas de atletismo. Aria sintetiza carga de entrenamiento, recuperación, preparación y estado mental en una decisión diaria de sesión — inteligencia de élite en el bolsillo de cada atleta.</p>
-          <a href="https://runwitharia.com" target="_blank" rel="noopener" class="ptile-link pl-c">
-            Verifica Tu Sprint
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-          </a>
-        </div>
+      <div class="sl-grid sl-grid--3 home-mt">
+
+        <article class="sl-card home-product">
+          <span class="home-pill">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>
+            Disponible
+          </span>
+          <h3 class="sl-card__title">Run with Aria</h3>
+          <p class="sl-card__body">Entrenamiento con IA para atletas de atletismo. Aria arma el día, cuida la recuperación y explica cada decisión que toma, en iPhone y en Android.</p>
+          <div class="home-product__foot">
+            <div class="sl-stores">
+              <a class="sl-store" href="https://apps.apple.com/us/app/run-with-aria/id6760048203" target="_blank" rel="noopener">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16.9 13.2c0-2.3 1.9-3.4 2-3.5-1.1-1.6-2.8-1.8-3.4-1.8-1.4-.2-2.8.9-3.5.9-.7 0-1.9-.9-3.1-.8-1.6 0-3 .9-3.8 2.4-1.6 2.8-.4 7 1.2 9.3.8 1.1 1.7 2.4 2.9 2.3 1.2 0 1.6-.7 3.1-.7 1.4 0 1.8.7 3.1.7 1.3 0 2.1-1.1 2.8-2.3.9-1.3 1.3-2.6 1.3-2.7-.1 0-2.6-1-2.6-3.8z"/><path d="M14.6 6.3c.6-.8 1.1-1.9 1-3-.9 0-2.1.6-2.8 1.4-.6.7-1.2 1.8-1 2.9 1 .1 2.1-.5 2.8-1.3z"/></svg>
+                <span class="sl-store__text">
+                  <span class="sl-store__kicker">Descárgala en el</span>
+                  <span class="sl-store__name">App Store</span>
+                </span>
+              </a>
+              <a class="sl-store" href="https://play.google.com/store/apps/details?id=com.runwitharia.mobile" target="_blank" rel="noopener">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5.6 3.4l12.9 8.6-12.9 8.6z"/></svg>
+                <span class="sl-store__text">
+                  <span class="sl-store__kicker">Consíguela en</span>
+                  <span class="sl-store__name">Google Play</span>
+                </span>
+              </a>
+            </div>
+          </div>
+        </article>
+
+        <article class="sl-card home-product">
+          <span class="home-pill">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>
+            Disponible
+          </span>
+          <h3 class="sl-card__title">Aria for Coaches</h3>
+          <p class="sl-card__body">El panel del entrenador, con el mismo motor que la app del atleta.</p>
+          <div class="home-product__foot">
+            <ul class="sl-dotlist home-product__specs">
+              <li>Panel del entrenador</li>
+              <li>Móvil</li>
+              <li>Web</li>
+            </ul>
+          </div>
+        </article>
+
+        <article class="sl-card sl-card--violet home-product">
+          <span class="home-pill home-pill--violet">Fútbol</span>
+          <h3 class="sl-card__title">Aria 12</h3>
+          <p class="sl-card__body">La hermana futbolera de Aria, con la misma inteligencia y pensada para cómo funciona de verdad la semana de un futbolista.</p>
+          <div class="home-product__foot">
+            <div class="home-product__note">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l2.6 5.4 5.9.8-4.3 4.1 1.1 5.9-5.3-2.9-5.3 2.9 1.1-5.9L3.5 9.2l5.9-.8z"/></svg>
+              <span>Joel Campbell abre el fútbol para Aria 12.</span>
+            </div>
+          </div>
+        </article>
+
       </div>
-
-      <!-- Aria XI -->
-      <div class="ptile tm" data-bg="12" data-reveal data-reveal-delay="1">
-        <video class="ptile-video" muted loop playsinline preload="none" poster="./videos/posters/aria-xi.jpg">
-          <source src="./videos/aria-xi.mp4" type="video/mp4">
-        </video>
-        <div class="ptile-overlay"></div>
-        <div class="ptile-line"></div>
-        <div class="ptile-top">
-          <img src="./stadioralabs info/aria12_logo.jpg" alt="Aria 12" class="ptile-logo" style="width:40px;height:40px;object-fit:contain;border-radius:6px">
-          <span class="ptile-badge pb-m">Para Equipos de Fútbol</span>
-        </div>
-        <div class="ptile-body">
-          <div class="ptile-name">Aria 12</div>
-          <div class="ptile-tag tt-m">Inteligencia de Disponibilidad Futbolística</div>
-          <p class="ptile-desc">Convierte los datos existentes del plantel en una decisión diaria — entrenamiento completo, modificado, recuperación o no disponible. Los entrenadores dejan de adivinar. Los jugadores dejan de ocultar el dolor. Primero el software. Agnóstico al hardware.</p>
-          <a href="lead-magnet-es.html" class="ptile-link pl-m">
-            Verificar Disponibilidad
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-          </a>
-        </div>
-      </div>
-
-      <!-- Stadiora -->
-      <div class="ptile tc" data-bg="STADIORA" data-reveal data-reveal-delay="2">
-        <video class="ptile-video" muted loop playsinline preload="none" poster="./videos/posters/stadiora.jpg">
-          <source src="./videos/stadiora.mp4" type="video/mp4">
-        </video>
-        <div class="ptile-overlay"></div>
-        <div class="ptile-line"></div>
-        <div class="ptile-top">
-          <img src="./stadioralabs info/Stadiora_logo.png" alt="Aria for Coaches" class="ptile-logo"
-            onerror="this.outerHTML='<svg class=\'ptile-icon\' viewBox=\'0 0 34 34\' fill=\'none\'><path d=\'M6 28L13 7h3l-5 15h8L15 7h3l8 21h-4l-5-15h-4L6 28z\' fill=\'%2300BEF3\'/></svg>'">
-          <span class="ptile-badge pb-c">Para Entrenadores y Academias</span>
-        </div>
-        <div class="ptile-body">
-          <div class="ptile-name">Aria for Coaches</div>
-          <div class="ptile-tag tt-c">Plataforma de Inteligencia para Entrenadores</div>
-          <p class="ptile-desc">Gestión de atletas, monitoreo de preparación y decisiones a nivel de equipo a escala — para entrenadores y academias de atletismo que quieren una operación de ciencia deportiva completa sin el personal.</p>
-          <a href="lead-magnet-es.html" class="ptile-link pl-c">
-            Verificar Tu Plantel
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-          </a>
-        </div>
-      </div>
-
-      <!-- API -->
-      <div class="ptile tv" data-bg="API" data-reveal data-reveal-delay="3">
-        <video class="ptile-video" muted loop playsinline preload="none" poster="./videos/posters/api.jpg">
-          <source src="./videos/api.mp4" type="video/mp4">
-        </video>
-        <div class="ptile-overlay"></div>
-        <div class="ptile-line"></div>
-        <div class="ptile-top">
-          <svg class="ptile-icon" viewBox="0 0 34 34" fill="none">
-            <rect x="4" y="4" width="26" height="26" rx="5" stroke="#8B5CF6" stroke-width="1.4"/>
-            <path d="M11 13L7 17L11 21" stroke="#8B5CF6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M23 13L27 17L23 21" stroke="#8B5CF6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            <path d="M19 10L15 24" stroke="#8B5CF6" stroke-width="2" stroke-linecap="round"/>
-          </svg>
-          <span class="ptile-badge pb-v">Para Desarrolladores</span>
-        </div>
-        <div class="ptile-body">
-          <div class="ptile-name">Aria Intelligence</div>
-          <div class="ptile-tag tt-v">La Capa API Central</div>
-          <p class="ptile-desc">La API de IA deportiva que impulsa los tres productos. Integra inteligencia de decisión específica por deporte — disponibilidad, riesgo de lesión, síntesis de preparación — en cualquier aplicación, en cualquier deporte.</p>
-          <a href="./api-es.html" class="ptile-link pl-v">
-            Acceso para Desarrolladores
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-          </a>
-        </div>
-      </div>
-
     </div>
-  </div>
-</section>
+  </section>
 
-<!-- ══ MISSION ══ -->
-<section id="mission">
-  <div class="miss-amb"></div>
-  <div class="miss-amb2"></div>
-  <div class="container">
-    <div class="miss-grid">
-      <div data-reveal>
-        <div class="eyebrow">Quiénes Somos</div>
-        <div class="miss-hed">
-          Inteligencia de Élite.<br>
-          <span class="md">Ya No Solo</span><br>
-          <span class="g-mint">Para Élites.</span>
+  <!-- ============================ 5. EL VALOR ============================ -->
+  <section class="sl-section" id="value">
+    <div class="sl-container">
+      <p class="sl-eyebrow">El valor</p>
+      <h2 class="sl-h2">Un equipo de apoyo completo por unos $10 al mes</h2>
+      <p class="sl-lead">Un profesional entrena con un entrenador personal, un nutricionista, un fisioterapeuta, un coach mental y un analista detrás. Casi nadie puede pagarle a cinco personas. Aria carga ese trabajo en una sola membresía.</p>
+
+      <ul class="home-roles">
+        <li class="home-role">Entrenador personal</li>
+        <li class="home-role">Nutricionista</li>
+        <li class="home-role">Fisioterapeuta</li>
+        <li class="home-role">Coach mental</li>
+        <li class="home-role">Analista de rendimiento</li>
+      </ul>
+
+      <div class="home-compare">
+        <div class="home-compare__cell">
+          <div class="home-compare__num">$1,110</div>
+          <p class="home-compare__label">Lo que cuesta ese equipo cada mes en Estados Unidos, aproximadamente.</p>
         </div>
-        <p class="miss-body">
-          La infraestructura detrás de un programa de entrenamiento de clase mundial cuesta cientos de miles de dólares al año. Estamos cerrando esa brecha — construido por un equipo en América Latina y los Estados Unidos, sirviendo a atletas y entrenadores en el Caribe, África Occidental y mercados emergentes en todo el mundo, con la convicción de que el acceso a inteligencia de élite no debe ser una función del presupuesto.
+        <div class="home-compare__cell">
+          <div class="home-compare__num">$430</div>
+          <p class="home-compare__label">Lo que cuesta el mismo equipo cada mes en América Latina, aproximadamente.</p>
+        </div>
+        <div class="home-compare__cell home-compare__cell--aria">
+          <div class="home-compare__num">$10</div>
+          <p class="home-compare__label">Lo que cuesta Aria cada mes, aproximadamente. Las membresías son de $7.99 y $14.99.</p>
+        </div>
+      </div>
+
+      <div class="home-multiple">
+        <span class="home-multiple__num">111x</span>
+        <p class="home-multiple__text">Hasta 111 veces el precio en valor entregado, y por eso un atleta con cualquier presupuesto puede entrenar como entrena un profesional.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================ 6. QUIÉNES SOMOS ============================ -->
+  <section class="sl-section sl-section--alt" id="team">
+      <span class="home-anchor" id="mission"></span>
+    <div class="sl-container">
+      <p class="sl-eyebrow">Quiénes somos</p>
+      <h2 class="sl-h2">Construido por gente que entrena y que programa</h2>
+      <p class="sl-lead">Stadiora Labs construye Aria para que cualquier atleta entrene con el apoyo que antes solo alcanzaba un presupuesto profesional. Lo hacemos junto a atletas y entrenadores, no por encima de ellos.</p>
+
+      <div class="home-team home-mt">
+
+        <article class="sl-card">
+          <img class="home-member__photo" src="./assets/deck-v2/ian_c.webp" width="320" height="320" loading="lazy" alt="Ian Rowe">
+          <h3 class="home-member__name">Ian Rowe</h3>
+          <p class="home-member__role">Cofundador y CTO</p>
+          <p class="home-member__bio">Ex-Microsoft, trabajó en Copilot Notebooks. Construyó el producto.</p>
+        </article>
+
+        <article class="sl-card">
+          <img class="home-member__photo" src="./assets/deck-v2/anthony_c.webp" width="320" height="320" loading="lazy" alt="Anthony Rugama">
+          <h3 class="home-member__name">Anthony Rugama</h3>
+          <p class="home-member__role">Cofundador y CEO</p>
+          <p class="home-member__bio">Arquitecto de Microsoft Cloud &amp; AI (GTM y ventas). Fundador de RedAfro y velocista. 4.º del mundo M40, plusmarquista de Centroamérica e Iberoamérica.</p>
+        </article>
+
+        <article class="sl-card">
+          <img class="home-member__photo" src="./assets/deck-v2/karla_c.webp" width="320" height="320" loading="lazy" alt="Karla Scott">
+          <h3 class="home-member__name">Karla Scott</h3>
+          <p class="home-member__role">CMO</p>
+          <p class="home-member__bio">Periodista y estratega de marketing digital, ventas y comunicación con más de 8 años de experiencia.</p>
+        </article>
+
+        <article class="sl-card">
+          <img class="home-member__photo" src="./assets/deck-v2/joel_c.webp" width="320" height="320" loading="lazy" alt="Joel Campbell">
+          <h3 class="home-member__name">Joel Campbell</h3>
+          <p class="home-member__role">Socio estratégico de capital</p>
+          <p class="home-member__bio">Abre el fútbol para Aria 12.</p>
+        </article>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================ 7. CIERRE ============================ -->
+  <section class="sl-section" id="download">
+    <div class="sl-container">
+      <div class="home-cta sl-center">
+        <p class="sl-eyebrow">Empieza hoy</p>
+        <h2 class="sl-h2">Recibe el plan de hoy, no otro tablero de datos</h2>
+        <p class="sl-lead">Descarga Run with Aria y la primera sesión ya está esperando. Y si prefieres ver primero tus números, haz el chequeo de rendimiento gratis.</p>
+
+        <div class="sl-stores">
+          <a class="sl-store" href="https://apps.apple.com/us/app/run-with-aria/id6760048203" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16.9 13.2c0-2.3 1.9-3.4 2-3.5-1.1-1.6-2.8-1.8-3.4-1.8-1.4-.2-2.8.9-3.5.9-.7 0-1.9-.9-3.1-.8-1.6 0-3 .9-3.8 2.4-1.6 2.8-.4 7 1.2 9.3.8 1.1 1.7 2.4 2.9 2.3 1.2 0 1.6-.7 3.1-.7 1.4 0 1.8.7 3.1.7 1.3 0 2.1-1.1 2.8-2.3.9-1.3 1.3-2.6 1.3-2.7-.1 0-2.6-1-2.6-3.8z"/><path d="M14.6 6.3c.6-.8 1.1-1.9 1-3-.9 0-2.1.6-2.8 1.4-.6.7-1.2 1.8-1 2.9 1 .1 2.1-.5 2.8-1.3z"/></svg>
+            <span class="sl-store__text">
+              <span class="sl-store__kicker">Descárgala en el</span>
+              <span class="sl-store__name">App Store</span>
+            </span>
+          </a>
+          <a class="sl-store" href="https://play.google.com/store/apps/details?id=com.runwitharia.mobile" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5.6 3.4l12.9 8.6-12.9 8.6z"/></svg>
+            <span class="sl-store__text">
+              <span class="sl-store__kicker">Consíguela en</span>
+              <span class="sl-store__name">Google Play</span>
+            </span>
+          </a>
+        </div>
+
+        <p>
+          <a class="home-textlink" href="./lead-magnet-es.html">
+            Haz el chequeo de rendimiento gratis
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          </a>
         </p>
       </div>
-      <div class="pillars">
-        <div class="pillar" data-reveal data-reveal-delay="1">
-          <div class="p-icon pi-c">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18m0 0h10a2 2 0 002-2V9M9 21H5a2 2 0 01-2-2V9m0 0h18"/>
-            </svg>
-          </div>
-          <div>
-            <div class="p-title">Ciencia Sobre el Hype</div>
-            <p class="p-desc">Cada afirmación está fundamentada en fisiología y validada por nuestro equipo de rendimiento y rehabilitación. Si no podemos respaldarlo, no lo enviamos.</p>
-          </div>
-        </div>
-        <div class="pillar" data-reveal data-reveal-delay="2">
-          <div class="p-icon pi-m">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/>
-              <circle cx="9" cy="7" r="4"/>
-              <path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/>
-            </svg>
-          </div>
-          <div>
-            <div class="p-title">Construir Con, No Para</div>
-            <p class="p-desc">Los atletas, entrenadores y asesores son co-constructores. Sus perspectivas son insumos del producto — no comentarios recopilados después del hecho.</p>
-          </div>
-        </div>
-        <div class="pillar" data-reveal data-reveal-delay="3">
-          <div class="p-icon pi-v">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
-            </svg>
-          </div>
-          <div>
-            <div class="p-title">La Brecha Es Nuestro Mercado</div>
-            <p class="p-desc">Debajo del club de la Premier League y el programa olímpico nacional se encuentra la mayoría del talento atlético mundial. Nadie ha construido para ellos. Nosotros sí.</p>
-          </div>
-        </div>
-      </div>
     </div>
-  </div>
-</section>
+  </section>
 
-<!-- ══ CTA ══ -->
-<section id="lm-cta">
-  <div class="cta-glow"></div>
-  <div class="container">
-    <div class="cta-inner" data-reveal>
-      <div class="eyebrow center dim">Diagnóstico de Rendimiento Gratuito</div>
-      <h2>
-        Descubre Si Estás Tomando<br>
-        <span class="g-cyan">La Decisión Correcta Hoy.</span>
-      </h2>
-      <p>Responde 6 preguntas. Obtén un informe de inteligencia personalizado construido sobre el mismo motor de decisión que impulsa los programas de rendimiento de élite. Gratis. Instantáneo. Sin registro previo.</p>
-      <a href="lead-magnet-es.html" class="btn btn-primary btn-lg">
-        Ejecutar Mi Diagnóstico
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-      </a>
-      <div class="cta-chips">
-        <div class="cta-chip">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-          2 minutos
-        </div>
-        <div class="cta-chip">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
-          Atletas y entrenadores
-        </div>
-        <div class="cta-chip">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
-          Atletismo y fútbol
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
+</main>
 
-<!-- ══ FOOTER ══ -->
-<footer id="footer">
-  <div class="container">
-    <div class="foot-grid">
-      <div class="fb">
-        <img src="./stadioralabs info/stadiora_labs_logo - white.png" alt="Stadiora Labs" onerror="this.style.display='none'">
-        <div class="fb-name">STADIORA LABS</div>
-        <div class="fb-tag">Un Ecosistema. Inteligentemente Conectado.</div>
-        <p class="fb-desc">La empresa de infraestructura de IA deportiva — construyendo la capa de inteligencia que convierte datos de atletas en decisiones para atletas, entrenadores y equipos en todo el mundo.</p>
-        <div class="fb-social">
-          <a href="https://www.linkedin.com/company/stadioralabs" target="_blank" rel="noopener" class="fb-slink" aria-label="LinkedIn">
-            <svg viewBox="0 0 24 24" fill="currentColor">
-              <path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2z"/>
-              <circle cx="4" cy="4" r="2"/>
-            </svg>
+<!-- ============================ FOOTER ============================ -->
+<footer class="sl-footer">
+  <div class="sl-container">
+    <div class="sl-footer__grid">
+      <div class="sl-footer__brand">
+        <img src="./stadioralabs info/stadiora_labs_logo - white.png" alt="Stadiora Labs">
+        <p class="sl-footer__tag">Entrenamiento con IA que convierte lo que un atleta genera cada día en una decisión clara.</p>
+        <div class="sl-footer__social">
+          <a href="https://www.linkedin.com/company/stadioralabs" target="_blank" rel="noopener" aria-label="Stadiora Labs en LinkedIn">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h3v11H4z"/><circle cx="5.5" cy="5.5" r="1.7"/><path d="M11 20V9"/><path d="M11 13.5a4 4 0 018 0V20"/></svg>
           </a>
         </div>
       </div>
       <div>
-        <div class="fc-title">Productos</div>
-        <ul class="fc-links">
-          <li><a href="https://runwitharia.com" target="_blank" rel="noopener">Aria</a></li>
-          <li><a href="lead-magnet-es.html">Aria 12</a></li>
-          <li><a href="lead-magnet-es.html">Aria for Coaches</a></li>
-          <li><a href="./api-es.html">API Aria Intelligence</a></li>
+        <p class="sl-footer__title">Productos</p>
+        <ul class="sl-footer__links">
+          <li><a href="https://apps.apple.com/us/app/run-with-aria/id6760048203" target="_blank" rel="noopener">Aria en el App Store</a></li>
+          <li><a href="https://play.google.com/store/apps/details?id=com.runwitharia.mobile" target="_blank" rel="noopener">Aria en Google Play</a></li>
+          <li><a href="#ecosystem">Aria for Coaches</a></li>
+          <li><a href="#ecosystem">Aria 12</a></li>
         </ul>
       </div>
       <div>
-        <div class="fc-title">Empresa</div>
-        <ul class="fc-links">
-          <li><a href="#mission">Nuestra Misión</a></li>
-          <li><a href="#engine">El Motor</a></li>
-          <li><a href="#ecosystem">Ecosistema</a></li>
+        <p class="sl-footer__title">Compañía</p>
+        <ul class="sl-footer__links">
+          <li><a href="#engine">El motor</a></li>
+          <li><a href="#team">Equipo</a></li>
+          <li><a href="./investors-es.html">Inversores</a></li>
+          <li><a href="./api-es.html">Aria Intelligence</a></li>
         </ul>
       </div>
       <div>
-        <div class="fc-title">Comenzar</div>
-        <ul class="fc-links">
-          <li><a href="lead-magnet-es.html">Diagnóstico Gratuito</a></li>
-          <li><a href="lead-magnet-es.html">Acceso para Atletas</a></li>
-          <li><a href="lead-magnet-es.html">Acceso para Entrenadores</a></li>
-          <li><a href="lead-magnet-es.html">Solicitar Demo</a></li>
+        <p class="sl-footer__title">Empieza</p>
+        <ul class="sl-footer__links">
+          <li><a href="./lead-magnet-es.html">Chequeo de rendimiento gratis</a></li>
+          <li><a href="#download">Descarga la app</a></li>
+          <li><a href="./index.html" hreflang="en">English</a></li>
         </ul>
       </div>
     </div>
-    <div class="foot-btm">
-      <p class="foot-copy">© 2026 Stadiora Labs. Todos los derechos reservados. Construido en América Latina y los Estados Unidos.</p>
-      <div class="foot-legal">
-        <a href="./privacy.html">Política de Privacidad</a>
-        <a href="./terms.html">Términos de Uso</a>
+    <div class="sl-footer__bottom">
+      <p class="home-copy">© 2026 Stadiora Labs. Hecho en América Latina y en Estados Unidos.</p>
+      <div class="sl-footer__legal">
+        <a href="./privacy.html">Privacidad</a>
+        <a href="./terms.html">Términos</a>
       </div>
     </div>
   </div>
 </footer>
 
-<script>
-const nav = document.getElementById('nav');
-window.addEventListener('scroll', () => { nav.classList.toggle('scrolled', window.scrollY > 40); }, { passive: true });
-
-function openMenu()  { document.getElementById('mobileMenu').classList.add('open');    document.body.style.overflow = 'hidden'; }
-function closeMenu() { document.getElementById('mobileMenu').classList.remove('open'); document.body.style.overflow = ''; }
-
-const revealObs = new IntersectionObserver(entries => {
-  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('on'); revealObs.unobserve(e.target); } });
-}, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
-document.querySelectorAll('[data-reveal]').forEach(el => revealObs.observe(el));
-
-const widgetEl = document.getElementById('hwBars');
-if (widgetEl) {
-  const barObs = new IntersectionObserver(entries => {
-    entries.forEach(e => {
-      if (e.isIntersecting) {
-        e.target.querySelectorAll('.hwb-fill').forEach(b => { b.style.width = b.dataset.w; });
-        barObs.unobserve(e.target);
-      }
-    });
-  }, { threshold: 0.4 });
-  barObs.observe(widgetEl);
-}
-
-const tileVidObs = new IntersectionObserver(entries => {
-  entries.forEach(e => {
-    if (e.isIntersecting) {
-      const vid = e.target.querySelector('.ptile-video');
-      if (vid && !vid.dataset.loading) {
-        vid.dataset.loading = '1';
-        vid.addEventListener('canplay', () => {
-          vid.play().then(() => vid.classList.add('vloaded')).catch(() => vid.classList.add('vloaded'));
-        }, { once: true });
-        vid.load();
-      }
-      tileVidObs.unobserve(e.target);
-    }
-  });
-}, { threshold: 0.15 });
-document.querySelectorAll('.ptile').forEach(t => tileVidObs.observe(t));
-
-document.querySelectorAll('a[href^="#"]').forEach(a => {
-  a.addEventListener('click', e => {
-    const t = document.querySelector(a.getAttribute('href'));
-    if (t) { e.preventDefault(); t.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
-  });
-});
-</script>
 </body>
 </html>
