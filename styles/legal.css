@@ -1,0 +1,324 @@
+/* ==========================================================================
+   Legal document styling for privacy.html and terms.html
+
+   These two pages carry long-form legal text, which the shared component set
+   in styles/site.css does not cover. Everything here is presentation only.
+   No rule in this file changes what either document says.
+
+   Load order per page:
+     styles/site.css   tokens, reset, nav, footer, buttons
+     styles/legal.css  this file
+
+   Every value is an --sl- token from site.css. The three signal colours at
+   the top are the exception. A legal notice needs amber and red to read as a
+   warning rather than as a brand accent, so they are declared once here,
+   scoped to these two pages, and used nowhere else on the site.
+   ========================================================================== */
+
+:root {
+  --lg-warn: #f5a524;
+  --lg-warn-soft: rgba(245, 165, 36, 0.07);
+  --lg-warn-line: rgba(245, 165, 36, 0.28);
+  --lg-alert: #ff7a7a;
+  --lg-alert-soft: rgba(255, 122, 122, 0.07);
+  --lg-alert-line: rgba(255, 122, 122, 0.28);
+  --lg-ok: #4ade80;
+  --lg-ok-soft: rgba(74, 222, 128, 0.08);
+  --lg-ok-line: rgba(74, 222, 128, 0.26);
+}
+
+/* ---------- Hero ---------------------------------------------------------- */
+#hero {
+  padding-block: calc(var(--sl-nav-h) + var(--sl-space-8)) var(--sl-space-8);
+  border-bottom: 1px solid var(--sl-border);
+  background: linear-gradient(180deg, var(--sl-ink-800) 0%, var(--sl-ink-900) 100%);
+}
+
+.doc-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sl-space-2);
+  font-family: var(--sl-font-mono);
+  font-size: var(--sl-text-label);
+  font-weight: 700;
+  letter-spacing: var(--sl-tracking-label);
+  text-transform: uppercase;
+  color: var(--sl-cyan);
+  margin-bottom: var(--sl-space-5);
+}
+.doc-eyebrow::before {
+  content: '';
+  display: block;
+  width: 24px;
+  height: 1px;
+  background: var(--sl-cyan);
+}
+
+.doc-title {
+  font-family: var(--sl-font-display);
+  font-size: var(--sl-text-h1);
+  font-weight: 700;
+  line-height: var(--sl-leading-tight);
+  letter-spacing: var(--sl-tracking-display);
+  color: var(--sl-white);
+  margin: 0 0 var(--sl-space-5);
+}
+
+.doc-meta { display: flex; gap: var(--sl-space-6); flex-wrap: wrap; }
+.doc-meta-item {
+  font-family: var(--sl-font-mono);
+  font-size: var(--sl-text-small);
+  color: var(--sl-text-faint);
+}
+.doc-meta-item strong { color: var(--sl-text); font-weight: 700; }
+
+/* ---------- Notices -------------------------------------------------------
+   .health-notice on the privacy policy, .medical-notice on the terms. Same
+   shape, different signal colour. */
+.health-notice,
+.medical-notice {
+  border-radius: var(--sl-radius);
+  padding: var(--sl-space-5) var(--sl-space-6);
+  margin: var(--sl-space-7) 0 0;
+  display: flex;
+  gap: var(--sl-space-4);
+  align-items: flex-start;
+}
+.health-notice { background: var(--lg-warn-soft); border: 1px solid var(--lg-warn-line); }
+.medical-notice { background: var(--lg-alert-soft); border: 1px solid var(--lg-alert-line); }
+
+.health-notice-icon,
+.medical-notice-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--sl-radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+.health-notice-icon { background: var(--lg-warn-soft); border: 1px solid var(--lg-warn-line); }
+.medical-notice-icon { background: var(--lg-alert-soft); border: 1px solid var(--lg-alert-line); }
+.health-notice-icon svg { width: 18px; height: 18px; color: var(--lg-warn); }
+.medical-notice-icon svg { width: 18px; height: 18px; color: var(--lg-alert); }
+
+.health-notice-title,
+.medical-notice-title {
+  font-size: var(--sl-text-small);
+  font-weight: 700;
+  margin-bottom: var(--sl-space-2);
+}
+.health-notice-title { color: var(--lg-warn); }
+.medical-notice-title { color: var(--lg-alert); }
+
+.health-notice-body,
+.medical-notice-body {
+  font-size: var(--sl-text-small);
+  color: var(--sl-text-muted);
+  line-height: var(--sl-leading-body);
+}
+.health-notice-body a { color: var(--lg-warn); text-decoration: underline; text-underline-offset: 3px; }
+.medical-notice-body a { color: var(--lg-alert); text-decoration: underline; text-underline-offset: 3px; }
+
+/* ---------- Layout and contents ------------------------------------------- */
+#doc-body { padding-block: var(--sl-space-8) var(--sl-space-9); }
+.doc-layout {
+  display: grid;
+  grid-template-columns: 220px minmax(0, 1fr);
+  gap: var(--sl-space-9);
+  align-items: start;
+}
+
+.toc { position: sticky; top: calc(var(--sl-nav-h) + var(--sl-space-5)); }
+.toc-title {
+  font-family: var(--sl-font-mono);
+  font-size: var(--sl-text-label);
+  font-weight: 700;
+  letter-spacing: var(--sl-tracking-label);
+  text-transform: uppercase;
+  color: var(--sl-text-faint);
+  margin-bottom: var(--sl-space-4);
+}
+.toc-links { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+.toc-links a {
+  font-size: 13px;
+  color: var(--sl-text-faint);
+  padding: 6px var(--sl-space-3);
+  border-radius: var(--sl-radius-sm);
+  border-left: 2px solid transparent;
+  display: block;
+  line-height: 1.4;
+  transition: color var(--sl-speed) var(--sl-ease), background var(--sl-speed) var(--sl-ease), border-color var(--sl-speed) var(--sl-ease);
+}
+.toc-links a:hover { color: var(--sl-white); background: var(--sl-surface); border-left-color: var(--sl-cyan); }
+.toc-links a.active { color: var(--sl-cyan-bright); border-left-color: var(--sl-cyan); background: var(--sl-cyan-soft); }
+
+/* ---------- Document body -------------------------------------------------- */
+.doc-content { max-width: 76ch; }
+.doc-section { margin-bottom: var(--sl-space-8); scroll-margin-top: calc(var(--sl-nav-h) + var(--sl-space-4)); }
+.doc-section:last-child { margin-bottom: 0; }
+
+.doc-section h2 {
+  font-family: var(--sl-font-display);
+  font-size: var(--sl-text-h3);
+  font-weight: 600;
+  line-height: var(--sl-leading-snug);
+  color: var(--sl-white);
+  margin: 0 0 var(--sl-space-5);
+  padding-bottom: var(--sl-space-3);
+  border-bottom: 1px solid var(--sl-border);
+  display: flex;
+  align-items: center;
+  gap: var(--sl-space-3);
+}
+.section-num {
+  font-family: var(--sl-font-mono);
+  font-size: var(--sl-text-label);
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: var(--sl-cyan);
+  background: var(--sl-cyan-soft);
+  border: 1px solid var(--sl-cyan-line);
+  padding: 3px 8px;
+  border-radius: var(--sl-radius-sm);
+  flex: none;
+}
+.doc-section h3 {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--sl-text);
+  margin: var(--sl-space-6) 0 var(--sl-space-2);
+}
+.doc-section p {
+  font-size: var(--sl-text-small);
+  color: var(--sl-text-muted);
+  line-height: 1.85;
+  margin: 0 0 var(--sl-space-4);
+}
+.doc-section p:last-child { margin-bottom: 0; }
+.doc-section a { color: var(--sl-cyan-bright); text-decoration: underline; text-underline-offset: 3px; }
+.doc-section a:hover { color: var(--sl-cyan); }
+
+.doc-section ul,
+.doc-section ol {
+  margin: var(--sl-space-3) 0 var(--sl-space-4);
+  padding-left: 0;
+  list-style: none;
+  display: grid;
+  gap: var(--sl-space-2);
+}
+.doc-section li {
+  font-size: var(--sl-text-small);
+  color: var(--sl-text-muted);
+  line-height: 1.75;
+  padding-left: 20px;
+  position: relative;
+}
+.doc-section li strong { color: var(--sl-text); }
+.doc-section ul li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 9px;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--sl-cyan);
+  opacity: 0.6;
+}
+.doc-section ol { counter-reset: ol-counter; }
+.doc-section ol li { counter-increment: ol-counter; }
+.doc-section ol li::before {
+  content: counter(ol-counter) '.';
+  position: absolute;
+  left: 0;
+  top: 0;
+  font-family: var(--sl-font-mono);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--sl-cyan);
+}
+
+/* ---------- Boxed callouts -------------------------------------------------- */
+.highlight-box,
+.disclaimer-box,
+.contact-box {
+  border-radius: var(--sl-radius);
+  padding: var(--sl-space-5) var(--sl-space-6);
+  margin: var(--sl-space-5) 0 0;
+}
+.highlight-box { background: var(--sl-cyan-soft); border: 1px solid var(--sl-cyan-line); }
+.disclaimer-box { background: var(--sl-surface); border: 1px solid var(--sl-border-strong); }
+.contact-box { background: var(--sl-ink-700); border: 1px solid var(--sl-border-strong); }
+.highlight-box p,
+.disclaimer-box p { font-size: 13px; margin-bottom: 0; }
+.contact-box p { margin-bottom: var(--sl-space-2); }
+.contact-box p:last-child { margin-bottom: 0; }
+
+/* ---------- Rights and framework grids -------------------------------------- */
+.rights-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: var(--sl-space-3); margin: var(--sl-space-5) 0; }
+.right-card {
+  background: var(--sl-ink-700);
+  border: 1px solid var(--sl-border);
+  border-radius: var(--sl-radius);
+  padding: var(--sl-space-5);
+}
+.right-card-label {
+  font-family: var(--sl-font-mono);
+  font-size: var(--sl-text-label);
+  font-weight: 700;
+  letter-spacing: var(--sl-tracking-label);
+  text-transform: uppercase;
+  color: var(--sl-cyan);
+  margin-bottom: var(--sl-space-2);
+}
+.right-card-title { font-size: var(--sl-text-small); font-weight: 700; color: var(--sl-white); margin-bottom: var(--sl-space-1); }
+.right-card-desc { font-size: 13px; color: var(--sl-text-muted); line-height: var(--sl-leading-body); }
+
+.framework-grid { display: grid; gap: var(--sl-space-3); margin: var(--sl-space-5) 0; }
+.framework-card {
+  background: var(--sl-ink-700);
+  border: 1px solid var(--sl-border);
+  border-radius: var(--sl-radius);
+  padding: var(--sl-space-5) var(--sl-space-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sl-space-4);
+  align-items: flex-start;
+}
+.fw-badge {
+  font-family: var(--sl-font-mono);
+  padding: 4px var(--sl-space-3);
+  border-radius: var(--sl-radius-pill);
+  font-size: var(--sl-text-label);
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  white-space: nowrap;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+.fw-gdpr { background: var(--sl-cyan-soft); border: 1px solid var(--sl-cyan-line); color: var(--sl-cyan); }
+.fw-ccpa { background: var(--lg-ok-soft); border: 1px solid var(--lg-ok-line); color: var(--lg-ok); }
+.fw-health { background: var(--lg-warn-soft); border: 1px solid var(--lg-warn-line); color: var(--lg-warn); }
+.fw-title { font-size: var(--sl-text-small); font-weight: 700; color: var(--sl-white); margin-bottom: var(--sl-space-1); }
+.fw-desc { font-size: 13px; color: var(--sl-text-muted); line-height: var(--sl-leading-body); }
+
+/* ---------- Responsive ------------------------------------------------------ */
+@media (max-width: 900px) {
+  .doc-layout { grid-template-columns: minmax(0, 1fr); gap: var(--sl-space-6); }
+  .toc {
+    position: static;
+    border: 1px solid var(--sl-border);
+    border-radius: var(--sl-radius);
+    background: var(--sl-ink-700);
+    padding: var(--sl-space-5);
+  }
+  .toc-links { grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); }
+}
+
+@media (max-width: 560px) {
+  .health-notice,
+  .medical-notice { flex-direction: column; }
+  .framework-card { gap: var(--sl-space-3); }
+}

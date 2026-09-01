@@ -187,6 +187,9 @@ colliding with its own legacy styles. Blocks use `sl-block`, elements use
 
 Colour a word inside a headline with `.sl-accent`, never with an inline `style` attribute.
 
+The nav and the footer are generated from `scripts/chrome.mjs` rather than authored per
+page. Read section 7 before editing either of them by hand.
+
 ### Patterns
 
 Nav with the mobile drawer. The drawer is the only interactive component in the system,
@@ -300,7 +303,27 @@ in `stadioralabs info/`, wherever both exist.
 | `qr_ios.png` | QR code, decodes to the App Store listing |
 | `qr_android.png` | QR code, decodes to `https://runwitharia.com`, not to a store listing. Do not label it as a Google Play code |
 | `brand_icon.png` | Brand icon |
+| `shot_home.webp` | Web-sized derivative of `shot_home.png`, 600 by 1184, 38 KB |
 | `shot_intelligence.webp` | Web-sized derivative of `shot_intelligence.png`, 600 by 1184, 53 KB. Built in slice #6, reuse it rather than the PNG |
+| `ian_c.webp` | Web-sized headshot, 320 by 320, 8 KB |
+| `anthony_c.webp` | Web-sized headshot, 320 by 320, 21 KB |
+| `karla_c.webp` | Web-sized headshot, 320 by 320, 12 KB |
+| `joel_c.webp` | Web-sized headshot, 320 by 320, 6 KB |
+
+`assets/og/` carries the social sharing cards. They are generated, not drawn by hand.
+
+| File | What it is |
+| --- | --- |
+| `og-default.png` | English sharing card, 1200 by 630 |
+| `og-default-es.png` | Spanish sharing card, 1200 by 630 |
+
+Regenerate them with `node scripts/make-og.mjs`, which needs `npm i puppeteer` first.
+The script renders the cards in headless Chrome against `styles/site.css`, so a token
+change flows straight through. Edit the `CARDS` array in that file to change the copy,
+and keep the headline verbatim from the page the card represents. One gotcha, the
+Google Fonts `@import` URL in `site.css` contains semicolons inside the weight list, so
+any code that strips the `@import` has to match to the end of the line rather than to the
+first `;`.
 
 Every image needs alt text. Decorative images get `alt=""` and `aria-hidden="true"`.
 
@@ -337,3 +360,141 @@ Before a page slice ships:
 - No emoji. Icons are stroke SVG.
 - Headings run in order, `h1` once per page.
 - Screenshots at desktop and 390px, both languages, attached to the PR.
+
+
+---
+
+## 7. Site chrome
+
+The nav and the footer are generated, not authored. `scripts/chrome.mjs` owns the markup
+for every page in both languages, which is what keeps them identical.
+
+Each page carries two marker pairs and nothing else:
+
+```html
+<!-- sl-chrome:nav -->
+...generated, do not hand edit...
+<!-- /sl-chrome:nav -->
+```
+
+```html
+<!-- sl-chrome:footer -->
+...generated, do not hand edit...
+<!-- /sl-chrome:footer -->
+```
+
+Commands:
+
+- `node scripts/chrome.mjs --write` rewrites the region in every page.
+- `node scripts/chrome.mjs --check` fails if any page has drifted, and fails if a root
+  `.html` file is missing from the `PAGES` array. Run it before opening a PR.
+
+The rendered HTML stays committed, so GitHub Pages still serves a plain static site with
+no build step. The script is a tool, not a dependency.
+
+To change the chrome, edit `scripts/chrome.mjs` and rerun `--write`. To add a page, add
+a row to `PAGES` with its `lang`, the `current` nav key, and the `twin` it points its
+language toggle at.
+
+Rules the script enforces, and that hand edits must not break:
+
+- Every page has a `.sl-skip` link as the first element in `<body>`, targeting `#main`.
+  Every page therefore needs `id="main"` on its `<main>`.
+- Nav links are the same four on every page, Home, Ecosystem, Aria Intelligence,
+  Investors, plus the free check CTA. Page-level anchors do not belong in the shared nav.
+  A page that needs an in-page index builds its own, the way `investors.html` does with
+  `.iv-index`.
+- The only permitted per-page variation is the `badge` slot, which renders
+  `.sl-chrome-badge` in the nav actions and in the drawer foot. `investors.html` uses it
+  for Confidential. Nothing else may differ.
+- The language toggle prints EN on the left and ES on the right on every page, in both
+  languages, so the control does not reorder itself when you switch.
+- `privacy.html`, `terms.html` and `404.html` have no Spanish twin. Their toggle routes to
+  the Spanish home page, and the footer legal links on Spanish pages carry
+  `hreflang="en"` so the language change is announced.
+- The footer carries the store badges, the product and company columns, the copy line,
+  the legal links, the language toggle, and the trademark attribution line. Google Play
+  and the App Store are named in that line, which is why it is not optional.
+
+Footer classes added on top of section 4: `.sl-footer__copy`, `.sl-footer__attrib`.
+Nav classes added: `.sl-skip`, `.sl-chrome-badge`.
+
+### Contact addresses
+
+The site uses role addresses, one per context, and they are not interchangeable.
+
+| Address | Where |
+| --- | --- |
+| `info@stadioralabs.com` | Footer Contact link, general enquiries |
+| `api@stadioralabs.com` | Aria Intelligence early access |
+| `investors@stadioralabs.com` | Investors page, the raise |
+| `privacy@stadioralabs.com` | Privacy policy |
+| `legal@stadioralabs.com` | Terms of use |
+| `security@stadioralabs.com` | Security disclosure |
+| `support@stadioralabs.com` | Product support |
+
+Do not invent a new address. All of the above trace to founder commits, not to this
+redesign.
+
+---
+
+## 8. Metadata
+
+Every page carries the same head block, in this order, between the viewport meta and the
+font preconnects. Nothing here is optional except `robots`.
+
+```html
+<title>Page name &middot; Stadiora Labs</title>
+<meta name="description" content="One sentence, current facts, under 160 characters.">
+<link rel="icon" href="./stadioralabs info/....png">
+<meta name="theme-color" content="#0A0E14">
+<link rel="canonical" href="https://stadioralabs.com/page.html">
+<link rel="alternate" hreflang="en" href="https://stadioralabs.com/page.html">
+<link rel="alternate" hreflang="es" href="https://stadioralabs.com/page-es.html">
+<link rel="alternate" hreflang="x-default" href="https://stadioralabs.com/page.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Stadiora Labs">
+<meta property="og:locale" content="en_US">
+<meta property="og:url" content="https://stadioralabs.com/page.html">
+<meta property="og:title" content="...">
+<meta property="og:description" content="...">
+<meta property="og:image" content="https://stadioralabs.com/assets/og/og-default.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="...">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="...">
+<meta name="twitter:description" content="...">
+<meta name="twitter:image" content="https://stadioralabs.com/assets/og/og-default.png">
+```
+
+- Titles use a middot separator, never a colon or a pipe. Display copy has no colons and
+  the title bar is display copy.
+- The Spanish twin uses `og:locale` `es_ES` and the Spanish OG card.
+- `hreflang` runs both ways. If A names B, B names A, and both name the same
+  `x-default`. The English page is always `x-default`.
+- Legal pages use `og:type` `article`. Everything else uses `website`.
+- `investors.html` and `investors-es.html` keep
+  `robots` `noindex, nofollow, noarchive, nosnippet` and stay out of `sitemap.xml`.
+  `robots.txt` disallows them as well.
+- `404.html` uses `noindex, follow` and carries no canonical.
+- `sitemap.xml` lists the public pages with `xhtml:link` alternates that match the page
+  tags. Add a page to it in the same commit that creates the page.
+
+---
+
+## 9. Legal pages
+
+`privacy.html` and `terms.html` are legal instruments. Restyle them, never reword them.
+
+- They load `styles/site.css` then `styles/legal.css`. `legal.css` is scoped to the
+  document classes those two pages use, `doc-section`, `toc`, `framework-card`,
+  `rights-grid`, `notice` and the rest.
+- Three page-scoped signal colours live there, `--lg-warn`, `--lg-alert`, `--lg-ok`.
+  They are not site tokens and no other page may use them.
+- The body copy still contains em dashes. That is a known copy-rule violation, left in
+  place because editing legal text is a substance change. Anything that changes a clause
+  needs legal review, not a style pass.
+- There is no Spanish twin. Translating a legal instrument changes it.
+- If a clause contradicts a current product fact, report it on the issue. Do not fix it
+  in the markup.

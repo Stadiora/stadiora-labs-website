@@ -1,0 +1,12 @@
+# stadioralabs.com
+
+User-agent: *
+Allow: /
+
+# The investor overview is gated and carries a noindex tag. Keeping crawlers
+# off it as well means the confidential deck never reaches an index by way of
+# a link someone shared.
+Disallow: /investors.html
+Disallow: /investors-es.html
+
+Sitemap: https://stadioralabs.com/sitemap.xml

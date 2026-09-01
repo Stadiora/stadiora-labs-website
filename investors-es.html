@@ -4,11 +4,30 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="robots" content="noindex, nofollow, noarchive, nosnippet">
-<title>Stadiora Labs, Resumen para Inversores</title>
+<title>Resumen para inversores · Stadiora Labs</title>
 <meta name="description" content="Resumen para inversores de Stadiora Labs. Run with Aria está en la App Store y en Google Play con más de 150 atletas, y levantamos una pre-seed de $750K.">
-<link rel="icon" type="image/png" href="./stadioralabs info/favicon.png">
-<link rel="alternate" hreflang="es" href="./investors-es.html">
-<link rel="alternate" hreflang="en" href="./investors.html">
+<link rel="icon" type="image/png" href="./stadioralabs%20info/favicon.png">
+<meta name="theme-color" content="#010812">
+<link rel="canonical" href="https://stadioralabs.com/investors-es.html">
+<link rel="alternate" hreflang="en" href="https://stadioralabs.com/investors.html">
+<link rel="alternate" hreflang="es" href="https://stadioralabs.com/investors-es.html">
+<link rel="alternate" hreflang="x-default" href="https://stadioralabs.com/investors.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Stadiora Labs">
+<meta property="og:locale" content="es_ES">
+<meta property="og:locale:alternate" content="en_US">
+<meta property="og:url" content="https://stadioralabs.com/investors-es.html">
+<meta property="og:title" content="Resumen para inversores · Stadiora Labs">
+<meta property="og:description" content="Resumen para inversores de Stadiora Labs. Run with Aria está en la App Store y en Google Play con más de 150 atletas, y levantamos una pre-seed de $750K.">
+<meta property="og:image" content="https://stadioralabs.com/assets/og/og-default-es.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Stadiora Labs. El deporte entierra al atleta en datos. Aria los convierte en la decisión de hoy.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Resumen para inversores · Stadiora Labs">
+<meta name="twitter:description" content="Resumen para inversores de Stadiora Labs. Run with Aria está en la App Store y en Google Play con más de 150 atletas, y levantamos una pre-seed de $750K.">
+<meta name="twitter:image" content="https://stadioralabs.com/assets/og/og-default-es.png">
+<meta name="twitter:image:alt" content="Stadiora Labs. El deporte entierra al atleta en datos. Aria los convierte en la decisión de hoy.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap">
@@ -85,26 +104,23 @@
 }
 .iv-gate__note { margin: var(--sl-space-6) 0 0; }
 
-/* ---- Nav extras ---- */
-.iv-nav-badge {
+/* ---- Section index ----
+   The shared nav carries the site links, so the six section anchors this page
+   needs live here instead. See scripts/chrome.mjs. */
+.iv-index { display: flex; flex-wrap: wrap; gap: var(--sl-space-2); margin-bottom: var(--sl-space-7); }
+.iv-index a {
   font-family: var(--sl-font-mono);
   font-size: var(--sl-text-label);
   font-weight: 700;
   letter-spacing: var(--sl-tracking-label);
   text-transform: uppercase;
-  color: var(--sl-cyan);
-  padding: 5px 11px;
-  border: 1px solid var(--sl-cyan-line);
-  border-radius: var(--sl-radius-sm);
-  background: var(--sl-cyan-soft);
-  white-space: nowrap;
+  padding: 7px 14px;
+  border: 1px solid var(--sl-border);
+  border-radius: var(--sl-radius-pill);
+  color: var(--sl-text-faint);
+  transition: color var(--sl-speed) var(--sl-ease), border-color var(--sl-speed) var(--sl-ease), background var(--sl-speed) var(--sl-ease);
 }
-/* Six section links plus two controls need the room. Below this the badge
-   drops out of the bar and the drawer foot carries it instead. */
-@media (max-width: 1080px) {
-  .sl-nav__links { gap: var(--sl-space-4); }
-  .iv-nav-badge.sl-nav__collapse { display: none; }
-}
+.iv-index a:hover { color: var(--sl-cyan-bright); border-color: var(--sl-cyan-line); background: var(--sl-cyan-soft); }
 
 /* ---- Hero ---- */
 .iv-hero { position: relative; overflow: hidden; }
@@ -243,23 +259,24 @@
 <!-- ============ CONTENIDO, OCULTO HASTA DESBLOQUEAR ============ -->
 <div id="mainContent" style="display:none">
 
+<!-- sl-chrome:nav -->
+<a class="sl-skip" href="#main">Saltar al contenido</a>
+
 <nav class="sl-nav">
   <div class="sl-container">
     <div class="sl-nav__inner">
       <a class="sl-nav__logo" href="./index-es.html">
-        <img src="./stadioralabs info/stadiora_labs_logo - white.png" alt="Stadiora Labs">
+        <img src="./stadioralabs%20info/stadiora_labs_logo%20-%20white.png" alt="Stadiora Labs">
       </a>
       <ul class="sl-nav__links">
-        <li><a href="#traction">Tracción</a></li>
-        <li><a href="#model">Modelo</a></li>
-        <li><a href="#market">Mercado</a></li>
-        <li><a href="#team">Equipo</a></li>
-        <li><a href="#raise">Ronda</a></li>
-        <li><a href="#dataroom">Sala de datos</a></li>
+        <li><a href="./index-es.html">Inicio</a></li>
+        <li><a href="./index-es.html#ecosystem">Ecosistema</a></li>
+        <li><a href="./api-es.html">Aria Intelligence</a></li>
+        <li><a href="./investors-es.html" aria-current="page">Inversores</a></li>
       </ul>
       <div class="sl-nav__actions">
-        <span class="iv-nav-badge sl-nav__collapse">Confidencial</span>
-        <a class="sl-btn sl-btn--primary sl-nav__collapse" href="mailto:investors@stadioralabs.com">Escríbenos</a>
+        <span class="sl-chrome-badge sl-nav__collapse">Confidencial</span>
+        <a class="sl-btn sl-btn--primary sl-nav__collapse" href="./lead-magnet-es.html">Chequeo gratis</a>
         <div class="sl-lang">
           <a class="sl-lang__btn" href="./investors.html" hreflang="en">EN</a>
           <span class="sl-lang__btn is-active" aria-current="true">ES</span>
@@ -276,20 +293,19 @@
 
 <div class="sl-nav__menu" id="sl-menu">
   <ul class="sl-nav__menu-links">
-    <li><a href="#traction">Tracción</a></li>
-    <li><a href="#model">Modelo</a></li>
-    <li><a href="#market">Mercado</a></li>
-    <li><a href="#team">Equipo</a></li>
-    <li><a href="#raise">Ronda</a></li>
-    <li><a href="#dataroom">Sala de datos</a></li>
+    <li><a href="./index-es.html">Inicio</a></li>
+    <li><a href="./index-es.html#ecosystem">Ecosistema</a></li>
+    <li><a href="./api-es.html">Aria Intelligence</a></li>
+    <li><a href="./investors-es.html" aria-current="page">Inversores</a></li>
   </ul>
   <div class="sl-nav__menu-foot">
-    <span class="iv-nav-badge" style="justify-self:start">Confidencial</span>
-    <a class="sl-btn sl-btn--primary sl-btn--block" href="mailto:investors@stadioralabs.com">Escríbenos</a>
+    <span class="sl-chrome-badge">Confidencial</span>
+    <a class="sl-btn sl-btn--primary sl-btn--block" href="./lead-magnet-es.html">Chequeo gratis</a>
   </div>
 </div>
+<!-- /sl-chrome:nav -->
 
-<main>
+<main id="main">
 
 <!-- ============ HERO ============ -->
 <section class="sl-section sl-nav-offset iv-hero" id="top">
@@ -301,10 +317,19 @@
       Run with Aria lee al atleta día a día y devuelve la decisión que tomaría un equipo completo de apoyo. Está en la
       App Store y en Google Play, y hoy hay más de 150 atletas en la plataforma.
     </p>
-    <ul class="sl-dotlist" style="margin-bottom:var(--sl-space-7)">
+    <ul class="sl-dotlist" style="margin-bottom:var(--sl-space-5)">
       <li>Confidencial</li>
       <li>No para distribución pública</li>
     </ul>
+
+    <nav class="iv-index" aria-label="Secciones de esta página">
+      <a href="#traction">Tracción</a>
+      <a href="#model">Modelo</a>
+      <a href="#market">Mercado</a>
+      <a href="#team">Equipo</a>
+      <a href="#raise">Ronda</a>
+      <a href="#dataroom">Sala de datos</a>
+    </nav>
 
     <div class="iv-stats">
       <div class="iv-stats__item">
@@ -653,36 +678,77 @@
 
 </main>
 
+<!-- sl-chrome:footer -->
 <footer class="sl-footer">
   <div class="sl-container">
     <div class="sl-footer__grid">
       <div class="sl-footer__brand">
-        <img src="./stadioralabs info/stadiora_labs_logo - white.png" alt="Stadiora Labs">
-        <p class="sl-footer__tag">Entrenamiento con IA para atletas y para los entrenadores que trabajan con ellos. Run with Aria está en la App Store y en Google Play.</p>
+        <img src="./stadioralabs%20info/stadiora_labs_logo%20-%20white.png" alt="Stadiora Labs">
+        <p class="sl-footer__tag">Stadiora Labs construye el motor Aria Intelligence y las apps que corren sobre él, para atletas y para quienes los entrenan.</p>
+        <div class="sl-stores">
+          <a class="sl-store" href="https://apps.apple.com/us/app/run-with-aria/id6760048203" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16.9 13.2c0-2.3 1.9-3.4 2-3.5-1.1-1.6-2.8-1.8-3.4-1.8-1.4-.2-2.8.9-3.5.9-.7 0-1.9-.9-3.1-.8-1.6 0-3 .9-3.8 2.4-1.6 2.8-.4 7 1.2 9.3.8 1.1 1.7 2.4 2.9 2.3 1.2 0 1.6-.7 3.1-.7 1.4 0 1.8.7 3.1.7 1.3 0 2.1-1.1 2.8-2.3.9-1.3 1.3-2.6 1.3-2.7-.1 0-2.6-1-2.6-3.8z"/><path d="M14.6 6.3c.6-.8 1.1-1.9 1-3-.9 0-2.1.6-2.8 1.4-.6.7-1.2 1.8-1 2.9 1 .1 2.1-.5 2.8-1.3z"/></svg>
+            <span class="sl-store__text">
+              <span class="sl-store__kicker">Descárgala en el</span>
+              <span class="sl-store__name">App Store</span>
+            </span>
+          </a>
+          <a class="sl-store" href="https://play.google.com/store/apps/details?id=com.runwitharia.mobile" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5.6 3.4l12.9 8.6-12.9 8.6z"/></svg>
+            <span class="sl-store__text">
+              <span class="sl-store__kicker">Consíguela en</span>
+              <span class="sl-store__name">Google Play</span>
+            </span>
+          </a>
+        </div>
+        <div class="sl-footer__social">
+          <a href="https://www.linkedin.com/company/stadioralabs" target="_blank" rel="noopener" aria-label="Stadiora Labs en LinkedIn">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h3v11H4z"/><circle cx="5.5" cy="5.5" r="1.7"/><path d="M11 20V9"/><path d="M11 13.5a4 4 0 018 0V20"/></svg>
+          </a>
+        </div>
       </div>
       <div>
-        <p class="sl-footer__title">Inversores</p>
+        <p class="sl-footer__title">Productos</p>
         <ul class="sl-footer__links">
-          <li><a href="mailto:investors@stadioralabs.com">investors@stadioralabs.com</a></li>
-          <li><a href="#dataroom">Sala de datos</a></li>
-          <li><a href="#raise">La ronda</a></li>
+          <li><a href="./index-es.html#ecosystem">Run with Aria</a></li>
+          <li><a href="./index-es.html#ecosystem">Aria for Coaches</a></li>
+          <li><a href="./index-es.html#ecosystem">Aria 12</a></li>
+          <li><a href="./api-es.html">Aria Intelligence</a></li>
         </ul>
       </div>
       <div>
-        <p class="sl-footer__title">Producto</p>
+        <p class="sl-footer__title">Compañía</p>
         <ul class="sl-footer__links">
-          <li><a href="https://apps.apple.com/us/app/run-with-aria/id6760048203" target="_blank" rel="noopener">App Store</a></li>
-          <li><a href="https://play.google.com/store/apps/details?id=com.runwitharia.mobile" target="_blank" rel="noopener">Google Play</a></li>
-          <li><a href="./index-es.html">stadioralabs.com</a></li>
+          <li><a href="./index-es.html#engine">El motor</a></li>
+          <li><a href="./index-es.html#team">Quiénes somos</a></li>
+          <li><a href="./investors-es.html">Inversores</a></li>
+          <li><a href="mailto:info@stadioralabs.com">Contacto</a></li>
+        </ul>
+      </div>
+      <div>
+        <p class="sl-footer__title">Empieza</p>
+        <ul class="sl-footer__links">
+          <li><a href="./lead-magnet-es.html">Chequeo de rendimiento gratis</a></li>
+          <li><a href="./index-es.html#download">Descarga la app</a></li>
+          <li><a href="./index-es.html">Inicio</a></li>
         </ul>
       </div>
     </div>
     <div class="sl-footer__bottom">
-      <span>&copy; 2026 Stadiora Labs. Todos los derechos reservados.</span>
-      <span class="sl-label">Confidencial, solo para inversores</span>
+      <p class="sl-footer__copy">© 2026 Stadiora Labs. Hecho en América Latina y Estados Unidos.</p>
+      <div class="sl-footer__legal">
+        <a href="./privacy.html" hreflang="en">Política de privacidad</a>
+        <a href="./terms.html" hreflang="en">Términos de uso</a>
+        <div class="sl-lang" aria-label="Idioma">
+          <a class="sl-lang__btn" href="./investors.html" hreflang="en">EN</a>
+          <span class="sl-lang__btn is-active" aria-current="true">ES</span>
+        </div>
+      </div>
     </div>
+    <p class="sl-footer__attrib">App Store es una marca de servicio de Apple Inc. Google Play y el logotipo de Google Play son marcas comerciales de Google LLC.</p>
   </div>
 </footer>
+<!-- /sl-chrome:footer -->
 
 </div><!-- /mainContent -->
 

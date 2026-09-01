@@ -239,7 +239,6 @@
 /* Section lead paragraph to the grid below it. */
 .home-mt { margin-top: var(--sl-space-7); }
 
-.home-copy { margin: 0; }
 
 /* Empty anchor that keeps an old inbound fragment landing on the right section
    after the section itself was renamed. api.html and api-es.html still link to
