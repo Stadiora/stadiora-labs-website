@@ -297,6 +297,41 @@ h1, h2, h3, h4 { margin: 0; font-family: var(--sl-font-display); font-weight: 60
 .sl-btn-row { display: flex; flex-wrap: wrap; gap: var(--sl-space-3); }
 
 /* ---------- 7. Nav bar, mobile drawer and language toggle ------------------ */
+
+/* Skip link. First focusable thing on every page, invisible until focused,
+   and it targets the id="main" that every page puts on its <main>. */
+.sl-skip {
+  position: absolute;
+  left: var(--sl-space-4);
+  top: var(--sl-space-4);
+  z-index: calc(var(--sl-z-nav) + 1);
+  transform: translateY(-200%);
+  padding: 10px 16px;
+  border-radius: var(--sl-radius-sm);
+  background: var(--sl-cyan);
+  color: var(--sl-ink-900);
+  font-size: var(--sl-text-small);
+  font-weight: 700;
+}
+.sl-skip:focus-visible { transform: translateY(0); }
+
+/* The one opt-in slot in the shared chrome, used by the investor overview
+   for its Confidential marker. See scripts/chrome.mjs. */
+.sl-chrome-badge {
+  justify-self: start;
+  font-family: var(--sl-font-mono);
+  font-size: var(--sl-text-label);
+  font-weight: 700;
+  letter-spacing: var(--sl-tracking-label);
+  text-transform: uppercase;
+  color: var(--sl-cyan);
+  padding: 5px 11px;
+  border: 1px solid var(--sl-cyan-line);
+  border-radius: var(--sl-radius-sm);
+  background: var(--sl-cyan-soft);
+  white-space: nowrap;
+}
+
 .sl-nav {
   position: fixed;
   inset: 0 0 auto 0;
@@ -529,8 +564,17 @@ body.sl-menu-open { overflow: hidden; }
   font-size: var(--sl-text-small);
   color: var(--sl-text-faint);
 }
-.sl-footer__legal { display: flex; flex-wrap: wrap; gap: var(--sl-space-5); }
+.sl-footer__legal { display: flex; flex-wrap: wrap; gap: var(--sl-space-5); align-items: center; }
 .sl-footer__legal a:hover { color: var(--sl-cyan-bright); }
+.sl-footer__copy { margin: 0; }
+
+/* Trademark attribution. Required wherever the store names appear, and the
+   store badges live in the footer on every page, so it lives here too. */
+.sl-footer__attrib {
+  margin: var(--sl-space-4) 0 0;
+  font-size: var(--sl-text-small);
+  color: var(--sl-text-faint);
+}
 
 /* ---------- 11. Utilities --------------------------------------------------- */
 .sl-center { text-align: center; }

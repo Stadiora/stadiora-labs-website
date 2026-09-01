@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Public pages only. investors.html and investors-es.html are gated and carry
+  a noindex robots tag, and 404.html is an error page, so none of them belong
+  in a sitemap. Every entry lists its EN and ES twin so search engines pair
+  them, which matches the rel="alternate" hreflang tags on the pages.
+-->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml">
+
+  <url>
+    <loc>https://stadioralabs.com/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stadioralabs.com/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stadioralabs.com/index-es.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stadioralabs.com/"/>
+    <lastmod>2026-09-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>1.0</priority>
+  </url>
+
+  <url>
+    <loc>https://stadioralabs.com/index-es.html</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stadioralabs.com/"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stadioralabs.com/index-es.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stadioralabs.com/"/>
+    <lastmod>2026-09-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>1.0</priority>
+  </url>
+
+  <url>
+    <loc>https://stadioralabs.com/lead-magnet.html</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stadioralabs.com/lead-magnet.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stadioralabs.com/lead-magnet-es.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stadioralabs.com/lead-magnet.html"/>
+    <lastmod>2026-09-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <url>
+    <loc>https://stadioralabs.com/lead-magnet-es.html</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stadioralabs.com/lead-magnet.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stadioralabs.com/lead-magnet-es.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stadioralabs.com/lead-magnet.html"/>
+    <lastmod>2026-09-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <url>
+    <loc>https://stadioralabs.com/api.html</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stadioralabs.com/api.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stadioralabs.com/api-es.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stadioralabs.com/api.html"/>
+    <lastmod>2026-09-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <url>
+    <loc>https://stadioralabs.com/api-es.html</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://stadioralabs.com/api.html"/>
+    <xhtml:link rel="alternate" hreflang="es" href="https://stadioralabs.com/api-es.html"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://stadioralabs.com/api.html"/>
+    <lastmod>2026-09-01</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <url>
+    <loc>https://stadioralabs.com/privacy.html</loc>
+    <lastmod>2026-09-01</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
+
+  <url>
+    <loc>https://stadioralabs.com/terms.html</loc>
+    <lastmod>2026-09-01</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
+
+</urlset>
