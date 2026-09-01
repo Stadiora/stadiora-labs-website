@@ -3,7 +3,7 @@
   Public pages only. investors.html and investors-es.html are gated and carry
   a noindex robots tag, and 404.html is an error page, so none of them belong
   in a sitemap. Every entry lists its EN and ES twin so search engines pair
-  them, which matches the rel="alternate" hreflang tags on the pages.
+  them.
 -->
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
         xmlns:xhtml="http://www.w3.org/1999/xhtml">
