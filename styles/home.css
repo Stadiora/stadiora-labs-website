@@ -62,8 +62,29 @@
   gap: var(--sl-space-6);
   grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
 }
-.home-stat { padding-left: var(--sl-space-4); border-left: 2px solid var(--sl-cyan-line); }
+.home-stat {
+  position: relative;
+  /* Every stat reserves the qualifier line, so the one stat that carries a
+     qualifier keeps its number on the same baseline as the rest of the row. */
+  padding-top: 18px;
+  padding-left: var(--sl-space-4);
+  border-left: 2px solid var(--sl-cyan-line);
+}
 .home-stat__label { color: var(--sl-text-muted); font-size: var(--sl-text-small); margin-top: var(--sl-space-2); }
+/* Qualifier in front of a stat number, so a ceiling never reads as a measured
+   result. */
+.home-stat__qual {
+  position: absolute;
+  top: 0;
+  left: var(--sl-space-4);
+  font-family: var(--sl-font-mono);
+  font-size: var(--sl-text-label);
+  font-weight: 700;
+  line-height: 18px;
+  letter-spacing: var(--sl-tracking-label);
+  text-transform: uppercase;
+  color: var(--sl-text-faint);
+}
 
 /* ---------- Signal list ------------------------------------------------------ */
 .home-signals { display: grid; gap: var(--sl-space-4); margin-top: var(--sl-space-6); }
@@ -96,6 +117,9 @@
 /* ---------- Status pill ------------------------------------------------------ */
 .home-pill {
   display: inline-flex;
+  /* The pill sits directly in .home-product, which is a flex column, so it is
+     blockified and would stretch the full card width without this. */
+  align-self: flex-start;
   align-items: center;
   gap: var(--sl-space-2);
   padding: 5px 12px;
@@ -127,7 +151,10 @@
   font-size: var(--sl-text-small);
 }
 .home-product__note svg { width: 18px; height: 18px; flex: none; color: var(--sl-violet); }
-.home-product__note--cyan svg { color: var(--sl-cyan); }
+
+/* Middot spec line, used where the facts pack only supports naming what the
+   product is rather than describing it. */
+.home-product__specs { padding-top: var(--sl-space-4); border-top: 1px solid var(--sl-border); }
 
 /* ---------- Value story --------------------------------------------------------- */
 .home-roles {
@@ -211,4 +238,14 @@
 /* ---------- Small helpers ------------------------------------------------------------ */
 /* Section lead paragraph to the grid below it. */
 .home-mt { margin-top: var(--sl-space-7); }
-.sl-footer__bottom p { margin: 0; }
+
+.home-copy { margin: 0; }
+
+/* Empty anchor that keeps an old inbound fragment landing on the right section
+   after the section itself was renamed. api.html and api-es.html still link to
+   index.html#mission, so #mission has to keep answering until slice #6 lands. */
+.home-anchor {
+  display: block;
+  height: 0;
+  scroll-margin-top: var(--sl-nav-h);
+}
