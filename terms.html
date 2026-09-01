@@ -2,87 +2,212 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<link rel="icon" type="image/png" href="./stadioralabs info/favicon.png">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Terms of use · Stadiora Labs</title>
-<meta name="description" content="The agreement that governs your use of Stadiora Labs products, including Run with Aria, Aria for Coaches and Aria 12.">
-<link rel="icon" type="image/png" href="./stadioralabs%20info/favicon.png">
-<meta name="theme-color" content="#010812">
-<link rel="canonical" href="https://stadioralabs.com/terms.html">
-<meta property="og:type" content="article">
-<meta property="og:site_name" content="Stadiora Labs">
-<meta property="og:locale" content="en_US">
-<meta property="og:url" content="https://stadioralabs.com/terms.html">
-<meta property="og:title" content="Terms of use · Stadiora Labs">
-<meta property="og:description" content="The agreement that governs your use of Stadiora Labs products, including Run with Aria, Aria for Coaches and Aria 12.">
-<meta property="og:image" content="https://stadioralabs.com/assets/og/og-default.png">
-<meta property="og:image:width" content="1200">
-<meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="Stadiora Labs. Sport buries athletes in data. Aria turns it into today&#39;s decision.">
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Terms of use · Stadiora Labs">
-<meta name="twitter:description" content="The agreement that governs your use of Stadiora Labs products, including Run with Aria, Aria for Coaches and Aria 12.">
-<meta name="twitter:image" content="https://stadioralabs.com/assets/og/og-default.png">
-<meta name="twitter:image:alt" content="Stadiora Labs. Sport buries athletes in data. Aria turns it into today&#39;s decision.">
+<meta name="description" content="Stadiora Labs Terms of Use — the agreement governing your use of Aria Intelligence products and services.">
+<title>Terms of Use — Stadiora Labs</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap">
-<link rel="stylesheet" href="./styles/site.css">
-<link rel="stylesheet" href="./styles/legal.css">
-<script>document.documentElement.className += ' sl-js';</script>
-<script src="./scripts/nav.js" defer></script>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+
+:root {
+  --black:   #010812;
+  --navy:    #040c1c;
+  --card:    #060e20;
+  --cyan:    #00BEF3;
+  --mint:    #34D399;
+  --violet:  #8B5CF6;
+  --white:   #ffffff;
+  --muted:   rgba(255,255,255,0.38);
+  --dim:     rgba(255,255,255,0.12);
+  --border:  rgba(255,255,255,0.07);
+  --border2: rgba(255,255,255,0.13);
+}
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--black);color:var(--white);font-family:'DM Sans',sans-serif;overflow-x:hidden;line-height:1.6}
+img{max-width:100%;display:block}
+a{text-decoration:none;color:inherit}
+
+.container{width:100%;max-width:1240px;margin:0 auto;padding:0 48px}
+
+/* ── NAV ── */
+#nav{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  padding:20px 0;background:rgba(1,8,18,.97);
+  border-bottom:1px solid var(--border);
+}
+.nav-inner{display:flex;align-items:center;gap:40px}
+.nav-logo{display:flex;align-items:center;gap:10px;margin-right:auto}
+.nav-logo img{height:48px;width:auto}
+.nav-logo-fallback{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:3px}
+.nav-back{
+  display:flex;align-items:center;gap:6px;
+  font-size:13px;font-weight:500;color:var(--muted);transition:color .2s;
+}
+.nav-back:hover{color:var(--white)}
+.nav-back svg{width:16px;height:16px}
+
+/* ── HERO ── */
+#hero{
+  padding:160px 0 80px;
+  border-bottom:1px solid var(--border);
+  background:linear-gradient(to bottom, var(--navy) 0%, var(--black) 100%);
+}
+.doc-eyebrow{
+  display:inline-flex;align-items:center;gap:8px;
+  font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;
+  color:var(--violet);margin-bottom:20px;
+}
+.doc-eyebrow::before{content:'';display:block;width:24px;height:1px;background:var(--violet)}
+.doc-title{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:clamp(52px,7vw,88px);letter-spacing:2px;line-height:.92;
+  margin-bottom:24px;
+}
+.doc-meta{display:flex;gap:32px;flex-wrap:wrap}
+.doc-meta-item{font-size:13px;color:var(--muted)}
+.doc-meta-item strong{color:rgba(255,255,255,.7);font-weight:600}
+
+/* ── MEDICAL NOTICE ── */
+.medical-notice{
+  background:rgba(239,68,68,.06);
+  border:1px solid rgba(239,68,68,.25);
+  border-radius:12px;padding:24px 28px;margin:48px 0;
+  display:flex;gap:16px;align-items:flex-start;
+}
+.medical-notice-icon{
+  width:36px;height:36px;border-radius:8px;
+  background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.2);
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;
+}
+.medical-notice-icon svg{width:18px;height:18px;color:#ef4444}
+.medical-notice-title{font-size:14px;font-weight:700;color:#ef4444;margin-bottom:6px}
+.medical-notice-body{font-size:13px;color:rgba(255,255,255,.6);line-height:1.7}
+
+/* ── LAYOUT ── */
+#doc-body{padding:80px 0 120px}
+.doc-layout{display:grid;grid-template-columns:220px 1fr;gap:80px;align-items:start}
+
+/* ── TOC ── */
+.toc{position:sticky;top:100px}
+.toc-title{font-size:10px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:rgba(255,255,255,.25);margin-bottom:16px}
+.toc-links{list-style:none;display:flex;flex-direction:column;gap:2px}
+.toc-links a{
+  font-size:12px;color:rgba(255,255,255,.35);
+  padding:6px 12px;border-radius:6px;border-left:2px solid transparent;
+  display:block;transition:.2s;line-height:1.4;
+}
+.toc-links a:hover{color:var(--white);background:rgba(255,255,255,.04);border-left-color:var(--violet)}
+.toc-links a.active{color:var(--violet);border-left-color:var(--violet);background:rgba(139,92,246,.05)}
+
+/* ── DOC CONTENT ── */
+.doc-content{max-width:760px}
+.doc-section{margin-bottom:64px;scroll-margin-top:100px}
+.doc-section h2{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:28px;letter-spacing:2px;color:var(--white);
+  margin-bottom:20px;padding-bottom:12px;
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:12px;
+}
+.section-num{
+  font-size:11px;font-weight:700;letter-spacing:2px;
+  color:var(--violet);background:rgba(139,92,246,.08);
+  border:1px solid rgba(139,92,246,.15);
+  padding:3px 8px;border-radius:4px;
+}
+.doc-section h3{
+  font-size:15px;font-weight:700;color:rgba(255,255,255,.9);
+  margin:28px 0 10px;
+}
+.doc-section p{
+  font-size:14px;color:rgba(255,255,255,.6);
+  line-height:1.85;margin-bottom:16px;
+}
+.doc-section p:last-child{margin-bottom:0}
+.doc-section ul,.doc-section ol{
+  margin:12px 0 16px 0;
+  padding-left:0;list-style:none;
+  display:flex;flex-direction:column;gap:8px;
+}
+.doc-section li{
+  font-size:14px;color:rgba(255,255,255,.6);
+  line-height:1.75;padding-left:20px;position:relative;
+}
+.doc-section ul li::before{
+  content:'';position:absolute;left:0;top:9px;
+  width:5px;height:5px;border-radius:50%;background:var(--violet);opacity:.6;
+}
+.doc-section ol{counter-reset:ol-counter}
+.doc-section ol li{counter-increment:ol-counter}
+.doc-section ol li::before{
+  content:counter(ol-counter) ".";
+  position:absolute;left:0;top:0;
+  font-size:12px;font-weight:700;color:var(--violet);opacity:.8;
+}
+
+.highlight-box{
+  background:var(--card);border:1px solid var(--border2);
+  border-radius:10px;padding:20px 24px;margin:20px 0;
+}
+.highlight-box p{margin-bottom:0;font-size:13px}
+
+.disclaimer-box{
+  background:rgba(139,92,246,.05);
+  border:1px solid rgba(139,92,246,.2);
+  border-radius:10px;padding:20px 24px;margin:20px 0;
+}
+.disclaimer-box p{margin-bottom:0;font-size:13px;color:rgba(255,255,255,.55)}
+
+.contact-box{
+  background:var(--card);border:1px solid var(--border2);border-radius:12px;
+  padding:28px;margin-top:20px;
+}
+.contact-box p{margin-bottom:8px}
+.contact-box a{color:var(--violet);border-bottom:1px solid rgba(139,92,246,.3);transition:.2s}
+.contact-box a:hover{border-bottom-color:var(--violet)}
+
+/* ── FOOTER ── */
+footer{background:var(--black);border-top:1px solid var(--border);padding:40px 0}
+.foot-btm{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px}
+.foot-copy{font-size:12px;color:rgba(255,255,255,.2)}
+.foot-legal{display:flex;gap:24px}
+.foot-legal a{font-size:12px;color:rgba(255,255,255,.2);transition:color .2s}
+.foot-legal a:hover{color:var(--muted)}
+
+/* ── RESPONSIVE ── */
+@media(max-width:860px){
+  .container{padding:0 24px}
+  .doc-layout{grid-template-columns:1fr}
+  .toc{display:none}
+}
+
+</style>
 </head>
 <body>
 
 <!-- ── NAV ── -->
-<!-- sl-chrome:nav -->
-<a class="sl-skip" href="#main">Skip to content</a>
-
-<nav class="sl-nav">
-  <div class="sl-container">
-    <div class="sl-nav__inner">
-      <a class="sl-nav__logo" href="./index.html">
-        <img src="./stadioralabs%20info/stadiora_labs_logo%20-%20white.webp" width="360" height="84" decoding="async" alt="Stadiora Labs">
+<nav id="nav">
+  <div class="container">
+    <div class="nav-inner">
+      <a href="./index.html" class="nav-logo">
+        <img src="./stadioralabs info/stadiora_labs_logo - white.png" alt="Stadiora Labs"
+          onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
+        <span class="nav-logo-fallback" style="display:none">STADIORA LABS</span>
       </a>
-      <ul class="sl-nav__links">
-        <li><a href="./index.html">Home</a></li>
-        <li><a href="./index.html#ecosystem">Ecosystem</a></li>
-        <li><a href="./api.html">Aria Intelligence</a></li>
-        <li><a href="./investors.html">Investors</a></li>
-      </ul>
-      <div class="sl-nav__actions">
-        <a class="sl-btn sl-btn--primary sl-nav__collapse" href="./lead-magnet.html">Free check</a>
-        <div class="sl-lang">
-          <span class="sl-lang__btn is-active" aria-current="true">EN</span>
-          <a class="sl-lang__btn" href="./index-es.html" hreflang="es">ES</a>
-        </div>
-      </div>
-      <button class="sl-nav__toggle" type="button" aria-controls="sl-menu"
-              aria-label="Open menu" data-label-open="Open menu" data-label-close="Close menu">
-        <svg class="sl-nav__icon-open" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
-        <svg class="sl-nav__icon-close" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
-      </button>
+      <a href="./index.html" class="nav-back">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        Back to Stadiora Labs
+      </a>
     </div>
   </div>
 </nav>
 
-<div class="sl-nav__menu" id="sl-menu">
-  <ul class="sl-nav__menu-links">
-    <li><a href="./index.html">Home</a></li>
-    <li><a href="./index.html#ecosystem">Ecosystem</a></li>
-    <li><a href="./api.html">Aria Intelligence</a></li>
-    <li><a href="./investors.html">Investors</a></li>
-  </ul>
-  <div class="sl-nav__menu-foot">
-    <a class="sl-btn sl-btn--primary sl-btn--block" href="./lead-magnet.html">Free check</a>
-  </div>
-</div>
-<!-- /sl-chrome:nav -->
-
-<main id="main">
-
 <!-- ── HERO ── -->
 <section id="hero">
-  <div class="sl-container">
+  <div class="container">
     <div class="doc-eyebrow">Legal</div>
     <h1 class="doc-title">Terms of Use</h1>
     <div class="doc-meta">
@@ -96,8 +221,8 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
       </div>
       <div>
-        <div class="medical-notice-title">Not a medical service, read Section 6</div>
-        <div class="medical-notice-body">Stadiora Labs products are decision-support tools, not medical devices, clinical services, or healthcare providers. Nothing generated by Aria Intelligence constitutes medical advice, diagnosis, or treatment. Coaches, athletes, and their medical teams are solely responsible for all training and health decisions. Section 6 sets out the full medical and health disclaimer. These terms should be reviewed by qualified legal counsel before enforcement. Questions: <a href="mailto:legal@stadioralabs.com">legal@stadioralabs.com</a></div>
+        <div class="medical-notice-title">Not a medical service — read Section 6</div>
+        <div class="medical-notice-body">Stadiora Labs products are decision-support tools, not medical devices, clinical services, or healthcare providers. Nothing generated by Aria Intelligence constitutes medical advice, diagnosis, or treatment. Coaches, athletes, and their medical teams are solely responsible for all training and health decisions. Section 6 sets out the full medical and health disclaimer. These terms should be reviewed by qualified legal counsel before enforcement. Questions: <a href="mailto:legal@stadioralabs.com" style="color:#ef4444;border-bottom:1px solid rgba(239,68,68,.3)">legal@stadioralabs.com</a></div>
       </div>
     </div>
   </div>
@@ -105,7 +230,7 @@
 
 <!-- ── DOC BODY ── -->
 <section id="doc-body">
-  <div class="sl-container">
+  <div class="container">
     <div class="doc-layout">
 
       <!-- TOC -->
@@ -138,7 +263,7 @@
         <div class="doc-section" id="s1">
           <h2><span class="section-num">01</span> Agreement to Terms</h2>
           <p>These Terms of Use ("Terms") constitute a legally binding agreement between you and Stadiora Labs ("Stadiora Labs," "we," "us," or "our") governing your access to and use of all Stadiora Labs products, services, and websites — including stadioralabs.com, runwitharia.com, the Aria application, Aria for Coaches, Aria 12, and the Aria Intelligence API (collectively, the "Services").</p>
-          <p>By creating an account, accessing, or using any of our Services, you confirm that you have read, understood, and agree to be bound by these Terms and our <a href="./privacy.html">Privacy Policy</a>, which is incorporated into these Terms by reference.</p>
+          <p>By creating an account, accessing, or using any of our Services, you confirm that you have read, understood, and agree to be bound by these Terms and our <a href="./privacy.html" style="color:var(--violet);border-bottom:1px solid rgba(139,92,246,.3)">Privacy Policy</a>, which is incorporated into these Terms by reference.</p>
           <p>If you do not agree to these Terms, you must not access or use our Services.</p>
           <div class="highlight-box">
             <p><strong>For organisations and coaches:</strong> If you are accepting these Terms on behalf of an organisation, academy, or club, you represent and warrant that you have the authority to bind that organisation to these Terms. References to "you" include both you personally and the organisation you represent.</p>
@@ -176,7 +301,7 @@
           <p>You must provide accurate, current, and complete information when creating an account. You are responsible for maintaining the accuracy of your account information and updating it promptly if it changes.</p>
 
           <h3>Account Security</h3>
-          <p>You are responsible for maintaining the confidentiality of your login credentials and for all activity that occurs under your account. You must notify us immediately at <a href="mailto:security@stadioralabs.com">security@stadioralabs.com</a> if you become aware of any unauthorised access to your account.</p>
+          <p>You are responsible for maintaining the confidentiality of your login credentials and for all activity that occurs under your account. You must notify us immediately at <a href="mailto:security@stadioralabs.com" style="color:var(--violet);border-bottom:1px solid rgba(139,92,246,.3)">security@stadioralabs.com</a> if you become aware of any unauthorised access to your account.</p>
 
           <h3>Coach and Organisation Accounts</h3>
           <p>Coaches and organisations that add athletes to their account are responsible for:</p>
@@ -216,7 +341,7 @@
         <div class="doc-section" id="s6">
           <h2><span class="section-num">06</span> Medical & Health Disclaimer</h2>
 
-          <div class="medical-notice is-flush">
+          <div class="medical-notice" style="margin-top:0">
             <div class="medical-notice-icon">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
             </div>
@@ -355,7 +480,7 @@
         <div class="doc-section" id="s14">
           <h2><span class="section-num">14</span> Termination</h2>
           <h3>Termination by You</h3>
-          <p>You may terminate your account at any time by contacting us at <a href="mailto:support@stadioralabs.com">support@stadioralabs.com</a>. Upon termination, your access to the Services will cease and your data will be handled in accordance with our Privacy Policy and the retention periods described therein.</p>
+          <p>You may terminate your account at any time by contacting us at <a href="mailto:support@stadioralabs.com" style="color:var(--violet);border-bottom:1px solid rgba(139,92,246,.3)">support@stadioralabs.com</a>. Upon termination, your access to the Services will cease and your data will be handled in accordance with our Privacy Policy and the retention periods described therein.</p>
 
           <h3>Termination by Us</h3>
           <p>We may suspend or terminate your access to the Services immediately, without notice, if we determine that you have:</p>
@@ -381,8 +506,8 @@
           <h3>For Users in the United States</h3>
           <p>If you are located in the United States, you agree that any dispute arising from these Terms or the Services shall be resolved through binding individual arbitration administered under the rules of the American Arbitration Association, except for claims that qualify for small claims court. You waive any right to participate in a class action lawsuit or class-wide arbitration.</p>
 
-          <h3>Dispute Resolution for All Users</h3>
-          <p>Before initiating any formal dispute, we encourage you to contact us at <a href="mailto:legal@stadioralabs.com">legal@stadioralabs.com</a> so we can attempt to resolve the matter informally within 30 days.</p>
+          <h3>Dispute Resolution — All Users</h3>
+          <p>Before initiating any formal dispute, we encourage you to contact us at <a href="mailto:legal@stadioralabs.com" style="color:var(--violet);border-bottom:1px solid rgba(139,92,246,.3)">legal@stadioralabs.com</a> so we can attempt to resolve the matter informally within 30 days.</p>
         </div>
 
         <div class="doc-section" id="s16">
@@ -401,12 +526,12 @@
           <h2><span class="section-num">17</span> Contact</h2>
           <p>For legal and terms-related enquiries:</p>
           <div class="contact-box">
-            <p><strong>Stadiora Labs · Legal</strong></p>
+            <p><strong>Stadiora Labs — Legal</strong></p>
             <p>General legal: <a href="mailto:legal@stadioralabs.com">legal@stadioralabs.com</a></p>
             <p>Privacy matters: <a href="mailto:privacy@stadioralabs.com">privacy@stadioralabs.com</a></p>
             <p>Security concerns: <a href="mailto:security@stadioralabs.com">security@stadioralabs.com</a></p>
             <p>Account support: <a href="mailto:support@stadioralabs.com">support@stadioralabs.com</a></p>
-            <p class="doc-footnote">These Terms were prepared in good faith based on the current nature of Stadiora Labs products and applicable legal frameworks as of May 2026. They should be reviewed and validated by qualified legal counsel — particularly with respect to health data processing, jurisdiction-specific consumer rights, and medical device regulatory requirements in markets where Stadiora Labs products are available.</p>
+            <p style="margin-top:20px;font-size:13px;color:rgba(255,255,255,.35);line-height:1.7">These Terms were prepared in good faith based on the current nature of Stadiora Labs products and applicable legal frameworks as of May 2026. They should be reviewed and validated by qualified legal counsel — particularly with respect to health data processing, jurisdiction-specific consumer rights, and medical device regulatory requirements in markets where Stadiora Labs products are available.</p>
           </div>
         </div>
 
@@ -416,79 +541,17 @@
 </section>
 
 <!-- ── FOOTER ── -->
-</main>
-
-<!-- sl-chrome:footer -->
-<footer class="sl-footer">
-  <div class="sl-container">
-    <div class="sl-footer__grid">
-      <div class="sl-footer__brand">
-        <img src="./stadioralabs%20info/stadiora_labs_logo%20-%20white.webp" width="360" height="84" loading="lazy" decoding="async" alt="Stadiora Labs">
-        <p class="sl-footer__tag">Stadiora Labs builds the Aria Intelligence engine and the apps that run on it, for athletes and for the coaches who work with them.</p>
-        <div class="sl-stores">
-          <a class="sl-store" href="https://apps.apple.com/us/app/run-with-aria/id6760048203" target="_blank" rel="noopener">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16.9 13.2c0-2.3 1.9-3.4 2-3.5-1.1-1.6-2.8-1.8-3.4-1.8-1.4-.2-2.8.9-3.5.9-.7 0-1.9-.9-3.1-.8-1.6 0-3 .9-3.8 2.4-1.6 2.8-.4 7 1.2 9.3.8 1.1 1.7 2.4 2.9 2.3 1.2 0 1.6-.7 3.1-.7 1.4 0 1.8.7 3.1.7 1.3 0 2.1-1.1 2.8-2.3.9-1.3 1.3-2.6 1.3-2.7-.1 0-2.6-1-2.6-3.8z"/><path d="M14.6 6.3c.6-.8 1.1-1.9 1-3-.9 0-2.1.6-2.8 1.4-.6.7-1.2 1.8-1 2.9 1 .1 2.1-.5 2.8-1.3z"/></svg>
-            <span class="sl-store__text">
-              <span class="sl-store__kicker">Download on the</span>
-              <span class="sl-store__name">App Store</span>
-            </span>
-          </a>
-          <a class="sl-store" href="https://play.google.com/store/apps/details?id=com.runwitharia.mobile" target="_blank" rel="noopener">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5.6 3.4l12.9 8.6-12.9 8.6z"/></svg>
-            <span class="sl-store__text">
-              <span class="sl-store__kicker">Get it on</span>
-              <span class="sl-store__name">Google Play</span>
-            </span>
-          </a>
-        </div>
-        <div class="sl-footer__social">
-          <a href="https://www.linkedin.com/company/stadioralabs" target="_blank" rel="noopener" aria-label="Stadiora Labs on LinkedIn">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h3v11H4z"/><circle cx="5.5" cy="5.5" r="1.7"/><path d="M11 20V9"/><path d="M11 13.5a4 4 0 018 0V20"/></svg>
-          </a>
-        </div>
-      </div>
-      <div>
-        <p class="sl-footer__title">Products</p>
-        <ul class="sl-footer__links">
-          <li><a href="./index.html#ecosystem">Run with Aria</a></li>
-          <li><a href="./index.html#ecosystem">Aria for Coaches</a></li>
-          <li><a href="./index.html#ecosystem">Aria 12</a></li>
-          <li><a href="./api.html">Aria Intelligence</a></li>
-        </ul>
-      </div>
-      <div>
-        <p class="sl-footer__title">Company</p>
-        <ul class="sl-footer__links">
-          <li><a href="./index.html#engine">The engine</a></li>
-          <li><a href="./index.html#team">Team</a></li>
-          <li><a href="./investors.html">Investors</a></li>
-          <li><a href="mailto:info@stadioralabs.com">Contact</a></li>
-        </ul>
-      </div>
-      <div>
-        <p class="sl-footer__title">Start</p>
-        <ul class="sl-footer__links">
-          <li><a href="./lead-magnet.html">Free performance check</a></li>
-          <li><a href="./index.html#download">Download the app</a></li>
-          <li><a href="./index.html">Home</a></li>
-        </ul>
+<footer>
+  <div class="container">
+    <div class="foot-btm">
+      <p class="foot-copy">© 2026 Stadiora Labs. All rights reserved. Built in Latin America & the United States.</p>
+      <div class="foot-legal">
+        <a href="./privacy.html">Privacy Policy</a>
+        <a href="./terms.html" style="color:rgba(255,255,255,.5)">Terms of Use</a>
       </div>
     </div>
-    <div class="sl-footer__bottom">
-      <p class="sl-footer__copy">© 2026 Stadiora Labs. Built in Latin America and the United States.</p>
-      <div class="sl-footer__legal">
-        <a href="./privacy.html">Privacy policy</a>
-        <a href="./terms.html">Terms of use</a>
-        <div class="sl-lang" aria-label="Language">
-          <span class="sl-lang__btn is-active" aria-current="true">EN</span>
-          <a class="sl-lang__btn" href="./index-es.html" hreflang="es">ES</a>
-        </div>
-      </div>
-    </div>
-    <p class="sl-footer__attrib">App Store is a service mark of Apple Inc. Google Play and the Google Play logo are trademarks of Google LLC.</p>
   </div>
 </footer>
-<!-- /sl-chrome:footer -->
 
 <script>
 // TOC active state on scroll
