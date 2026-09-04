@@ -125,6 +125,9 @@ body::before{
 .tm-btn:hover{opacity:.8}
 .tm-li{background:#0a66c2}
 .tm-tm{background:#1a5276}
+.tm-bio{font-size:11px;color:rgba(255,255,255,.28);line-height:1.6;text-align:center;max-width:180px}
+.tm-dual{display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start;margin:56px 0 0}
+@media(max-width:700px){.tm-dual{grid-template-columns:1fr}}
 
 /* FOOTER */
 #footer{background:#020810;padding:76px 0 40px;border-top:1px solid var(--border)}
@@ -237,6 +240,7 @@ body::before{
         <div class="tm-initials" style="display:none;background:rgba(0,190,243,.1);border:1px solid rgba(0,190,243,.25);color:var(--cyan)">AR</div>
         <div class="tm-name">Anthony Rugama Brown</div>
         <div class="tm-role">Founder &amp; CEO</div>
+        <div class="tm-bio">Microsoft engineer, former Olympic-level athlete, and AI researcher. Built Stadiora to make elite sports intelligence accessible to every athlete.</div>
         <a href="https://www.linkedin.com/in/anthonyrugama" target="_blank" rel="noopener" class="tm-btn tm-li">
           <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
           LinkedIn
@@ -248,6 +252,7 @@ body::before{
         <div class="tm-initials" style="display:none;background:rgba(0,190,243,.1);border:1px solid rgba(0,190,243,.25);color:var(--cyan)">IR</div>
         <div class="tm-name">Ian Phillip Rowe Rojas</div>
         <div class="tm-role">Co-Founder &amp; CTO</div>
+        <div class="tm-bio">Full-stack architect designing the data infrastructure and AI engine powering the Stadiora ecosystem.</div>
         <a href="https://www.linkedin.com/in/irowe12" target="_blank" rel="noopener" class="tm-btn tm-li">
           <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
           LinkedIn
@@ -255,33 +260,36 @@ body::before{
       </div>
     </div>
 
-    <div class="tm-group-lbl" data-reveal>Leadership</div>
-    <div class="tm-grid">
-      <div class="tm-card" data-reveal>
-        <img src="./assets/deck-v2/karla_c.webp" alt="Karla Scott" class="tm-photo"
-          onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-        <div class="tm-initials" style="display:none;background:rgba(139,92,246,.1);border:1px solid rgba(139,92,246,.25);color:#8B5CF6">KS</div>
-        <div class="tm-name">Karla Scott</div>
-        <div class="tm-role">CMO</div>
-        <a href="https://www.linkedin.com/in/karla-scott-515908111" target="_blank" rel="noopener" class="tm-btn tm-li">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
-          LinkedIn
-        </a>
+    <div class="tm-dual" data-reveal>
+      <div>
+        <div class="tm-group-lbl" style="margin-top:0">Leadership</div>
+        <div class="tm-card">
+          <img src="./assets/deck-v2/karla_c.webp" alt="Karla Scott" class="tm-photo"
+            onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+          <div class="tm-initials" style="display:none;background:rgba(139,92,246,.1);border:1px solid rgba(139,92,246,.25);color:#8B5CF6">KS</div>
+          <div class="tm-name">Karla Scott</div>
+          <div class="tm-role">CMO</div>
+          <div class="tm-bio">Brand and growth strategist with deep roots in sports marketing across Latin America and the United States.</div>
+          <a href="https://www.linkedin.com/in/karla-scott-515908111" target="_blank" rel="noopener" class="tm-btn tm-li">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+            LinkedIn
+          </a>
+        </div>
       </div>
-    </div>
-
-    <div class="tm-group-lbl" data-reveal>Strategic Partner</div>
-    <div class="tm-grid">
-      <div class="tm-card" data-reveal>
-        <img src="./assets/deck-v2/joel_c.webp" alt="Joel Campbell" class="tm-photo"
-          onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-        <div class="tm-initials" style="display:none;background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.25);color:#f59e0b">JC</div>
-        <div class="tm-name">Joel Campbell</div>
-        <div class="tm-role">Strategic Equity Partner — Aria 12</div>
-        <a href="https://www.transfermarkt.com/joel-campbell/profil/spieler/131248" target="_blank" rel="noopener" class="tm-btn tm-tm">
-          <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
-          Transfermarkt
-        </a>
+      <div>
+        <div class="tm-group-lbl" style="margin-top:0">Strategic Partner</div>
+        <div class="tm-card">
+          <img src="./assets/deck-v2/joel_c.webp" alt="Joel Campbell" class="tm-photo"
+            onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+          <div class="tm-initials" style="display:none;background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.25);color:#f59e0b">JC</div>
+          <div class="tm-name">Joel Campbell</div>
+          <div class="tm-role">Strategic Equity Partner — Aria 12</div>
+          <div class="tm-bio">Costa Rican international footballer and Arsenal alum bringing elite sport credibility as a strategic equity partner in Aria 12.</div>
+          <a href="https://www.transfermarkt.com/joel-campbell/profil/spieler/131248" target="_blank" rel="noopener" class="tm-btn tm-tm">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
+            Transfermarkt
+          </a>
+        </div>
       </div>
     </div>
 
@@ -291,6 +299,7 @@ body::before{
         <div class="tm-initials" style="background:rgba(52,211,153,.08);border:1px solid rgba(52,211,153,.2);color:#34D399">MS</div>
         <div class="tm-name">Marco Saenz</div>
         <div class="tm-role">Operations &amp; Community Lead</div>
+        <div class="tm-bio">Drives operational growth and community-building across Stadiora's emerging market partnerships.</div>
         <a href="https://www.linkedin.com/in/marco-saenz-605aba42" target="_blank" rel="noopener" class="tm-btn tm-li">
           <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
           LinkedIn
@@ -300,6 +309,7 @@ body::before{
         <div class="tm-initials" style="background:rgba(52,211,153,.08);border:1px solid rgba(52,211,153,.2);color:#34D399">KV</div>
         <div class="tm-name">Katherine Vega</div>
         <div class="tm-role">Performance &amp; Rehabilitation Advisor</div>
+        <div class="tm-bio">Physical therapist specializing in injury prevention, athlete recovery, and return-to-sport protocols.</div>
         <a href="https://www.linkedin.com/in/katherine-vega-r-663652223" target="_blank" rel="noopener" class="tm-btn tm-li">
           <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
           LinkedIn
@@ -308,7 +318,8 @@ body::before{
       <div class="tm-card" data-reveal data-reveal-delay="2">
         <div class="tm-initials" style="background:rgba(52,211,153,.08);border:1px solid rgba(52,211,153,.2);color:#34D399">JW</div>
         <div class="tm-name">Julián Wais</div>
-        <div class="tm-role">Medical &amp; Performance Advisor</div>
+        <div class="tm-role">Human Movement &amp; Osteopathy Advisor</div>
+        <div class="tm-bio">Expert in human movement and osteopathy, bridging clinical insight with high-performance athletic training protocols.</div>
         <a href="https://www.linkedin.com/in/julian-wais-83758b234" target="_blank" rel="noopener" class="tm-btn tm-li">
           <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
           LinkedIn
@@ -318,6 +329,7 @@ body::before{
         <div class="tm-initials" style="background:rgba(52,211,153,.08);border:1px solid rgba(52,211,153,.2);color:#34D399">IG</div>
         <div class="tm-name">Ivana Guerra</div>
         <div class="tm-role">Sports Psychology Advisor</div>
+        <div class="tm-bio">Sports psychologist focused on mental performance, resilience, and cognitive readiness in competitive environments.</div>
         <a href="https://www.linkedin.com/in/ivana-guerra-341576376" target="_blank" rel="noopener" class="tm-btn tm-li">
           <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
           LinkedIn
@@ -327,16 +339,28 @@ body::before{
         <div class="tm-initials" style="background:rgba(52,211,153,.08);border:1px solid rgba(52,211,153,.2);color:#34D399">CM</div>
         <div class="tm-name">Cristhian Monge Arce</div>
         <div class="tm-role">Early Investor &amp; Family Supporter</div>
+        <div class="tm-bio">Foundational early supporter who believed in Stadiora from day one and helped make it possible.</div>
         <a href="https://www.linkedin.com/in/cristhian-jos%C3%A9-monge-arce-bds/" target="_blank" rel="noopener" class="tm-btn tm-li">
           <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
           LinkedIn
         </a>
       </div>
       <div class="tm-card" data-reveal data-reveal-delay="1">
-        <div class="tm-initials" style="background:rgba(52,211,153,.08);border:1px solid rgba(52,211,153,.2);color:#34D399">JP</div>
-        <div class="tm-name">John Paul Anderson</div>
+        <div class="tm-initials" style="background:rgba(52,211,153,.08);border:1px solid rgba(52,211,153,.2);color:#34D399">LA</div>
+        <div class="tm-name">Luigi Allen</div>
         <div class="tm-role">Caribbean Partnerships Lead</div>
-        <a href="https://www.linkedin.com/in/john-paul-d-anderson" target="_blank" rel="noopener" class="tm-btn tm-li">
+        <div class="tm-bio">Building Stadiora's regional footprint across the Caribbean through strategic athlete and organizational partnerships.</div>
+        <a href="https://www.linkedin.com/in/luigia/" target="_blank" rel="noopener" class="tm-btn tm-li">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+          LinkedIn
+        </a>
+      </div>
+      <div class="tm-card" data-reveal data-reveal-delay="2">
+        <div class="tm-initials" style="background:rgba(52,211,153,.08);border:1px solid rgba(52,211,153,.2);color:#34D399">CQ</div>
+        <div class="tm-name">Dr. Charlie Quirós</div>
+        <div class="tm-role">Physical Training &amp; Nutrition Expert</div>
+        <div class="tm-bio">Sports scientist combining exercise physiology and nutritional strategy to optimize athlete performance and body composition.</div>
+        <a href="https://www.linkedin.com/in/charlie-quiros-6504a7231/" target="_blank" rel="noopener" class="tm-btn tm-li">
           <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
           LinkedIn
         </a>
@@ -349,6 +373,7 @@ body::before{
         <div class="tm-initials" style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.45)">MA</div>
         <div class="tm-name">Michelle Allen</div>
         <div class="tm-role">Project Attorney</div>
+        <div class="tm-bio">Legal counsel overseeing IP, corporate structure, and compliance across Stadiora's operations in Latin America and the US.</div>
         <a href="https://www.linkedin.com/in/michelle-allen-cr" target="_blank" rel="noopener" class="tm-btn tm-li">
           <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
           LinkedIn
