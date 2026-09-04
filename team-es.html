@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" type="image/png" href="./stadioralabs info/favicon.png">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Conoce al equipo de Stadiora Labs — ingenieros, científicos, entrenadores y atletas construyendo la capa de IA que convierte datos en decisiones.">
+<title>El Equipo — Stadiora Labs</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+
+.lang-toggle{display:flex;gap:4px;align-items:center}
+.lang-btn{font-size:11px;font-weight:700;letter-spacing:1.5px;padding:5px 11px;border-radius:6px;border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.35);background:transparent;cursor:pointer;text-decoration:none;transition:all .2s}
+.lang-btn.active{color:var(--cyan);border-color:rgba(0,190,243,.4);background:rgba(0,190,243,.07)}
+.lang-btn:hover:not(.active){color:rgba(255,255,255,.65);border-color:rgba(255,255,255,.25)}
+
+:root{
+  --black:#010812;--navy:#040c1c;--card:#060e20;
+  --cyan:#00BEF3;--mint:#34D399;--violet:#8B5CF6;
+  --white:#ffffff;--muted:rgba(255,255,255,0.38);
+  --dim:rgba(255,255,255,0.12);--border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.13);
+}
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--black);color:var(--white);font-family:'DM Sans',sans-serif;overflow-x:hidden;line-height:1.6}
+img{max-width:100%;display:block}
+a{text-decoration:none;color:inherit}
+
+body::before{
+  content:'';position:fixed;inset:0;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)'/%3E%3C/svg%3E");
+  opacity:.02;pointer-events:none;z-index:9998;
+}
+
+.container{width:100%;max-width:1240px;margin:0 auto;padding:0 48px}
+
+[data-reveal]{opacity:0;transform:translateY(32px);transition:opacity .7s cubic-bezier(.22,1,.36,1),transform .7s cubic-bezier(.22,1,.36,1)}
+[data-reveal].on{opacity:1;transform:none}
+[data-reveal-delay="1"]{transition-delay:.1s}
+[data-reveal-delay="2"]{transition-delay:.2s}
+[data-reveal-delay="3"]{transition-delay:.3s}
+[data-reveal-delay="4"]{transition-delay:.42s}
+
+.eyebrow{
+  display:inline-flex;align-items:center;gap:12px;
+  font-size:10px;font-weight:700;letter-spacing:3.5px;text-transform:uppercase;
+  color:var(--cyan);margin-bottom:20px;
+}
+.eyebrow::before{content:'';width:16px;height:1px;background:currentColor;flex-shrink:0}
+
+.g-cyan{background:linear-gradient(90deg,var(--cyan),#5ee8ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+
+.btn{display:inline-flex;align-items:center;gap:10px;padding:15px 30px;border-radius:10px;border:none;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:700;cursor:pointer;transition:all .22s ease;white-space:nowrap;text-decoration:none;position:relative;overflow:hidden}
+.btn svg{width:16px;height:16px;flex-shrink:0;transition:transform .22s}
+.btn:hover svg{transform:translateX(4px)}
+.btn-ghost{background:rgba(255,255,255,.05);color:var(--white);border:1px solid var(--border2)}
+.btn-ghost:hover{background:rgba(255,255,255,.08);border-color:rgba(0,190,243,.4);color:var(--cyan);transform:translateY(-2px)}
+
+#nav{position:fixed;top:0;left:0;right:0;z-index:1000;padding:22px 0;transition:all .3s ease}
+#nav.scrolled{background:rgba(1,8,18,.9);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);padding:13px 0;border-bottom:1px solid var(--border)}
+.nav-inner{display:flex;align-items:center;justify-content:space-between;gap:20px}
+.nav-logo{display:flex;align-items:center;gap:10px;flex-shrink:0}
+.nav-logo img{height:48px;width:auto}
+.nav-logo-fallback{font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:4px;background:linear-gradient(90deg,var(--white),rgba(255,255,255,.6));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.nav-links{display:flex;align-items:center;gap:38px;list-style:none}
+.nav-links a{font-size:13px;font-weight:600;color:rgba(255,255,255,.42);transition:color .2s}
+.nav-links a:hover{color:var(--white)}
+.nav-links a.active{color:var(--white)}
+.nav-pill{display:inline-flex;align-items:center;gap:8px;background:rgba(0,190,243,.08);border:1px solid rgba(0,190,243,.22);border-radius:100px;padding:8px 20px;font-size:13px;font-weight:700;color:var(--cyan);transition:all .22s;text-decoration:none}
+.nav-pill svg{width:13px;height:13px;transition:transform .22s}
+.nav-pill:hover{background:rgba(0,190,243,.15);border-color:rgba(0,190,243,.4)}
+.nav-pill:hover svg{transform:translateX(3px)}
+
+.hamburger{display:none;flex-direction:column;gap:5px;background:none;border:none;cursor:pointer;padding:4px}
+.hamburger span{display:block;width:22px;height:1.5px;background:var(--white);border-radius:2px;transition:all .3s}
+.mobile-menu{display:none;position:fixed;inset:0;background:var(--black);z-index:999;flex-direction:column;align-items:center;justify-content:center;gap:32px}
+.mobile-menu.open{display:flex}
+.mobile-menu a{font-family:'Bebas Neue',sans-serif;font-size:46px;letter-spacing:3px;color:rgba(255,255,255,.38);transition:color .2s}
+.mobile-menu a:hover{color:var(--white)}
+.mobile-close{position:absolute;top:24px;right:32px;background:none;border:none;color:rgba(255,255,255,.3);font-size:28px;cursor:pointer}
+
+#page-hero{position:relative;padding:160px 0 100px;background:var(--black);overflow:hidden}
+.ph-atm{position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse 70% 60% at 80% 20%, rgba(0,190,243,.1) 0%, transparent 60%),radial-gradient(ellipse 50% 45% at 10% 80%, rgba(139,92,246,.08) 0%, transparent 55%)}
+.ph-inner{position:relative;z-index:1}
+.ph-inner h1{font-family:'Bebas Neue',sans-serif;font-size:clamp(52px,8vw,100px);letter-spacing:2px;line-height:.9;margin-bottom:24px}
+.ph-inner p{font-size:17px;color:rgba(255,255,255,.5);max-width:580px;line-height:1.85;margin-bottom:36px}
+.ph-back{display:inline-flex;align-items:center;gap:8px;font-size:13px;color:rgba(255,255,255,.3);transition:color .2s;margin-bottom:32px}
+.ph-back:hover{color:var(--white)}
+.ph-back svg{width:14px;height:14px;transform:rotate(180deg);transition:transform .22s}
+.ph-back:hover svg{transform:rotate(180deg) translateX(3px)}
+
+#team-section{padding:80px 0 120px;background:var(--black)}
+.tm-group-lbl{font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,.2);margin:56px 0 20px;padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,.05)}
+.tm-group-lbl:first-child{margin-top:0}
+.tm-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:16px}
+.tm-card{background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:16px;padding:28px 22px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:12px;transition:border-color .25s,background .25s}
+.tm-card:hover{border-color:rgba(0,190,243,.22);background:rgba(0,190,243,.03)}
+.tm-photo{width:80px;height:80px;border-radius:50%;object-fit:cover;object-position:top center;border:2px solid rgba(0,190,243,.2)}
+.tm-initials{width:80px;height:80px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:1px;flex-shrink:0}
+.tm-name{font-size:15px;font-weight:700;color:var(--white);line-height:1.3}
+.tm-role{font-size:12px;color:var(--muted);line-height:1.5}
+.tm-btn{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;padding:6px 14px;border-radius:7px;margin-top:4px;transition:opacity .2s;text-decoration:none;color:#fff}
+.tm-btn:hover{opacity:.8}
+.tm-li{background:#0a66c2}
+.tm-tm{background:#1a5276}
+
+#footer{background:#020810;padding:76px 0 40px;border-top:1px solid var(--border)}
+.foot-grid{display:grid;grid-template-columns:2.2fr 1fr 1fr 1fr;gap:56px;margin-bottom:64px}
+.fb img{height:34px;width:auto;margin-bottom:16px}
+.fb-name{font-family:'Bebas Neue',sans-serif;font-size:19px;letter-spacing:4px;margin-bottom:6px}
+.fb-tag{font-size:10px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:rgba(255,255,255,.2);margin-bottom:16px}
+.fb-desc{font-size:13px;color:rgba(255,255,255,.26);line-height:1.78;max-width:280px}
+.fb-social{display:flex;gap:10px;margin-top:26px}
+.fb-slink{width:36px;height:36px;border-radius:8px;background:rgba(255,255,255,.03);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.26);transition:all .22s}
+.fb-slink:hover{background:rgba(0,190,243,.08);border-color:rgba(0,190,243,.3);color:var(--cyan)}
+.fb-slink svg{width:16px;height:16px}
+.fc-title{font-size:10px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:rgba(255,255,255,.2);margin-bottom:20px}
+.fc-links{list-style:none;display:flex;flex-direction:column;gap:14px}
+.fc-links a{font-size:14px;color:rgba(255,255,255,.32);transition:color .2s}
+.fc-links a:hover{color:var(--white)}
+.foot-btm{padding-top:32px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.foot-copy{font-size:12px;color:rgba(255,255,255,.18)}
+.foot-legal{display:flex;gap:24px}
+.foot-legal a{font-size:12px;color:rgba(255,255,255,.18);transition:color .2s}
+.foot-legal a:hover{color:rgba(255,255,255,.5)}
+
+@media(max-width:900px){
+  .container{padding:0 24px}
+  #nav .nav-links,.nav-pill{display:none}
+  .hamburger{display:flex}
+  .foot-grid{grid-template-columns:1fr 1fr;gap:36px}
+  .fb{grid-column:1/-1}
+}
+@media(max-width:600px){
+  .tm-grid{grid-template-columns:repeat(auto-fill,minmax(160px,1fr))}
+  .foot-grid{grid-template-columns:1fr}
+  .foot-btm{flex-direction:column;align-items:flex-start}
+}
+
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav id="nav">
+  <div class="container">
+    <div class="nav-inner">
+      <a href="./index-es.html" class="nav-logo">
+        <img src="./stadioralabs info/stadiora_labs_logo - white.png" alt="Stadiora Labs"
+          onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
+        <span class="nav-logo-fallback" style="display:none">STADIORA LABS</span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="./index-es.html#engine">El Motor</a></li>
+        <li><a href="./index-es.html#ecosystem">Productos</a></li>
+        <li><a href="./index-es.html#mission">Misión</a></li>
+        <li><a href="./team-es.html" class="active">Equipo</a></li>
+      </ul>
+      <a href="lead-magnet-es.html" class="nav-pill">
+        Check Gratis
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </a>
+      <div class="lang-toggle">
+        <a href="./team.html" class="lang-btn">EN</a>
+        <span class="lang-btn active">ES</span>
+      </div>
+      <button class="hamburger" onclick="openMenu()" aria-label="Abrir menú">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<!-- Mobile -->
+<div class="mobile-menu" id="mobileMenu">
+  <button class="mobile-close" onclick="closeMenu()">&#215;</button>
+  <a href="./index-es.html#engine" onclick="closeMenu()">El Motor</a>
+  <a href="./index-es.html#ecosystem" onclick="closeMenu()">Productos</a>
+  <a href="./index-es.html#mission" onclick="closeMenu()">Misión</a>
+  <a href="./team-es.html" onclick="closeMenu()" style="color:var(--white)">Equipo</a>
+  <a href="lead-magnet-es.html" onclick="closeMenu()" style="color:var(--cyan)">Check Gratis</a>
+</div>
+
+<!-- HERO -->
+<section id="page-hero">
+  <div class="ph-atm"></div>
+  <div class="container">
+    <div class="ph-inner">
+      <a href="./index-es.html#mission" class="ph-back" data-reveal>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        Volver a Stadiora Labs
+      </a>
+      <div class="eyebrow" data-reveal>Quiénes Somos</div>
+      <h1 data-reveal data-reveal-delay="1">
+        Construido por Personas<br>
+        <span class="g-cyan">Que Conocen el Deporte.</span>
+      </h1>
+      <p data-reveal data-reveal-delay="2">
+        Un equipo multidisciplinario de ingenieros, científicos, entrenadores y atletas — unidos en torno a una sola misión: hacer que la inteligencia de élite sea accesible para cada atleta y entrenador, independientemente del presupuesto.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- TEAM -->
+<section id="team-section">
+  <div class="container">
+
+    <div class="tm-group-lbl" data-reveal>Fundadores</div>
+    <div class="tm-grid">
+      <div class="tm-card" data-reveal>
+        <img src="./assets/deck-v2/anthony_c.webp" alt="Anthony Rugama" class="tm-photo"
+          onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+        <div class="tm-initials" style="display:none;background:rgba(0,190,243,.1);border:1px solid rgba(0,190,243,.25);color:var(--cyan)">AR</div>
+        <div class="tm-name">Anthony Rugama Brown</div>
+        <div class="tm-role">Fundador &amp; CEO</div>
+        <a href="https://www.linkedin.com/in/anthonyrugama" target="_blank" rel="noopener" class="tm-btn tm-li">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+          LinkedIn
+        </a>
+      </div>
+      <div class="tm-card" data-reveal data-reveal-delay="1">
+        <img src="./assets/deck-v2/ian_c.webp" alt="Ian Rowe" class="tm-photo"
+          onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+        <div class="tm-initials" style="display:none;background:rgba(0,190,243,.1);border:1px solid rgba(0,190,243,.25);color:var(--cyan)">IR</div>
+        <div class="tm-name">Ian Phillip Rowe Rojas</div>
+        <div class="tm-role">Co-Fundador &amp; CTO</div>
+        <a href="https://www.linkedin.com/in/irowe12" target="_blank" rel="noopener" class="tm-btn tm-li">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+          LinkedIn
+        </a>
+      </div>
+    </div>
+
+    <div class="tm-group-lbl" data-reveal>Liderazgo</div>
+    <div class="tm-grid">
+      <div class="tm-card" data-reveal>
+        <img src="./assets/deck-v2/karla_c.webp" alt="Karla Scott" class="tm-photo"
+          onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+        <div class="tm-initials" style="display:none;background:rgba(139,92,246,.1);border:1px solid rgba(139,92,246,.25);color:#8B5CF6">KS</div>
+        <div class="tm-name">Karla Scott</div>
+        <div class="tm-role">CMO</div>
+        <a href="https://www.linkedin.com/in/karla-scott-515908111" target="_blank" rel="noopener" class="tm-btn tm-li">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+          LinkedIn
+        </a>
+      </div>
+    </div>
+
+    <div class="tm-group-lbl" data-reveal>Socio Estratégico</div>
+    <div class="tm-grid">
+      <div class="tm-card" data-reveal>
+        <img src="./assets/deck-v2/joel_c.webp" alt="Joel Campbell" class="tm-photo"
+          onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+        <div class="tm-initials" style="display:none;background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.25);color:#f59e0b">JC</div>
+        <div class="tm-name">Joel Campbell</div>
+        <div class="tm-role">Socio Estratégico de Capital — Aria 12</div>
+        <a href="https://www.transfermarkt.com/joel-campbell/profil/spieler/131248" target="_blank" rel="noopener" class="tm-btn tm-tm">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
+          Transfermarkt
+        </a>
+      </div>
+    </div>
+
+    <div class="tm-group-lbl" data-reveal>Asesores &amp; Colaboradores</div>
+    <div class="tm-grid">
+      <div class="tm-card" data-reveal>
+        <div class="tm-initials" style="background:rgba(52,211,153,.08);border:1px solid rgba(52,211,153,.2);color:#34D399">MS</div>
+        <div class="tm-name">Marco Saenz</div>
+        <div class="tm-role">Operaciones &amp; Comunidad</div>
+        <a href="https://www.linkedin.com/in/marco-saenz-605aba42" target="_blank" rel="noopener" class="tm-btn tm-li">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+          LinkedIn
+        </a>
+      </div>
+      <div class="tm-card" data-reveal data-reveal-delay="1">
+        <div class="tm-initials" style="background:rgba(52,211,153,.08);border:1px solid rgba(52,211,153,.2);color:#34D399">KV</div>
+        <div class="tm-name">Katherine Vega</div>
+        <div class="tm-role">Asesora de Rendimiento y Rehabilitación</div>
+        <a href="https://www.linkedin.com/in/katherine-vega-r-663652223" target="_blank" rel="noopener" class="tm-btn tm-li">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+          LinkedIn
+        </a>
+      </div>
+      <div class="tm-card" data-reveal data-reveal-delay="2">
+        <div class="tm-initials" style="background:rgba(52,211,153,.08);border:1px solid rgba(52,211,153,.2);color:#34D399">JW</div>
+        <div class="tm-name">Julián Wais</div>
+        <div class="tm-role">Asesor Médico y de Rendimiento</div>
+        <a href="https://www.linkedin.com/in/julian-wais-83758b234" target="_blank" rel="noopener" class="tm-btn tm-li">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+          LinkedIn
+        </a>
+      </div>
+      <div class="tm-card" data-reveal data-reveal-delay="3">
+        <div class="tm-initials" style="background:rgba(52,211,153,.08);border:1px solid rgba(52,211,153,.2);color:#34D399">IG</div>
+        <div class="tm-name">Ivana Guerra</div>
+        <div class="tm-role">Asesora de Psicología Deportiva</div>
+        <a href="https://www.linkedin.com/in/ivana-guerra-341576376" target="_blank" rel="noopener" class="tm-btn tm-li">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+          LinkedIn
+        </a>
+      </div>
+      <div class="tm-card" data-reveal>
+        <div class="tm-initials" style="background:rgba(52,211,153,.08);border:1px solid rgba(52,211,153,.2);color:#34D399">CM</div>
+        <div class="tm-name">Cristhian Monge Arce</div>
+        <div class="tm-role">Inversionista Temprano y Apoyo Familiar</div>
+        <a href="https://www.linkedin.com/in/cristhian-jos%C3%A9-monge-arce-bds/" target="_blank" rel="noopener" class="tm-btn tm-li">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+          LinkedIn
+        </a>
+      </div>
+      <div class="tm-card" data-reveal data-reveal-delay="1">
+        <div class="tm-initials" style="background:rgba(52,211,153,.08);border:1px solid rgba(52,211,153,.2);color:#34D399">JP</div>
+        <div class="tm-name">John Paul Anderson</div>
+        <div class="tm-role">Líder de Alianzas en el Caribe</div>
+        <a href="https://www.linkedin.com/in/john-paul-d-anderson" target="_blank" rel="noopener" class="tm-btn tm-li">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+          LinkedIn
+        </a>
+      </div>
+    </div>
+
+    <div class="tm-group-lbl" data-reveal>Legal</div>
+    <div class="tm-grid">
+      <div class="tm-card" data-reveal>
+        <div class="tm-initials" style="background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.45)">MA</div>
+        <div class="tm-name">Michelle Allen</div>
+        <div class="tm-role">Abogada del Proyecto</div>
+        <a href="https://www.linkedin.com/in/michelle-allen-cr" target="_blank" rel="noopener" class="tm-btn tm-li">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+          LinkedIn
+        </a>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer id="footer">
+  <div class="container">
+    <div class="foot-grid">
+      <div class="fb">
+        <img src="./stadioralabs info/stadiora_labs_logo - white.png" alt="Stadiora Labs" onerror="this.style.display='none'">
+        <div class="fb-name">STADIORA LABS</div>
+        <div class="fb-tag">Un Ecosistema. Inteligentemente Conectado.</div>
+        <p class="fb-desc">La empresa de infraestructura de IA deportiva — construyendo la capa de inteligencia que convierte datos de atletas en decisiones para atletas, entrenadores y equipos en todo el mundo.</p>
+        <div class="fb-social">
+          <a href="https://www.linkedin.com/company/stadioralabs" target="_blank" rel="noopener" class="fb-slink" aria-label="LinkedIn">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2z"/><circle cx="4" cy="4" r="2"/></svg>
+          </a>
+        </div>
+      </div>
+      <div>
+        <div class="fc-title">Productos</div>
+        <ul class="fc-links">
+          <li><a href="https://runwitharia.com" target="_blank" rel="noopener">Aria</a></li>
+          <li><a href="lead-magnet-es.html">Aria 12</a></li>
+          <li><a href="lead-magnet-es.html">Aria for Coaches</a></li>
+          <li><a href="./api-es.html">API Aria Intelligence</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="fc-title">Empresa</div>
+        <ul class="fc-links">
+          <li><a href="./index-es.html#mission">Nuestra Misión</a></li>
+          <li><a href="./index-es.html#engine">El Motor</a></li>
+          <li><a href="./index-es.html#ecosystem">Ecosistema</a></li>
+          <li><a href="./team-es.html">El Equipo</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="fc-title">Comenzar</div>
+        <ul class="fc-links">
+          <li><a href="lead-magnet-es.html">Check de Rendimiento Gratis</a></li>
+          <li><a href="lead-magnet-es.html">Acceso para Atletas</a></li>
+          <li><a href="lead-magnet-es.html">Acceso para Entrenadores</a></li>
+          <li><a href="lead-magnet-es.html">Solicitar Demo</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="foot-btm">
+      <p class="foot-copy">© 2026 Stadiora Labs. Todos los derechos reservados. Construido en América Latina y Estados Unidos.</p>
+      <div class="foot-legal">
+        <a href="./privacy.html">Política de Privacidad</a>
+        <a href="./terms.html">Términos de Uso</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+const nav = document.getElementById('nav');
+window.addEventListener('scroll', () => { nav.classList.toggle('scrolled', window.scrollY > 40); }, { passive: true });
+function openMenu()  { document.getElementById('mobileMenu').classList.add('open');    document.body.style.overflow = 'hidden'; }
+function closeMenu() { document.getElementById('mobileMenu').classList.remove('open'); document.body.style.overflow = ''; }
+
+const revealObs = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('on'); revealObs.unobserve(e.target); } });
+}, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+document.querySelectorAll('[data-reveal]').forEach(el => revealObs.observe(el));
+</script>
+</body>
+</html>
