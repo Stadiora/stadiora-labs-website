@@ -491,6 +491,9 @@ body::before{
 .miss-hed{font-family:'Bebas Neue',sans-serif;font-size:clamp(42px,5.5vw,70px);letter-spacing:2px;line-height:.95;margin-bottom:28px}
 .miss-hed .md{color:rgba(255,255,255,.2)}
 .miss-body{font-size:15px;color:rgba(255,255,255,.5);line-height:1.9;max-width:460px}
+.miss-mv{margin-top:32px;display:flex;flex-direction:column;gap:20px}
+.miss-mv-lbl{font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--cyan);margin-bottom:6px}
+.miss-mv-text{font-size:14px;color:rgba(255,255,255,.65);line-height:1.8;max-width:460px;margin:0}
 
 .pillars{display:flex;flex-direction:column;gap:40px}
 .pillar{display:flex;gap:22px;align-items:flex-start}
@@ -590,7 +593,7 @@ body::before{
       <ul class="nav-links">
         <li><a href="#engine">The Engine</a></li>
         <li><a href="#ecosystem">Products</a></li>
-        <li><a href="#mission">Mission</a></li>
+        <li><a href="#mission">Who We Are</a></li>
       </ul>
       <a href="lead-magnet.html" class="nav-pill">
         Free Check
@@ -612,7 +615,7 @@ body::before{
   <button class="mobile-close" onclick="closeMenu()">&#215;</button>
   <a href="#engine"    onclick="closeMenu()">The Engine</a>
   <a href="#ecosystem" onclick="closeMenu()">Products</a>
-  <a href="#mission"   onclick="closeMenu()">Mission</a>
+  <a href="#mission"   onclick="closeMenu()">Who We Are</a>
   <a href="lead-magnet.html" onclick="closeMenu()" style="color:var(--cyan)">Free Check</a>
 </div>
 
@@ -941,6 +944,16 @@ body::before{
         <p class="miss-body">
           The infrastructure behind a world-class training program costs hundreds of thousands of dollars per year. We are closing that gap — built by a team across Latin America and the United States, serving athletes and coaches in the Caribbean, West Africa, and emerging markets worldwide, on the belief that access to elite intelligence should not be a function of budget.
         </p>
+        <div class="miss-mv">
+          <div>
+            <div class="miss-mv-lbl">Mission</div>
+            <p class="miss-mv-text">To give everyone who trains, in every sport and regardless of access or resources, the intelligence of a world-class coaching team.</p>
+          </div>
+          <div>
+            <div class="miss-mv-lbl">Vision</div>
+            <p class="miss-mv-text">A world where everyone carries elite coaching in their pocket, powered by Aria Intelligence.</p>
+          </div>
+        </div>
         <a href="team.html" class="btn btn-ghost" style="margin-top:28px;width:fit-content">
           Meet the Team
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>

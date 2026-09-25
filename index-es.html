@@ -441,6 +441,9 @@ body::before{
 .miss-hed{font-family:'Bebas Neue',sans-serif;font-size:clamp(42px,5.5vw,70px);letter-spacing:2px;line-height:.95;margin-bottom:28px}
 .miss-hed .md{color:rgba(255,255,255,.2)}
 .miss-body{font-size:15px;color:rgba(255,255,255,.5);line-height:1.9;max-width:460px}
+.miss-mv{margin-top:32px;display:flex;flex-direction:column;gap:20px}
+.miss-mv-lbl{font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--cyan);margin-bottom:6px}
+.miss-mv-text{font-size:14px;color:rgba(255,255,255,.65);line-height:1.8;max-width:460px;margin:0}
 
 .pillars{display:flex;flex-direction:column;gap:40px}
 .pillar{display:flex;gap:22px;align-items:flex-start}
@@ -531,7 +534,7 @@ body::before{
       <ul class="nav-links">
         <li><a href="#engine">El Motor</a></li>
         <li><a href="#ecosystem">Productos</a></li>
-        <li><a href="#mission">Misión</a></li>
+        <li><a href="#mission">Quiénes Somos</a></li>
       </ul>
       <a href="lead-magnet-es.html" class="nav-pill">
         Diagnóstico Gratis
@@ -553,7 +556,7 @@ body::before{
   <button class="mobile-close" onclick="closeMenu()">&#215;</button>
   <a href="#engine"    onclick="closeMenu()">El Motor</a>
   <a href="#ecosystem" onclick="closeMenu()">Productos</a>
-  <a href="#mission"   onclick="closeMenu()">Misión</a>
+  <a href="#mission"   onclick="closeMenu()">Quiénes Somos</a>
   <a href="lead-magnet-es.html" onclick="closeMenu()" style="color:var(--cyan)">Diagnóstico Gratis</a>
 </div>
 
@@ -872,6 +875,16 @@ body::before{
         <p class="miss-body">
           La infraestructura detrás de un programa de entrenamiento de clase mundial cuesta cientos de miles de dólares al año. Estamos cerrando esa brecha — construido por un equipo en América Latina y los Estados Unidos, sirviendo a atletas y entrenadores en el Caribe, África Occidental y mercados emergentes en todo el mundo, con la convicción de que el acceso a inteligencia de élite no debe ser una función del presupuesto.
         </p>
+        <div class="miss-mv">
+          <div>
+            <div class="miss-mv-lbl">Misión</div>
+            <p class="miss-mv-text">Darle a todos los que entrenan, en cualquier deporte y sin importar el acceso o los recursos, la inteligencia de un equipo de entrenamiento de clase mundial.</p>
+          </div>
+          <div>
+            <div class="miss-mv-lbl">Visión</div>
+            <p class="miss-mv-text">Un mundo donde todos llevan en el bolsillo un entrenamiento de élite, impulsado por Aria Intelligence.</p>
+          </div>
+        </div>
         <a href="team-es.html" class="btn btn-ghost" style="margin-top:28px;width:fit-content">
           Conoce al Equipo
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
