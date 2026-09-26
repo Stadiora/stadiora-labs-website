@@ -529,6 +529,16 @@ body::before{
 .ptile-hub-btn{display:inline-flex;align-items:center;gap:10px;background:var(--cyan);color:var(--black);font-size:13px;font-weight:700;padding:13px 26px;border-radius:100px;text-decoration:none;transition:opacity .2s,gap .2s;width:fit-content}
 .ptile-hub-btn:hover{opacity:.85;gap:16px}
 .ptile-hub-btn svg{width:14px;height:14px}
+.trusted{padding:80px 0}
+.trusted-hd{text-align:center;margin-bottom:56px}
+.trusted-eyebrow{font-size:11px;font-weight:700;letter-spacing:4px;text-transform:uppercase;color:var(--cyan);margin-bottom:10px}
+.trusted-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(28px,3.5vw,44px);letter-spacing:2px;line-height:1;margin-bottom:10px}
+.trusted-sub{font-size:14px;color:rgba(255,255,255,.38);line-height:1.7}
+.trusted-grid{display:flex;align-items:center;justify-content:center;gap:20px;flex-wrap:wrap}
+.partner-card{display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:16px;padding:24px 36px;width:210px;height:100px;text-decoration:none;transition:background .3s,border-color .3s}
+.partner-card:hover{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.14)}
+.partner-card img,.partner-card svg{max-width:136px;max-height:54px;width:100%;object-fit:contain;filter:brightness(0) invert(1);opacity:.55;transition:opacity .3s}
+.partner-card:hover img,.partner-card:hover svg{opacity:.9}
 @media(max-width:1000px){
   .ptiles-v2{grid-template-columns:1fr 1fr}
   .ptile-v2:last-child{grid-column:1/-1}
@@ -1102,6 +1112,28 @@ body::before{
           </div>
         </div>
       </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ TRUSTED BY ══ -->
+<section class="trusted">
+  <div class="container">
+    <div class="trusted-hd" data-reveal>
+      <div class="trusted-eyebrow">Trusted By</div>
+      <h2 class="trusted-title">People Who Believe in Our Work</h2>
+      <p class="trusted-sub">The institutions and investors backing Stadiora Labs.</p>
+    </div>
+    <div class="trusted-grid" data-reveal>
+      <a href="https://thethinktank.vc/" target="_blank" rel="noopener" class="partner-card">
+        <img src="./stadioralabs info/thinktank_logo.png" alt="ThinkTank.VC">
+      </a>
+      <a href="https://www.ciemhcavi.una.ac.cr/" target="_blank" rel="noopener" class="partner-card">
+        <img src="./stadioralabs info/una_logo.png" alt="Universidad Nacional Costa Rica">
+      </a>
+      <a href="https://diprovid.ucr.ac.cr/auge/" target="_blank" rel="noopener" class="partner-card">
+        <img src="./stadioralabs info/auge_logo.svg" alt="Auge UCR">
+      </a>
     </div>
   </div>
 </section>
