@@ -136,19 +136,21 @@
     .lcard.tv:hover { border-color: rgba(139,92,246,.4); background: rgba(139,92,246,.05); }
 
     .lcard-icon {
-      width: 44px;
-      height: 44px;
-      border-radius: 12px;
+      width: 56px;
+      height: 40px;
       flex-shrink: 0;
       display: flex;
       align-items: center;
       justify-content: center;
       overflow: hidden;
     }
-    .lcard-icon img { width: 100%; height: 100%; object-fit: contain; }
-    .lcard-icon.ic-c { background: rgba(0,190,243,.12); }
-    .lcard-icon.ic-m { background: rgba(52,211,153,.12); }
-    .lcard-icon.ic-v { background: rgba(139,92,246,.12); }
+    .lcard-icon img {
+      max-width: 56px;
+      max-height: 36px;
+      width: auto;
+      height: auto;
+      object-fit: contain;
+    }
 
     .lcard-body { flex: 1; min-width: 0; }
     .lcard-name { font-size: 15px; font-weight: 700; line-height: 1.2; margin-bottom: 3px; }
@@ -350,9 +352,8 @@
   <div class="section-lbl">Our Products</div>
 
   <a href="https://runwitharia.com" target="_blank" rel="noopener" class="lcard tc" onclick="trackClick('run-with-aria')">
-    <div class="lcard-icon ic-c">
-      <img src="./stadioralabs info/aria_logo.png" alt="Run with Aria"
-        onerror="this.outerHTML='<svg viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'#00BEF3\' stroke-width=\'2\' width=\'22\' height=\'22\'><circle cx=\'12\' cy=\'5\' r=\'1.5\'/><path d=\'M9 8.5L7 15h2l1-3 2 2V20h2v-6.5L12.5 12l.5-2 2 2.5H17V11h-2L12.5 8H9z\'/></svg>'">
+    <div class="lcard-icon">
+      <img src="./stadioralabs info/aria_logo.png" alt="Run with Aria">
     </div>
     <div class="lcard-body">
       <div class="lcard-name">Run with Aria</div>
@@ -362,9 +363,8 @@
   </a>
 
   <a href="./lead-magnet.html" class="lcard tm" onclick="trackClick('aria-12')">
-    <div class="lcard-icon ic-m">
-      <img src="./stadioralabs info/aria12_logo.jpg" alt="Aria 12"
-        onerror="this.outerHTML='<svg viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'#34D399\' stroke-width=\'1.5\' width=\'22\' height=\'22\'><circle cx=\'12\' cy=\'12\' r=\'9\'/><path d=\'M12 8v4l3 3\'/></svg>'">
+    <div class="lcard-icon">
+      <img src="./stadioralabs info/aria12_logo.jpg" alt="Aria 12">
     </div>
     <div class="lcard-body">
       <div class="lcard-name">Aria 12</div>
@@ -374,9 +374,8 @@
   </a>
 
   <a href="./lead-magnet.html" class="lcard tc" onclick="trackClick('aria-for-coaches')">
-    <div class="lcard-icon ic-c">
-      <img src="./stadioralabs info/Stadiora_logo.png" alt="Aria for Coaches"
-        onerror="this.outerHTML='<svg viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'#00BEF3\' stroke-width=\'1.5\' width=\'22\' height=\'22\'><path d=\'M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2\'/><circle cx=\'9\' cy=\'7\' r=\'4\'/><path d=\'M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75\'/></svg>'">
+    <div class="lcard-icon">
+      <img src="./stadioralabs info/Stadiora_logo.png" alt="Aria for Coaches">
     </div>
     <div class="lcard-body">
       <div class="lcard-name">Aria for Coaches</div>
@@ -386,9 +385,8 @@
   </a>
 
   <a href="#" class="lcard tv" onclick="trackClick('fitmg'); return false;">
-    <div class="lcard-icon ic-v">
-      <img src="./stadioralabs info/fitmg_logo.webp" alt="FitMG"
-        onerror="this.outerHTML='<svg viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'#8B5CF6\' stroke-width=\'1.8\' width=\'22\' height=\'22\'><rect x=\'2\' y=\'9.5\' width=\'2.5\' height=\'5\' rx=\'0.5\'/><rect x=\'4.5\' y=\'11\' width=\'2\' height=\'2\' rx=\'0.3\'/><line x1=\'6.5\' y1=\'12\' x2=\'17.5\' y2=\'12\'/><rect x=\'17.5\' y=\'11\' width=\'2\' height=\'2\' rx=\'0.3\'/><rect x=\'19.5\' y=\'9.5\' width=\'2.5\' height=\'5\' rx=\'0.5\'/></svg>'">
+    <div class="lcard-icon">
+      <img src="./stadioralabs info/fitmg_logo.webp" alt="FitMG">
     </div>
     <div class="lcard-body">
       <div class="lcard-name">FitMG</div>
