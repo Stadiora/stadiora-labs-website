@@ -258,9 +258,9 @@ body::before{
 
 .engine-split{
   display:grid;grid-template-columns:1fr 1fr;
-  gap:80px;align-items:center;
+  gap:80px;align-items:stretch;
 }
-.engine-text{}
+.engine-text{display:flex;flex-direction:column;justify-content:center}
 .engine-text .eyebrow{margin-bottom:24px}
 .engine-h2{
   font-family:'Bebas Neue',sans-serif;
@@ -284,15 +284,17 @@ body::before{
 .echip-dot.m{background:var(--mint)}
 .echip-dot.v{background:var(--violet)}
 
-/* Phone visual */
+/* Dashboard visual */
 .engine-phone{
-  display:flex;align-items:center;justify-content:center;
+  display:flex;align-items:stretch;justify-content:center;
   position:relative;
 }
 .engine-phone-img{
-  width:100%;max-width:420px;height:auto;
-  display:block;margin:0 auto;
-  filter:drop-shadow(0 40px 80px rgba(0,0,0,.7)) drop-shadow(0 0 60px rgba(0,190,243,.15));
+  width:100%;height:100%;
+  object-fit:cover;object-position:top left;
+  display:block;
+  border-radius:14px;
+  box-shadow:0 32px 80px rgba(0,0,0,.75),0 0 50px rgba(0,190,243,.1);
 }
 
 @media(max-width:900px){
@@ -340,11 +342,11 @@ body::before{
 .eco-intro p{font-size:16px;color:rgba(255,255,255,.5);line-height:1.85}
 
 /* Editorial tile grid */
-.ptiles{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;background:rgba(255,255,255,.05);border-radius:22px;overflow:hidden}
+.ptiles{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;background:transparent;border-radius:0;overflow:visible}
 
 .ptile{
-  background:var(--card);
-  padding:60px 52px;min-height:480px;
+  background:var(--card);border-radius:20px;
+  padding:36px 32px;min-height:440px;
   position:relative;overflow:hidden;
   display:flex;flex-direction:column;justify-content:flex-end;
   transition:background .4s ease;
@@ -358,9 +360,31 @@ body::before{
 }
 .ptile-video.vloaded{opacity:.28}
 .ptile:hover .ptile-video.vloaded{opacity:.42}
+/* product card background image */
+.ptile-bg{
+  position:absolute;inset:0;width:100%;height:100%;
+  object-fit:cover;object-position:center;
+  opacity:.55;z-index:0;
+  transition:opacity .4s;
+}
+.ptile:hover .ptile-bg{opacity:.68}
+
+/* phone mockup image inside product cards */
+.ptile-phone-img{
+  position:absolute;right:0;top:50%;transform:translateY(-50%);
+  height:120%;width:auto;max-width:52%;
+  object-fit:contain;object-position:right center;
+  z-index:4;pointer-events:none;
+  mix-blend-mode:multiply;
+}
 .ptile-overlay{
   position:absolute;inset:0;z-index:1;pointer-events:none;
-  background:linear-gradient(160deg,rgba(6,14,32,.92) 0%,rgba(6,14,32,.6) 42%,rgba(6,14,32,.92) 100%);
+  background:linear-gradient(to right,
+    rgba(6,14,32,.97) 0%,
+    rgba(6,14,32,.95) 35%,
+    rgba(6,14,32,.55) 54%,
+    rgba(6,14,32,.08) 68%,
+    transparent 78%);
 }
 
 .ptile::before{
@@ -389,7 +413,7 @@ body::before{
 .tm .ptile-line{background:linear-gradient(90deg,var(--mint),transparent 70%)}
 .tv .ptile-line{background:linear-gradient(90deg,var(--violet),transparent 70%)}
 
-.ptile-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:auto;padding-bottom:40px;position:relative;z-index:3}
+.ptile-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:auto;padding-bottom:40px;position:relative;z-index:3;max-width:54%}
 .ptile-logo{height:34px;width:auto;object-fit:contain}
 .ptile-icon{width:34px;height:34px;flex-shrink:0}
 .ptile-badge{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:5px 12px;border-radius:100px;flex-shrink:0}
@@ -397,15 +421,19 @@ body::before{
 .pb-m{background:rgba(52,211,153,.1);color:var(--mint);  border:1px solid rgba(52,211,153,.22)}
 .pb-v{background:rgba(139,92,246,.1);color:var(--violet);border:1px solid rgba(139,92,246,.22)}
 
-.ptile-body{position:relative;z-index:3}
+.ptile-body{position:relative;z-index:3;max-width:54%}
 .ptile-name{font-family:'Bebas Neue',sans-serif;font-size:52px;letter-spacing:2px;line-height:1;margin-bottom:6px}
-.ptile-tag{font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:16px}
-.tt-c{color:var(--cyan)}.tt-m{color:var(--mint)}.tt-v{color:var(--violet)}
-.ptile-desc{font-size:14px;color:rgba(255,255,255,.48);line-height:1.78;margin-bottom:28px;max-width:360px}
-.ptile-link{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:700;transition:gap .22s}
-.ptile-link:hover{gap:14px}
-.ptile-link svg{width:14px;height:14px}
-.pl-c{color:var(--cyan)}.pl-m{color:var(--mint)}.pl-v{color:var(--violet)}
+.ptile-tag{font-size:13px;font-weight:500;letter-spacing:0;text-transform:none;margin-bottom:24px;color:rgba(255,255,255,.52);line-height:1.5}
+.tt-c{color:rgba(0,190,243,.7)}.tt-m{color:rgba(52,211,153,.7)}.tt-v{color:rgba(139,92,246,.7)}
+.ptile-desc{display:none}
+.ptile-link{display:inline-flex;align-items:center;gap:14px;text-decoration:none;transition:gap .22s}
+.ptile-link:hover{gap:20px}
+.ptile-link-ico{width:46px;height:46px;border-radius:50%;border:2px solid currentColor;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.05)}
+.ptile-link-ico svg{width:18px;height:18px}
+.ptile-link-lbl{font-size:14px;font-weight:700}
+.pl-c{color:var(--cyan)}
+.pl-m{color:var(--mint)}
+.pl-v{color:var(--violet)}
 
 /* FitMG "Coming Soon" state */
 .ptile-link.soon{opacity:.45;cursor:default;pointer-events:none}
@@ -423,9 +451,8 @@ body::before{
 .ptile-hub-screen img{width:100%;height:100%;object-fit:cover;object-position:top left;display:block}
 .ptile-hub-screen::after{content:'';position:absolute;inset:0;background:linear-gradient(to right,transparent 75%,rgba(4,12,32,.95));pointer-events:none}
 .ptile-hub-content{grid-row:1;grid-column:2;padding:52px 52px 40px 44px;display:flex;flex-direction:column;justify-content:center}
-.ptile-hub-features{grid-row:2;grid-column:1/-1;display:grid;grid-template-columns:repeat(5,1fr);border-top:1px solid rgba(255,255,255,.06)}
-.hub-feat{padding:22px 16px;text-align:center;border-right:1px solid rgba(255,255,255,.05)}
-.hub-feat:last-child{border-right:none}
+.ptile-hub-features{grid-row:2;grid-column:1/-1;display:grid;grid-template-columns:repeat(5,1fr);padding:8px 0 4px}
+.hub-feat{padding:22px 16px;text-align:center}
 .hub-feat-icon{width:28px;height:28px;margin:0 auto 10px;color:var(--cyan);opacity:.7}
 .hub-feat-title{font-size:11px;font-weight:700;color:var(--white);margin-bottom:3px}
 .hub-feat-sub{font-size:10px;color:rgba(255,255,255,.32);line-height:1.4}
@@ -681,7 +708,7 @@ body::before{
 
       <!-- Right: phone -->
       <div class="engine-phone" data-reveal data-reveal-delay="2">
-        <img src="./phone-aria.webp" alt="Aria Intelligence app — readiness score 71, contributors: HRV, Sleep, Deep Sleep, Resting HR" class="engine-phone-img">
+        <img src="./engine-dashboard.webp" alt="Aria for Coaches dashboard" class="engine-phone-img">
       </div>
 
     </div>
@@ -703,67 +730,58 @@ body::before{
 
       <!-- Run with Aria -->
       <div class="ptile tc" data-bg="ARIA" data-reveal>
-        <video class="ptile-video" muted loop playsinline preload="none">
-          <source src="./videos/aria.mp4" type="video/mp4">
-        </video>
+        <img src="./bg-aria.webp" alt="" class="ptile-bg">
+        <img src="./phone-rwa.webp" alt="Run with Aria app" class="ptile-phone-img">
         <div class="ptile-overlay"></div>
         <div class="ptile-line"></div>
         <div class="ptile-top">
           <img src="./stadioralabs info/aria_logo.png" alt="Run with Aria" class="ptile-logo"
             onerror="this.outerHTML='<svg class=\'ptile-icon\' viewBox=\'0 0 34 34\' fill=\'none\'><path d=\'M17 2L3 17l6 3 3 10 5-8 6 5-2-10 6-3L17 2z\' fill=\'%2300BEF3\' opacity=\'.9\'/></svg>'">
-          <span class="ptile-badge pb-c">For Athletes</span>
         </div>
         <div class="ptile-body">
           <div class="ptile-name">Run with Aria</div>
-          <div class="ptile-tag tt-c">AI Training Intelligence for Track &amp; Field</div>
-          <p class="ptile-desc">Complete training, recovery, nutrition, and performance intelligence — with an AI coach that knows your body and makes one clear daily decision.</p>
+          <div class="ptile-tag tt-c">Smarter training for every runner.</div>
           <a href="https://runwitharia.com/" target="_blank" rel="noopener" class="ptile-link pl-c">
-            Visit Our Website
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            <span class="ptile-link-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
+            <span class="ptile-link-lbl">Explore</span>
           </a>
         </div>
       </div>
 
       <!-- Aria 12 -->
       <div class="ptile tm" data-bg="12" data-reveal data-reveal-delay="1">
-        <video class="ptile-video" muted loop playsinline preload="none">
-          <source src="./videos/aria-12.mp4" type="video/mp4">
-        </video>
+        <img src="./bg-aria12.webp" alt="" class="ptile-bg">
+        <img src="./phone-aria12.webp" alt="Aria 12 app" class="ptile-phone-img">
         <div class="ptile-overlay"></div>
         <div class="ptile-line"></div>
         <div class="ptile-top">
           <img src="./stadioralabs info/aria12_logo.jpg" alt="Aria 12" class="ptile-logo" style="width:40px;height:40px;object-fit:contain;border-radius:6px">
-          <span class="ptile-badge pb-m">For Football Teams</span>
         </div>
         <div class="ptile-body">
           <div class="ptile-name">Aria 12</div>
-          <div class="ptile-tag tt-m">AI Availability Intelligence for Football</div>
-          <p class="ptile-desc">Turn squad data into smarter training, injury prevention, and availability decisions. Coaches stop guessing. Players stop hiding pain.</p>
+          <div class="ptile-tag tt-m">Data-driven development for every player.</div>
           <a href="lead-magnet.html" class="ptile-link pl-m">
-            Check Squad Availability
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            <span class="ptile-link-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
+            <span class="ptile-link-lbl">Explore</span>
           </a>
         </div>
       </div>
 
-      <!-- FitMG — Fix: dead href="#" → lead-magnet, label as coming soon -->
+      <!-- FitMG -->
       <div class="ptile tv" data-bg="FITMG" data-reveal data-reveal-delay="2">
-        <video class="ptile-video" muted loop playsinline preload="none">
-          <source src="./videos/fitmg.mp4" type="video/mp4">
-        </video>
+        <img src="./bg-fitmg.webp" alt="" class="ptile-bg">
+        <img src="./phone-fitmg.webp" alt="FitMG app" class="ptile-phone-img">
         <div class="ptile-overlay"></div>
         <div class="ptile-line"></div>
         <div class="ptile-top">
           <img src="./stadioralabs info/fitmg_logo.webp" alt="FitMG" class="ptile-logo" style="width:40px;height:40px;object-fit:contain;border-radius:8px">
-          <span class="ptile-badge pb-v">Fitness Platform</span>
         </div>
         <div class="ptile-body">
           <div class="ptile-name">FitMG</div>
-          <div class="ptile-tag tt-v">AI Strength &amp; Fitness for Every Journey</div>
-          <p class="ptile-desc">Elite strength and fitness programming, now accessible to everyone. Personalized plans backed by science for athletes and anyone ready to train smarter.</p>
+          <div class="ptile-tag tt-v">Strength, health and fitness for every journey.</div>
           <a href="https://testflight.apple.com/join/eDc3hw5D" target="_blank" rel="noopener" class="ptile-link pl-v">
-            Explore FitMG on iPhone
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            <span class="ptile-link-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
+            <span class="ptile-link-lbl">Explore</span>
           </a>
         </div>
       </div>
