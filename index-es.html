@@ -325,6 +325,21 @@ body::before{
 }
 .ptile-video.vloaded{opacity:.28}
 .ptile:hover .ptile-video.vloaded{opacity:.42}
+/* product card background image */
+.ptile-bg{
+  position:absolute;inset:0;width:100%;height:100%;
+  object-fit:cover;object-position:center;
+  opacity:.45;z-index:0;transition:opacity .4s;
+}
+.ptile:hover .ptile-bg{opacity:.58}
+.ptile-overlay{
+  position:absolute;inset:0;z-index:1;pointer-events:none;
+  background:linear-gradient(to right,
+    rgba(6,14,32,.95) 0%,
+    rgba(6,14,32,.88) 38%,
+    rgba(6,14,32,.45) 58%,
+    transparent 75%);
+}
 /* phone mockup image inside product cards */
 .ptile-phone-img{
   position:absolute;right:0;top:50%;transform:translateY(-50%);
@@ -666,7 +681,9 @@ body::before{
 
       <!-- Run with Aria -->
       <div class="ptile tc" data-bg="ARIA" data-reveal>
+        <img src="./bg-aria.webp" alt="" class="ptile-bg">
         <img src="./phone-rwa.webp" alt="Run with Aria app" class="ptile-phone-img">
+        <div class="ptile-overlay"></div>
         <div class="ptile-body">
           <div class="ptile-name">Run with Aria</div>
           <div class="ptile-tag tt-c">Entrenamiento inteligente para cada corredor.</div>
@@ -679,7 +696,9 @@ body::before{
 
       <!-- Aria 12 -->
       <div class="ptile tm" data-bg="12" data-reveal data-reveal-delay="1">
+        <img src="./bg-aria12.webp" alt="" class="ptile-bg">
         <img src="./phone-aria12.webp" alt="Aria 12 app" class="ptile-phone-img">
+        <div class="ptile-overlay"></div>
         <div class="ptile-body">
           <div class="ptile-name">Aria 12</div>
           <div class="ptile-tag tt-m">Desarrollo basado en datos para cada jugador.</div>
@@ -692,7 +711,9 @@ body::before{
 
       <!-- FitMG -->
       <div class="ptile tv" data-bg="FITMG" data-reveal data-reveal-delay="2">
+        <img src="./bg-fitmg.webp" alt="" class="ptile-bg">
         <img src="./phone-fitmg.webp" alt="FitMG app" class="ptile-phone-img">
+        <div class="ptile-overlay"></div>
         <div class="ptile-body">
           <div class="ptile-name">FitMG</div>
           <div class="ptile-tag tt-v">Fuerza, salud y fitness para cada trayectoria.</div>
