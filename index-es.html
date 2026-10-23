@@ -466,27 +466,33 @@ body::before{
   .eco-bridge-v2{height:56px}
 }
 
-#mission{background:var(--navy);position:relative;overflow:hidden;padding:120px 0}
+#mission{background:var(--black);position:relative;overflow:hidden;padding:100px 0}
 .miss-amb{position:absolute;top:-80px;right:-200px;width:700px;height:700px;background:radial-gradient(circle,rgba(52,211,153,.055) 0%,transparent 65%);pointer-events:none}
 .miss-amb2{position:absolute;bottom:-80px;left:-100px;width:400px;height:400px;background:radial-gradient(circle,rgba(139,92,246,.05) 0%,transparent 65%);pointer-events:none}
-
-.miss-grid{display:grid;grid-template-columns:1fr 1fr;gap:100px;align-items:center;position:relative;z-index:1}
-.miss-hed{font-family:'Bebas Neue',sans-serif;font-size:clamp(42px,5.5vw,70px);letter-spacing:2px;line-height:.95;margin-bottom:28px}
-.miss-hed .md{color:var(--white)}
-.miss-body{font-size:15px;color:rgba(255,255,255,.5);line-height:1.9;max-width:460px}
-.miss-mv{margin-top:32px;display:flex;flex-direction:column;gap:20px}
-.miss-mv-lbl{font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--cyan);margin-bottom:6px}
-.miss-mv-text{font-size:14px;color:rgba(255,255,255,.65);line-height:1.8;max-width:460px;margin:0}
-
-.pillars{display:flex;flex-direction:column;gap:40px}
-.pillar{display:flex;gap:22px;align-items:flex-start}
-.p-icon{width:30px;height:30px;flex-shrink:0;display:flex;align-items:center;justify-content:center}
-.p-icon svg{width:26px;height:26px}
-.pi-c{color:var(--cyan)}
-.pi-m{color:var(--mint)}
-.pi-v{color:var(--violet)}
-.p-title{font-size:15px;font-weight:700;color:var(--white);margin-bottom:7px;letter-spacing:.1px}
-.p-desc{font-size:13px;color:rgba(255,255,255,.42);line-height:1.75}
+.miss-inner{position:relative;z-index:1;padding:52px 56px}
+.miss-eyebrow{font-size:10px;font-weight:700;letter-spacing:4px;text-transform:uppercase;color:var(--cyan);margin-bottom:16px}
+.miss-hed{font-family:'Bebas Neue',sans-serif;font-size:clamp(38px,5vw,68px);letter-spacing:2px;line-height:1;margin-bottom:18px}
+.miss-sub{font-size:15px;color:rgba(255,255,255,.48);line-height:1.75;max-width:700px;margin-bottom:40px}
+.miss-divider{display:none}
+.miss-mv-grid{display:grid;grid-template-columns:1fr 1fr;gap:32px;margin-bottom:36px}
+.miss-mv-item{display:flex;gap:16px;align-items:flex-start}
+.miss-mv-ico{width:38px;height:38px;flex-shrink:0;border-radius:50%;border:1px solid rgba(0,190,243,.35);display:flex;align-items:center;justify-content:center;color:var(--cyan);background:rgba(0,190,243,.06)}
+.miss-mv-ico.v{border-color:rgba(52,211,153,.35);color:var(--mint);background:rgba(52,211,153,.06)}
+.miss-mv-ico svg{width:17px;height:17px}
+.miss-mv-title{font-size:14px;font-weight:700;color:var(--white);margin-bottom:6px}
+.miss-mv-text{font-size:13px;color:rgba(255,255,255,.48);line-height:1.7;margin:0}
+.miss-pillars{display:grid;grid-template-columns:repeat(3,1fr);gap:28px}
+.miss-pillar-ico{width:26px;height:26px;margin-bottom:10px}
+.miss-pillar-ico svg{width:24px;height:24px}
+.miss-pillar-ico.c{color:var(--cyan)}
+.miss-pillar-ico.m{color:var(--mint)}
+.miss-pillar-ico.v{color:var(--violet)}
+.miss-pillar-title{font-size:14px;font-weight:700;color:var(--white);margin-bottom:5px}
+.miss-pillar-desc{font-size:13px;color:rgba(255,255,255,.42);line-height:1.6}
+.miss-footer{display:flex;justify-content:flex-end;margin-top:36px;padding-top:28px}
+.miss-team-link{display:inline-flex;align-items:center;gap:8px;font-size:14px;font-weight:700;color:var(--cyan);text-decoration:none;transition:gap .2s}
+.miss-team-link:hover{gap:13px}
+.miss-team-link svg{width:14px;height:14px}
 
 #lm-cta{background:var(--black);position:relative;overflow:hidden;padding:120px 0}
 .cta-glow{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:900px;height:560px;background:radial-gradient(ellipse,rgba(0,190,243,.1) 0%,rgba(139,92,246,.06) 45%,transparent 70%);pointer-events:none}
@@ -533,7 +539,9 @@ body::before{
   .flow-center{padding:0}
   .flow-center::before,.flow-center::after{display:none}
   .ptiles{grid-template-columns:1fr;border-radius:16px}
-  .miss-grid{grid-template-columns:1fr;gap:56px}
+  .miss-inner{padding:36px 28px}
+  .miss-mv-grid{grid-template-columns:1fr}
+  .miss-pillars{grid-template-columns:1fr}
   .foot-grid{grid-template-columns:1fr 1fr;gap:36px}
   .fb{grid-column:1/-1}
   .stmt-main{font-size:clamp(60px,13vw,120px)}
@@ -777,68 +785,65 @@ body::before{
   <div class="miss-amb"></div>
   <div class="miss-amb2"></div>
   <div class="container">
-    <div class="miss-grid">
-      <div data-reveal>
-        <div class="eyebrow">Quiénes Somos</div>
-        <div class="miss-hed">
-          Inteligencia de Élite.<br>
-          <span class="md">Ya No Solo</span><br>
-          <span class="g-mint">Para Élites.</span>
-        </div>
-        <p class="miss-body">
-          La infraestructura detrás de un programa de entrenamiento de clase mundial cuesta cientos de miles de dólares al año. Estamos cerrando esa brecha — construido por un equipo en América Latina y los Estados Unidos, sirviendo a atletas y entrenadores en el Caribe, África Occidental y mercados emergentes en todo el mundo, con la convicción de que el acceso a inteligencia de élite no debe ser una función del presupuesto.
-        </p>
-        <div class="miss-mv">
-          <div>
-            <div class="miss-mv-lbl">Misión</div>
-            <p class="miss-mv-text">Darle a todas las personas que entrenan, en cualquier deporte e independientemente de su acceso o recursos, la inteligencia de un equipo de entrenamiento de clase mundial.</p>
+    <div class="miss-inner" data-reveal>
+      <div class="miss-eyebrow">Quiénes Somos</div>
+      <div class="miss-hed">Inteligencia de Élite.<br>Para Todos.</div>
+      <p class="miss-sub">Creemos que la inteligencia de coaching de clase mundial debe ser accesible para cada atleta, entrenador y organización—no solo para la élite.</p>
+
+      <hr class="miss-divider">
+
+      <div class="miss-mv-grid">
+        <div class="miss-mv-item">
+          <div class="miss-mv-ico">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/><line x1="12" y1="2" x2="12" y2="4"/><line x1="12" y1="20" x2="12" y2="22"/><line x1="2" y1="12" x2="4" y2="12"/><line x1="20" y1="12" x2="22" y2="12"/></svg>
           </div>
           <div>
-            <div class="miss-mv-lbl">Visión</div>
-            <p class="miss-mv-text">Un mundo donde todas las personas que entrenan llevan en el bolsillo un coach de élite que conoce su cuerpo.</p>
+            <div class="miss-mv-title">Nuestra Misión</div>
+            <p class="miss-mv-text">Hacer la inteligencia de rendimiento de élite accesible para todos.</p>
           </div>
         </div>
-        <a href="team-es.html" class="btn btn-ghost" style="margin-top:28px;width:fit-content">
+        <div class="miss-mv-item">
+          <div class="miss-mv-ico v">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          </div>
+          <div>
+            <div class="miss-mv-title">Nuestra Visión</div>
+            <p class="miss-mv-text">Un mundo donde cada atleta pueda entrenar más inteligente y alcanzar su potencial.</p>
+          </div>
+        </div>
+      </div>
+
+      <hr class="miss-divider">
+
+      <div class="miss-pillars">
+        <div>
+          <div class="miss-pillar-ico c">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18m0 0h10a2 2 0 002-2V9M9 21H5a2 2 0 01-2-2V9m0 0h18"/></svg>
+          </div>
+          <div class="miss-pillar-title">Ciencia sobre Hype</div>
+          <div class="miss-pillar-desc">Innovación basada en evidencia.</div>
+        </div>
+        <div>
+          <div class="miss-pillar-ico m">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+          </div>
+          <div class="miss-pillar-title">Construido Juntos</div>
+          <div class="miss-pillar-desc">Creado con entrenadores y atletas.</div>
+        </div>
+        <div>
+          <div class="miss-pillar-ico v">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
+          </div>
+          <div class="miss-pillar-title">Acceso para Todos</div>
+          <div class="miss-pillar-desc">Tecnología de élite sin barreras.</div>
+        </div>
+      </div>
+
+      <div class="miss-footer">
+        <a href="team-es.html" class="miss-team-link">
           Conoce al Equipo
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
         </a>
-      </div>
-      <div class="pillars">
-        <div class="pillar" data-reveal data-reveal-delay="1">
-          <div class="p-icon pi-c">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18m0 0h10a2 2 0 002-2V9M9 21H5a2 2 0 01-2-2V9m0 0h18"/>
-            </svg>
-          </div>
-          <div>
-            <div class="p-title">Ciencia Sobre el Hype</div>
-            <p class="p-desc">Cada afirmación está fundamentada en fisiología y validada por nuestro equipo de rendimiento y rehabilitación. Si no podemos respaldarlo, no lo enviamos.</p>
-          </div>
-        </div>
-        <div class="pillar" data-reveal data-reveal-delay="2">
-          <div class="p-icon pi-m">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/>
-              <circle cx="9" cy="7" r="4"/>
-              <path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/>
-            </svg>
-          </div>
-          <div>
-            <div class="p-title">Construir Con, No Para</div>
-            <p class="p-desc">Atletas, entrenadores y asesores son co-creadores. Sus aportes son insumos del producto, no retroalimentación recogida después. <strong style="color:var(--white)">Aria potencia a los entrenadores, nunca los reemplaza.</strong></p>
-          </div>
-        </div>
-        <div class="pillar" data-reveal data-reveal-delay="3">
-          <div class="p-icon pi-v">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
-            </svg>
-          </div>
-          <div>
-            <div class="p-title">La Brecha Es Nuestro Mercado</div>
-            <p class="p-desc">Debajo del club de la Premier League y el programa olímpico nacional se encuentra la mayoría del talento atlético mundial. Nadie ha construido para ellos. Nosotros sí.</p>
-          </div>
-        </div>
       </div>
     </div>
   </div>

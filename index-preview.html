@@ -1,0 +1,1053 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<link rel="icon" type="image/png" href="./stadioralabs info/favicon.png">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Stadiora Labs builds the AI intelligence layer that converts athlete data into decisions. One ecosystem. Intelligently connected.">
+<title>Stadiora Labs — Sports AI Infrastructure [PREVIEW]</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+
+/* Language toggle */
+.lang-toggle{display:flex;gap:4px;align-items:center}
+.lang-btn{font-size:11px;font-weight:700;letter-spacing:1.5px;padding:5px 11px;border-radius:6px;border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.35);background:transparent;cursor:pointer;text-decoration:none;transition:all .2s}
+.lang-btn.active{color:var(--cyan);border-color:rgba(0,190,243,.4);background:rgba(0,190,243,.07)}
+.lang-btn:hover:not(.active){color:rgba(255,255,255,.65);border-color:rgba(255,255,255,.25)}
+
+:root {
+  --black:   #010812;
+  --navy:    #040c1c;
+  --card:    #060e20;
+  --cyan:    #00BEF3;
+  --mint:    #34D399;
+  --violet:  #8B5CF6;
+  --white:   #ffffff;
+  --muted:   rgba(255,255,255,0.38);
+  --dim:     rgba(255,255,255,0.12);
+  --border:  rgba(255,255,255,0.07);
+  --border2: rgba(255,255,255,0.13);
+}
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--black);color:var(--white);font-family:'DM Sans',sans-serif;overflow-x:hidden;line-height:1.6}
+img{max-width:100%;display:block}
+a{text-decoration:none;color:inherit}
+
+/* Grain */
+body::before{
+  content:'';position:fixed;inset:0;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)'/%3E%3C/svg%3E");
+  opacity:.02;pointer-events:none;z-index:9998;
+}
+
+.container{width:100%;max-width:1240px;margin:0 auto;padding:0 48px}
+
+/* ── Reveal (scroll sections only) ── */
+[data-reveal]{opacity:0;transform:translateY(32px);transition:opacity .7s cubic-bezier(.22,1,.36,1),transform .7s cubic-bezier(.22,1,.36,1)}
+[data-reveal].on{opacity:1;transform:none}
+[data-reveal-delay="1"]{transition-delay:.1s}
+[data-reveal-delay="2"]{transition-delay:.2s}
+[data-reveal-delay="3"]{transition-delay:.3s}
+[data-reveal-delay="4"]{transition-delay:.42s}
+
+/* ── Type ── */
+.bb{font-family:'Bebas Neue',sans-serif;letter-spacing:2px}
+.eyebrow{
+  display:inline-flex;align-items:center;gap:12px;
+  font-size:10px;font-weight:700;letter-spacing:3.5px;text-transform:uppercase;
+  color:var(--cyan);margin-bottom:20px;
+}
+.eyebrow::before{content:'';width:16px;height:1px;background:currentColor;flex-shrink:0}
+.eyebrow.mint{color:var(--mint)}.eyebrow.dim{color:rgba(255,255,255,0.28)}
+.eyebrow.center{display:flex;justify-content:center}
+
+/* Gradient text */
+.g-cyan{color:var(--white)}
+.g-mint{color:var(--white)}
+.g-multi{color:var(--white)}
+
+/* ── Buttons ── */
+.btn{
+  display:inline-flex;align-items:center;gap:10px;
+  padding:15px 30px;border-radius:10px;border:none;
+  font-family:'DM Sans',sans-serif;font-size:14px;font-weight:700;
+  cursor:pointer;transition:all .22s ease;white-space:nowrap;
+  text-decoration:none;position:relative;overflow:hidden;
+}
+.btn svg{width:16px;height:16px;flex-shrink:0;transition:transform .22s}
+.btn:hover svg{transform:translateX(4px)}
+.btn-lg{padding:18px 40px;font-size:15px;border-radius:12px}
+
+.btn-primary{
+  background:linear-gradient(135deg,#00BEF3,#00d8b4);
+  color:#010812;font-weight:800;
+}
+.btn-primary::after{
+  content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.28),transparent);
+  animation:shimmer 3.5s ease infinite;
+}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 16px 48px rgba(0,190,243,.4),0 0 0 1px rgba(0,190,243,.25)}
+.btn-ghost{background:rgba(255,255,255,.05);color:var(--white);border:1px solid var(--border2)}
+.btn-ghost:hover{background:rgba(255,255,255,.08);border-color:rgba(0,190,243,.4);color:var(--cyan);transform:translateY(-2px)}
+
+@keyframes shimmer{0%{left:-100%}60%,100%{left:100%}}
+
+/* ═══════════════════════════════
+   NAV
+═══════════════════════════════ */
+#nav{
+  position:fixed;top:0;left:0;right:0;z-index:1000;
+  padding:22px 0;transition:all .3s ease;
+}
+#nav.scrolled{
+  background:rgba(1,8,18,.9);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  padding:13px 0;border-bottom:1px solid var(--border);
+}
+.nav-inner{display:flex;align-items:center;justify-content:space-between;gap:20px}
+.nav-logo{display:flex;align-items:center;gap:10px;flex-shrink:0}
+.nav-logo img{height:48px;width:auto}
+.nav-logo-fallback{
+  font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:4px;
+  background:linear-gradient(90deg,var(--white),rgba(255,255,255,.6));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+}
+.nav-links{display:flex;align-items:center;gap:38px;list-style:none}
+.nav-links a{font-size:15px;font-weight:600;color:rgba(255,255,255,.82);transition:color .2s}
+.nav-links a:hover{color:var(--white)}
+.nav-pill{
+  display:inline-flex;align-items:center;gap:8px;
+  background:rgba(0,190,243,.08);border:1px solid rgba(0,190,243,.22);
+  border-radius:100px;padding:8px 20px;font-size:13px;font-weight:700;color:var(--cyan);
+  transition:all .22s;text-decoration:none;
+}
+.nav-pill svg{width:13px;height:13px;transition:transform .22s}
+.nav-pill:hover{background:rgba(0,190,243,.15);border-color:rgba(0,190,243,.4)}
+.nav-pill:hover svg{transform:translateX(3px)}
+
+.hamburger{display:none;flex-direction:column;gap:5px;background:none;border:none;cursor:pointer;padding:4px}
+.hamburger span{display:block;width:22px;height:1.5px;background:var(--white);border-radius:2px;transition:all .3s}
+.mobile-menu{display:none;position:fixed;inset:0;background:var(--black);z-index:999;flex-direction:column;align-items:center;justify-content:center;gap:32px}
+.mobile-menu.open{display:flex}
+.mobile-menu a{font-family:'Bebas Neue',sans-serif;font-size:46px;letter-spacing:3px;color:rgba(255,255,255,.38);transition:color .2s}
+.mobile-menu a:hover{color:var(--white)}
+.mobile-close{position:absolute;top:24px;right:32px;background:none;border:none;color:rgba(255,255,255,.3);font-size:28px;cursor:pointer}
+
+/* ═══════════════════════════════
+   HERO — image-driven
+═══════════════════════════════ */
+#hero{
+  position:relative;min-height:100vh;
+  display:flex;align-items:center;
+  overflow:hidden;padding:140px 0 120px;
+  background:var(--black);
+}
+
+/* The AI visualization image IS the hero */
+.hero-bg{position:absolute;inset:0;overflow:hidden}
+.hero-bg-img{
+  position:absolute;inset:0;width:100%;height:100%;
+  object-fit:cover;object-position:60% center;
+  opacity:.92;
+}
+/* Black fades from left (text area) → transparent on right (image shines through) */
+.hero-bg-overlay{
+  position:absolute;inset:0;
+  background:
+    linear-gradient(to right,
+      rgba(1,8,18,1)    0%,
+      rgba(1,8,18,.98)  25%,
+      rgba(1,8,18,.82)  40%,
+      rgba(1,8,18,.35)  58%,
+      rgba(1,8,18,.08)  78%,
+      rgba(1,8,18,.02) 100%),
+    linear-gradient(to bottom,
+      rgba(1,8,18,.5)  0%,
+      transparent      18%,
+      transparent      72%,
+      rgba(1,8,18,.9) 100%);
+}
+
+/* Hero layout — text on left, image fills entire background */
+.hero-inner{
+  position:relative;z-index:1;
+  display:flex;align-items:center;width:100%;
+}
+.hero-content{
+  flex:0 0 auto;
+  width:min(580px,52%);
+}
+
+/* ── Hero content enters immediately (no scroll observer) ── */
+@keyframes heroFadeUp{
+  from{opacity:0;transform:translateY(28px)}
+  to{opacity:1;transform:none}
+}
+.hero-badge {
+  display:inline-flex;align-items:center;gap:10px;
+  background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.09);
+  border-radius:100px;padding:7px 18px;margin-bottom:32px;
+  font-size:11px;font-weight:600;letter-spacing:2.5px;text-transform:uppercase;
+  color:rgba(255,255,255,.42);
+  animation: heroFadeUp .7s cubic-bezier(.22,1,.36,1) .05s both;
+}
+.hero-h1{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:clamp(52px,7vw,92px);
+  letter-spacing:2px;line-height:.9;margin-bottom:32px;
+  animation: heroFadeUp .8s cubic-bezier(.22,1,.36,1) .18s both;
+}
+.h1-l1{display:block;color:var(--white)}
+.h1-l2{display:block;color:var(--white)}
+.h1-l3{display:block;color:var(--white)}
+.hero-sub{
+  font-size:clamp(15px,1.9vw,18px);color:rgba(255,255,255,.55);
+  max-width:520px;line-height:1.85;margin-bottom:44px;
+  animation: heroFadeUp .8s cubic-bezier(.22,1,.36,1) .32s both;
+}
+.hero-ctas{
+  display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:60px;
+  animation: heroFadeUp .8s cubic-bezier(.22,1,.36,1) .46s both;
+}
+
+/* Stats — now just 2 (removed the implausible "1 Decision Delivered") */
+.hero-stats{
+  display:flex;align-items:stretch;border-top:1px solid var(--border);padding-top:36px;max-width:400px;
+  animation: heroFadeUp .8s cubic-bezier(.22,1,.36,1) .58s both;
+}
+.hstat{flex:1}
+.hstat+.hstat{padding-left:28px;border-left:1px solid var(--border)}
+.hstat-n{font-family:'Bebas Neue',sans-serif;font-size:44px;letter-spacing:1px;line-height:1;margin-bottom:4px;color:var(--white)}
+.hstat-n .c{color:var(--cyan)}
+.hstat-l{font-size:11px;color:rgba(255,255,255,.3);font-weight:600;letter-spacing:.3px}
+
+/* Scroll line */
+.hero-scroll{position:absolute;bottom:34px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:10px;z-index:1}
+.scroll-line{width:1px;height:52px;background:linear-gradient(to bottom,rgba(255,255,255,0),rgba(255,255,255,.2),rgba(255,255,255,0));animation:scrollAnim 2.4s ease-in-out infinite}
+.scroll-lbl{font-size:9px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,.18)}
+@keyframes scrollAnim{0%{transform:scaleY(0);transform-origin:top;opacity:0} 30%{opacity:1} 50%{transform:scaleY(1);transform-origin:top} 51%{transform:scaleY(1);transform-origin:bottom} 100%{transform:scaleY(0);transform-origin:bottom;opacity:0}}
+
+.bdot{width:6px;height:6px;border-radius:50%;background:var(--mint);animation:bdotPulse 2.6s ease-in-out infinite}
+@keyframes bdotPulse{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(52,211,153,0)} 50%{opacity:.7;box-shadow:0 0 0 5px rgba(52,211,153,.14)}}
+
+
+/* ═══════════════════════════════
+   MARQUEE
+═══════════════════════════════ */
+.marquee-wrap{
+  border-top:1px solid var(--border);border-bottom:1px solid var(--border);
+  padding:15px 0;overflow:hidden;background:rgba(255,255,255,.012);
+}
+.marquee-track{display:flex;animation:marqScroll 30s linear infinite;white-space:nowrap}
+.marq-item{
+  display:flex;align-items:center;gap:32px;padding:0 40px;
+  font-size:10px;font-weight:700;letter-spacing:4px;text-transform:uppercase;
+  color:rgba(255,255,255,.18);flex-shrink:0;
+}
+.marq-item .ma{color:var(--cyan);font-size:14px;letter-spacing:0;line-height:1}
+@keyframes marqScroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+/* ═══════════════════════════════
+   ENGINE
+═══════════════════════════════ */
+/* Engine section — Teamworks-inspired two-column split */
+#engine{background:var(--black);position:relative;overflow:hidden;padding:120px 0}
+
+.engine-split{
+  display:grid;grid-template-columns:1fr 1fr;
+  gap:80px;align-items:stretch;
+}
+.engine-text{display:flex;flex-direction:column;justify-content:center}
+.engine-text .eyebrow{margin-bottom:24px}
+.engine-h2{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:clamp(42px,5.5vw,76px);
+  letter-spacing:2px;line-height:.95;
+  margin-bottom:28px;
+}
+.engine-desc{
+  font-size:17px;color:rgba(255,255,255,.5);
+  line-height:1.85;max-width:480px;margin-bottom:40px;
+}
+.engine-chips{display:flex;flex-direction:column;gap:14px}
+.echip{
+  display:flex;align-items:center;gap:14px;
+  font-size:14px;color:rgba(255,255,255,.55);
+}
+.echip-dot{
+  width:6px;height:6px;border-radius:50%;flex-shrink:0;
+}
+.echip-dot.c{background:var(--cyan)}
+.echip-dot.m{background:var(--mint)}
+.echip-dot.v{background:var(--violet)}
+
+/* Dashboard visual */
+.engine-phone{
+  display:flex;align-items:stretch;justify-content:center;
+  position:relative;
+}
+.engine-phone-img{
+  width:100%;height:100%;
+  object-fit:cover;object-position:top left;
+  display:block;
+  border-radius:14px;
+  box-shadow:0 32px 80px rgba(0,0,0,.75),0 0 50px rgba(0,190,243,.1);
+}
+
+@media(max-width:900px){
+  .engine-split{grid-template-columns:1fr;gap:52px}
+  .engine-phone{order:-1}
+  .engine-phone-img{max-width:280px}
+}
+
+
+/* ═══════════════════════════════
+   STATEMENT
+═══════════════════════════════ */
+#statement{
+  background:var(--black);position:relative;overflow:hidden;
+  padding:0;display:flex;align-items:center;justify-content:center;
+  min-height:420px;
+  border-top:1px solid rgba(255,255,255,.05);
+  border-bottom:1px solid rgba(255,255,255,.05);
+}
+.stmt-glow{
+  position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  width:900px;height:360px;
+  background:radial-gradient(ellipse,rgba(0,190,243,.09) 0%,rgba(139,92,246,.05) 45%,transparent 70%);
+  pointer-events:none;
+}
+.stmt-inner{position:relative;z-index:1;text-align:center;padding:80px 40px}
+.stmt-pre{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:clamp(22px,3vw,38px);letter-spacing:6px;
+  color:rgba(255,255,255,.18);margin-bottom:12px;
+}
+.stmt-main{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:clamp(80px,15vw,200px);letter-spacing:4px;line-height:.85;
+  background:linear-gradient(90deg,var(--cyan) 0%,var(--mint) 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+
+/* ═══════════════════════════════
+   PRODUCTS
+═══════════════════════════════ */
+#ecosystem{background:var(--black);padding:120px 0}
+.eco-intro{text-align:center;max-width:560px;margin:0 auto 80px}
+.eco-intro h2{font-family:'Bebas Neue',sans-serif;font-size:clamp(42px,5.5vw,76px);letter-spacing:2px;line-height:.97;margin-bottom:18px}
+.eco-intro p{font-size:16px;color:rgba(255,255,255,.5);line-height:1.85}
+
+/* Editorial tile grid */
+.ptiles{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;background:transparent;border-radius:0;overflow:visible}
+
+.ptile{
+  background:var(--card);border-radius:20px;
+  padding:36px 32px;min-height:440px;
+  position:relative;overflow:hidden;
+  display:flex;flex-direction:column;justify-content:flex-end;
+  transition:background .4s ease;
+}
+.ptile:hover{background:#070f22}
+
+.ptile-video{
+  position:absolute;inset:0;width:100%;height:100%;
+  object-fit:cover;opacity:0;z-index:0;
+  transition:opacity .6s ease;
+}
+.ptile-video.vloaded{opacity:.28}
+.ptile:hover .ptile-video.vloaded{opacity:.42}
+/* product card background image */
+.ptile-bg{
+  position:absolute;inset:0;width:100%;height:100%;
+  object-fit:cover;object-position:center;
+  opacity:.45;z-index:0;transition:opacity .4s;
+}
+.ptile:hover .ptile-bg{opacity:.58}
+.ptile-overlay{
+  position:absolute;inset:0;z-index:1;pointer-events:none;
+  background:linear-gradient(to right,
+    rgba(6,14,32,.95) 0%,
+    rgba(6,14,32,.88) 38%,
+    rgba(6,14,32,.45) 58%,
+    transparent 75%);
+}
+/* phone mockup image inside product cards */
+.ptile-phone-img{
+  position:absolute;right:0;top:50%;transform:translateY(-50%);
+  height:145%;width:auto;max-width:62%;
+  object-fit:contain;object-position:right center;
+  z-index:5;pointer-events:none;
+  filter:drop-shadow(0 0 40px rgba(0,0,0,.6));
+}
+
+.ptile::before{
+  content:attr(data-bg);
+  font-family:'Bebas Neue',sans-serif;
+  font-size:220px;letter-spacing:-4px;line-height:1;
+  position:absolute;bottom:-20px;right:-10px;
+  color:var(--white);opacity:.03;
+  pointer-events:none;user-select:none;
+  transition:opacity .4s;z-index:2;
+}
+.ptile:hover::before{opacity:.06}
+
+.ptile::after{
+  content:'';position:absolute;inset:0;pointer-events:none;
+  transition:opacity .4s;opacity:.6;z-index:1;
+}
+.ptile.tc::after{background:radial-gradient(ellipse 58% 68% at 76% 52%,rgba(0,190,243,.22) 0%,transparent 70%)}
+.ptile.tm::after{background:radial-gradient(ellipse 58% 68% at 76% 52%,rgba(52,211,153,.20) 0%,transparent 70%)}
+.ptile.tv::after{background:radial-gradient(ellipse 58% 68% at 76% 52%,rgba(139,92,246,.20) 0%,transparent 70%)}
+.ptile:hover::after{opacity:1}
+
+.ptile-body{position:relative;z-index:3;max-width:44%}
+.ptile-name{font-family:'Bebas Neue',sans-serif;font-size:clamp(28px,3.2vw,40px);letter-spacing:2px;line-height:1.05;margin-bottom:8px}
+.ptile-tag{font-size:13px;font-weight:500;letter-spacing:0;text-transform:none;margin-bottom:24px;color:rgba(255,255,255,.52);line-height:1.5}
+.tt-c{color:rgba(0,190,243,.7)}.tt-m{color:rgba(52,211,153,.7)}.tt-v{color:rgba(139,92,246,.7)}
+.ptile-desc{display:none}
+.ptile-link{display:inline-flex;align-items:center;gap:14px;text-decoration:none;transition:gap .22s}
+.ptile-link:hover{gap:20px}
+.ptile-link-ico{width:46px;height:46px;border-radius:50%;border:2px solid currentColor;flex-shrink:0;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.05)}
+.ptile-link-ico svg{width:18px;height:18px}
+.ptile-link-lbl{font-size:14px;font-weight:700}
+.pl-c{color:var(--cyan)}
+.pl-m{color:var(--mint)}
+.pl-v{color:var(--violet)}
+
+/* FitMG "Coming Soon" state */
+.ptile-link.soon{opacity:.45;cursor:default;pointer-events:none}
+.coming-tag{font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:3px 9px;border-radius:4px;border:1px solid rgba(139,92,246,.3);color:rgba(139,92,246,.7);background:rgba(139,92,246,.06);display:inline-block;margin-bottom:12px}
+
+/* Eco v2 heading */
+.eco-v2-hd{text-align:center;max-width:700px;margin:0 auto 64px}
+.eco-v2-eyebrow{font-size:11px;font-weight:700;letter-spacing:4px;text-transform:uppercase;color:var(--cyan);margin-bottom:16px}
+.eco-v2-h2{font-family:'Bebas Neue',sans-serif;font-size:clamp(42px,5.5vw,76px);letter-spacing:2px;line-height:.97;margin-bottom:20px}
+.eco-v2-sub{font-size:15px;color:rgba(255,255,255,.5);line-height:1.75;max-width:600px;margin:0 auto}
+
+/* Aria for Coaches hub */
+.ptile-hub{margin-top:16px;border-radius:20px;border:1px solid rgba(0,190,243,.18);background:rgba(4,12,32,.9);box-shadow:0 0 80px rgba(0,190,243,.06) inset;display:grid;grid-template-columns:52% 1fr;grid-template-rows:1fr auto}
+.ptile-hub-screen{grid-row:1;grid-column:1;overflow:hidden;border-radius:20px 0 0 0;position:relative;min-height:360px}
+.ptile-hub-screen img{width:100%;height:100%;object-fit:cover;object-position:top left;display:block}
+.ptile-hub-screen::after{content:'';position:absolute;inset:0;background:linear-gradient(to right,transparent 75%,rgba(4,12,32,.95));pointer-events:none}
+.ptile-hub-content{grid-row:1;grid-column:2;padding:52px 52px 40px 44px;display:flex;flex-direction:column;justify-content:center}
+.ptile-hub-features{grid-row:2;grid-column:1/-1;display:grid;grid-template-columns:repeat(5,1fr);padding:8px 0 4px}
+.hub-feat{padding:22px 16px;text-align:center}
+.hub-feat-icon{width:28px;height:28px;margin:0 auto 10px;color:var(--cyan);opacity:.7}
+.hub-feat-title{font-size:11px;font-weight:700;color:var(--white);margin-bottom:3px}
+.hub-feat-sub{font-size:10px;color:rgba(255,255,255,.32);line-height:1.4}
+.ptile-hub-eyebrow{font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--cyan);margin-bottom:16px}
+.ptile-hub-name{font-family:'Bebas Neue',sans-serif;font-size:clamp(40px,4vw,62px);letter-spacing:2px;line-height:1;margin-bottom:16px}
+.ptile-hub-desc{font-size:16px;font-weight:500;color:rgba(255,255,255,.6);line-height:1.5;margin-bottom:32px;max-width:420px}
+.ptile-hub-btn{display:inline-flex;align-items:center;gap:10px;background:var(--cyan);color:var(--black);font-size:13px;font-weight:700;padding:13px 26px;border-radius:100px;text-decoration:none;transition:opacity .2s,gap .2s;width:fit-content}
+.ptile-hub-btn:hover{opacity:.85;gap:16px}
+.ptile-hub-btn svg{width:14px;height:14px}
+
+/* Trusted */
+.trusted{padding:80px 0}
+/* Testimonial */
+#testimonial{background:var(--black);padding:100px 0}
+.testi-inner{max-width:860px;margin:0 auto;text-align:center}
+.testi-icon{width:32px;height:24px;color:var(--cyan);opacity:.35;margin:0 auto 32px;display:block}
+.testi-text{font-size:clamp(18px,2.2vw,24px);line-height:1.75;color:rgba(255,255,255,.85);font-style:italic;margin-bottom:36px}
+.testi-name{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px;color:var(--white);margin-bottom:6px}
+.testi-role{font-size:13px;color:rgba(255,255,255,.4);letter-spacing:.5px}
+.trusted-hd{text-align:center;margin-bottom:56px}
+.trusted-eyebrow{font-size:11px;font-weight:700;letter-spacing:4px;text-transform:uppercase;color:var(--cyan);margin-bottom:10px}
+.trusted-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(42px,5.5vw,76px);letter-spacing:2px;line-height:.97;margin-bottom:10px}
+.trusted-sub{font-size:14px;color:rgba(255,255,255,.38);line-height:1.7}
+.trusted-grid{display:flex;align-items:center;justify-content:center;gap:20px;flex-wrap:wrap}
+.partner-card{display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:16px;padding:24px 36px;width:210px;height:100px;text-decoration:none;transition:background .3s,border-color .3s}
+.partner-card:hover{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.14)}
+.partner-card img,.partner-card svg{max-width:136px;max-height:54px;width:100%;object-fit:contain;opacity:.8;transition:opacity .3s}
+.partner-card:hover img,.partner-card:hover svg{opacity:1}
+
+/* ═══════════════════════════════
+   MISSION
+═══════════════════════════════ */
+#mission{background:var(--black);position:relative;overflow:hidden;padding:100px 0}
+.miss-amb{position:absolute;top:-80px;right:-200px;width:700px;height:700px;background:radial-gradient(circle,rgba(52,211,153,.055) 0%,transparent 65%);pointer-events:none}
+.miss-amb2{position:absolute;bottom:-80px;left:-100px;width:400px;height:400px;background:radial-gradient(circle,rgba(139,92,246,.05) 0%,transparent 65%);pointer-events:none}
+.miss-inner{position:relative;z-index:1;padding:52px 56px}
+.miss-eyebrow{font-size:10px;font-weight:700;letter-spacing:4px;text-transform:uppercase;color:var(--cyan);margin-bottom:16px}
+.miss-hed{font-family:'Bebas Neue',sans-serif;font-size:clamp(38px,5vw,68px);letter-spacing:2px;line-height:1;margin-bottom:18px}
+.miss-sub{font-size:15px;color:rgba(255,255,255,.48);line-height:1.75;max-width:700px;margin-bottom:40px}
+.miss-divider{display:none}
+.miss-mv-grid{display:grid;grid-template-columns:1fr 1fr;gap:32px;margin-bottom:36px}
+.miss-mv-item{display:flex;gap:16px;align-items:flex-start}
+.miss-mv-ico{width:38px;height:38px;flex-shrink:0;border-radius:50%;border:1px solid rgba(0,190,243,.35);display:flex;align-items:center;justify-content:center;color:var(--cyan);background:rgba(0,190,243,.06)}
+.miss-mv-ico.v{border-color:rgba(52,211,153,.35);color:var(--mint);background:rgba(52,211,153,.06)}
+.miss-mv-ico svg{width:17px;height:17px}
+.miss-mv-title{font-size:14px;font-weight:700;color:var(--white);margin-bottom:6px}
+.miss-mv-text{font-size:13px;color:rgba(255,255,255,.48);line-height:1.7;margin:0}
+.miss-pillars{display:grid;grid-template-columns:repeat(3,1fr);gap:28px}
+.miss-pillar-ico{width:26px;height:26px;margin-bottom:10px}
+.miss-pillar-ico svg{width:24px;height:24px}
+.miss-pillar-ico.c{color:var(--cyan)}
+.miss-pillar-ico.m{color:var(--mint)}
+.miss-pillar-ico.v{color:var(--violet)}
+.miss-pillar-title{font-size:14px;font-weight:700;color:var(--white);margin-bottom:5px}
+.miss-pillar-desc{font-size:13px;color:rgba(255,255,255,.42);line-height:1.6}
+.miss-footer{display:flex;justify-content:flex-end;margin-top:36px;padding-top:28px}
+.miss-team-link{display:inline-flex;align-items:center;gap:8px;font-size:14px;font-weight:700;color:var(--cyan);text-decoration:none;transition:gap .2s}
+.miss-team-link:hover{gap:13px}
+.miss-team-link svg{width:14px;height:14px}
+
+/* ═══════════════════════════════
+   CTA
+═══════════════════════════════ */
+#lm-cta{background:var(--black);position:relative;overflow:hidden;padding:120px 0}
+.cta-glow{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:900px;height:560px;background:radial-gradient(ellipse,rgba(0,190,243,.1) 0%,rgba(139,92,246,.06) 45%,transparent 70%);pointer-events:none}
+.cta-inner{position:relative;z-index:1;text-align:center;max-width:740px;margin:0 auto}
+.cta-inner h2{font-family:'Bebas Neue',sans-serif;font-size:clamp(42px,5.5vw,76px);letter-spacing:2px;line-height:.97;margin:20px 0 26px}
+.cta-inner p{font-size:16px;color:rgba(255,255,255,.48);line-height:1.85;margin-bottom:44px}
+.cta-chips{display:flex;align-items:center;justify-content:center;gap:28px;margin-top:24px;flex-wrap:wrap}
+.cta-chip{display:flex;align-items:center;gap:7px;font-size:12px;color:rgba(255,255,255,.28);font-weight:500}
+.cta-chip svg{width:14px;height:14px;color:var(--mint);opacity:.6}
+
+/* ═══════════════════════════════
+   FOOTER
+═══════════════════════════════ */
+#footer{background:#020810;padding:76px 0 40px;border-top:1px solid var(--border)}
+.foot-grid{display:grid;grid-template-columns:2.2fr 1fr 1fr 1fr;gap:56px;margin-bottom:64px}
+.fb img{height:34px;width:auto;margin-bottom:16px}
+.fb-name{font-family:'Bebas Neue',sans-serif;font-size:19px;letter-spacing:4px;margin-bottom:6px}
+.fb-tag{font-size:10px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:rgba(255,255,255,.2);margin-bottom:16px}
+.fb-desc{font-size:13px;color:rgba(255,255,255,.26);line-height:1.78;max-width:280px}
+.fb-social{display:flex;gap:10px;margin-top:26px}
+.fb-slink{width:36px;height:36px;border-radius:8px;background:rgba(255,255,255,.03);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,.26);transition:all .22s}
+.fb-slink:hover{background:rgba(0,190,243,.08);border-color:rgba(0,190,243,.3);color:var(--cyan)}
+.fb-slink svg{width:16px;height:16px}
+.fc-title{font-size:10px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:rgba(255,255,255,.2);margin-bottom:20px}
+.fc-links{list-style:none;display:flex;flex-direction:column;gap:14px}
+.fc-links a{font-size:14px;color:rgba(255,255,255,.32);transition:color .2s}
+.fc-links a:hover{color:var(--white)}
+.foot-btm{padding-top:32px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px}
+.foot-copy{font-size:12px;color:rgba(255,255,255,.18)}
+.foot-legal{display:flex;gap:24px}
+.foot-legal a{font-size:12px;color:rgba(255,255,255,.18);transition:color .2s}
+.foot-legal a:hover{color:rgba(255,255,255,.5)}
+
+/* ═══════════════════════════════
+   RESPONSIVE
+═══════════════════════════════ */
+@media(max-width:1100px){
+  .hero-content{width:min(520px,58%)}
+}
+@media(max-width:900px){
+  .container{padding:0 24px}
+  #nav .nav-links,.nav-pill{display:none}
+  .hamburger{display:flex}
+  .hero-inner{padding:140px 0 80px}
+  .hero-content{width:100%;max-width:100%}
+  .hero-h1{font-size:clamp(56px,13vw,90px)}
+  .hero-bg-img{object-position:70% center}
+  .hero-bg-overlay{background:linear-gradient(to right,rgba(1,8,18,1) 0%,rgba(1,8,18,.98) 35%,rgba(1,8,18,.88) 55%,rgba(1,8,18,.65) 75%,rgba(1,8,18,.4) 100%),linear-gradient(to bottom,rgba(1,8,18,.5) 0%,transparent 18%,transparent 72%,rgba(1,8,18,.9) 100%)}
+  .ptiles{grid-template-columns:1fr;border-radius:16px}
+  .ptile-hub{grid-template-columns:1fr;grid-template-rows:320px auto auto}
+  .ptile-hub-screen{grid-row:1;grid-column:1;border-radius:20px 20px 0 0}
+  .ptile-hub-content{grid-row:2;grid-column:1;padding:40px}
+  .ptile-hub-features{grid-row:3;grid-column:1}
+  .miss-inner{padding:36px 28px}
+  .miss-mv-grid{grid-template-columns:1fr}
+  .miss-pillars{grid-template-columns:1fr}
+  .foot-grid{grid-template-columns:1fr 1fr;gap:36px}
+  .fb{grid-column:1/-1}
+  .stmt-main{font-size:clamp(60px,13vw,120px)}
+}
+@media(max-width:680px){
+  .ptile-hub-features{grid-template-columns:1fr 1fr}
+}
+@media(max-width:600px){
+  .hero-ctas{flex-direction:column;align-items:flex-start}
+  .hero-stats{flex-direction:column}
+  .hstat{padding:0;border:none}
+  .hstat+.hstat{padding:0;border:none;border-top:1px solid var(--border);padding-top:20px;margin-top:4px}
+  .ptile{padding:40px 28px;min-height:400px}
+  .ptile::before{font-size:140px}
+  .foot-grid{grid-template-columns:1fr}
+  .foot-btm{flex-direction:column;align-items:flex-start}
+  .cta-chips{flex-direction:column;gap:14px}
+}
+
+</style>
+</head>
+<body>
+
+<!-- ══ NAV ══ -->
+<nav id="nav">
+  <div class="container">
+    <div class="nav-inner">
+      <a href="#" class="nav-logo">
+        <img src="./stadioralabs info/stadiora_labs_logo - white.png" alt="Stadiora Labs"
+          onerror="this.style.display='none';this.nextElementSibling.style.display='block'">
+        <span class="nav-logo-fallback" style="display:none">STADIORA LABS</span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="#engine">The Engine</a></li>
+        <li><a href="#ecosystem">Products</a></li>
+        <li><a href="#mission">Who We Are</a></li>
+      </ul>
+      <a href="lead-magnet.html" class="nav-pill">
+        Free Check
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </a>
+      <div class="lang-toggle">
+        <span class="lang-btn active">EN</span>
+        <a href="./index-es.html" class="lang-btn">ES</a>
+      </div>
+      <button class="hamburger" onclick="openMenu()" aria-label="Open menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<!-- Mobile -->
+<div class="mobile-menu" id="mobileMenu">
+  <button class="mobile-close" onclick="closeMenu()">&#215;</button>
+  <a href="#engine"    onclick="closeMenu()">The Engine</a>
+  <a href="#ecosystem" onclick="closeMenu()">Products</a>
+  <a href="#mission"   onclick="closeMenu()">Who We Are</a>
+  <a href="lead-magnet.html" onclick="closeMenu()" style="color:var(--cyan)">Free Check</a>
+</div>
+
+<!-- ══ HERO ══ -->
+<section id="hero">
+
+  <!-- AI visualization image: the site's main visual anchor -->
+  <div class="hero-bg">
+    <img src="./hero-ai.webp" alt="Aria Intelligence — sports AI dashboard visualization" class="hero-bg-img">
+    <div class="hero-bg-overlay"></div>
+  </div>
+
+  <div class="container">
+    <div class="hero-inner">
+
+      <!-- Text on the left — image fills the right organically -->
+      <div class="hero-content">
+        <h1 class="hero-h1">
+          <span class="h1-l1">The Future of</span>
+          <span class="h1-l2">Human Performance</span>
+          <span class="h1-l3">Starts Here.</span>
+        </h1>
+
+        <p class="hero-sub">
+          Empowering athletes, coaches, and organizations through one AI-powered sports ecosystem.
+        </p>
+      </div>
+
+
+    </div>
+  </div>
+
+  <div class="hero-scroll">
+    <div class="scroll-line"></div>
+    <span class="scroll-lbl">Scroll</span>
+  </div>
+</section>
+
+<!-- ══ MARQUEE ══ -->
+<div class="marquee-wrap">
+  <div class="marquee-track">
+    <div class="marq-item">Athlete First <span class="ma">·</span></div>
+    <div class="marq-item">Science Over Hype <span class="ma">·</span></div>
+    <div class="marq-item">Data to Decisions <span class="ma">·</span></div>
+    <div class="marq-item">Build With Not For <span class="ma">·</span></div>
+    <div class="marq-item">The Gap Is Our Market <span class="ma">·</span></div>
+    <div class="marq-item">Aria Intelligence <span class="ma">·</span></div>
+    <div class="marq-item">Football Availability <span class="ma">·</span></div>
+    <div class="marq-item">Sprint Readiness <span class="ma">·</span></div>
+    <div class="marq-item">Built for Every Level <span class="ma">·</span></div>
+    <div class="marq-item">Athlete First <span class="ma">·</span></div>
+    <div class="marq-item">Science Over Hype <span class="ma">·</span></div>
+    <div class="marq-item">Data to Decisions <span class="ma">·</span></div>
+    <div class="marq-item">Build With Not For <span class="ma">·</span></div>
+    <div class="marq-item">The Gap Is Our Market <span class="ma">·</span></div>
+    <div class="marq-item">Aria Intelligence <span class="ma">·</span></div>
+    <div class="marq-item">Football Availability <span class="ma">·</span></div>
+    <div class="marq-item">Sprint Readiness <span class="ma">·</span></div>
+    <div class="marq-item">Built for Every Level <span class="ma">·</span></div>
+  </div>
+</div>
+
+<!-- ══ ENGINE ══ -->
+<section id="engine">
+  <div class="container">
+    <div class="engine-split">
+
+      <!-- Left: text -->
+      <div class="engine-text" data-reveal>
+        <div class="eyebrow">The Intelligence Engine</div>
+        <h2 class="engine-h2">
+          One Brain.<br>
+          Every Signal.<br>
+          <span class="g-cyan">One Decision.</span>
+        </h2>
+        <p class="engine-desc">
+          Aria Intelligence is the AI decision engine behind every Stadiora Labs product. It doesn't visualize your data — it translates it into one clear, actionable output.
+        </p>
+        <div class="engine-chips">
+          <div class="echip"><span class="echip-dot c"></span>Training load, recovery &amp; sleep</div>
+          <div class="echip"><span class="echip-dot m"></span>Injury risk &amp; readiness</div>
+          <div class="echip"><span class="echip-dot c"></span>HRV, nutrition &amp; cycle context</div>
+          <div class="echip"><span class="echip-dot v"></span>Coach input — all in one decision</div>
+        </div>
+      </div>
+
+      <!-- Right: phone -->
+      <div class="engine-phone" data-reveal data-reveal-delay="2">
+        <img src="./engine-dashboard.webp" alt="Aria for Coaches dashboard" class="engine-phone-img">
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══ PRODUCTS ══ -->
+<section id="ecosystem">
+  <div class="container">
+
+    <div class="eco-v2-hd" data-reveal>
+      <div class="eco-v2-eyebrow">One Ecosystem</div>
+      <h2 class="eco-v2-h2">Built for Coaches.<br><span class="g-mint">Made for Athletes.</span></h2>
+      <!-- Fix: "ARIA, ARIA 12" → "Run with Aria, Aria 12" -->
+      <p class="eco-v2-sub">Run with Aria, Aria 12, and FitMG connect seamlessly through Aria for Coaches, giving you a complete view of every athlete, sport, and performance journey.</p>
+    </div>
+
+    <div class="ptiles">
+
+      <!-- Run with Aria -->
+      <div class="ptile tc" data-bg="ARIA" data-reveal>
+        <img src="./bg-aria.webp" alt="" class="ptile-bg">
+        <img src="./phone-rwa.webp" alt="Run with Aria app" class="ptile-phone-img">
+        <div class="ptile-overlay"></div>
+        <div class="ptile-body">
+          <div class="ptile-name">Run with Aria</div>
+          <div class="ptile-tag tt-c">Smarter training for every runner.</div>
+          <a href="https://runwitharia.com/" target="_blank" rel="noopener" class="ptile-link pl-c">
+            <span class="ptile-link-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
+            <span class="ptile-link-lbl">Explore</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- Aria 12 -->
+      <div class="ptile tm" data-bg="12" data-reveal data-reveal-delay="1">
+        <img src="./bg-aria12.webp" alt="" class="ptile-bg">
+        <img src="./phone-aria12.webp" alt="Aria 12 app" class="ptile-phone-img">
+        <div class="ptile-overlay"></div>
+        <div class="ptile-body">
+          <div class="ptile-name">Aria 12</div>
+          <div class="ptile-tag tt-m">Data-driven development for every player.</div>
+          <a href="lead-magnet.html" class="ptile-link pl-m">
+            <span class="ptile-link-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
+            <span class="ptile-link-lbl">Explore</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- FitMG -->
+      <div class="ptile tv" data-bg="FITMG" data-reveal data-reveal-delay="2">
+        <img src="./bg-fitmg.webp" alt="" class="ptile-bg">
+        <img src="./phone-fitmg.webp" alt="FitMG app" class="ptile-phone-img">
+        <div class="ptile-overlay"></div>
+        <div class="ptile-body">
+          <div class="ptile-name">FitMG</div>
+          <div class="ptile-tag tt-v">Strength, health and fitness for every journey.</div>
+          <a href="https://testflight.apple.com/join/eDc3hw5D" target="_blank" rel="noopener" class="ptile-link pl-v">
+            <span class="ptile-link-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg></span>
+            <span class="ptile-link-lbl">Explore</span>
+          </a>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Aria for Coaches — Hub -->
+    <div class="ptile-hub" data-reveal>
+      <div class="ptile-hub-screen">
+        <img src="./stadioralabs info/aria_coaches_dashboard.webp" alt="Aria for Coaches dashboard">
+      </div>
+      <div class="ptile-hub-content">
+        <div class="ptile-hub-eyebrow">Coaching Intelligence Hub</div>
+        <div class="ptile-hub-name">Aria for Coaches</div>
+        <p class="ptile-hub-desc">One platform to manage every athlete.</p>
+        <a href="https://ariaforcoaches.com/" target="_blank" rel="noopener" class="ptile-hub-btn">
+          Visit Our Website
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </a>
+      </div>
+      <div class="ptile-hub-features">
+        <div class="hub-feat">
+          <div class="hub-feat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg></div>
+          <div class="hub-feat-title">Unified Athlete Profiles</div>
+          <div class="hub-feat-sub">All sports. One view.</div>
+        </div>
+        <div class="hub-feat">
+          <div class="hub-feat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M18 20V10M12 20V4M6 20v-6"/></svg></div>
+          <div class="hub-feat-title">Training &amp; Performance</div>
+          <div class="hub-feat-sub">Plan, track and analyze.</div>
+        </div>
+        <div class="hub-feat">
+          <div class="hub-feat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg></div>
+          <div class="hub-feat-title">Health &amp; Recovery</div>
+          <div class="hub-feat-sub">Reduce risk. Improve longevity.</div>
+        </div>
+        <div class="hub-feat">
+          <div class="hub-feat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></div>
+          <div class="hub-feat-title">Scheduling &amp; Availability</div>
+          <div class="hub-feat-sub">Smarter decisions, better results.</div>
+        </div>
+        <div class="hub-feat">
+          <div class="hub-feat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2a7 7 0 017 7c0 2.5-1.5 4.5-3.5 5.5V17a1 1 0 01-1 1h-5a1 1 0 01-1-1v-2.5C6.5 13.5 5 11.5 5 9a7 7 0 017-7z"/><path d="M9 21h6M10 17.5v-3M14 17.5v-3"/></svg></div>
+          <div class="hub-feat-title">AI Insights</div>
+          <div class="hub-feat-sub">Personalized recommendations.</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ══ MISSION ══ -->
+<section id="mission">
+  <div class="miss-amb"></div>
+  <div class="miss-amb2"></div>
+  <div class="container">
+    <div class="miss-inner" data-reveal>
+      <div class="miss-eyebrow">Who We Are</div>
+      <div class="miss-hed">Elite Intelligence.<br>For Everyone.</div>
+      <p class="miss-sub">We believe world-class coaching intelligence should be accessible to every athlete, coach, and organization—not just the elite.</p>
+
+      <hr class="miss-divider">
+
+      <div class="miss-mv-grid">
+        <div class="miss-mv-item">
+          <div class="miss-mv-ico">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/><line x1="12" y1="2" x2="12" y2="4"/><line x1="12" y1="20" x2="12" y2="22"/><line x1="2" y1="12" x2="4" y2="12"/><line x1="20" y1="12" x2="22" y2="12"/></svg>
+          </div>
+          <div>
+            <div class="miss-mv-title">Our Mission</div>
+            <p class="miss-mv-text">Make elite-level performance intelligence accessible to everyone.</p>
+          </div>
+        </div>
+        <div class="miss-mv-item">
+          <div class="miss-mv-ico v">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          </div>
+          <div>
+            <div class="miss-mv-title">Our Vision</div>
+            <p class="miss-mv-text">A world where every athlete can train smarter and reach their potential.</p>
+          </div>
+        </div>
+      </div>
+
+      <hr class="miss-divider">
+
+      <div class="miss-pillars">
+        <div>
+          <div class="miss-pillar-ico c">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18m0 0h10a2 2 0 002-2V9M9 21H5a2 2 0 01-2-2V9m0 0h18"/></svg>
+          </div>
+          <div class="miss-pillar-title">Science Over Hype</div>
+          <div class="miss-pillar-desc">Evidence-driven innovation.</div>
+        </div>
+        <div>
+          <div class="miss-pillar-ico m">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+          </div>
+          <div class="miss-pillar-title">Built Together</div>
+          <div class="miss-pillar-desc">Created with coaches and athletes.</div>
+        </div>
+        <div>
+          <div class="miss-pillar-ico v">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
+          </div>
+          <div class="miss-pillar-title">Access for All</div>
+          <div class="miss-pillar-desc">Elite technology without barriers.</div>
+        </div>
+      </div>
+
+      <div class="miss-footer">
+        <a href="team.html" class="miss-team-link">
+          Meet the Team
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ TRUSTED BY ══ -->
+<section class="trusted">
+  <div class="container">
+    <div class="trusted-hd">
+      <div class="trusted-eyebrow">Backed By</div>
+      <h2 class="trusted-title">The Institutions Behind Our Work</h2>
+      <p class="trusted-sub">The investors and institutions that back Stadiora Labs.</p>
+    </div>
+    <div class="trusted-grid">
+      <a href="https://thethinktank.vc/" target="_blank" rel="noopener" class="partner-card">
+        <img src="./stadioralabs info/thinktank_logo.png" alt="ThinkTank.VC">
+      </a>
+      <a href="https://www.ciemhcavi.una.ac.cr/" target="_blank" rel="noopener" class="partner-card">
+        <img src="./stadioralabs info/una_logo.png" alt="Universidad Nacional Costa Rica">
+      </a>
+      <a href="https://diprovid.ucr.ac.cr/auge/" target="_blank" rel="noopener" class="partner-card">
+        <img src="./stadioralabs info/auge_logo.svg" alt="Auge UCR">
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ══ TESTIMONIAL ══ -->
+<section id="testimonial">
+  <div class="container">
+    <div class="testi-inner" data-reveal>
+      <svg class="testi-icon" viewBox="0 0 40 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M0 30V18C0 7.2 6.4 1.6 19.2 0L20.8 3.2C13.6 4.8 9.6 8.4 9.6 14.4V16H18V30H0ZM22 30V18C22 7.2 28.4 1.6 41.2 0L42.8 3.2C35.6 4.8 31.6 8.4 31.6 14.4V16H40V30H22Z" fill="currentColor"/>
+      </svg>
+      <blockquote class="testi-text">"As a coach, I can't always see how the athlete is eating, how they slept, whether they have any discomfort, or if they're accumulating too much load. The platform lets me have all that information in one place and use intelligence to analyze it in real time — giving me a much more complete picture of each athlete."</blockquote>
+      <div class="testi-name">Roberto Méndez</div>
+      <div class="testi-role">Athletics Coach · Costa Rica Athletics Federation</div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ CTA ══ -->
+<section id="lm-cta">
+  <div class="cta-glow"></div>
+  <div class="container">
+    <div class="cta-inner" data-reveal>
+      <div class="eyebrow center dim">Free Performance Check</div>
+      <h2>
+        Find Out if You're Making<br>
+        <span class="g-cyan">The Right Decision Today.</span>
+      </h2>
+      <p>Answer 6 questions. Get a personalized intelligence report built on the same decision engine that powers elite performance programs. Free. Instant. No sign-up required to start.</p>
+      <a href="lead-magnet.html" class="btn btn-primary btn-lg">
+        Run My Performance Check
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </a>
+      <div class="cta-chips">
+        <div class="cta-chip">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          2 minutes
+        </div>
+        <div class="cta-chip">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+          Athletes &amp; coaches
+        </div>
+        <div class="cta-chip">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+          Track &amp; field and football
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ FOOTER ══ -->
+<footer id="footer">
+  <div class="container">
+    <div class="foot-grid">
+      <div class="fb">
+        <img src="./stadioralabs info/stadiora_labs_logo - white.png" alt="Stadiora Labs" onerror="this.style.display='none'">
+        <div class="fb-name">STADIORA LABS</div>
+        <div class="fb-tag">One Ecosystem. Intelligently Connected.</div>
+        <p class="fb-desc">The sports AI infrastructure company — building the intelligence layer that converts athlete data into decisions for athletes, coaches, and teams worldwide.</p>
+        <div class="fb-social">
+          <a href="https://www.linkedin.com/company/stadioralabs" target="_blank" rel="noopener" class="fb-slink" aria-label="LinkedIn">
+            <svg viewBox="0 0 24 24" fill="currentColor">
+              <path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2z"/>
+              <circle cx="4" cy="4" r="2"/>
+            </svg>
+          </a>
+        </div>
+      </div>
+      <div>
+        <div class="fc-title">Products</div>
+        <ul class="fc-links">
+          <!-- Fix: "Aria" → "Run with Aria" -->
+          <li><a href="https://runwitharia.com" target="_blank" rel="noopener">Run with Aria</a></li>
+          <li><a href="lead-magnet.html">Aria 12</a></li>
+          <li><a href="lead-magnet.html">Aria for Coaches</a></li>
+          <!-- Fix: API removed (in development, not a product yet) -->
+          <li><a href="lead-magnet.html">FitMG</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="fc-title">Company</div>
+        <ul class="fc-links">
+          <li><a href="#mission">Our Mission</a></li>
+          <li><a href="#engine">The Engine</a></li>
+          <li><a href="#ecosystem">Ecosystem</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="fc-title">Get Started</div>
+        <ul class="fc-links">
+          <li><a href="lead-magnet.html">Free Performance Check</a></li>
+          <li><a href="lead-magnet.html">Athlete Access</a></li>
+          <li><a href="lead-magnet.html">Coach Access</a></li>
+          <li><a href="lead-magnet.html">Request a Demo</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="foot-btm">
+      <p class="foot-copy">© 2026 Stadiora Labs. All rights reserved. Built in Latin America &amp; the United States.</p>
+      <div class="foot-legal">
+        <a href="./privacy.html">Privacy Policy</a>
+        <a href="./terms.html">Terms of Use</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+// Nav scroll
+const nav = document.getElementById('nav');
+window.addEventListener('scroll', () => { nav.classList.toggle('scrolled', window.scrollY > 40); }, { passive: true });
+
+// Mobile menu
+function openMenu()  { document.getElementById('mobileMenu').classList.add('open');    document.body.style.overflow = 'hidden'; }
+function closeMenu() { document.getElementById('mobileMenu').classList.remove('open'); document.body.style.overflow = ''; }
+
+// Scroll reveal (sections below hero only)
+const revealObs = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('on'); revealObs.unobserve(e.target); } });
+}, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+document.querySelectorAll('[data-reveal]').forEach(el => revealObs.observe(el));
+
+// Product tile video lazy-load
+const tileVidObs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      const vid = e.target.querySelector('.ptile-video');
+      if (vid && !vid.dataset.loading) {
+        vid.dataset.loading = '1';
+        vid.addEventListener('canplay', () => {
+          vid.play().then(() => vid.classList.add('vloaded')).catch(() => vid.classList.add('vloaded'));
+        }, { once: true });
+        vid.load();
+      }
+      tileVidObs.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.15 });
+document.querySelectorAll('.ptile').forEach(t => tileVidObs.observe(t));
+
+// Smooth anchor scroll
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener('click', e => {
+    const t = document.querySelector(a.getAttribute('href'));
+    if (t) { e.preventDefault(); t.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+  });
+});
+</script>
+</body>
+</html>
