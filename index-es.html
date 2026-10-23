@@ -427,8 +427,8 @@ body::before{
 .ptile-hub-content{grid-row:1;grid-column:2;padding:52px 52px 40px 44px;display:flex;flex-direction:column;justify-content:center}
 .ptile-hub-features{grid-row:2;grid-column:1/-1;display:grid;grid-template-columns:repeat(5,1fr);padding:24px 0 16px;border-top:none}
 .hub-feat{padding:22px 16px;text-align:center}
-.hub-feat-icon{width:36px;height:36px;margin:0 auto 12px;color:var(--cyan);opacity:.75}
-.hub-feat-icon svg{width:36px;height:36px}
+.hub-feat-icon{width:28px;height:28px;margin:0 auto 12px;color:var(--cyan);opacity:.75}
+.hub-feat-icon svg{width:28px;height:28px}
 .hub-feat-title{font-size:11px;font-weight:700;color:var(--white);margin-bottom:3px}
 .hub-feat-sub{font-size:10px;color:rgba(255,255,255,.32);line-height:1.4}
 .ptile-hub-eyebrow{font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--cyan);margin-bottom:16px}
@@ -474,24 +474,19 @@ body::before{
 .miss-amb2{position:absolute;bottom:-80px;left:-100px;width:400px;height:400px;background:radial-gradient(circle,rgba(139,92,246,.05) 0%,transparent 65%);pointer-events:none}
 .miss-inner{position:relative;z-index:1;padding:52px 56px}
 .miss-eyebrow{font-size:10px;font-weight:700;letter-spacing:4px;text-transform:uppercase;color:var(--cyan);margin-bottom:16px}
-.miss-hed{font-family:'Bebas Neue',sans-serif;font-size:clamp(38px,5vw,68px);letter-spacing:2px;line-height:1;margin-bottom:18px}
-.miss-sub{font-size:15px;color:rgba(255,255,255,.48);line-height:1.75;max-width:700px;margin-bottom:40px}
+.miss-hed{font-family:'Bebas Neue',sans-serif;font-size:clamp(48px,6vw,82px);letter-spacing:2px;line-height:1;margin-bottom:20px}
+.miss-sub{font-size:18px;color:rgba(255,255,255,.5);line-height:1.7;max-width:750px;margin-bottom:56px}
 .miss-divider{display:none}
-.miss-mv-grid{display:grid;grid-template-columns:1fr 1fr;gap:32px;margin-bottom:36px}
-.miss-mv-item{display:flex;gap:16px;align-items:flex-start}
-.miss-mv-ico{width:38px;height:38px;flex-shrink:0;border-radius:50%;border:1px solid rgba(0,190,243,.35);display:flex;align-items:center;justify-content:center;color:var(--cyan);background:rgba(0,190,243,.06)}
-.miss-mv-ico.v{border-color:rgba(52,211,153,.35);color:var(--mint);background:rgba(52,211,153,.06)}
-.miss-mv-ico svg{width:17px;height:17px}
-.miss-mv-title{font-size:14px;font-weight:700;color:var(--white);margin-bottom:6px}
-.miss-mv-text{font-size:13px;color:rgba(255,255,255,.48);line-height:1.7;margin:0}
-.miss-pillars{display:grid;grid-template-columns:repeat(3,1fr);gap:28px}
-.miss-pillar-ico{width:26px;height:26px;margin-bottom:10px}
-.miss-pillar-ico svg{width:24px;height:24px}
-.miss-pillar-ico.c{color:var(--cyan)}
-.miss-pillar-ico.m{color:var(--mint)}
-.miss-pillar-ico.v{color:var(--violet)}
-.miss-pillar-title{font-size:14px;font-weight:700;color:var(--white);margin-bottom:5px}
-.miss-pillar-desc{font-size:13px;color:rgba(255,255,255,.42);line-height:1.6}
+.miss-top-row{display:grid;grid-template-columns:1fr 1fr;gap:40px;margin:0 auto 48px}
+.miss-top-row .miss-col-desc{font-size:18px;white-space:nowrap}
+.miss-bot-row{display:grid;grid-template-columns:repeat(3,1fr);gap:40px}
+.miss-col{display:flex;flex-direction:column;align-items:center;text-align:center}
+.miss-col-ico{width:44px;height:44px;margin-bottom:18px}
+.miss-col-ico svg{width:44px;height:44px}
+.miss-col-ico.w{color:var(--white);filter:drop-shadow(0 0 8px rgba(255,255,255,.25))}
+.miss-col-ico.c{color:var(--cyan);filter:drop-shadow(0 0 10px rgba(0,190,243,.4))}
+.miss-col-title{font-size:18px;font-weight:700;color:var(--white);margin-bottom:10px}
+.miss-col-desc{font-size:15px;color:rgba(255,255,255,.48);line-height:1.65;margin:0}
 .miss-footer{display:flex;justify-content:flex-end;margin-top:36px;padding-top:28px}
 .miss-team-link{display:inline-flex;align-items:center;gap:8px;font-size:14px;font-weight:700;color:var(--cyan);text-decoration:none;transition:gap .2s}
 .miss-team-link:hover{gap:13px}
@@ -543,8 +538,9 @@ body::before{
   .flow-center::before,.flow-center::after{display:none}
   .ptiles{grid-template-columns:1fr;border-radius:16px}
   .miss-inner{padding:36px 28px}
-  .miss-mv-grid{grid-template-columns:1fr}
-  .miss-pillars{grid-template-columns:1fr}
+  .miss-top-row{grid-template-columns:1fr}
+  .miss-top-row .miss-col-desc{white-space:normal}
+  .miss-bot-row{grid-template-columns:1fr}
   .foot-grid{grid-template-columns:1fr 1fr;gap:36px}
   .fb{grid-column:1/-1}
   .stmt-main{font-size:clamp(60px,13vw,120px)}
@@ -793,52 +789,33 @@ body::before{
       <div class="miss-hed">Inteligencia de Élite.<br>Para Todos.</div>
       <p class="miss-sub">Estamos democratizando la tecnología deportiva, haciendo que la inteligencia de coaching de clase mundial sea accesible para cada atleta, entrenador y organización.</p>
 
-      <hr class="miss-divider">
-
-      <div class="miss-mv-grid">
-        <div class="miss-mv-item">
-          <div class="miss-mv-ico">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/><line x1="12" y1="2" x2="12" y2="4"/><line x1="12" y1="20" x2="12" y2="22"/><line x1="2" y1="12" x2="4" y2="12"/><line x1="20" y1="12" x2="22" y2="12"/></svg>
-          </div>
-          <div>
-            <div class="miss-mv-title">Nuestra Misión</div>
-            <p class="miss-mv-text">Hacer la inteligencia de rendimiento de élite accesible para todos.</p>
-          </div>
+      <div class="miss-top-row">
+        <div class="miss-col">
+          <div class="miss-col-ico w"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/><line x1="12" y1="2" x2="12" y2="4"/><line x1="12" y1="20" x2="12" y2="22"/><line x1="2" y1="12" x2="4" y2="12"/><line x1="20" y1="12" x2="22" y2="12"/></svg></div>
+          <div class="miss-col-title">Nuestra Misión</div>
+          <p class="miss-col-desc">Hacer la inteligencia de rendimiento de élite accesible para todos.</p>
         </div>
-        <div class="miss-mv-item">
-          <div class="miss-mv-ico v">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-          </div>
-          <div>
-            <div class="miss-mv-title">Nuestra Visión</div>
-            <p class="miss-mv-text">Un mundo donde cada atleta pueda entrenar más inteligente y alcanzar su potencial.</p>
-          </div>
+        <div class="miss-col">
+          <div class="miss-col-ico w"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></div>
+          <div class="miss-col-title">Nuestra Visión</div>
+          <p class="miss-col-desc">Un mundo donde cada atleta pueda entrenar más inteligente y alcanzar su potencial.</p>
         </div>
       </div>
-
-      <hr class="miss-divider">
-
-      <div class="miss-pillars">
-        <div>
-          <div class="miss-pillar-ico c">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18m0 0h10a2 2 0 002-2V9M9 21H5a2 2 0 01-2-2V9m0 0h18"/></svg>
-          </div>
-          <div class="miss-pillar-title">Ciencia sobre Hype</div>
-          <div class="miss-pillar-desc">Innovación basada en evidencia.</div>
+      <div class="miss-bot-row">
+        <div class="miss-col">
+          <div class="miss-col-ico w"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18m0 0h10a2 2 0 002-2V9M9 21H5a2 2 0 01-2-2V9m0 0h18"/></svg></div>
+          <div class="miss-col-title">Ciencia sobre Hype</div>
+          <p class="miss-col-desc">Innovación basada en evidencia.</p>
         </div>
-        <div>
-          <div class="miss-pillar-ico m">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
-          </div>
-          <div class="miss-pillar-title">Construido Juntos</div>
-          <div class="miss-pillar-desc">Creado con entrenadores y atletas.</div>
+        <div class="miss-col">
+          <div class="miss-col-ico w"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg></div>
+          <div class="miss-col-title">Construido Juntos</div>
+          <p class="miss-col-desc">Creado con entrenadores y atletas.</p>
         </div>
-        <div>
-          <div class="miss-pillar-ico v">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
-          </div>
-          <div class="miss-pillar-title">Acceso para Todos</div>
-          <div class="miss-pillar-desc">Tecnología de élite sin barreras.</div>
+        <div class="miss-col">
+          <div class="miss-col-ico w"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg></div>
+          <div class="miss-col-title">Acceso para Todos</div>
+          <p class="miss-col-desc">Tecnología de élite sin barreras.</p>
         </div>
       </div>
 
