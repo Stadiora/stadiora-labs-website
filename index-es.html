@@ -330,8 +330,8 @@ body::before{
   position:absolute;right:0;top:50%;transform:translateY(-50%);
   height:120%;width:auto;max-width:52%;
   object-fit:contain;object-position:right center;
-  z-index:4;pointer-events:none;
-  mix-blend-mode:multiply;
+  z-index:5;pointer-events:none;
+  filter:drop-shadow(0 0 40px rgba(0,0,0,.6));
 }
 
 .ptile::before{
@@ -347,11 +347,11 @@ body::before{
 
 .ptile::after{
   content:'';position:absolute;inset:0;pointer-events:none;
-  transition:opacity .4s;opacity:.7;z-index:2;
+  transition:opacity .4s;opacity:.6;z-index:1;
 }
-.ptile.tc::after{background:radial-gradient(ellipse 58% 68% at 76% 52%,rgba(0,190,243,.24) 0%,transparent 70%)}
-.ptile.tm::after{background:radial-gradient(ellipse 58% 68% at 76% 52%,rgba(52,211,153,.22) 0%,transparent 70%)}
-.ptile.tv::after{background:radial-gradient(ellipse 58% 68% at 76% 52%,rgba(139,92,246,.22) 0%,transparent 70%)}
+.ptile.tc::after{background:radial-gradient(ellipse 58% 68% at 76% 52%,rgba(0,190,243,.22) 0%,transparent 70%)}
+.ptile.tm::after{background:radial-gradient(ellipse 58% 68% at 76% 52%,rgba(52,211,153,.20) 0%,transparent 70%)}
+.ptile.tv::after{background:radial-gradient(ellipse 58% 68% at 76% 52%,rgba(139,92,246,.20) 0%,transparent 70%)}
 .ptile:hover::after{opacity:1}
 
 .ptile-line{position:absolute;top:0;left:0;right:0;height:2px;pointer-events:none;z-index:3}
@@ -408,10 +408,14 @@ body::before{
 .ptile-hub-screen img{width:100%;height:100%;object-fit:cover;object-position:top left;display:block}
 .ptile-hub-screen::after{content:'';position:absolute;inset:0;background:linear-gradient(to right,transparent 75%,rgba(4,12,32,.95));pointer-events:none}
 .ptile-hub-content{grid-row:1;grid-column:2;padding:52px 52px 40px 44px;display:flex;flex-direction:column;justify-content:center}
-.ptile-hub-tagline{grid-row:2;grid-column:1/-1;padding:20px 44px;border-top:1px solid rgba(0,190,243,.1);font-size:14px;font-weight:600;color:rgba(255,255,255,.45);letter-spacing:.2px}
+.ptile-hub-features{grid-row:2;grid-column:1/-1;display:grid;grid-template-columns:repeat(5,1fr);padding:8px 0 4px}
+.hub-feat{padding:22px 16px;text-align:center}
+.hub-feat-icon{width:28px;height:28px;margin:0 auto 10px;color:var(--cyan);opacity:.7}
+.hub-feat-title{font-size:11px;font-weight:700;color:var(--white);margin-bottom:3px}
+.hub-feat-sub{font-size:10px;color:rgba(255,255,255,.32);line-height:1.4}
 .ptile-hub-eyebrow{font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--cyan);margin-bottom:16px}
-.ptile-hub-name{font-family:'Bebas Neue',sans-serif;font-size:clamp(40px,4vw,62px);letter-spacing:2px;line-height:1;margin-bottom:10px}
-.ptile-hub-desc{font-size:14px;color:rgba(255,255,255,.5);line-height:1.82;margin-bottom:32px;max-width:400px}
+.ptile-hub-name{font-family:'Bebas Neue',sans-serif;font-size:clamp(40px,4vw,62px);letter-spacing:2px;line-height:1;margin-bottom:16px}
+.ptile-hub-desc{font-size:16px;font-weight:500;color:rgba(255,255,255,.6);line-height:1.5;margin-bottom:32px;max-width:420px}
 .ptile-hub-btn{display:inline-flex;align-items:center;gap:10px;background:var(--cyan);color:var(--black);font-size:13px;font-weight:700;padding:13px 26px;border-radius:100px;text-decoration:none;transition:opacity .2s,gap .2s;width:fit-content}
 .ptile-hub-btn:hover{opacity:.85;gap:16px}
 .ptile-hub-btn svg{width:14px;height:14px}
@@ -663,7 +667,6 @@ body::before{
       <!-- Run with Aria -->
       <div class="ptile tc" data-bg="ARIA" data-reveal>
         <img src="./phone-rwa.webp" alt="Run with Aria app" class="ptile-phone-img">
-        <div class="ptile-line"></div>
         <div class="ptile-body">
           <div class="ptile-name">Run with Aria</div>
           <div class="ptile-tag tt-c">Entrenamiento inteligente para cada corredor.</div>
@@ -677,7 +680,6 @@ body::before{
       <!-- Aria 12 -->
       <div class="ptile tm" data-bg="12" data-reveal data-reveal-delay="1">
         <img src="./phone-aria12.webp" alt="Aria 12 app" class="ptile-phone-img">
-        <div class="ptile-line"></div>
         <div class="ptile-body">
           <div class="ptile-name">Aria 12</div>
           <div class="ptile-tag tt-m">Desarrollo basado en datos para cada jugador.</div>
@@ -691,7 +693,6 @@ body::before{
       <!-- FitMG -->
       <div class="ptile tv" data-bg="FITMG" data-reveal data-reveal-delay="2">
         <img src="./phone-fitmg.webp" alt="FitMG app" class="ptile-phone-img">
-        <div class="ptile-line"></div>
         <div class="ptile-body">
           <div class="ptile-name">FitMG</div>
           <div class="ptile-tag tt-v">Fuerza, salud y fitness para cada trayectoria.</div>
@@ -712,13 +713,39 @@ body::before{
       <div class="ptile-hub-content">
         <div class="ptile-hub-eyebrow">Hub de Inteligencia para Coaches</div>
         <div class="ptile-hub-name">Aria for Coaches</div>
-        <p class="ptile-hub-desc">Gestiona atletas, monitorea preparación, planifica entrenamientos y toma decisiones basadas en datos en todos los deportes y disciplinas de fitness — en una plataforma conectada.</p>
+        <p class="ptile-hub-desc">Una plataforma para gestionar a cada atleta.</p>
         <a href="https://ariaforcoaches.com/" target="_blank" rel="noopener" class="ptile-hub-btn">
           Visita nuestro sitio
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
         </a>
       </div>
-      <div class="ptile-hub-tagline">Una plataforma para gestionar a cada atleta.</div>
+      <div class="ptile-hub-features">
+        <div class="hub-feat">
+          <div class="hub-feat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg></div>
+          <div class="hub-feat-title">Perfiles Unificados</div>
+          <div class="hub-feat-sub">Todos los deportes. Una vista.</div>
+        </div>
+        <div class="hub-feat">
+          <div class="hub-feat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M18 20V10M12 20V4M6 20v-6"/></svg></div>
+          <div class="hub-feat-title">Entrenamiento &amp; Rendimiento</div>
+          <div class="hub-feat-sub">Planifica, mide y analiza.</div>
+        </div>
+        <div class="hub-feat">
+          <div class="hub-feat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg></div>
+          <div class="hub-feat-title">Salud &amp; Recuperación</div>
+          <div class="hub-feat-sub">Reduce el riesgo. Mejora la longevidad.</div>
+        </div>
+        <div class="hub-feat">
+          <div class="hub-feat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg></div>
+          <div class="hub-feat-title">Planificación &amp; Disponibilidad</div>
+          <div class="hub-feat-sub">Decisiones más inteligentes.</div>
+        </div>
+        <div class="hub-feat">
+          <div class="hub-feat-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2a7 7 0 017 7c0 2.5-1.5 4.5-3.5 5.5V17a1 1 0 01-1 1h-5a1 1 0 01-1-1v-2.5C6.5 13.5 5 11.5 5 9a7 7 0 017-7z"/><path d="M9 21h6M10 17.5v-3M14 17.5v-3"/></svg></div>
+          <div class="hub-feat-title">Insights con IA</div>
+          <div class="hub-feat-sub">Recomendaciones personalizadas.</div>
+        </div>
+      </div>
     </div>
 
   </div>
