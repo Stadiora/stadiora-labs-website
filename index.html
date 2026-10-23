@@ -5,7 +5,7 @@
 <link rel="icon" type="image/png" href="./stadioralabs info/favicon.png">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="Stadiora Labs builds the AI intelligence layer that converts athlete data into decisions. One ecosystem. Intelligently connected.">
-<title>Stadiora Labs — Sports AI Infrastructure</title>
+<title>Stadiora Labs — Sports AI Infrastructure [PREVIEW]</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -45,7 +45,7 @@ body::before{
 
 .container{width:100%;max-width:1240px;margin:0 auto;padding:0 48px}
 
-/* ── Reveal ── */
+/* ── Reveal (scroll sections only) ── */
 [data-reveal]{opacity:0;transform:translateY(32px);transition:opacity .7s cubic-bezier(.22,1,.36,1),transform .7s cubic-bezier(.22,1,.36,1)}
 [data-reveal].on{opacity:1;transform:none}
 [data-reveal-delay="1"]{transition-delay:.1s}
@@ -137,96 +137,91 @@ body::before{
 .mobile-close{position:absolute;top:24px;right:32px;background:none;border:none;color:rgba(255,255,255,.3);font-size:28px;cursor:pointer}
 
 /* ═══════════════════════════════
-   HERO
+   HERO — image-driven
 ═══════════════════════════════ */
 #hero{
   position:relative;min-height:100vh;
   display:flex;align-items:center;
-  overflow:hidden;padding:140px 0 100px;
+  overflow:hidden;padding:140px 0 120px;
   background:var(--black);
 }
 
-/* Video slot — drop hero.mp4 into ./videos/ to activate */
-.hero-vid-wrap{position:absolute;inset:0;overflow:hidden}
-.hero-vid{
+/* The AI visualization image IS the hero */
+.hero-bg{position:absolute;inset:0;overflow:hidden}
+.hero-bg-img{
   position:absolute;inset:0;width:100%;height:100%;
-  object-fit:cover;opacity:.32;
+  object-fit:cover;object-position:60% center;
+  opacity:.92;
 }
-.hero-vid-overlay{
+/* Black fades from left (text area) → transparent on right (image shines through) */
+.hero-bg-overlay{
   position:absolute;inset:0;
   background:
-    linear-gradient(to right, rgba(1,8,18,.96) 38%, rgba(1,8,18,.65) 75%, rgba(1,8,18,.82) 100%),
-    linear-gradient(to bottom, rgba(1,8,18,.2) 0%, rgba(1,8,18,.6) 100%);
+    linear-gradient(to right,
+      rgba(1,8,18,1)    0%,
+      rgba(1,8,18,.98)  25%,
+      rgba(1,8,18,.82)  40%,
+      rgba(1,8,18,.35)  58%,
+      rgba(1,8,18,.08)  78%,
+      rgba(1,8,18,.02) 100%),
+    linear-gradient(to bottom,
+      rgba(1,8,18,.5)  0%,
+      transparent      18%,
+      transparent      72%,
+      rgba(1,8,18,.9) 100%);
 }
 
-/* CSS fallback atmosphere (shows when no video) */
-.hero-atm{
-  position:absolute;inset:0;pointer-events:none;
-  background:
-    radial-gradient(ellipse 80% 65% at 90% 15%, rgba(0,190,243,.15) 0%, transparent 58%),
-    radial-gradient(ellipse 55% 50% at 8% 90%,  rgba(139,92,246,.11) 0%, transparent 58%),
-    radial-gradient(ellipse 45% 40% at 55% 55%, rgba(52,211,153,.05) 0%, transparent 60%);
-}
-.hero-grid{
-  position:absolute;inset:0;pointer-events:none;
-  background-image:
-    linear-gradient(rgba(255,255,255,.02) 1px,transparent 1px),
-    linear-gradient(90deg,rgba(255,255,255,.02) 1px,transparent 1px);
-  background-size:100px 100px;
-  mask-image:radial-gradient(ellipse 100% 80% at 80% 0%,rgba(0,0,0,.7) 0%,transparent 70%);
-}
-.hero-sweep{
-  position:absolute;inset:0;pointer-events:none;
-  background:linear-gradient(118deg,transparent 38%,rgba(0,190,243,.05) 50%,transparent 62%);
-  animation:sweep 10s ease-in-out infinite;
-}
-@keyframes sweep{0%,100%{opacity:0;transform:translateX(-30%)} 40%{opacity:1} 55%{opacity:0;transform:translateX(130%)}}
-
-/* Orbs */
-.orb{position:absolute;border-radius:50%;pointer-events:none;animation:orbFloat 12s ease-in-out infinite}
-.orb-1{width:800px;height:800px;background:radial-gradient(circle,rgba(0,190,243,.13) 0%,transparent 65%);top:-250px;right:-200px;filter:blur(70px);animation-delay:0s}
-.orb-2{width:500px;height:500px;background:radial-gradient(circle,rgba(139,92,246,.1) 0%,transparent 65%);bottom:-150px;left:-80px;filter:blur(90px);animation-delay:-6s}
-@keyframes orbFloat{0%,100%{transform:translate(0,0) scale(1)} 33%{transform:translate(20px,-28px) scale(1.03)} 66%{transform:translate(-16px,18px) scale(.97)}}
-
-/* Hero layout */
+/* Hero layout — text on left, image fills entire background */
 .hero-inner{
   position:relative;z-index:1;
-  display:flex;align-items:center;gap:64px;width:100%;
+  display:flex;align-items:center;width:100%;
 }
-.hero-content{flex:1;min-width:0}
+.hero-content{
+  flex:0 0 auto;
+  width:min(580px,52%);
+}
 
-.hero-badge{
+/* ── Hero content enters immediately (no scroll observer) ── */
+@keyframes heroFadeUp{
+  from{opacity:0;transform:translateY(28px)}
+  to{opacity:1;transform:none}
+}
+.hero-badge {
   display:inline-flex;align-items:center;gap:10px;
   background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.09);
   border-radius:100px;padding:7px 18px;margin-bottom:32px;
   font-size:11px;font-weight:600;letter-spacing:2.5px;text-transform:uppercase;
   color:rgba(255,255,255,.42);
+  animation: heroFadeUp .7s cubic-bezier(.22,1,.36,1) .05s both;
 }
-.bdot{width:6px;height:6px;border-radius:50%;background:var(--mint);animation:bdotPulse 2.6s ease-in-out infinite}
-@keyframes bdotPulse{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(52,211,153,0)} 50%{opacity:.7;box-shadow:0 0 0 5px rgba(52,211,153,.14)}}
-
 .hero-h1{
   font-family:'Bebas Neue',sans-serif;
-  font-size:clamp(64px,10.5vw,136px);
-  letter-spacing:2px;line-height:.86;margin-bottom:32px;
+  font-size:clamp(52px,7vw,92px);
+  letter-spacing:2px;line-height:.9;margin-bottom:32px;
+  animation: heroFadeUp .8s cubic-bezier(.22,1,.36,1) .18s both;
 }
 .h1-l1{display:block;color:var(--white)}
-.h1-l2{display:block;color:rgba(255,255,255,.22)}
+.h1-l2{display:block;color:var(--white)}
 .h1-l3{
   display:block;
   background:linear-gradient(90deg,var(--cyan) 0%,var(--mint) 60%);
   -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
 }
-
 .hero-sub{
   font-size:clamp(15px,1.9vw,18px);color:rgba(255,255,255,.55);
   max-width:520px;line-height:1.85;margin-bottom:44px;
+  animation: heroFadeUp .8s cubic-bezier(.22,1,.36,1) .32s both;
+}
+.hero-ctas{
+  display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:60px;
+  animation: heroFadeUp .8s cubic-bezier(.22,1,.36,1) .46s both;
 }
 
-.hero-ctas{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:60px}
-
-/* Stats */
-.hero-stats{display:flex;align-items:stretch;border-top:1px solid var(--border);padding-top:36px;max-width:500px}
+/* Stats — now just 2 (removed the implausible "1 Decision Delivered") */
+.hero-stats{
+  display:flex;align-items:stretch;border-top:1px solid var(--border);padding-top:36px;max-width:400px;
+  animation: heroFadeUp .8s cubic-bezier(.22,1,.36,1) .58s both;
+}
 .hstat{flex:1}
 .hstat+.hstat{padding-left:28px;border-left:1px solid var(--border)}
 .hstat-n{font-family:'Bebas Neue',sans-serif;font-size:44px;letter-spacing:1px;line-height:1;margin-bottom:4px;color:var(--white)}
@@ -239,63 +234,9 @@ body::before{
 .scroll-lbl{font-size:9px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,.18)}
 @keyframes scrollAnim{0%{transform:scaleY(0);transform-origin:top;opacity:0} 30%{opacity:1} 50%{transform:scaleY(1);transform-origin:top} 51%{transform:scaleY(1);transform-origin:bottom} 100%{transform:scaleY(0);transform-origin:bottom;opacity:0}}
 
-/* ── Hero Widget ── */
-.hero-widget{
-  width:340px;flex-shrink:0;
-  background:rgba(0,190,243,.04);
-  border:1px solid rgba(0,190,243,.18);
-  border-radius:20px;padding:30px;
-  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
-  position:relative;overflow:hidden;
-}
-.hero-widget::before{
-  content:'';position:absolute;top:-60px;right:-60px;
-  width:180px;height:180px;border-radius:50%;
-  background:radial-gradient(circle,rgba(0,190,243,.14) 0%,transparent 65%);
-  pointer-events:none;
-}
-.hw-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px}
-.hw-title{font-size:9px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,.35)}
-.hw-live{display:flex;align-items:center;gap:6px;font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--mint)}
-.hw-live::before{content:'';width:5px;height:5px;border-radius:50%;background:var(--mint);animation:bdotPulse 2s ease-in-out infinite}
+.bdot{width:6px;height:6px;border-radius:50%;background:var(--mint);animation:bdotPulse 2.6s ease-in-out infinite}
+@keyframes bdotPulse{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(52,211,153,0)} 50%{opacity:.7;box-shadow:0 0 0 5px rgba(52,211,153,.14)}}
 
-/* Radial score ring */
-.hw-ring-wrap{display:flex;justify-content:center;margin-bottom:26px;position:relative}
-.hw-svg{width:148px;height:148px;transform:rotate(-90deg)}
-.ring-bg{fill:none;stroke:rgba(255,255,255,.05);stroke-width:8}
-.ring-fill{
-  fill:none;stroke:url(#rg);stroke-width:8;stroke-linecap:round;
-  stroke-dasharray:220;stroke-dashoffset:220;
-  animation:ringFill 2.2s cubic-bezier(.4,0,.2,1) .6s forwards;
-}
-@keyframes ringFill{to{stroke-dashoffset:17.6}}
-.ring-num{
-  position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
-  text-align:center;
-}
-.ring-num-val{font-family:'Bebas Neue',sans-serif;font-size:52px;letter-spacing:2px;line-height:1;color:var(--white)}
-.ring-num-lbl{font-size:9px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:var(--cyan)}
-
-/* Data bars */
-.hw-bars{display:flex;flex-direction:column;gap:13px;margin-bottom:20px}
-.hwb{display:flex;align-items:center;gap:10px}
-.hwb-lbl{font-size:11px;color:rgba(255,255,255,.38);width:70px;flex-shrink:0}
-.hwb-track{flex:1;height:3px;background:rgba(255,255,255,.07);border-radius:2px;overflow:hidden}
-.hwb-fill{height:100%;border-radius:2px;background:linear-gradient(90deg,var(--cyan),var(--mint));width:0;transition:width 1.5s cubic-bezier(.4,0,.2,1)}
-.hwb-val{font-size:11px;font-weight:700;color:rgba(255,255,255,.55);width:28px;text-align:right;flex-shrink:0}
-
-.hw-footer{
-  display:flex;align-items:center;justify-content:space-between;
-  padding-top:16px;border-top:1px solid var(--border);
-}
-.hw-footer-lbl{font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,.25)}
-.hw-footer-dot{
-  width:22px;height:22px;border-radius:50%;
-  background:rgba(0,190,243,.12);border:1px solid rgba(0,190,243,.25);
-  display:flex;align-items:center;justify-content:center;
-  animation:bdotPulse 3s ease-in-out infinite;
-}
-.hw-footer-dot::after{content:'';width:7px;height:7px;border-radius:50%;background:var(--cyan)}
 
 /* ═══════════════════════════════
    MARQUEE
@@ -316,51 +257,54 @@ body::before{
 /* ═══════════════════════════════
    ENGINE
 ═══════════════════════════════ */
-#engine{background:var(--navy);position:relative;overflow:hidden;padding:120px 0}
-#engine::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(0,190,243,.5),transparent)}
-#engine::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(0,190,243,.15),transparent)}
-.engine-amb{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:700px;height:460px;background:radial-gradient(ellipse,rgba(0,190,243,.07) 0%,transparent 65%);pointer-events:none}
+/* Engine section — Teamworks-inspired two-column split */
+#engine{background:var(--black);position:relative;overflow:hidden;padding:120px 0}
 
-.engine-intro{text-align:center;max-width:640px;margin:0 auto 90px}
-.engine-intro h2{font-family:'Bebas Neue',sans-serif;font-size:clamp(40px,5.5vw,76px);letter-spacing:2px;line-height:.97;margin-bottom:18px}
-.engine-intro p{font-size:16px;color:rgba(255,255,255,.5);line-height:1.85}
-
-.flow{display:grid;grid-template-columns:230px 280px 230px;align-items:center;gap:0 0;max-width:960px;margin:0 auto;position:relative;z-index:1}
-.flow-col{display:flex;flex-direction:column;gap:10px;width:230px}
-.flow-col.inputs{align-items:stretch}
-.flow-col.outputs{align-items:stretch}
-
-.fpill{padding:11px 16px;border-radius:9px;font-size:12px;font-weight:600;white-space:normal;text-align:center;line-height:1.35;width:100%;box-sizing:border-box}
-.fpill-in{background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.07);color:rgba(255,255,255,.36)}
-.fpill-out{border:1px solid;font-weight:700}
-.fp-cyan  {border-color:rgba(0,190,243,.38); background:rgba(0,190,243,.08); color:var(--cyan)}
-.fp-mint  {border-color:rgba(52,211,153,.38);background:rgba(52,211,153,.08);color:var(--mint)}
-.fp-amber {border-color:rgba(245,158,11,.38);background:rgba(245,158,11,.08);color:#f59e0b}
-.fp-violet{border-color:rgba(139,92,246,.38);background:rgba(139,92,246,.08);color:var(--violet)}
-
-.flow-center{display:flex;flex-direction:column;align-items:center;padding:0 24px;position:relative}
-.flow-center::before,.flow-center::after{content:'';position:absolute;top:50%;height:1px;width:24px;border-top:1px dashed rgba(0,190,243,.25)}
-.flow-center::before{right:100%}.flow-center::after{left:100%}
-
-.engine-box{
-  background:linear-gradient(155deg,rgba(0,190,243,.1) 0%,rgba(0,190,243,.03) 100%);
-  border:1px solid rgba(0,190,243,.28);border-radius:20px;
-  padding:40px 28px;text-align:center;width:100%;position:relative;
-  animation:ePulse 5s ease-in-out infinite;
+.engine-split{
+  display:grid;grid-template-columns:1fr 1fr;
+  gap:80px;align-items:center;
 }
-@keyframes ePulse{0%,100%{box-shadow:0 0 50px rgba(0,190,243,.08),inset 0 0 30px rgba(0,190,243,.03)} 50%{box-shadow:0 0 110px rgba(0,190,243,.2),inset 0 0 60px rgba(0,190,243,.08)}}
-.ering{position:absolute;border-radius:inherit;pointer-events:none}
-.er1{inset:-18px;border:1px solid rgba(0,190,243,.1);border-radius:30px;animation:erBreath 5s ease-in-out infinite}
-.er2{inset:-36px;border:1px solid rgba(0,190,243,.05);border-radius:38px;animation:erBreath 5s ease-in-out infinite .6s}
-@keyframes erBreath{0%,100%{opacity:.4;transform:scale(1)} 50%{opacity:1;transform:scale(1.02)}}
-.e-icon{width:56px;height:56px;border-radius:14px;background:rgba(0,190,243,.1);border:1px solid rgba(0,190,243,.2);display:flex;align-items:center;justify-content:center;margin:0 auto 16px}
-.e-icon svg{width:26px;height:26px;color:var(--cyan)}
-.e-name{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:3px;color:var(--white);margin-bottom:5px}
-.e-sub{font-size:10px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:var(--cyan);opacity:.8}
+.engine-text{}
+.engine-text .eyebrow{margin-bottom:24px}
+.engine-h2{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:clamp(42px,5.5vw,76px);
+  letter-spacing:2px;line-height:.95;
+  margin-bottom:28px;
+}
+.engine-desc{
+  font-size:17px;color:rgba(255,255,255,.5);
+  line-height:1.85;max-width:480px;margin-bottom:40px;
+}
+.engine-chips{display:flex;flex-direction:column;gap:14px}
+.echip{
+  display:flex;align-items:center;gap:14px;
+  font-size:14px;color:rgba(255,255,255,.55);
+}
+.echip-dot{
+  width:6px;height:6px;border-radius:50%;flex-shrink:0;
+}
+.echip-dot.c{background:var(--cyan)}
+.echip-dot.m{background:var(--mint)}
+.echip-dot.v{background:var(--violet)}
 
-.engine-verdict{text-align:center;margin-top:80px;font-family:'Bebas Neue',sans-serif;font-size:clamp(26px,3.5vw,46px);letter-spacing:4px}
-.ev-dim{color:rgba(255,255,255,.18)}
-.ev-accent{background:linear-gradient(90deg,var(--cyan),var(--mint));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+/* Phone visual */
+.engine-phone{
+  display:flex;align-items:center;justify-content:center;
+  position:relative;
+}
+.engine-phone-img{
+  width:100%;max-width:420px;height:auto;
+  display:block;margin:0 auto;
+  filter:drop-shadow(0 40px 80px rgba(0,0,0,.7)) drop-shadow(0 0 60px rgba(0,190,243,.15));
+}
+
+@media(max-width:900px){
+  .engine-split{grid-template-columns:1fr;gap:52px}
+  .engine-phone{order:-1}
+  .engine-phone-img{max-width:280px}
+}
+
 
 /* ═══════════════════════════════
    STATEMENT
@@ -396,7 +340,7 @@ body::before{
 ═══════════════════════════════ */
 #ecosystem{background:var(--black);padding:120px 0}
 .eco-intro{text-align:center;max-width:560px;margin:0 auto 80px}
-.eco-intro h2{font-family:'Bebas Neue',sans-serif;font-size:clamp(40px,5.5vw,76px);letter-spacing:2px;line-height:.97;margin-bottom:18px}
+.eco-intro h2{font-family:'Bebas Neue',sans-serif;font-size:clamp(42px,5.5vw,76px);letter-spacing:2px;line-height:.97;margin-bottom:18px}
 .eco-intro p{font-size:16px;color:rgba(255,255,255,.5);line-height:1.85}
 
 /* Editorial tile grid */
@@ -411,7 +355,6 @@ body::before{
 }
 .ptile:hover{background:#070f22}
 
-/* Product tile video background */
 .ptile-video{
   position:absolute;inset:0;width:100%;height:100%;
   object-fit:cover;opacity:0;z-index:0;
@@ -419,18 +362,11 @@ body::before{
 }
 .ptile-video.vloaded{opacity:.28}
 .ptile:hover .ptile-video.vloaded{opacity:.42}
-/* Dark gradient overlay so text stays readable */
 .ptile-overlay{
   position:absolute;inset:0;z-index:1;pointer-events:none;
-  background:linear-gradient(
-    160deg,
-    rgba(6,14,32,.92) 0%,
-    rgba(6,14,32,.6)  42%,
-    rgba(6,14,32,.92) 100%
-  );
+  background:linear-gradient(160deg,rgba(6,14,32,.92) 0%,rgba(6,14,32,.6) 42%,rgba(6,14,32,.92) 100%);
 }
 
-/* Ghost background product name */
 .ptile::before{
   content:attr(data-bg);
   font-family:'Bebas Neue',sans-serif;
@@ -438,24 +374,20 @@ body::before{
   position:absolute;bottom:-20px;right:-10px;
   color:var(--white);opacity:.03;
   pointer-events:none;user-select:none;
-  transition:opacity .4s;
-  z-index:2;
+  transition:opacity .4s;z-index:2;
 }
 .ptile:hover::before{opacity:.06}
 
-/* Corner accent glow */
 .ptile::after{
   content:'';position:absolute;top:-80px;right:-80px;
   width:250px;height:250px;border-radius:50%;pointer-events:none;
-  transition:opacity .4s;opacity:.8;
-  z-index:2;
+  transition:opacity .4s;opacity:.8;z-index:2;
 }
 .ptile.tc::after{background:radial-gradient(circle,rgba(0,190,243,.14) 0%,transparent 65%)}
 .ptile.tm::after{background:radial-gradient(circle,rgba(52,211,153,.12) 0%,transparent 65%)}
 .ptile.tv::after{background:radial-gradient(circle,rgba(139,92,246,.12) 0%,transparent 65%)}
 .ptile:hover::after{opacity:1}
 
-/* Top accent line */
 .ptile-line{position:absolute;top:0;left:0;right:0;height:2px;pointer-events:none;z-index:3}
 .tc .ptile-line{background:linear-gradient(90deg,var(--cyan),transparent 70%)}
 .tm .ptile-line{background:linear-gradient(90deg,var(--mint),transparent 70%)}
@@ -479,38 +411,17 @@ body::before{
 .ptile-link svg{width:14px;height:14px}
 .pl-c{color:var(--cyan)}.pl-m{color:var(--mint)}.pl-v{color:var(--violet)}
 
-/* ── ECOSYSTEM V2 ── */
+/* FitMG "Coming Soon" state */
+.ptile-link.soon{opacity:.45;cursor:default;pointer-events:none}
+.coming-tag{font-size:9px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;padding:3px 9px;border-radius:4px;border:1px solid rgba(139,92,246,.3);color:rgba(139,92,246,.7);background:rgba(139,92,246,.06);display:inline-block;margin-bottom:12px}
+
+/* Eco v2 heading */
 .eco-v2-hd{text-align:center;max-width:700px;margin:0 auto 64px}
 .eco-v2-eyebrow{font-size:11px;font-weight:700;letter-spacing:4px;text-transform:uppercase;color:var(--cyan);margin-bottom:16px}
-.eco-v2-h2{font-family:'Bebas Neue',sans-serif;font-size:clamp(38px,5.5vw,70px);letter-spacing:2px;line-height:1;margin-bottom:20px}
+.eco-v2-h2{font-family:'Bebas Neue',sans-serif;font-size:clamp(42px,5.5vw,76px);letter-spacing:2px;line-height:.97;margin-bottom:20px}
 .eco-v2-sub{font-size:15px;color:rgba(255,255,255,.5);line-height:1.75;max-width:600px;margin:0 auto}
-.ptiles-v2{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
-.ptile-v2{position:relative;border-radius:20px;overflow:hidden;min-height:440px;display:flex;flex-direction:column;justify-content:flex-end;border:1px solid rgba(255,255,255,.07);transition:border-color .3s,box-shadow .3s}
-.ptile-v2.tc{border-color:rgba(0,190,243,.25);box-shadow:0 0 40px rgba(0,190,243,.05) inset}
-.ptile-v2.tm{border-color:rgba(52,211,153,.22);box-shadow:0 0 40px rgba(52,211,153,.04) inset}
-.ptile-v2.tv{border-color:rgba(139,92,246,.22);box-shadow:0 0 40px rgba(139,92,246,.04) inset}
-.ptile-v2:hover.tc{border-color:rgba(0,190,243,.5);box-shadow:0 0 60px rgba(0,190,243,.1) inset}
-.ptile-v2:hover.tm{border-color:rgba(52,211,153,.45);box-shadow:0 0 60px rgba(52,211,153,.08) inset}
-.ptile-v2:hover.tv{border-color:rgba(139,92,246,.45);box-shadow:0 0 60px rgba(139,92,246,.08) inset}
-.ptile-v2-bg{position:absolute;inset:0}
-.ptile-v2-video{width:100%;height:100%;object-fit:cover;opacity:.13}
-.ptile-v2-grad{position:absolute;inset:0;background:linear-gradient(to top,rgba(4,10,28,.98) 0%,rgba(4,10,28,.72) 45%,rgba(4,10,28,.2) 100%)}
-.ptile-v2-phone{position:absolute;right:14px;top:14px;width:132px;height:auto;filter:drop-shadow(0 16px 48px rgba(0,0,0,.65));z-index:2;border-radius:20px}
-.ptile-v2-body{position:relative;z-index:3;padding:28px 28px 32px}
-.ptile-v2-sub{font-size:9px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;margin-bottom:8px}
-.ptile-v2-name{font-family:'Bebas Neue',sans-serif;font-size:54px;letter-spacing:2px;line-height:1;margin-bottom:10px}
-.ptile-v2-desc{font-size:13px;color:rgba(255,255,255,.5);line-height:1.72;margin-bottom:22px;max-width:280px}
-.ptile-v2-lnk{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:700;transition:gap .2s}
-.ptile-v2-lnk:hover{gap:14px}
-.ptile-v2-lnk svg{width:14px;height:14px}
-.eco-bridge-v2{position:relative;height:72px}
-.eco-bridge-v2 svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
-.eco-bicons{position:absolute;top:0;left:0;right:0;display:flex;justify-content:space-around;transform:translateY(-50%)}
-.ebi{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;border:1px solid}
-.ebi.tc{background:rgba(0,190,243,.12);border-color:rgba(0,190,243,.5);color:var(--cyan)}
-.ebi.tm{background:rgba(52,211,153,.12);border-color:rgba(52,211,153,.45);color:var(--mint)}
-.ebi.tv{background:rgba(139,92,246,.12);border-color:rgba(139,92,246,.45);color:var(--violet)}
-.ebi svg{width:16px;height:16px}
+
+/* Aria for Coaches hub */
 .ptile-hub{margin-top:16px;border-radius:20px;border:1px solid rgba(0,190,243,.18);background:rgba(4,12,32,.9);box-shadow:0 0 80px rgba(0,190,243,.06) inset;display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr auto}
 .ptile-hub-screen{grid-row:1;grid-column:1;overflow:hidden;border-radius:20px 0 0 0;position:relative;min-height:360px}
 .ptile-hub-screen img{width:100%;height:100%;object-fit:cover;object-position:top left;display:block}
@@ -529,54 +440,46 @@ body::before{
 .ptile-hub-btn{display:inline-flex;align-items:center;gap:10px;background:var(--cyan);color:var(--black);font-size:13px;font-weight:700;padding:13px 26px;border-radius:100px;text-decoration:none;transition:opacity .2s,gap .2s;width:fit-content}
 .ptile-hub-btn:hover{opacity:.85;gap:16px}
 .ptile-hub-btn svg{width:14px;height:14px}
-.trusted{padding:80px 0;border-top:1px solid rgba(255,255,255,.06)}
+
+/* Trusted */
+.trusted{padding:80px 0}
+/* Testimonial */
+#testimonial{background:var(--black);padding:100px 0}
+.testi-inner{max-width:860px;margin:0 auto;text-align:center}
+.testi-icon{width:32px;height:24px;color:var(--cyan);opacity:.35;margin:0 auto 32px;display:block}
+.testi-text{font-size:clamp(18px,2.2vw,24px);line-height:1.75;color:rgba(255,255,255,.85);font-style:italic;margin-bottom:36px}
+.testi-name{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px;color:var(--white);margin-bottom:6px}
+.testi-role{font-size:13px;color:rgba(255,255,255,.4);letter-spacing:.5px}
 .trusted-hd{text-align:center;margin-bottom:56px}
 .trusted-eyebrow{font-size:11px;font-weight:700;letter-spacing:4px;text-transform:uppercase;color:var(--cyan);margin-bottom:10px}
-.trusted-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(28px,3.5vw,44px);letter-spacing:2px;line-height:1;margin-bottom:10px}
+.trusted-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(42px,5.5vw,76px);letter-spacing:2px;line-height:.97;margin-bottom:10px}
 .trusted-sub{font-size:14px;color:rgba(255,255,255,.38);line-height:1.7}
 .trusted-grid{display:flex;align-items:center;justify-content:center;gap:20px;flex-wrap:wrap}
 .partner-card{display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:16px;padding:24px 36px;width:210px;height:100px;text-decoration:none;transition:background .3s,border-color .3s}
 .partner-card:hover{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.14)}
 .partner-card img,.partner-card svg{max-width:136px;max-height:54px;width:100%;object-fit:contain;opacity:.8;transition:opacity .3s}
 .partner-card:hover img,.partner-card:hover svg{opacity:1}
-@media(max-width:1000px){
-  .ptiles-v2{grid-template-columns:1fr 1fr}
-  .ptile-v2:last-child{grid-column:1/-1}
-  .ptile-hub{grid-template-columns:1fr;grid-template-rows:320px auto auto}
-  .ptile-hub-screen{grid-row:1;grid-column:1;border-radius:20px 20px 0 0}
-  .ptile-hub-content{grid-row:2;grid-column:1;padding:40px}
-  .ptile-hub-features{grid-row:3;grid-column:1}
-}
-@media(max-width:680px){
-  .ptiles-v2{grid-template-columns:1fr}
-  .ptile-v2:last-child{grid-column:1}
-  .ptile-hub-features{grid-template-columns:1fr 1fr}
-  .eco-bridge-v2{height:56px}
-}
 
 /* ═══════════════════════════════
    MISSION
 ═══════════════════════════════ */
-#mission{background:var(--navy);position:relative;overflow:hidden;padding:120px 0}
-#mission::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(52,211,153,.35),transparent)}
+#mission{background:var(--black);position:relative;overflow:hidden;padding:120px 0}
 .miss-amb{position:absolute;top:-80px;right:-200px;width:700px;height:700px;background:radial-gradient(circle,rgba(52,211,153,.055) 0%,transparent 65%);pointer-events:none}
 .miss-amb2{position:absolute;bottom:-80px;left:-100px;width:400px;height:400px;background:radial-gradient(circle,rgba(139,92,246,.05) 0%,transparent 65%);pointer-events:none}
-
 .miss-grid{display:grid;grid-template-columns:1fr 1fr;gap:100px;align-items:center;position:relative;z-index:1}
-.miss-hed{font-family:'Bebas Neue',sans-serif;font-size:clamp(42px,5.5vw,70px);letter-spacing:2px;line-height:.95;margin-bottom:28px}
+.miss-hed{font-family:'Bebas Neue',sans-serif;font-size:clamp(42px,5.5vw,76px);letter-spacing:2px;line-height:.97;margin-bottom:28px}
 .miss-hed .md{color:rgba(255,255,255,.2)}
 .miss-body{font-size:15px;color:rgba(255,255,255,.5);line-height:1.9;max-width:460px}
 .miss-mv{margin-top:32px;display:flex;flex-direction:column;gap:20px}
 .miss-mv-lbl{font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--cyan);margin-bottom:6px}
 .miss-mv-text{font-size:14px;color:rgba(255,255,255,.65);line-height:1.8;max-width:460px;margin:0}
-
 .pillars{display:flex;flex-direction:column;gap:40px}
 .pillar{display:flex;gap:22px;align-items:flex-start}
-.p-icon{width:46px;height:46px;border-radius:12px;flex-shrink:0;display:flex;align-items:center;justify-content:center;border:1px solid}
-.p-icon svg{width:20px;height:20px}
-.pi-c{background:rgba(0,190,243,.07); border-color:rgba(0,190,243,.2); color:var(--cyan)}
-.pi-m{background:rgba(52,211,153,.07);border-color:rgba(52,211,153,.2);color:var(--mint)}
-.pi-v{background:rgba(139,92,246,.07);border-color:rgba(139,92,246,.2);color:var(--violet)}
+.p-icon{width:30px;height:30px;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+.p-icon svg{width:26px;height:26px}
+.pi-c{color:var(--cyan)}
+.pi-m{color:var(--mint)}
+.pi-v{color:var(--violet)}
 .p-title{font-size:15px;font-weight:700;color:var(--white);margin-bottom:7px;letter-spacing:.1px}
 .p-desc{font-size:13px;color:rgba(255,255,255,.42);line-height:1.75}
 
@@ -584,10 +487,9 @@ body::before{
    CTA
 ═══════════════════════════════ */
 #lm-cta{background:var(--black);position:relative;overflow:hidden;padding:120px 0}
-#lm-cta::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(0,190,243,.35),transparent)}
 .cta-glow{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:900px;height:560px;background:radial-gradient(ellipse,rgba(0,190,243,.1) 0%,rgba(139,92,246,.06) 45%,transparent 70%);pointer-events:none}
 .cta-inner{position:relative;z-index:1;text-align:center;max-width:740px;margin:0 auto}
-.cta-inner h2{font-family:'Bebas Neue',sans-serif;font-size:clamp(40px,5.5vw,76px);letter-spacing:2px;line-height:.97;margin:20px 0 26px}
+.cta-inner h2{font-family:'Bebas Neue',sans-serif;font-size:clamp(42px,5.5vw,76px);letter-spacing:2px;line-height:.97;margin:20px 0 26px}
 .cta-inner p{font-size:16px;color:rgba(255,255,255,.48);line-height:1.85;margin-bottom:44px}
 .cta-chips{display:flex;align-items:center;justify-content:center;gap:28px;margin-top:24px;flex-wrap:wrap}
 .cta-chip{display:flex;align-items:center;gap:7px;font-size:12px;color:rgba(255,255,255,.28);font-weight:500}
@@ -619,26 +521,30 @@ body::before{
 /* ═══════════════════════════════
    RESPONSIVE
 ═══════════════════════════════ */
-@media(max-width:1024px){
-  .hero-widget{width:300px}
-  .hero-inner{gap:40px}
+@media(max-width:1100px){
+  .hero-content{width:min(520px,58%)}
 }
 @media(max-width:900px){
   .container{padding:0 24px}
   #nav .nav-links,.nav-pill{display:none}
   .hamburger{display:flex}
-  .hero-inner{flex-direction:column;gap:48px;padding:140px 0 80px}
+  .hero-inner{padding:140px 0 80px}
+  .hero-content{width:100%;max-width:100%}
   .hero-h1{font-size:clamp(56px,13vw,90px)}
-  .hero-widget{width:100%;max-width:420px}
-  .flow{grid-template-columns:1fr;gap:36px}
-  .flow-col.inputs,.flow-col.outputs{align-items:stretch}
-  .flow-center{padding:0}
-  .flow-center::before,.flow-center::after{display:none}
+  .hero-bg-img{object-position:70% center}
+  .hero-bg-overlay{background:linear-gradient(to right,rgba(1,8,18,1) 0%,rgba(1,8,18,.98) 35%,rgba(1,8,18,.88) 55%,rgba(1,8,18,.65) 75%,rgba(1,8,18,.4) 100%),linear-gradient(to bottom,rgba(1,8,18,.5) 0%,transparent 18%,transparent 72%,rgba(1,8,18,.9) 100%)}
   .ptiles{grid-template-columns:1fr;border-radius:16px}
+  .ptile-hub{grid-template-columns:1fr;grid-template-rows:320px auto auto}
+  .ptile-hub-screen{grid-row:1;grid-column:1;border-radius:20px 20px 0 0}
+  .ptile-hub-content{grid-row:2;grid-column:1;padding:40px}
+  .ptile-hub-features{grid-row:3;grid-column:1}
   .miss-grid{grid-template-columns:1fr;gap:56px}
   .foot-grid{grid-template-columns:1fr 1fr;gap:36px}
   .fb{grid-column:1/-1}
   .stmt-main{font-size:clamp(60px,13vw,120px)}
+}
+@media(max-width:680px){
+  .ptile-hub-features{grid-template-columns:1fr 1fr}
 }
 @media(max-width:600px){
   .hero-ctas{flex-direction:column;align-items:flex-start}
@@ -697,126 +603,28 @@ body::before{
 <!-- ══ HERO ══ -->
 <section id="hero">
 
-  <!-- Video background slot.
-       Place an athletic sports video at ./videos/hero.mp4 (loop, no audio needed).
-       Recommended: dark stadium / track & field / football training footage, 1920×1080. -->
-  <div class="hero-vid-wrap">
-    <video class="hero-vid" autoplay muted loop playsinline>
-      <source src="./videos/hero.mp4" type="video/mp4">
-    </video>
-    <div class="hero-vid-overlay"></div>
+  <!-- AI visualization image: the site's main visual anchor -->
+  <div class="hero-bg">
+    <img src="./hero-ai.webp" alt="Aria Intelligence — sports AI dashboard visualization" class="hero-bg-img">
+    <div class="hero-bg-overlay"></div>
   </div>
-
-  <div class="hero-atm"></div>
-  <div class="hero-grid"></div>
-  <div class="hero-sweep"></div>
-  <div class="orb orb-1"></div>
-  <div class="orb orb-2"></div>
 
   <div class="container">
     <div class="hero-inner">
 
-      <!-- Left: Text -->
+      <!-- Text on the left — image fills the right organically -->
       <div class="hero-content">
-        <div class="hero-badge" data-reveal>
-          <span class="bdot"></span>
-          Sports AI Infrastructure
-        </div>
-
-        <h1 class="hero-h1" data-reveal data-reveal-delay="1">
-          <span class="h1-l1">Sports Has</span>
-          <span class="h1-l2">Too Much Data.</span>
-          <span class="h1-l3">We Fixed That.</span>
+        <h1 class="hero-h1">
+          <span class="h1-l1">The Future of</span>
+          <span class="h1-l2">Human Performance</span>
+          <span class="h1-l3">Starts Here.</span>
         </h1>
 
-        <p class="hero-sub" data-reveal data-reveal-delay="2">
-          Aria Intelligence connects every signal your athletes generate — training load, recovery, injury risk, readiness, nutrition, weather — and converts them into one clear decision. Not a chart. Not a score.
+        <p class="hero-sub">
+          Empowering athletes, coaches, and organizations through one AI-powered sports ecosystem.
         </p>
-
-        <div class="hero-ctas" data-reveal data-reveal-delay="3">
-          <a href="https://apps.apple.com/us/app/run-with-aria/id6760048203" target="_blank" rel="noopener" class="btn btn-primary btn-lg">
-            Download Aria on the App Store
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-          </a>
-          <a href="https://play.google.com/store/apps/details?id=com.runwitharia.mobile" target="_blank" rel="noopener" class="btn btn-ghost btn-lg">
-            Get Aria on Google Play
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-          </a>
-        </div>
-
-        <div class="hero-stats" data-reveal data-reveal-delay="4">
-          <div class="hstat">
-            <div class="hstat-n"><span class="c">3</span></div>
-            <div class="hstat-l">Products in Ecosystem</div>
-          </div>
-          <div class="hstat">
-            <div class="hstat-n"><span class="c">150+</span></div>
-            <div class="hstat-l">Athletes on the Platform</div>
-          </div>
-          <div class="hstat">
-            <div class="hstat-n"><span class="c">1</span></div>
-            <div class="hstat-l">Decision Delivered</div>
-          </div>
-        </div>
       </div>
 
-      <!-- Right: Animated readiness widget -->
-      <div class="hero-widget" data-reveal data-reveal-delay="3">
-
-        <!-- SVG gradient definition -->
-        <svg width="0" height="0" style="position:absolute">
-          <defs>
-            <linearGradient id="rg" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stop-color="#00BEF3"/>
-              <stop offset="100%" stop-color="#34D399"/>
-            </linearGradient>
-          </defs>
-        </svg>
-
-        <div class="hw-header">
-          <span class="hw-title">Readiness Score</span>
-          <span class="hw-live">Live</span>
-        </div>
-
-        <div class="hw-ring-wrap">
-          <svg class="hw-svg" viewBox="0 0 100 100">
-            <circle class="ring-bg"   cx="50" cy="50" r="35"/>
-            <circle class="ring-fill" cx="50" cy="50" r="35"/>
-          </svg>
-          <div class="ring-num">
-            <div class="ring-num-val">92</div>
-            <div class="ring-num-lbl">Optimal</div>
-          </div>
-        </div>
-
-        <div class="hw-bars" id="hwBars">
-          <div class="hwb">
-            <span class="hwb-lbl">Sleep</span>
-            <div class="hwb-track"><div class="hwb-fill" data-w="95%"></div></div>
-            <span class="hwb-val">95%</span>
-          </div>
-          <div class="hwb">
-            <span class="hwb-lbl">Recovery</span>
-            <div class="hwb-track"><div class="hwb-fill" data-w="88%"></div></div>
-            <span class="hwb-val">88%</span>
-          </div>
-          <div class="hwb">
-            <span class="hwb-lbl">HRV</span>
-            <div class="hwb-track"><div class="hwb-fill" data-w="92%"></div></div>
-            <span class="hwb-val">92%</span>
-          </div>
-          <div class="hwb">
-            <span class="hwb-lbl">Load</span>
-            <div class="hwb-track"><div class="hwb-fill" data-w="85%"></div></div>
-            <span class="hwb-val">85%</span>
-          </div>
-        </div>
-
-        <div class="hw-footer">
-          <span class="hw-footer-lbl">Aria Intelligence</span>
-          <div class="hw-footer-dot"></div>
-        </div>
-      </div>
 
     </div>
   </div>
@@ -853,66 +661,34 @@ body::before{
 
 <!-- ══ ENGINE ══ -->
 <section id="engine">
-  <div class="engine-amb"></div>
   <div class="container">
+    <div class="engine-split">
 
-    <div class="engine-intro" data-reveal>
-      <div class="eyebrow center">The Intelligence Engine</div>
-      <h2>One Brain.<br><span class="g-cyan">Every Signal. One Decision.</span></h2>
-      <p>Aria Intelligence is the AI decision engine behind every Stadiora Labs product. It doesn't visualise your data — it translates it into one clear, actionable output.</p>
-    </div>
-
-    <div class="flow">
-      <div class="flow-col inputs" data-reveal>
-        <div class="fpill fpill-in">Training Load &amp; Volume</div>
-        <div class="fpill fpill-in">Recovery &amp; Sleep Data</div>
-        <div class="fpill fpill-in">Injury Risk Signals</div>
-        <div class="fpill fpill-in">Mental Health &amp; Readiness</div>
-        <div class="fpill fpill-in">Nutrition &amp; Fuel</div>
-        <div class="fpill fpill-in">Cycle-Aware Context</div>
-        <div class="fpill fpill-in">Coach Input</div>
-      </div>
-
-      <div class="flow-center" data-reveal data-reveal-delay="2">
-        <div class="engine-box">
-          <div class="ering er1"></div>
-          <div class="ering er2"></div>
-          <div class="e-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M12 2L2 7l10 5 10-5-10-5z"/>
-              <path d="M2 17l10 5 10-5"/>
-              <path d="M2 12l10 5 10-5"/>
-            </svg>
-          </div>
-          <div class="e-name">Aria Intelligence</div>
-          <div class="e-sub">AI Decision Engine</div>
+      <!-- Left: text -->
+      <div class="engine-text" data-reveal>
+        <div class="eyebrow">The Intelligence Engine</div>
+        <h2 class="engine-h2">
+          One Brain.<br>
+          Every Signal.<br>
+          <span class="g-cyan">One Decision.</span>
+        </h2>
+        <p class="engine-desc">
+          Aria Intelligence is the AI decision engine behind every Stadiora Labs product. It doesn't visualize your data — it translates it into one clear, actionable output.
+        </p>
+        <div class="engine-chips">
+          <div class="echip"><span class="echip-dot c"></span>Training load, recovery &amp; sleep</div>
+          <div class="echip"><span class="echip-dot m"></span>Injury risk &amp; readiness</div>
+          <div class="echip"><span class="echip-dot c"></span>HRV, nutrition &amp; cycle context</div>
+          <div class="echip"><span class="echip-dot v"></span>Coach input — all in one decision</div>
         </div>
       </div>
 
-      <div class="flow-col outputs" data-reveal data-reveal-delay="3">
-        <div class="fpill fpill-out fp-cyan">Availability Index</div>
-        <div class="fpill fpill-out fp-mint">Coach Attention Queue</div>
-        <div class="fpill fpill-out fp-amber">Sprint Readiness Score</div>
-        <div class="fpill fpill-out fp-mint">Return-to-Play Guide</div>
-        <div class="fpill fpill-out fp-cyan">Player Passport</div>
-        <div class="fpill fpill-out fp-violet">Daily Session Decision</div>
+      <!-- Right: phone -->
+      <div class="engine-phone" data-reveal data-reveal-delay="2">
+        <img src="./phone-aria.webp" alt="Aria Intelligence app — readiness score 71, contributors: HRV, Sleep, Deep Sleep, Resting HR" class="engine-phone-img">
       </div>
+
     </div>
-
-    <div class="engine-verdict" data-reveal>
-      <span class="ev-dim">Not a chart.&nbsp;&nbsp;&nbsp;Not a score.&nbsp;&nbsp;&nbsp;</span>
-      <span class="ev-accent">A decision.</span>
-    </div>
-
-  </div>
-</section>
-
-<!-- ══ STATEMENT ══ -->
-<section id="statement" data-reveal>
-  <div class="stmt-glow"></div>
-  <div class="stmt-inner">
-    <div class="stmt-pre">Sports Has Too Much Data.</div>
-    <div class="stmt-main">We Own<br>The Gap.</div>
   </div>
 </section>
 
@@ -923,14 +699,15 @@ body::before{
     <div class="eco-v2-hd" data-reveal>
       <div class="eco-v2-eyebrow">One Ecosystem</div>
       <h2 class="eco-v2-h2">Built for Coaches.<br><span class="g-mint">Made for Athletes.</span></h2>
-      <p class="eco-v2-sub">ARIA, ARIA 12, and FitMG connect seamlessly through Aria for Coaches, giving you a complete view of every athlete, sport, and performance journey.</p>
+      <!-- Fix: "ARIA, ARIA 12" → "Run with Aria, Aria 12" -->
+      <p class="eco-v2-sub">Run with Aria, Aria 12, and FitMG connect seamlessly through Aria for Coaches, giving you a complete view of every athlete, sport, and performance journey.</p>
     </div>
 
     <div class="ptiles">
 
       <!-- Run with Aria -->
       <div class="ptile tc" data-bg="ARIA" data-reveal>
-        <video class="ptile-video" muted loop playsinline preload="none" poster="./videos/posters/aria.jpg">
+        <video class="ptile-video" muted loop playsinline preload="none">
           <source src="./videos/aria.mp4" type="video/mp4">
         </video>
         <div class="ptile-overlay"></div>
@@ -953,7 +730,7 @@ body::before{
 
       <!-- Aria 12 -->
       <div class="ptile tm" data-bg="12" data-reveal data-reveal-delay="1">
-        <video class="ptile-video" muted loop playsinline preload="none" poster="./videos/posters/aria-12.jpg">
+        <video class="ptile-video" muted loop playsinline preload="none">
           <source src="./videos/aria-12.mp4" type="video/mp4">
         </video>
         <div class="ptile-overlay"></div>
@@ -973,7 +750,7 @@ body::before{
         </div>
       </div>
 
-      <!-- FitMG -->
+      <!-- FitMG — Fix: dead href="#" → lead-magnet, label as coming soon -->
       <div class="ptile tv" data-bg="FITMG" data-reveal data-reveal-delay="2">
         <video class="ptile-video" muted loop playsinline preload="none">
           <source src="./videos/fitmg.mp4" type="video/mp4">
@@ -988,8 +765,9 @@ body::before{
           <div class="ptile-name">FitMG</div>
           <div class="ptile-tag tt-v">AI Strength &amp; Fitness for Every Journey</div>
           <p class="ptile-desc">Elite strength and fitness programming, now accessible to everyone. Personalized plans backed by science for athletes and anyone ready to train smarter.</p>
-          <a href="#" class="ptile-link pl-v">
-            Explore FitMG
+          <div class="coming-tag">Launching Soon</div>
+          <a href="lead-magnet.html" class="ptile-link pl-v">
+            Join the Waitlist
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
           </a>
         </div>
@@ -1120,9 +898,9 @@ body::before{
 <section class="trusted">
   <div class="container">
     <div class="trusted-hd">
-      <div class="trusted-eyebrow">Trusted By</div>
-      <h2 class="trusted-title">People Who Believe in Our Work</h2>
-      <p class="trusted-sub">The institutions and investors backing Stadiora Labs.</p>
+      <div class="trusted-eyebrow">Backed By</div>
+      <h2 class="trusted-title">The Institutions Behind Our Work</h2>
+      <p class="trusted-sub">The investors and institutions that back Stadiora Labs.</p>
     </div>
     <div class="trusted-grid">
       <a href="https://thethinktank.vc/" target="_blank" rel="noopener" class="partner-card">
@@ -1138,6 +916,20 @@ body::before{
   </div>
 </section>
 
+<!-- ══ TESTIMONIAL ══ -->
+<section id="testimonial">
+  <div class="container">
+    <div class="testi-inner" data-reveal>
+      <svg class="testi-icon" viewBox="0 0 40 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M0 30V18C0 7.2 6.4 1.6 19.2 0L20.8 3.2C13.6 4.8 9.6 8.4 9.6 14.4V16H18V30H0ZM22 30V18C22 7.2 28.4 1.6 41.2 0L42.8 3.2C35.6 4.8 31.6 8.4 31.6 14.4V16H40V30H22Z" fill="currentColor"/>
+      </svg>
+      <blockquote class="testi-text">"As a coach, I can't always see how the athlete is eating, how they slept, whether they have any discomfort, or if they're accumulating too much load. The platform lets me have all that information in one place and use intelligence to analyze it in real time — giving me a much more complete picture of each athlete."</blockquote>
+      <div class="testi-name">Roberto Méndez</div>
+      <div class="testi-role">Athletics Coach · Costa Rica Athletics Federation</div>
+    </div>
+  </div>
+</section>
+
 <!-- ══ CTA ══ -->
 <section id="lm-cta">
   <div class="cta-glow"></div>
@@ -1148,7 +940,7 @@ body::before{
         Find Out if You're Making<br>
         <span class="g-cyan">The Right Decision Today.</span>
       </h2>
-      <p>Answer 6 questions. Get a personalised intelligence report built on the same decision engine that powers elite performance programs. Free. Instant. No sign-up required to start.</p>
+      <p>Answer 6 questions. Get a personalized intelligence report built on the same decision engine that powers elite performance programs. Free. Instant. No sign-up required to start.</p>
       <a href="lead-magnet.html" class="btn btn-primary btn-lg">
         Run My Performance Check
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
@@ -1192,10 +984,12 @@ body::before{
       <div>
         <div class="fc-title">Products</div>
         <ul class="fc-links">
-          <li><a href="https://runwitharia.com" target="_blank" rel="noopener">Aria</a></li>
+          <!-- Fix: "Aria" → "Run with Aria" -->
+          <li><a href="https://runwitharia.com" target="_blank" rel="noopener">Run with Aria</a></li>
           <li><a href="lead-magnet.html">Aria 12</a></li>
           <li><a href="lead-magnet.html">Aria for Coaches</a></li>
-          <li><a href="./api.html">Aria Intelligence API</a></li>
+          <!-- Fix: API removed (in development, not a product yet) -->
+          <li><a href="lead-magnet.html">FitMG</a></li>
         </ul>
       </div>
       <div>
@@ -1217,7 +1011,7 @@ body::before{
       </div>
     </div>
     <div class="foot-btm">
-      <p class="foot-copy">© 2026 Stadiora Labs. All rights reserved. Built in Latin America & the United States.</p>
+      <p class="foot-copy">© 2026 Stadiora Labs. All rights reserved. Built in Latin America &amp; the United States.</p>
       <div class="foot-legal">
         <a href="./privacy.html">Privacy Policy</a>
         <a href="./terms.html">Terms of Use</a>
@@ -1235,27 +1029,13 @@ window.addEventListener('scroll', () => { nav.classList.toggle('scrolled', windo
 function openMenu()  { document.getElementById('mobileMenu').classList.add('open');    document.body.style.overflow = 'hidden'; }
 function closeMenu() { document.getElementById('mobileMenu').classList.remove('open'); document.body.style.overflow = ''; }
 
-// Scroll reveal
+// Scroll reveal (sections below hero only)
 const revealObs = new IntersectionObserver(entries => {
   entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('on'); revealObs.unobserve(e.target); } });
 }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
 document.querySelectorAll('[data-reveal]').forEach(el => revealObs.observe(el));
 
-// Hero widget bar animation
-const widgetEl = document.getElementById('hwBars');
-if (widgetEl) {
-  const barObs = new IntersectionObserver(entries => {
-    entries.forEach(e => {
-      if (e.isIntersecting) {
-        e.target.querySelectorAll('.hwb-fill').forEach(b => { b.style.width = b.dataset.w; });
-        barObs.unobserve(e.target);
-      }
-    });
-  }, { threshold: 0.4 });
-  barObs.observe(widgetEl);
-}
-
-// Product tile video lazy-load — wait for canplay before showing
+// Product tile video lazy-load
 const tileVidObs = new IntersectionObserver(entries => {
   entries.forEach(e => {
     if (e.isIntersecting) {

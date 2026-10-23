@@ -131,81 +131,53 @@ body::before{
 #hero{
   position:relative;min-height:100vh;
   display:flex;align-items:center;
-  overflow:hidden;padding:140px 0 100px;
+  overflow:hidden;padding:140px 0 120px;
   background:var(--black);
 }
-.hero-vid-wrap{position:absolute;inset:0;overflow:hidden}
-.hero-vid{
+.hero-bg{position:absolute;inset:0;overflow:hidden}
+.hero-bg-img{
   position:absolute;inset:0;width:100%;height:100%;
-  object-fit:cover;opacity:.32;
+  object-fit:cover;object-position:60% center;opacity:.92;
 }
-.hero-vid-overlay{
+.hero-bg-overlay{
   position:absolute;inset:0;
   background:
-    linear-gradient(to right, rgba(1,8,18,.96) 38%, rgba(1,8,18,.65) 75%, rgba(1,8,18,.82) 100%),
-    linear-gradient(to bottom, rgba(1,8,18,.2) 0%, rgba(1,8,18,.6) 100%);
+    linear-gradient(to right,
+      rgba(1,8,18,1)    0%,
+      rgba(1,8,18,.98)  25%,
+      rgba(1,8,18,.82)  40%,
+      rgba(1,8,18,.35)  58%,
+      rgba(1,8,18,.08)  78%,
+      rgba(1,8,18,.02) 100%),
+    linear-gradient(to bottom,
+      rgba(1,8,18,.5)  0%,
+      transparent      18%,
+      transparent      72%,
+      rgba(1,8,18,.9) 100%);
 }
-.hero-atm{
-  position:absolute;inset:0;pointer-events:none;
-  background:
-    radial-gradient(ellipse 80% 65% at 90% 15%, rgba(0,190,243,.15) 0%, transparent 58%),
-    radial-gradient(ellipse 55% 50% at 8% 90%,  rgba(139,92,246,.11) 0%, transparent 58%),
-    radial-gradient(ellipse 45% 40% at 55% 55%, rgba(52,211,153,.05) 0%, transparent 60%);
-}
-.hero-grid{
-  position:absolute;inset:0;pointer-events:none;
-  background-image:
-    linear-gradient(rgba(255,255,255,.02) 1px,transparent 1px),
-    linear-gradient(90deg,rgba(255,255,255,.02) 1px,transparent 1px);
-  background-size:100px 100px;
-  mask-image:radial-gradient(ellipse 100% 80% at 80% 0%,rgba(0,0,0,.7) 0%,transparent 70%);
-}
-.hero-sweep{
-  position:absolute;inset:0;pointer-events:none;
-  background:linear-gradient(118deg,transparent 38%,rgba(0,190,243,.05) 50%,transparent 62%);
-  animation:sweep 10s ease-in-out infinite;
-}
-@keyframes sweep{0%,100%{opacity:0;transform:translateX(-30%)} 40%{opacity:1} 55%{opacity:0;transform:translateX(130%)}}
+.hero-inner{position:relative;z-index:1;display:flex;align-items:center;width:100%}
+.hero-content{flex:0 0 auto;width:min(580px,52%)}
 
-.orb{position:absolute;border-radius:50%;pointer-events:none;animation:orbFloat 12s ease-in-out infinite}
-.orb-1{width:800px;height:800px;background:radial-gradient(circle,rgba(0,190,243,.13) 0%,transparent 65%);top:-250px;right:-200px;filter:blur(70px);animation-delay:0s}
-.orb-2{width:500px;height:500px;background:radial-gradient(circle,rgba(139,92,246,.1) 0%,transparent 65%);bottom:-150px;left:-80px;filter:blur(90px);animation-delay:-6s}
-@keyframes orbFloat{0%,100%{transform:translate(0,0) scale(1)} 33%{transform:translate(20px,-28px) scale(1.03)} 66%{transform:translate(-16px,18px) scale(.97)}}
-
-.hero-inner{
-  position:relative;z-index:1;
-  display:flex;align-items:center;gap:64px;width:100%;
-}
-.hero-content{flex:1;min-width:0}
-
-.hero-badge{
-  display:inline-flex;align-items:center;gap:10px;
-  background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.09);
-  border-radius:100px;padding:7px 18px;margin-bottom:32px;
-  font-size:11px;font-weight:600;letter-spacing:2.5px;text-transform:uppercase;
-  color:rgba(255,255,255,.42);
-}
-.bdot{width:6px;height:6px;border-radius:50%;background:var(--mint);animation:bdotPulse 2.6s ease-in-out infinite}
-@keyframes bdotPulse{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(52,211,153,0)} 50%{opacity:.7;box-shadow:0 0 0 5px rgba(52,211,153,.14)}}
+@keyframes heroFadeUp{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:none}}
 
 .hero-h1{
   font-family:'Bebas Neue',sans-serif;
-  font-size:clamp(64px,10.5vw,136px);
-  letter-spacing:2px;line-height:.86;margin-bottom:32px;
+  font-size:clamp(52px,7vw,92px);
+  letter-spacing:2px;line-height:.9;margin-bottom:32px;
+  animation:heroFadeUp .8s cubic-bezier(.22,1,.36,1) .18s both;
 }
 .h1-l1{display:block;color:var(--white)}
-.h1-l2{display:block;color:rgba(255,255,255,.22)}
+.h1-l2{display:block;color:var(--white)}
 .h1-l3{
   display:block;
   background:linear-gradient(90deg,var(--cyan) 0%,var(--mint) 60%);
   -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
 }
-
 .hero-sub{
   font-size:clamp(15px,1.9vw,18px);color:rgba(255,255,255,.55);
   max-width:520px;line-height:1.85;margin-bottom:44px;
+  animation:heroFadeUp .8s cubic-bezier(.22,1,.36,1) .32s both;
 }
-
 .hero-ctas{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:60px}
 
 .hero-stats{display:flex;align-items:stretch;border-top:1px solid var(--border);padding-top:36px;max-width:500px}
@@ -288,51 +260,24 @@ body::before{
 .marq-item .ma{color:var(--cyan);font-size:14px;letter-spacing:0;line-height:1}
 @keyframes marqScroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
 
-#engine{background:var(--navy);position:relative;overflow:hidden;padding:120px 0}
-#engine::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(0,190,243,.5),transparent)}
-#engine::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(0,190,243,.15),transparent)}
-.engine-amb{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:700px;height:460px;background:radial-gradient(ellipse,rgba(0,190,243,.07) 0%,transparent 65%);pointer-events:none}
-
-.engine-intro{text-align:center;max-width:640px;margin:0 auto 90px}
-.engine-intro h2{font-family:'Bebas Neue',sans-serif;font-size:clamp(40px,5.5vw,76px);letter-spacing:2px;line-height:.97;margin-bottom:18px}
-.engine-intro p{font-size:16px;color:rgba(255,255,255,.5);line-height:1.85}
-
-.flow{display:grid;grid-template-columns:230px 280px 230px;align-items:center;gap:0 0;max-width:960px;margin:0 auto;position:relative;z-index:1}
-.flow-col{display:flex;flex-direction:column;gap:10px;width:230px}
-.flow-col.inputs{align-items:stretch}
-.flow-col.outputs{align-items:stretch}
-
-.fpill{padding:11px 16px;border-radius:9px;font-size:12px;font-weight:600;white-space:normal;text-align:center;line-height:1.35;width:100%;box-sizing:border-box}
-.fpill-in{background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.07);color:rgba(255,255,255,.36)}
-.fpill-out{border:1px solid;font-weight:700}
-.fp-cyan  {border-color:rgba(0,190,243,.38); background:rgba(0,190,243,.08); color:var(--cyan)}
-.fp-mint  {border-color:rgba(52,211,153,.38);background:rgba(52,211,153,.08);color:var(--mint)}
-.fp-amber {border-color:rgba(245,158,11,.38);background:rgba(245,158,11,.08);color:#f59e0b}
-.fp-violet{border-color:rgba(139,92,246,.38);background:rgba(139,92,246,.08);color:var(--violet)}
-
-.flow-center{display:flex;flex-direction:column;align-items:center;padding:0 24px;position:relative}
-.flow-center::before,.flow-center::after{content:'';position:absolute;top:50%;height:1px;width:24px;border-top:1px dashed rgba(0,190,243,.25)}
-.flow-center::before{right:100%}.flow-center::after{left:100%}
-
-.engine-box{
-  background:linear-gradient(155deg,rgba(0,190,243,.1) 0%,rgba(0,190,243,.03) 100%);
-  border:1px solid rgba(0,190,243,.28);border-radius:20px;
-  padding:40px 28px;text-align:center;width:100%;position:relative;
-  animation:ePulse 5s ease-in-out infinite;
+#engine{background:var(--black);position:relative;overflow:hidden;padding:120px 0}
+.engine-split{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center}
+.engine-text .eyebrow{margin-bottom:24px}
+.engine-h2{font-family:'Bebas Neue',sans-serif;font-size:clamp(42px,5.5vw,76px);letter-spacing:2px;line-height:.95;margin-bottom:28px}
+.engine-desc{font-size:17px;color:rgba(255,255,255,.5);line-height:1.85;max-width:480px;margin-bottom:40px}
+.engine-chips{display:flex;flex-direction:column;gap:14px}
+.echip{display:flex;align-items:center;gap:14px;font-size:14px;color:rgba(255,255,255,.55)}
+.echip-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.echip-dot.c{background:var(--cyan)}
+.echip-dot.m{background:var(--mint)}
+.echip-dot.v{background:var(--violet)}
+.engine-phone{display:flex;align-items:center;justify-content:center;position:relative}
+.engine-phone-img{width:100%;max-width:420px;height:auto;display:block;margin:0 auto;filter:drop-shadow(0 40px 80px rgba(0,0,0,.7)) drop-shadow(0 0 60px rgba(0,190,243,.15))}
+@media(max-width:900px){
+  .engine-split{grid-template-columns:1fr;gap:52px}
+  .engine-phone{order:-1}
+  .engine-phone-img{max-width:280px}
 }
-@keyframes ePulse{0%,100%{box-shadow:0 0 50px rgba(0,190,243,.08),inset 0 0 30px rgba(0,190,243,.03)} 50%{box-shadow:0 0 110px rgba(0,190,243,.2),inset 0 0 60px rgba(0,190,243,.08)}}
-.ering{position:absolute;border-radius:inherit;pointer-events:none}
-.er1{inset:-18px;border:1px solid rgba(0,190,243,.1);border-radius:30px;animation:erBreath 5s ease-in-out infinite}
-.er2{inset:-36px;border:1px solid rgba(0,190,243,.05);border-radius:38px;animation:erBreath 5s ease-in-out infinite .6s}
-@keyframes erBreath{0%,100%{opacity:.4;transform:scale(1)} 50%{opacity:1;transform:scale(1.02)}}
-.e-icon{width:56px;height:56px;border-radius:14px;background:rgba(0,190,243,.1);border:1px solid rgba(0,190,243,.2);display:flex;align-items:center;justify-content:center;margin:0 auto 16px}
-.e-icon svg{width:26px;height:26px;color:var(--cyan)}
-.e-name{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:3px;color:var(--white);margin-bottom:5px}
-.e-sub{font-size:10px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:var(--cyan);opacity:.8}
-
-.engine-verdict{text-align:center;margin-top:80px;font-family:'Bebas Neue',sans-serif;font-size:clamp(26px,3.5vw,46px);letter-spacing:4px}
-.ev-dim{color:rgba(255,255,255,.18)}
-.ev-accent{background:linear-gradient(90deg,var(--cyan),var(--mint));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
 
 #statement{
   background:var(--black);position:relative;overflow:hidden;
@@ -480,10 +425,17 @@ body::before{
 .ptile-hub-btn{display:inline-flex;align-items:center;gap:10px;background:var(--cyan);color:var(--black);font-size:13px;font-weight:700;padding:13px 26px;border-radius:100px;text-decoration:none;transition:opacity .2s,gap .2s;width:fit-content}
 .ptile-hub-btn:hover{opacity:.85;gap:16px}
 .ptile-hub-btn svg{width:14px;height:14px}
-.trusted{padding:80px 0;border-top:1px solid rgba(255,255,255,.06)}
+.trusted{padding:80px 0}
+/* Testimonial */
+#testimonial{background:var(--black);padding:100px 0}
+.testi-inner{max-width:860px;margin:0 auto;text-align:center}
+.testi-icon{width:32px;height:24px;color:var(--cyan);opacity:.35;margin:0 auto 32px;display:block}
+.testi-text{font-size:clamp(18px,2.2vw,24px);line-height:1.75;color:rgba(255,255,255,.85);font-style:italic;margin-bottom:36px}
+.testi-name{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px;color:var(--white);margin-bottom:6px}
+.testi-role{font-size:13px;color:rgba(255,255,255,.4);letter-spacing:.5px}
 .trusted-hd{text-align:center;margin-bottom:56px}
 .trusted-eyebrow{font-size:11px;font-weight:700;letter-spacing:4px;text-transform:uppercase;color:var(--cyan);margin-bottom:10px}
-.trusted-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(28px,3.5vw,44px);letter-spacing:2px;line-height:1;margin-bottom:10px}
+.trusted-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(42px,5.5vw,76px);letter-spacing:2px;line-height:.97;margin-bottom:10px}
 .trusted-sub{font-size:14px;color:rgba(255,255,255,.38);line-height:1.7}
 .trusted-grid{display:flex;align-items:center;justify-content:center;gap:20px;flex-wrap:wrap}
 .partner-card{display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:16px;padding:24px 36px;width:210px;height:100px;text-decoration:none;transition:background .3s,border-color .3s}
@@ -506,7 +458,6 @@ body::before{
 }
 
 #mission{background:var(--navy);position:relative;overflow:hidden;padding:120px 0}
-#mission::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(52,211,153,.35),transparent)}
 .miss-amb{position:absolute;top:-80px;right:-200px;width:700px;height:700px;background:radial-gradient(circle,rgba(52,211,153,.055) 0%,transparent 65%);pointer-events:none}
 .miss-amb2{position:absolute;bottom:-80px;left:-100px;width:400px;height:400px;background:radial-gradient(circle,rgba(139,92,246,.05) 0%,transparent 65%);pointer-events:none}
 
@@ -520,16 +471,15 @@ body::before{
 
 .pillars{display:flex;flex-direction:column;gap:40px}
 .pillar{display:flex;gap:22px;align-items:flex-start}
-.p-icon{width:46px;height:46px;border-radius:12px;flex-shrink:0;display:flex;align-items:center;justify-content:center;border:1px solid}
-.p-icon svg{width:20px;height:20px}
-.pi-c{background:rgba(0,190,243,.07); border-color:rgba(0,190,243,.2); color:var(--cyan)}
-.pi-m{background:rgba(52,211,153,.07);border-color:rgba(52,211,153,.2);color:var(--mint)}
-.pi-v{background:rgba(139,92,246,.07);border-color:rgba(139,92,246,.2);color:var(--violet)}
+.p-icon{width:30px;height:30px;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+.p-icon svg{width:26px;height:26px}
+.pi-c{color:var(--cyan)}
+.pi-m{color:var(--mint)}
+.pi-v{color:var(--violet)}
 .p-title{font-size:15px;font-weight:700;color:var(--white);margin-bottom:7px;letter-spacing:.1px}
 .p-desc{font-size:13px;color:rgba(255,255,255,.42);line-height:1.75}
 
 #lm-cta{background:var(--black);position:relative;overflow:hidden;padding:120px 0}
-#lm-cta::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(0,190,243,.35),transparent)}
 .cta-glow{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:900px;height:560px;background:radial-gradient(ellipse,rgba(0,190,243,.1) 0%,rgba(139,92,246,.06) 45%,transparent 70%);pointer-events:none}
 .cta-inner{position:relative;z-index:1;text-align:center;max-width:740px;margin:0 auto}
 .cta-inner h2{font-family:'Bebas Neue',sans-serif;font-size:clamp(40px,5.5vw,76px);letter-spacing:2px;line-height:.97;margin:20px 0 26px}
@@ -635,121 +585,24 @@ body::before{
 
 <!-- ══ HERO ══ -->
 <section id="hero">
-  <div class="hero-vid-wrap">
-    <video class="hero-vid" autoplay muted loop playsinline>
-      <source src="./videos/hero.mp4" type="video/mp4">
-    </video>
-    <div class="hero-vid-overlay"></div>
+  <div class="hero-bg">
+    <img src="./hero-ai.webp" alt="Aria Intelligence — visualización de dashboard deportivo con IA" class="hero-bg-img">
+    <div class="hero-bg-overlay"></div>
   </div>
-
-  <div class="hero-atm"></div>
-  <div class="hero-grid"></div>
-  <div class="hero-sweep"></div>
-  <div class="orb orb-1"></div>
-  <div class="orb orb-2"></div>
 
   <div class="container">
     <div class="hero-inner">
-
       <div class="hero-content">
-        <div class="hero-badge" data-reveal>
-          <span class="bdot"></span>
-          Infraestructura de IA Deportiva
-        </div>
-
-        <h1 class="hero-h1" data-reveal data-reveal-delay="1">
-          <span class="h1-l1">El Deporte Tiene</span>
-          <span class="h1-l2">Demasiados Datos.</span>
-          <span class="h1-l3">Nosotros Lo Resolvimos.</span>
+        <h1 class="hero-h1">
+          <span class="h1-l1">El Futuro del</span>
+          <span class="h1-l2">Rendimiento Humano</span>
+          <span class="h1-l3">Comienza Aquí.</span>
         </h1>
 
-        <p class="hero-sub" data-reveal data-reveal-delay="2">
-          Aria Intelligence conecta cada señal que generan tus atletas — carga de entrenamiento, recuperación, riesgo de lesión, preparación, nutrición, clima — y las convierte en una decisión clara. No un gráfico. No un puntaje.
+        <p class="hero-sub">
+          Empoderando atletas, entrenadores y organizaciones a través de un ecosistema deportivo impulsado por IA.
         </p>
-
-        <div class="hero-ctas" data-reveal data-reveal-delay="3">
-          <a href="https://apps.apple.com/us/app/run-with-aria/id6760048203" target="_blank" rel="noopener" class="btn btn-primary btn-lg">
-            Descarga Aria en el App Store
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-          </a>
-          <a href="https://play.google.com/store/apps/details?id=com.runwitharia.mobile" target="_blank" rel="noopener" class="btn btn-ghost btn-lg">
-            Consigue Aria en Google Play
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-          </a>
-        </div>
-
-        <div class="hero-stats" data-reveal data-reveal-delay="4">
-          <div class="hstat">
-            <div class="hstat-n"><span class="c">3</span></div>
-            <div class="hstat-l">Productos en el Ecosistema</div>
-          </div>
-          <div class="hstat">
-            <div class="hstat-n"><span class="c">150+</span></div>
-            <div class="hstat-l">Atletas en la Plataforma</div>
-          </div>
-          <div class="hstat">
-            <div class="hstat-n"><span class="c">1</span></div>
-            <div class="hstat-l">Decisión Entregada</div>
-          </div>
-        </div>
       </div>
-
-      <!-- Widget -->
-      <div class="hero-widget" data-reveal data-reveal-delay="3">
-        <svg width="0" height="0" style="position:absolute">
-          <defs>
-            <linearGradient id="rg" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stop-color="#00BEF3"/>
-              <stop offset="100%" stop-color="#34D399"/>
-            </linearGradient>
-          </defs>
-        </svg>
-
-        <div class="hw-header">
-          <span class="hw-title">Puntuación de Preparación</span>
-          <span class="hw-live">En Vivo</span>
-        </div>
-
-        <div class="hw-ring-wrap">
-          <svg class="hw-svg" viewBox="0 0 100 100">
-            <circle class="ring-bg"   cx="50" cy="50" r="35"/>
-            <circle class="ring-fill" cx="50" cy="50" r="35"/>
-          </svg>
-          <div class="ring-num">
-            <div class="ring-num-val">92</div>
-            <div class="ring-num-lbl">Óptimo</div>
-          </div>
-        </div>
-
-        <div class="hw-bars" id="hwBars">
-          <div class="hwb">
-            <span class="hwb-lbl">Sueño</span>
-            <div class="hwb-track"><div class="hwb-fill" data-w="95%"></div></div>
-            <span class="hwb-val">95%</span>
-          </div>
-          <div class="hwb">
-            <span class="hwb-lbl">Recuperación</span>
-            <div class="hwb-track"><div class="hwb-fill" data-w="88%"></div></div>
-            <span class="hwb-val">88%</span>
-          </div>
-          <div class="hwb">
-            <span class="hwb-lbl">VFC</span>
-            <div class="hwb-track"><div class="hwb-fill" data-w="92%"></div></div>
-            <span class="hwb-val">92%</span>
-          </div>
-          <div class="hwb">
-            <span class="hwb-lbl">Carga</span>
-            <div class="hwb-track"><div class="hwb-fill" data-w="85%"></div></div>
-            <span class="hwb-val">85%</span>
-          </div>
-        </div>
-
-        <div class="hw-footer">
-          <span class="hw-footer-lbl">Aria Intelligence</span>
-          <div class="hw-footer-dot"></div>
-        </div>
-      </div>
-
     </div>
   </div>
 
@@ -785,66 +638,23 @@ body::before{
 
 <!-- ══ ENGINE ══ -->
 <section id="engine">
-  <div class="engine-amb"></div>
   <div class="container">
-
-    <div class="engine-intro" data-reveal>
-      <div class="eyebrow center">El Motor de Inteligencia</div>
-      <h2>Un Cerebro.<br><span class="g-cyan">Cada Señal. Una Decisión.</span></h2>
-      <p>Aria Intelligence es el motor de decisión IA detrás de cada producto de Stadiora Labs. No visualiza tus datos — los traduce en una salida clara y accionable.</p>
-    </div>
-
-    <div class="flow">
-      <div class="flow-col inputs" data-reveal>
-        <div class="fpill fpill-in">Carga de Entrenamiento</div>
-        <div class="fpill fpill-in">Recuperación y Sueño</div>
-        <div class="fpill fpill-in">Señales de Riesgo de Lesión</div>
-        <div class="fpill fpill-in">Salud Mental y Preparación</div>
-        <div class="fpill fpill-in">Nutrición y Combustible</div>
-        <div class="fpill fpill-in">Contexto del Ciclo</div>
-        <div class="fpill fpill-in">Entrada del Entrenador</div>
-      </div>
-
-      <div class="flow-center" data-reveal data-reveal-delay="2">
-        <div class="engine-box">
-          <div class="ering er1"></div>
-          <div class="ering er2"></div>
-          <div class="e-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M12 2L2 7l10 5 10-5-10-5z"/>
-              <path d="M2 17l10 5 10-5"/>
-              <path d="M2 12l10 5 10-5"/>
-            </svg>
-          </div>
-          <div class="e-name">Aria Intelligence</div>
-          <div class="e-sub">Motor de Decisión IA</div>
+    <div class="engine-split">
+      <div class="engine-text" data-reveal>
+        <div class="eyebrow">El Motor de Inteligencia</div>
+        <h2 class="engine-h2">Un Cerebro.<br>Cada Señal.<br><span class="g-cyan">Una Decisión.</span></h2>
+        <p class="engine-desc">Aria Intelligence es el motor de decisión IA detrás de cada producto de Stadiora Labs. No visualiza tus datos — los traduce en una salida clara y accionable.</p>
+        <div class="engine-chips">
+          <div class="echip"><span class="echip-dot c"></span>Carga de entrenamiento, recuperación y sueño</div>
+          <div class="echip"><span class="echip-dot m"></span>Riesgo de lesión y preparación</div>
+          <div class="echip"><span class="echip-dot c"></span>VFC, nutrición y contexto del ciclo</div>
+          <div class="echip"><span class="echip-dot v"></span>Entrada del entrenador — todo en una decisión</div>
         </div>
       </div>
-
-      <div class="flow-col outputs" data-reveal data-reveal-delay="3">
-        <div class="fpill fpill-out fp-cyan">Índice de Disponibilidad</div>
-        <div class="fpill fpill-out fp-mint">Cola de Atención del Entrenador</div>
-        <div class="fpill fpill-out fp-amber">Puntuación al Sprint</div>
-        <div class="fpill fpill-out fp-mint">Guía de Retorno al Juego</div>
-        <div class="fpill fpill-out fp-cyan">Pasaporte del Jugador</div>
-        <div class="fpill fpill-out fp-violet">Decisión Diaria de Sesión</div>
+      <div class="engine-phone" data-reveal data-reveal-delay="2">
+        <img src="./phone-aria.webp" alt="App Aria Intelligence — puntuación de preparación 71" class="engine-phone-img">
       </div>
     </div>
-
-    <div class="engine-verdict" data-reveal>
-      <span class="ev-dim">No un gráfico.&nbsp;&nbsp;&nbsp;No un puntaje.&nbsp;&nbsp;&nbsp;</span>
-      <span class="ev-accent">Una decisión.</span>
-    </div>
-
-  </div>
-</section>
-
-<!-- ══ STATEMENT ══ -->
-<section id="statement" data-reveal>
-  <div class="stmt-glow"></div>
-  <div class="stmt-inner">
-    <div class="stmt-pre">El Deporte Tiene Demasiados Datos.</div>
-    <div class="stmt-main">Dominamos<br>La Brecha.</div>
   </div>
 </section>
 
@@ -1053,8 +863,8 @@ body::before{
   <div class="container">
     <div class="trusted-hd">
       <div class="trusted-eyebrow">Respaldados Por</div>
-      <h2 class="trusted-title">Personas que Creen en Nuestro Trabajo</h2>
-      <p class="trusted-sub">Las instituciones e inversores que respaldan a Stadiora Labs.</p>
+      <h2 class="trusted-title">Las Instituciones Detrás de Nuestro Trabajo</h2>
+      <p class="trusted-sub">Los inversores e instituciones que respaldan a Stadiora Labs.</p>
     </div>
     <div class="trusted-grid">
       <a href="https://thethinktank.vc/" target="_blank" rel="noopener" class="partner-card">
@@ -1066,6 +876,20 @@ body::before{
       <a href="https://diprovid.ucr.ac.cr/auge/" target="_blank" rel="noopener" class="partner-card">
         <img src="./stadioralabs info/auge_logo.svg" alt="Auge UCR">
       </a>
+    </div>
+  </div>
+</section>
+
+<!-- ══ TESTIMONIAL ══ -->
+<section id="testimonial">
+  <div class="container">
+    <div class="testi-inner" data-reveal>
+      <svg class="testi-icon" viewBox="0 0 40 30" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M0 30V18C0 7.2 6.4 1.6 19.2 0L20.8 3.2C13.6 4.8 9.6 8.4 9.6 14.4V16H18V30H0ZM22 30V18C22 7.2 28.4 1.6 41.2 0L42.8 3.2C35.6 4.8 31.6 8.4 31.6 14.4V16H40V30H22Z" fill="currentColor"/>
+      </svg>
+      <blockquote class="testi-text">"Como entrenador, no siempre puedo ver cómo está comiendo el atleta, cómo durmió, si tiene alguna molestia o si está acumulando demasiada carga. La plataforma me permite tener toda esa información en un solo lugar y utilizar inteligencia para analizarla en tiempo real, dándome una visión mucho más completa de cada atleta."</blockquote>
+      <div class="testi-name">Roberto Méndez</div>
+      <div class="testi-role">Entrenador de Atletismo · Federación de Atletismo de Costa Rica</div>
     </div>
   </div>
 </section>
