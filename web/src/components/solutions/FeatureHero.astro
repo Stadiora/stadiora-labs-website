@@ -1,0 +1,94 @@
+---
+interface Action {
+  label: string;
+  href: string;
+}
+interface Props {
+  eyebrow: string;
+  title: string;
+  sub: string;
+  primary: Action;
+  secondary?: Action;
+  /** Optional narrower media column, for portrait photos. */
+  mediaWidth?: 'wide' | 'narrow';
+}
+const { eyebrow, title, sub, primary, secondary, mediaWidth = 'wide' } = Astro.props;
+---
+
+<section class="fhero" aria-labelledby="fhero-title">
+  <div class:list={['container', 'fhero__grid', `fhero__grid--${mediaWidth}`]}>
+    <div class="fhero__copy">
+      <p class="eyebrow">{eyebrow}</p>
+      <h1 id="fhero-title" class="fhero__title h-lane">{title}</h1>
+      <p class="fhero__sub">{sub}</p>
+      <div class="fhero__cta">
+        <a class="btn btn--primary btn--lg" href={primary.href}>{primary.label}</a>
+        {secondary && <a class="btn btn--secondary btn--lg" href={secondary.href}>{secondary.label}</a>}
+      </div>
+    </div>
+    <div class="fhero__media">
+      <slot />
+    </div>
+  </div>
+</section>
+
+<style>
+  .fhero {
+    padding-block: 48px 40px;
+  }
+  .fhero__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+    gap: 48px;
+    align-items: center;
+  }
+  .fhero__grid--narrow {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+  .fhero__title {
+    margin-top: 12px;
+    font-size: clamp(40px, 4.7vw, 64px);
+    line-height: 1.07;
+    letter-spacing: -0.02em;
+    text-wrap: balance;
+  }
+  .fhero__sub {
+    margin-top: 24px;
+    max-width: 34em;
+    color: var(--ink-2);
+    font-size: clamp(18px, 1.7vw, 24px);
+    line-height: 1.4;
+  }
+  .fhero__cta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-top: 32px;
+  }
+  .fhero__media {
+    min-width: 0;
+  }
+  .fhero__media :global(.fhero__photo) {
+    overflow: hidden;
+    border-radius: var(--radius-card);
+  }
+
+  @media (max-width: 1100px) {
+    .fhero__grid,
+    .fhero__grid--narrow {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 32px;
+    }
+  }
+  @media (max-width: 720px) {
+    .fhero {
+      padding-block: 32px 24px;
+    }
+    .fhero__cta {
+      flex-direction: column;
+    }
+    .fhero__cta .btn {
+      width: 100%;
+    }
+  }
+</style>

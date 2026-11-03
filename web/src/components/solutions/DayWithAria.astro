@@ -1,0 +1,310 @@
+---
+import Icon from '../ui/Icon.astro';
+import { common } from '../../i18n/pages/common';
+import type { CoachesCopy } from '../../i18n/pages/coaches';
+import type { Locale } from '../../i18n';
+
+interface Props {
+  copy: CoachesCopy;
+  locale: Locale;
+}
+const { copy, locale } = Astro.props;
+const caption = common[locale].demoCaption;
+const initials = (name: string) => name.charAt(0);
+---
+
+<section class="day" aria-labelledby="day-title">
+  <div class="container">
+    <div class="section-head">
+      <h2 id="day-title" class="h-lane">{copy.day.title}</h2>
+    </div>
+    <ol class="day__grid">
+      <li class="day__step" data-reveal>
+        <div class="day__head">
+          <span class="day__dot" aria-hidden="true"></span>
+          <p class="day__time">{copy.day.steps[0].time}</p>
+          <h3 class="day__title">{copy.day.steps[0].title}</h3>
+        </div>
+        <div class="pcard day__card">
+          <p class="day__card-title">{copy.ready.title}</p>
+          <ul class="ready">
+            {
+              copy.ready.rows.map((row) => (
+                <li class="ready__row">
+                  <span class="ready__avatar" aria-hidden="true">{initials(row.name)}</span>
+                  <span class="ready__name">{row.name}</span>
+                  <span class="ready__score num">{row.score}</span>
+                  <span class:list={['ready__state', row.state === 'attention' && 'is-attention']}>
+                    <span class:list={['dot', row.state === 'attention' && 'dot--amber']} aria-hidden="true" />
+                    {copy.ready.states[row.state as 'ready' | 'attention']}
+                  </span>
+                </li>
+              ))
+            }
+          </ul>
+          <p class="demo-note">{caption}</p>
+        </div>
+      </li>
+
+      <li class="day__step" data-reveal style="--reveal-i:1">
+        <div class="day__head">
+          <span class="day__dot" aria-hidden="true"></span>
+          <p class="day__time">{copy.day.steps[1].time}</p>
+          <h3 class="day__title">{copy.day.steps[1].title}</h3>
+        </div>
+        <div class="pcard day__card">
+          <div class="session__head">
+            <div>
+              <p class="session__name">{copy.session.name}</p>
+              <p class="session__meta">{copy.session.meta}</p>
+            </div>
+            <span class="session__saved"><Icon name="check" size={14} />{copy.session.saved}</span>
+          </div>
+          <ul class="session__rows">
+            <li class="session__row"><span>{copy.session.group}</span><span class="num">{copy.session.groupSets}</span></li>
+            <li class="session__row session__row--edit"><span>{copy.session.one}</span><span class="num">{copy.session.oneSets}</span></li>
+          </ul>
+          <p class="session__note">{copy.session.note}</p>
+          <p class="demo-note">{caption}</p>
+        </div>
+      </li>
+
+      <li class="day__step" data-reveal style="--reveal-i:2">
+        <div class="day__head">
+          <span class="day__dot" aria-hidden="true"></span>
+          <p class="day__time">{copy.day.steps[2].time}</p>
+          <h3 class="day__title">{copy.day.steps[2].title}</h3>
+        </div>
+        <div class="pcard day__card">
+          <p class="day__card-title">{copy.chat.title} · {copy.chat.thread}</p>
+          <ul class="chat">
+            {
+              copy.chat.messages.map((m) => (
+                <li class:list={['chat__msg', m.from === 'coach' && 'is-coach']}>
+                  <p class="chat__bubble">{m.text}</p>
+                  <p class="chat__time">{m.time}</p>
+                </li>
+              ))
+            }
+          </ul>
+          <p class="demo-note">{caption}</p>
+        </div>
+      </li>
+    </ol>
+  </div>
+</section>
+
+<style>
+  .day {
+    padding-block: 56px 72px;
+  }
+  .day__grid {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 24px;
+    margin-top: 40px;
+  }
+  /* The line the dots sit on. */
+  .day__grid::before {
+    content: '';
+    position: absolute;
+    top: 6px;
+    left: 5px;
+    right: 5px;
+    height: 2px;
+    background: var(--line);
+  }
+  .day__step {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    min-width: 0;
+  }
+  .day__head {
+    padding-top: 28px;
+  }
+  .day__dot {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--cyan);
+    box-shadow: 0 0 0 4px var(--bg);
+  }
+  .day__time {
+    color: var(--ink-2);
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 24px;
+  }
+  .day__title {
+    font-size: 24px;
+    line-height: 30px;
+  }
+  .day__card {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 16px;
+    padding: 24px;
+  }
+  .day__card .demo-note {
+    margin-top: auto;
+    padding-top: 4px;
+  }
+  .day__card-title {
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 24px;
+  }
+
+  .ready {
+    display: grid;
+  }
+  .ready__row {
+    display: grid;
+    grid-template-columns: 36px minmax(0, 1fr) auto auto;
+    align-items: center;
+    gap: 12px;
+    padding-block: 10px;
+    border-bottom: 1px solid var(--line);
+    font-size: 15px;
+  }
+  .ready__row:last-child {
+    border-bottom: 0;
+  }
+  .ready__avatar {
+    display: grid;
+    place-items: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: var(--cyan-tint);
+    color: var(--cyan-ink);
+    font-weight: 600;
+  }
+  .ready__score {
+    font-size: 20px;
+    font-weight: 600;
+  }
+  .ready__state {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    min-width: 7.5em;
+    color: var(--ink-2);
+    font-size: 14px;
+  }
+  .ready__state.is-attention {
+    color: var(--amber-ink);
+    font-weight: 600;
+  }
+
+  .session__head {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .session__name {
+    font-family: var(--font-display);
+    font-size: 22px;
+    font-weight: 600;
+    line-height: 28px;
+  }
+  .session__meta {
+    color: var(--ink-2);
+    font-size: 14px;
+    line-height: 20px;
+  }
+  .session__saved {
+    display: inline-flex;
+    align-items: center;
+    align-self: flex-start;
+    gap: 4px;
+    color: var(--mint-ink);
+    font-size: 14px;
+    font-weight: 600;
+  }
+  .session__rows {
+    display: grid;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+  }
+  .session__row {
+    display: flex;
+    justify-content: space-between;
+    padding: 12px 14px;
+    font-size: 15px;
+  }
+  .session__row + .session__row {
+    border-top: 1px solid var(--line);
+  }
+  .session__row--edit {
+    background: var(--cyan-tint);
+    font-weight: 600;
+  }
+  .session__note {
+    padding: 12px 14px;
+    border-radius: 10px;
+    background: var(--surface);
+    color: var(--ink-2);
+    font-size: 14px;
+    line-height: 20px;
+  }
+
+  .chat {
+    display: grid;
+    gap: 14px;
+  }
+  .chat__msg {
+    display: grid;
+    gap: 4px;
+    justify-items: start;
+  }
+  .chat__msg.is-coach {
+    justify-items: end;
+  }
+  .chat__bubble {
+    max-width: 86%;
+    padding: 10px 14px;
+    border-radius: 14px 14px 14px 4px;
+    background: var(--surface);
+    font-size: 15px;
+    line-height: 22px;
+  }
+  .is-coach .chat__bubble {
+    border-radius: 14px 14px 4px 14px;
+    background: var(--cyan-tint);
+  }
+  .chat__time {
+    color: var(--ink-3);
+    font-size: 12px;
+    line-height: 16px;
+  }
+
+  @media (max-width: 1100px) {
+    .day__grid {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 40px;
+      margin-top: 32px;
+    }
+    .day__grid::before {
+      display: none;
+    }
+    .day__head {
+      padding-top: 24px;
+    }
+  }
+  @media (max-width: 720px) {
+    .day {
+      padding-block: 40px 56px;
+    }
+    .ready__state {
+      min-width: 0;
+    }
+  }
+</style>

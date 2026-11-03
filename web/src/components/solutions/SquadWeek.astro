@@ -1,0 +1,323 @@
+---
+import type { ClubsCopy } from '../../i18n/pages/clubs';
+
+interface Props {
+  copy: ClubsCopy;
+}
+const { copy } = Astro.props;
+const w = copy.week;
+
+// Mini line chart geometry (viewBox units). The y axis is fixed at 30 to 50 cm.
+const box = { left: 30, right: 292, top: 8, bottom: 96 };
+const x = (i: number, n: number) => box.left + 12 + ((box.right - box.left - 24) * i) / (n - 1);
+const y = (v: number) => box.bottom - ((v - 30) / 20) * (box.bottom - box.top);
+const points = (values: number[]) => values.map((v, i) => `${x(i, values.length).toFixed(1)},${y(v).toFixed(1)}`);
+const label = (values: number[]) =>
+  w.chartLabel.replace('{first}', String(values[0])).replace('{last}', String(values[values.length - 1]));
+---
+
+<section class="squad" aria-label={w.title}>
+  <div class="container" data-tabs data-reveal>
+    <div class="tabs squad__tabs" role="tablist" aria-label={w.tabsLabel}>
+      {
+        copy.squads.map((s) => (
+          <button
+            class="tab"
+            type="button"
+            role="tab"
+            id={`squad-tab-${s.id}`}
+            aria-controls={`squad-panel-${s.id}`}
+            aria-selected={s.id === copy.defaultSquad ? 'true' : 'false'}
+            tabindex={s.id === copy.defaultSquad ? 0 : -1}
+            data-text={s.label}
+          >
+            {s.label}
+          </button>
+        ))
+      }
+      <span class="tabs__lane" aria-hidden="true"></span>
+    </div>
+
+    <div class="squad__card xf">
+      {
+        copy.squads.map((s) => {
+          const on = s.id === copy.defaultSquad;
+          const pts = points(s.cmj);
+          return (
+            <div class="squad__panel" role="tabpanel" id={`squad-panel-${s.id}`} aria-labelledby={`squad-tab-${s.id}`} data-active={on ? '' : undefined} inert={!on}>
+              <div class="squad__top">
+                <h2 class="squad__title">
+                  {s.label} · {w.title}
+                </h2>
+                <p class="squad__range">{w.range}</p>
+              </div>
+              <div class="squad__tiles">
+                <article class="tile">
+                  <h3 class="tile__label">
+                    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                      <circle cx="12" cy="12" r="8.5" />
+                      <path d="m12 8 3.6 2.6-1.4 4.2H9.8l-1.4-4.2zM12 3.5V8M15.6 10.6l4.2-1.4M14.2 14.8l2.6 3.6M9.8 14.8l-2.6 3.6M8.4 10.6 4.2 9.2" />
+                    </svg>
+                    {w.fixture}
+                  </h3>
+                  <p class="tile__big">
+                    {s.fixture.day} · vs {s.fixture.opponent}
+                  </p>
+                  <p class="tile__sub">
+                    {s.fixture.time} · {s.fixture.venue}
+                  </p>
+                </article>
+
+                <article class="tile">
+                  <h3 class="tile__label">
+                    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                      <path d="M12 4 7 19h10zM9.2 12h5.6M5 19h14" />
+                    </svg>
+                    {w.practices}
+                  </h3>
+                  <ul class="tile__rows">
+                    {
+                      s.practices.map((p) => (
+                        <li class="tile__row">
+                          <span>{p.day} · {w.practice}</span>
+                          <span class="num">{p.time}</span>
+                        </li>
+                      ))
+                    }
+                  </ul>
+                </article>
+
+                <article class="tile">
+                  <h3 class="tile__label">{w.availability}</h3>
+                  <ul class="avail">
+                    <li><span class="dot" aria-hidden="true"></span><span class="num">{s.available}</span> {w.states.available}</li>
+                    <li><span class="dot dot--amber" aria-hidden="true"></span><span class="num">{s.doubtful}</span> {w.states.doubtful}</li>
+                    <li><span class="dot dot--muted" aria-hidden="true"></span><span class="num">{s.unavailable}</span> {w.states.unavailable}</li>
+                  </ul>
+                </article>
+
+                <article class="tile">
+                  <h3 class="tile__label">
+                    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                      <path d="M4 10v4h3l6 4V6L7 10zM16.5 9a4 4 0 0 1 0 6M7 14l1 5h2.5l-1-4.2" />
+                    </svg>
+                    {w.announcement}
+                  </h3>
+                  <p class="tile__big">{s.note}</p>
+                  <p class="tile__sub"><span class="num">{s.read}</span> {w.of} <span class="num">{s.total}</span> {w.read}</p>
+                </article>
+
+                <article class="tile tile--chart">
+                  <h3 class="tile__label">
+                    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                      <path d="M5 19v-6M12 19V5M19 19v-10" />
+                    </svg>
+                    <span>{w.powerLab}<span class="tile__metric">{w.metric}</span><span class="tile__note">{w.metricNote}</span></span>
+                  </h3>
+                  <svg class="chart" viewBox="0 0 300 126" role="img" aria-label={label(s.cmj)}>
+                    {[30, 40, 50].map((tick) => (
+                      <g>
+                        <line x1={box.left} x2={box.right} y1={y(tick)} y2={y(tick)} class="chart__grid" />
+                        <text x={box.left - 6} y={y(tick) + 4} text-anchor="end" class="chart__tick">{tick}</text>
+                      </g>
+                    ))}
+                    <polyline points={pts.join(' ')} class="chart__line" fill="none" />
+                    {pts.map((p) => {
+                      const [cx, cy] = p.split(',');
+                      return <circle cx={cx} cy={cy} r="3.5" class="chart__dot" />;
+                    })}
+                    {w.dates.map((d, i) => (
+                      <text x={x(i, w.dates.length)} y="118" text-anchor="middle" class="chart__tick">{d}</text>
+                    ))}
+                  </svg>
+                </article>
+              </div>
+              <p class="demo-note">{copy.demoNote}</p>
+            </div>
+          );
+        })
+      }
+    </div>
+  </div>
+</section>
+
+<style>
+  .squad {
+    padding-block: 32px 56px;
+    background: var(--surface);
+  }
+  .squad__tabs {
+    margin-bottom: 24px;
+  }
+  .squad__card {
+    padding: 28px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-card);
+    background: var(--bg);
+  }
+  .squad__panel {
+    min-width: 0;
+  }
+  .squad__top {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 8px 24px;
+  }
+  .squad__title {
+    font-size: 24px;
+    line-height: 30px;
+  }
+  .squad__range {
+    color: var(--ink-2);
+    font-size: 15px;
+  }
+  .squad__tiles {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1.5fr);
+    gap: 14px;
+    margin-top: 20px;
+  }
+  .tile {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-width: 0;
+    min-height: 168px;
+    padding: 16px;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+  }
+  .tile__label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--ink);
+    font-family: var(--font-body);
+    font-size: 15px;
+    font-weight: 600;
+    line-height: 20px;
+  }
+  .tile__label svg {
+    flex: none;
+    color: var(--cyan-ink);
+  }
+  .tile__big {
+    margin-top: auto;
+    font-size: 19px;
+    font-weight: 600;
+    line-height: 25px;
+  }
+  .tile__sub {
+    margin-bottom: auto;
+    color: var(--ink-2);
+    font-size: 16px;
+    line-height: 22px;
+  }
+  .tile__rows {
+    display: grid;
+    margin-block: auto;
+  }
+  .tile__row {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    padding-block: 10px;
+    font-size: 15px;
+  }
+  .tile__row .num {
+    flex: none;
+    white-space: nowrap;
+  }
+  .tile__row + .tile__row {
+    border-top: 1px solid var(--line);
+  }
+  .avail {
+    display: grid;
+    gap: 12px;
+    margin-block: auto;
+    font-size: 16px;
+  }
+  .avail li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .tile__metric,
+  .tile__note {
+    display: block;
+    line-height: 20px;
+  }
+  .tile__metric {
+    font-weight: 600;
+  }
+  .tile__note {
+    color: var(--ink-2);
+    font-size: 14px;
+    font-weight: 400;
+  }
+  .tile--chart .tile__label {
+    align-items: flex-start;
+  }
+  .chart {
+    width: 100%;
+    height: auto;
+    margin-top: auto;
+    overflow: visible;
+  }
+  .chart__grid {
+    stroke: var(--line);
+    stroke-width: 1;
+  }
+  .chart__tick {
+    fill: var(--ink-2);
+    font-size: 10px;
+  }
+  .chart__line {
+    stroke: var(--cyan-ink);
+    stroke-width: 2;
+    stroke-linejoin: round;
+  }
+  .chart__dot {
+    fill: var(--cyan-ink);
+  }
+
+  @media (max-width: 1280px) {
+    .squad__tiles {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+    .tile--chart {
+      grid-column: span 2;
+    }
+  }
+  @media (max-width: 900px) {
+    .squad__tiles {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .tile--chart {
+      grid-column: span 2;
+    }
+  }
+  @media (max-width: 720px) {
+    .squad {
+      padding-block: 24px 40px;
+    }
+    .squad__card {
+      padding: 16px;
+    }
+    .squad__tiles {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .tile {
+      min-height: 0;
+    }
+    .tile--chart {
+      grid-column: auto;
+    }
+  }
+</style>
+
+<script>
+  import '../../scripts/tabs';
+</script>

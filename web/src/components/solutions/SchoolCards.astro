@@ -1,0 +1,335 @@
+---
+import Phone from '../ui/Phone.astro';
+import Icon from '../ui/Icon.astro';
+import type { SchoolsCopy } from '../../i18n/pages/schools';
+
+interface Props {
+  copy: SchoolsCopy;
+}
+const { copy } = Astro.props;
+
+// Small sport glyphs, drawn for this card only.
+const glyphs: Record<string, string> = {
+  run: '<circle cx="14.5" cy="4.5" r="1.8"/><path d="M5 20l3.5-5.5 3 1 2-3.5-3-2-3 1.5M11.5 8.5l3.5 3.5 3.5-.5M12 16l-1 4"/>',
+  ball: '<circle cx="12" cy="12" r="8.5"/><path d="m12 8 3.6 2.6-1.4 4.2H9.8l-1.4-4.2zM12 3.5V8M15.6 10.6l4.2-1.4M14.2 14.8l2.6 3.6M9.8 14.8l-2.6 3.6M8.4 10.6 4.2 9.2"/>',
+  volleyball: '<circle cx="12" cy="12" r="8.5"/><path d="M12 3.5c-2.4 2-3.4 4.6-3.2 8.5M20 9c-3.6-.4-6.4.6-8.8 3M16.5 19.2c-.4-3.4-2-5.8-5-7.4M5.2 17c1.8-3 4.4-4.4 7.8-4.6"/>',
+  weights: '<path d="M6.5 8v8M17.5 8v8M3.5 10v4M20.5 10v4M6.5 12h11"/>',
+};
+const week = copy.guardian.days;
+const done = [true, true, false, true, true];
+---
+
+<section class="section--tight-top cards" aria-label={copy.title}>
+  <div class="container cards__grid">
+    <article class="pcard" data-reveal>
+      <h2 class="pcard__title">{copy.admin.title}</h2>
+      <div class="screen admin">
+        <p class="screen__head">{copy.admin.school}</p>
+        <ul class="admin__rows">
+          {
+            copy.admin.rows.map((row) => (
+              <li class="admin__row">
+                <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" set:html={glyphs[row.glyph]} />
+                <span class="admin__name">
+                  {row.sport} <span class="admin__count">· {row.count} {copy.admin.athletes}</span>
+                </span>
+                <span class="admin__status">
+                  <span class:list={['dot', row.status === 'planning' && 'dot--amber']} aria-hidden="true" />
+                  {copy.admin.status[row.status as 'active' | 'planning']}
+                </span>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+      <p class="demo-note">{copy.admin.caption}</p>
+    </article>
+
+    <article class="pcard guardian" data-reveal style="--reveal-i:1">
+      <h2 class="pcard__title">{copy.guardian.title}</h2>
+      <div class="guardian__stage">
+        <Phone decorative={false} class="guardian__phone">
+          <div class="gp">
+            <div class="gp__bar">
+              <Icon name="sparkle" size={14} />
+              <span>{copy.guardian.app}</span>
+            </div>
+            <div class="gp__child">
+              <span class="gp__avatar" aria-hidden="true">S</span>
+              <div>
+                <p class="gp__name">{copy.guardian.child}</p>
+                <p class="gp__meta">{copy.guardian.childMeta}</p>
+              </div>
+            </div>
+            <div class="gp__week">
+              <p class="gp__label">{copy.guardian.week}</p>
+              <ul class="gp__days">
+                {
+                  week.map((day, i) => (
+                    <li class:list={['gp__day', done[i] && 'is-done']}>
+                      <span class="gp__tick" aria-hidden="true">
+                        {done[i] && <Icon name="check" size={10} />}
+                      </span>
+                      {day}
+                    </li>
+                  ))
+                }
+              </ul>
+            </div>
+            <div class="gp__msg">
+              <p class="gp__msg-head">
+                <span>{copy.guardian.message.from}</span>
+                <span class="gp__ago">{copy.guardian.message.ago}</span>
+              </p>
+              <p class="gp__msg-body">{copy.guardian.message.body}</p>
+            </div>
+            <div class="gp__consent">
+              <span>{copy.guardian.consent}</span>
+              <span class="gp__signed">{copy.guardian.signed} <Icon name="check" size={11} /></span>
+            </div>
+          </div>
+        </Phone>
+      </div>
+      <p class="demo-note">{copy.guardian.included}</p>
+    </article>
+
+    <article class="pcard consent" data-reveal style="--reveal-i:2">
+      <h2 class="pcard__title">{copy.consent.title}</h2>
+      <ul class="consent__list">
+        {
+          copy.consent.lines.map((line, i) => (
+            <li class="consent__item">
+              <span class="consent__icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+                  {i === 0 && <path d="M7 3.5h7l4 4v13H7zM14 3.5v4h4M9.5 12h6M9.5 15.5h6" />}
+                  {i === 1 && <path d="M12 3.5l7 2.8v5.4c0 4.2-2.8 7.4-7 8.8-4.2-1.4-7-4.6-7-8.8V6.3zM9 12l2.2 2.2L15.5 10" />}
+                  {i === 2 && <path d="M12 3.5l7 2.8v5.4c0 4.2-2.8 7.4-7 8.8-4.2-1.4-7-4.6-7-8.8V6.3zM9.2 9.2l5.6 5.6M14.8 9.2l-5.6 5.6" />}
+                </svg>
+              </span>
+              <span class="consent__text">{line}</span>
+            </li>
+          ))
+        }
+      </ul>
+    </article>
+  </div>
+</section>
+
+<style>
+  .cards {
+    padding-bottom: 32px;
+  }
+  .cards__grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 24px;
+    align-items: stretch;
+  }
+  .pcard {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  .pcard .demo-note {
+    margin-top: auto;
+  }
+
+  /* Admin overview */
+  .admin__rows {
+    display: grid;
+  }
+  .admin__row {
+    display: grid;
+    grid-template-columns: 22px minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 12px;
+    padding: 13px 16px;
+    border-bottom: 1px solid var(--line);
+    color: var(--ink);
+    font-size: 15px;
+    line-height: 22px;
+  }
+  .admin__row:last-child {
+    border-bottom: 0;
+  }
+  .admin__row svg {
+    color: var(--ink-2);
+  }
+  .admin__count {
+    color: var(--ink-2);
+  }
+  .admin__status {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--ink-2);
+    font-size: 14px;
+  }
+
+  /* Guardian portal */
+  /* The phone is cropped at the bottom so the card shows the screen, not empty glass. */
+  .guardian__stage {
+    display: grid;
+    justify-items: center;
+    height: 390px;
+    overflow: hidden;
+    -webkit-mask-image: linear-gradient(#000 82%, transparent);
+    mask-image: linear-gradient(#000 82%, transparent);
+  }
+  .guardian :global(.guardian__phone) {
+    --phone-w: 252px;
+  }
+  .gp {
+    display: flex;
+    flex-direction: column;
+    gap: 0.55em;
+    padding: 0 0.9em;
+    font-size: 0.78em;
+  }
+  .gp__bar {
+    display: flex;
+    align-items: center;
+    gap: 0.5em;
+    padding-block: 0.4em;
+    color: var(--ink);
+    font-size: 1.05em;
+    font-weight: 600;
+  }
+  .gp__bar :global(svg) {
+    color: var(--violet-ink);
+  }
+  .gp__child,
+  .gp__week,
+  .gp__msg,
+  .gp__consent {
+    border: 1px solid var(--line);
+    border-radius: 0.8em;
+    background: var(--bg);
+  }
+  .gp__child {
+    display: flex;
+    align-items: center;
+    gap: 0.7em;
+    padding: 0.6em 0.8em;
+  }
+  .gp__avatar {
+    display: grid;
+    place-items: center;
+    flex: none;
+    width: 2.6em;
+    height: 2.6em;
+    border-radius: 50%;
+    background: var(--cyan-tint);
+    color: var(--cyan-ink);
+    font-weight: 600;
+  }
+  .gp__name {
+    font-weight: 600;
+    font-size: 1.05em;
+    line-height: 1.25;
+  }
+  .gp__meta,
+  .gp__label,
+  .gp__ago {
+    color: var(--ink-2);
+    font-size: 0.85em;
+    line-height: 1.3;
+  }
+  .gp__week {
+    padding: 0.6em 0.8em;
+  }
+  .gp__label {
+    color: var(--ink);
+    font-weight: 600;
+  }
+  .gp__days {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 0.5em;
+  }
+  .gp__day {
+    display: grid;
+    justify-items: center;
+    gap: 0.25em;
+    color: var(--ink-2);
+    font-size: 0.8em;
+  }
+  .gp__tick {
+    display: grid;
+    place-items: center;
+    width: 1.9em;
+    height: 1.9em;
+    border-radius: 50%;
+    background: var(--surface-2);
+    color: #fff;
+  }
+  .is-done .gp__tick {
+    background: var(--mint-ink);
+  }
+  .gp__msg {
+    padding: 0.6em 0.8em;
+  }
+  .gp__msg-head {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.5em;
+    font-size: 0.85em;
+    font-weight: 600;
+    line-height: 1.3;
+  }
+  .gp__msg-head .gp__ago {
+    font-weight: 400;
+  }
+  .gp__msg-body {
+    margin-top: 0.25em;
+    color: var(--ink-2);
+    font-size: 0.85em;
+    line-height: 1.35;
+  }
+  .gp__consent {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.7em 0.8em;
+    font-size: 0.95em;
+  }
+  .gp__signed {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3em;
+    color: var(--mint-ink);
+    font-weight: 600;
+  }
+
+  /* Consent strip */
+  .consent__list {
+    display: grid;
+    gap: 28px;
+    margin-block: auto;
+  }
+  .consent__item {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+  .consent__icon {
+    display: grid;
+    place-items: center;
+    flex: none;
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: var(--cyan-tint);
+    color: var(--cyan-ink);
+  }
+  .consent__text {
+    color: var(--ink);
+    font-size: 19px;
+    line-height: 26px;
+  }
+
+  @media (max-width: 1100px) {
+    .cards__grid {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+</style>

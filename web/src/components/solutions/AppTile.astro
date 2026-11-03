@@ -1,0 +1,240 @@
+---
+import Photo from '../ui/Photo.astro';
+import Phone from '../ui/Phone.astro';
+import Icon from '../ui/Icon.astro';
+import { altFor } from '../../i18n/pages/common';
+import { site } from '../../data/site';
+import type { AthletesCopy } from '../../i18n/pages/athletes';
+import type { Locale } from '../../i18n';
+
+interface Props {
+  app: AthletesCopy['apps'][number];
+  copy: AthletesCopy;
+  locale: Locale;
+}
+const { app, copy, locale } = Astro.props;
+
+const icons: Record<string, string> = {
+  run: '/apps/run-with-aria.webp',
+  aria12: '/apps/aria-12.webp',
+  lift: '/apps/lift-with-aria.webp',
+  fitmg: '/apps/fitmg.webp',
+};
+const stores: Record<string, { ios?: string; android?: string; beta?: string }> = {
+  run: { ios: site.stores.runIos, android: site.stores.runAndroid },
+  fitmg: { android: site.stores.fitmgAndroid, beta: site.stores.fitmgIosBeta },
+};
+const links = stores[app.id] ?? {};
+// Each app has its own tint for the session icon on the demo screen.
+const tint: Record<string, string> = {
+  run: 'var(--cyan-tint)',
+  aria12: 'rgb(52 211 153 / 0.22)',
+  lift: 'rgb(251 113 133 / 0.22)',
+  fitmg: 'rgb(245 158 11 / 0.22)',
+};
+---
+
+<article class:list={['app', `app--${app.id}`]} data-reveal>
+  <div class="app__photo">
+    <Photo slot={app.slot} ratio="3/4" sizes="(max-width: 720px) 92vw, (max-width: 1100px) 46vw, 310px" alt={altFor(app.slot, locale)} />
+    <Phone class="app__phone">
+      <div class="ap">
+        <div class="ap__head">
+          <div>
+            <p class="ap__title">{app.today}</p>
+            <p class="ap__date">{app.date}</p>
+          </div>
+          <Icon name="pin" size={12} />
+        </div>
+        <ul class="ap__list">
+          {
+            app.items.map((item, i) => (
+              <li class:list={['ap__item', i === 0 && 'is-first']}>
+                {'done' in item && item.done ? (
+                  <span class="ap__check" aria-hidden="true"><Icon name="check" size={10} /></span>
+                ) : (
+                  <span class="ap__ico" style={`background:${tint[app.id]}`} aria-hidden="true"></span>
+                )}
+                <span class="ap__text">
+                  <span class="ap__name">{item.title}</span>
+                  <span class="ap__sub">{item.sub}{'meta' in item && item.meta ? ` · ${item.meta}` : ''}</span>
+                </span>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+    </Phone>
+  </div>
+
+  <div class="app__body">
+    <div class="app__id">
+      <img class="app__icon" src={icons[app.id]} alt="" width="56" height="56" loading="lazy" decoding="async" />
+      <div>
+        <h3 class="app__name">{app.name}</h3>
+        <p class="app__status">{app.status}</p>
+      </div>
+    </div>
+    {
+      app.live && (
+        <div class="app__badges">
+          {links.ios && (
+            <a class="app__badge" href={links.ios} rel="noopener" aria-label={`${app.name}: ${copy.badge.ios}`}>
+              <img src={copy.badgeFiles.ios} alt={copy.badge.ios} width="120" height="40" loading="lazy" decoding="async" />
+            </a>
+          )}
+          {links.android && (
+            <a class="app__badge" href={links.android} rel="noopener" aria-label={`${app.name}: ${copy.badge.android}`}>
+              <img src={copy.badgeFiles.android} alt={copy.badge.android} width="135" height="40" loading="lazy" decoding="async" />
+            </a>
+          )}
+          {links.beta && (
+            <a class="link link-arrow app__beta" href={links.beta} rel="noopener">
+              {copy.beta}
+              <Icon name="arrow-right" />
+            </a>
+          )}
+        </div>
+      )
+    }
+  </div>
+</article>
+
+<style>
+  .app {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    overflow: hidden;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-card);
+    background: var(--bg);
+  }
+  .app__photo {
+    position: relative;
+    overflow: hidden;
+  }
+  .app__photo :global(.photo) {
+    display: block;
+  }
+  .app__photo :global(.app__phone) {
+    --phone-w: 150px;
+    position: absolute;
+    top: 62%;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  .app__body {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 16px;
+    padding: 20px 16px;
+  }
+  .app__id {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .app__icon {
+    flex: none;
+    width: 56px;
+    height: 56px;
+    border-radius: 14px;
+  }
+  .app__name {
+    font-size: 22px;
+    line-height: 28px;
+  }
+  .app__status {
+    color: var(--ink-2);
+    font-size: 16px;
+    line-height: 22px;
+  }
+  .app__badges {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin-top: auto;
+  }
+  .app__badge {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    border-radius: 8px;
+  }
+  .app__badge img {
+    display: block;
+    height: 40px;
+    width: auto;
+  }
+  .app__beta {
+    padding-inline: 4px;
+  }
+
+  /* The demo screen inside the phone: sized in em from --phone-w. */
+  .ap {
+    padding: 0 1.1em;
+  }
+  .ap__head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    padding-top: 0.5em;
+  }
+  .ap__title {
+    font-family: var(--font-display);
+    font-size: 1.6em;
+    font-weight: 600;
+    line-height: 1.2;
+  }
+  .ap__date {
+    color: var(--ink-2);
+    font-size: 0.95em;
+  }
+  .ap__list {
+    display: grid;
+    gap: 0.7em;
+    margin-top: 0.9em;
+  }
+  .ap__item {
+    display: flex;
+    align-items: center;
+    gap: 0.7em;
+    padding: 0.6em;
+    border-radius: 0.8em;
+    font-size: 1em;
+  }
+  .ap__item.is-first {
+    border: 1px solid var(--line);
+    box-shadow: 0 0.2em 0.6em rgb(8 19 43 / 0.06);
+  }
+  .ap__ico,
+  .ap__check {
+    display: grid;
+    place-items: center;
+    flex: none;
+    width: 2.6em;
+    height: 2.6em;
+    border-radius: 0.7em;
+  }
+  .ap__check {
+    border: 1.5px solid var(--mint-ink);
+    border-radius: 50%;
+    color: var(--mint-ink);
+  }
+  .ap__text {
+    display: grid;
+    min-width: 0;
+  }
+  .ap__name {
+    font-weight: 600;
+    line-height: 1.25;
+  }
+  .ap__sub {
+    color: var(--ink-2);
+    font-size: 0.9em;
+    line-height: 1.3;
+  }
+</style>
