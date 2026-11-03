@@ -1,0 +1,356 @@
+{
+ "results": [
+  {
+   "group": "pricing/data",
+   "name": "price table matches the epic and DECISIONS oracle (both regions, annual, yearly, education, add-ons)",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "group": "pricing/region",
+   "name": "every zone in zone.tab (418) maps to its country's region",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "group": "pricing/region",
+   "name": "legacy Argentina and Brazil aliases are LatAm",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "group": "pricing/region",
+   "name": "Puerto Rico, US, Canada, Europe, UTC and unknown or missing zones are US",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "group": "pricing/region",
+   "name": "browser time zone picks the region on the page (14 zones, Core/Performance shown)",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "group": "pricing/region",
+   "name": "?region=latam overrides a US time zone",
+   "pass": true,
+   "detail": "latam $129"
+  },
+  {
+   "group": "pricing/region",
+   "name": "?region=us overrides a LatAm time zone (Spanish page)",
+   "pass": true,
+   "detail": "us $199"
+  },
+  {
+   "group": "pricing/region",
+   "name": "an unknown ?region value is ignored and the time zone decides",
+   "pass": true,
+   "detail": "latam"
+  },
+  {
+   "group": "pricing/prices",
+   "name": "Core and Performance price, meta, billed line, Schools from, education, extra coach (48 states: en/es x us/latam x monthly/annual x 6 sizes)",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "group": "pricing/prices",
+   "name": "no dollar amount outside the current state is anywhere in the DOM, dialogs included",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "group": "pricing/prices",
+   "name": "the other region's exclusive amounts never appear",
+   "pass": true,
+   "detail": "0 states"
+  },
+  {
+   "group": "pricing/prices",
+   "name": "annual is 10% off rounded down per month; the yearly total is that times 12",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "group": "pricing/behaviour",
+   "name": "nothing is announced and nothing rolls on first load",
+   "pass": true,
+   "detail": "{\"live\":\"\",\"rolling\":0}"
+  },
+  {
+   "group": "pricing/behaviour",
+   "name": "arrow keys move the billing radios and the prices follow",
+   "pass": true,
+   "detail": "annual $179"
+  },
+  {
+   "group": "pricing/behaviour",
+   "name": "prices roll on a user change (motion on)",
+   "pass": true,
+   "detail": "2 rolling"
+  },
+  {
+   "group": "pricing/behaviour",
+   "name": "the live region announces both plans after a change",
+   "pass": true,
+   "detail": "Core, 179 dollars per month, billed yearly. Performance, 269 dollars per month, billed yearly"
+  },
+  {
+   "group": "pricing/behaviour",
+   "name": "the roll animation clears itself",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "group": "pricing/behaviour",
+   "name": "ArrowLeft returns to monthly",
+   "pass": true,
+   "detail": "monthly $199"
+  },
+  {
+   "group": "pricing/behaviour",
+   "name": "the athlete select works from the keyboard (ArrowDown: 100 to 250)",
+   "pass": true,
+   "detail": "250 $349"
+  },
+  {
+   "group": "pricing/behaviour",
+   "name": "ArrowUp twice goes from 250 to 50",
+   "pass": true,
+   "detail": "50 $129"
+  },
+  {
+   "group": "pricing/behaviour",
+   "name": "Tab goes from the billing radios to the athlete select",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "group": "pricing/behaviour",
+   "name": "Tab then visits the plan buttons in card order, with the education rates button after Schools",
+   "pass": true,
+   "detail": "plan-free,plan-core,plan-performance,plan-schools,education-rates,plan-federations"
+  },
+  {
+   "group": "pricing/behaviour",
+   "name": "reduced motion: the price roll has no duration",
+   "pass": true,
+   "detail": "1e-06s"
+  },
+  {
+   "group": "pricing/behaviour",
+   "name": "reveal-on-scroll: add-ons and FAQ end fully visible after scrolling through",
+   "pass": true,
+   "detail": "0"
+  },
+  {
+   "group": "pricing/dialogs",
+   "name": "1280px: all four dialogs open, trap focus, close on Escape, backdrop and button, return focus, lock scroll",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "group": "pricing/dialogs",
+   "name": "1280px: the page stayed clean (no console errors)",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "group": "pricing/dialogs",
+   "name": "390px: all four dialogs open, trap focus, close on Escape, backdrop and button, return focus, lock scroll",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "group": "pricing/dialogs",
+   "name": "390px: the page stayed clean (no console errors)",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "group": "pricing/layout",
+   "name": "390px: no overflow or overlap in cards, controls and add-ons, rows aligned (8 states, en/es x us/latam x default/annual-1000)",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "group": "pricing/layout",
+   "name": "1024px: no overflow or overlap in cards, controls and add-ons, rows aligned (8 states, en/es x us/latam x default/annual-1000)",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "group": "pricing/layout",
+   "name": "1280px: no overflow or overlap in cards, controls and add-ons, rows aligned (8 states, en/es x us/latam x default/annual-1000)",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "group": "pricing/layout",
+   "name": "1440px: no overflow or overlap in cards, controls and add-ons, rows aligned (8 states, en/es x us/latam x default/annual-1000)",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "group": "pricing/contrast",
+   "name": "light/en: text meets WCAG AA in 7 states (847 text runs, lowest 4.57:1)",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "group": "pricing/contrast",
+   "name": "light/es: text meets WCAG AA in 7 states (847 text runs, lowest 4.57:1)",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "group": "pricing/contrast",
+   "name": "dark/en: text meets WCAG AA in 7 states (847 text runs, lowest 7.91:1)",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "group": "pricing/contrast",
+   "name": "dark/es: text meets WCAG AA in 7 states (847 text runs, lowest 7.91:1)",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "group": "pricing/targets",
+   "name": "390px: 19 buttons, controls and summaries are at least 44px",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "group": "pricing/targets",
+   "name": "1280px: 19 buttons, controls and summaries are at least 44px",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "group": "pricing/a11y",
+   "name": "en 1440px: Tab walk of 50 stops: every stop visible, indicated, uncovered, none inside aria-hidden",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "group": "pricing/a11y",
+   "name": "en 1440px: 8 images all have alt, one h1 and one main, no heading level skipped, no unnamed button or link, lang set",
+   "pass": true,
+   "detail": "{\"noAlt\":0,\"hiddenTabbable\":[],\"h1\":1,\"main\":1,\"headings\":\"1233333233332\",\"unnamed\":0,\"lang\":\"en\"}"
+  },
+  {
+   "group": "pricing/a11y",
+   "name": "en 1440px: no console errors or failed requests",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "group": "pricing/a11y",
+   "name": "en 390px: Tab walk of 43 stops: every stop visible, indicated, uncovered, none inside aria-hidden",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "group": "pricing/a11y",
+   "name": "en 390px: 8 images all have alt, one h1 and one main, no heading level skipped, no unnamed button or link, lang set",
+   "pass": true,
+   "detail": "{\"noAlt\":0,\"hiddenTabbable\":[],\"h1\":1,\"main\":1,\"headings\":\"1233333233332\",\"unnamed\":0,\"lang\":\"en\"}"
+  },
+  {
+   "group": "pricing/a11y",
+   "name": "en 390px: no console errors or failed requests",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "group": "pricing/a11y",
+   "name": "es 1440px: Tab walk of 50 stops: every stop visible, indicated, uncovered, none inside aria-hidden",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "group": "pricing/a11y",
+   "name": "es 1440px: 8 images all have alt, one h1 and one main, no heading level skipped, no unnamed button or link, lang set",
+   "pass": true,
+   "detail": "{\"noAlt\":0,\"hiddenTabbable\":[],\"h1\":1,\"main\":1,\"headings\":\"1233333233332\",\"unnamed\":0,\"lang\":\"es\"}"
+  },
+  {
+   "group": "pricing/a11y",
+   "name": "es 1440px: no console errors or failed requests",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "group": "pricing/a11y",
+   "name": "es 390px: Tab walk of 43 stops: every stop visible, indicated, uncovered, none inside aria-hidden",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "group": "pricing/a11y",
+   "name": "es 390px: 8 images all have alt, one h1 and one main, no heading level skipped, no unnamed button or link, lang set",
+   "pass": true,
+   "detail": "{\"noAlt\":0,\"hiddenTabbable\":[],\"h1\":1,\"main\":1,\"headings\":\"1233333233332\",\"unnamed\":0,\"lang\":\"es\"}"
+  },
+  {
+   "group": "pricing/a11y",
+   "name": "es 390px: no console errors or failed requests",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "group": "pricing/links",
+   "name": "en: Free, Core and Performance go to sign-up; Schools to the booking page; Federations to contact",
+   "pass": true,
+   "detail": "{\"free\":\"https://app.ariaforcoaches.com/signup\",\"core\":\"https://app.ariaforcoaches.com/signup\",\"performance\":\"https://app.ariaforcoaches.com/signup\",\"schools\":\"https://bookings.cloud.microsoft/bookwithme/user/0d09299a358447868cc84c1a06d8f5e6@stadioralabs.com?anonymous&ismsaljsauthenabled&ep=plink\",\"federations\":\"/connect.html\"}"
+  },
+  {
+   "group": "pricing/links",
+   "name": "es: Free, Core and Performance go to sign-up; Schools to the booking page; Federations to contact",
+   "pass": true,
+   "detail": "{\"free\":\"https://app.ariaforcoaches.com/signup\",\"core\":\"https://app.ariaforcoaches.com/signup\",\"performance\":\"https://app.ariaforcoaches.com/signup\",\"schools\":\"https://bookings.cloud.microsoft/bookwithme/user/0d09299a358447868cc84c1a06d8f5e6@stadioralabs.com?anonymous&ismsaljsauthenabled&ep=plink\",\"federations\":\"/connect.html\"}"
+  },
+  {
+   "group": "pricing/links",
+   "name": "the language switch keeps you on pricing in the other language",
+   "pass": true,
+   "detail": "en=/pricing/,es=/es/pricing/,en=/pricing/,es=/es/pricing/,en=/pricing/,es=/es/pricing/ | en=/pricing/,es=/es/pricing/,en=/pricing/,es=/es/pricing/,en=/pricing/,es=/es/pricing/"
+  },
+  {
+   "group": "pricing/no-js",
+   "name": "1280px without JavaScript: US monthly prices for 100 athletes, controls hidden with a note, dialog content inline, no overflow",
+   "pass": true,
+   "detail": "{\"core\":\"$199\",\"performance\":\"$299\",\"controls\":false,\"note\":true,\"more\":false,\"dialogs\":4,\"rates\":true,\"overflow\":false,\"faq\":7,\"opacity\":0}"
+  },
+  {
+   "group": "pricing/no-js",
+   "name": "390px without JavaScript: US monthly prices for 100 athletes, controls hidden with a note, dialog content inline, no overflow",
+   "pass": true,
+   "detail": "{\"core\":\"$199\",\"performance\":\"$299\",\"controls\":false,\"note\":true,\"more\":false,\"dialogs\":4,\"rates\":true,\"overflow\":false,\"faq\":7,\"opacity\":0}"
+  }
+ ],
+ "metrics": {
+  "pricing": {
+   "tallestCta": {
+    "en-390": 48,
+    "es-390": 48,
+    "en-1024": 48,
+    "es-1024": 48,
+    "en-1280": 48,
+    "es-1280": 48,
+    "en-1440": 48,
+    "es-1440": 56
+   },
+   "contrastSkipped-light-en": 0,
+   "contrastMin-light-en": 4.57,
+   "contrastSkipped-light-es": 0,
+   "contrastMin-light-es": 4.57,
+   "contrastSkipped-dark-en": 0,
+   "contrastMin-dark-en": 7.91,
+   "contrastSkipped-dark-es": 0,
+   "contrastMin-dark-es": 7.91
+  }
+ }
+}
