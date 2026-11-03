@@ -1,0 +1,38 @@
+---
+import type { ShowcaseCopy } from '../../../i18n/pages/home-showcase';
+interface Props {
+  t: ShowcaseCopy['head'];
+}
+const { t } = Astro.props;
+const rows = [
+  { label: t.fromLabel, words: t.from, tail: false },
+  { label: t.toLabel, words: t.to, tail: true },
+];
+---
+
+<div class="show-head">
+  <div>
+    <h2 class="d" id="sh-h">
+      <span class="row"><span>{t.heading}</span></span>
+      {
+        rows.map((r) => (
+          <span class="row" aria-hidden="true">
+            <small>{r.label}</small>
+            <span class:list={['swap', { gt: r.tail }]} data-swap={JSON.stringify(r.words)}>
+              {r.words.map((w, i) => (
+                <span class={i === 0 ? 'on' : undefined}>{w}</span>
+              ))}
+            </span>
+          </span>
+        ))
+      }
+      <span class="sr">{t.sr}</span>
+    </h2>
+    <p class="lead">{t.lead}</p>
+  </div>
+  <div class="mosaic rv" data-mosaic>
+    <img src="/home/img/night-huddle-800.webp" alt="" width="800" height="533" loading="lazy" decoding="async" />
+    <canvas width="640" height="512" aria-hidden="true"></canvas>
+    <span class="lbl">{t.mosaicLabel}</span>
+  </div>
+</div>

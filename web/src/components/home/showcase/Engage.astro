@@ -1,0 +1,122 @@
+---
+import type { ShowcaseCopy } from '../../../i18n/pages/home-showcase';
+interface Props {
+  t: ShowcaseCopy['engage'];
+  demo: string;
+}
+const { t, demo } = Astro.props;
+const p = t.phone;
+const scenes = ['chat', 'feed', 'bc', 'ann'] as const;
+const bubblePos = { chat: 'a', feed: 'b', bc: 'c', ann: 'd' } as const;
+const bubbleDepth = { chat: 24, feed: 30, bc: 20, ann: 26 } as const;
+---
+
+<article class="panel reading rv" id="engage" aria-labelledby="pc-h">
+  <div class="en-grid" data-autotabs data-at="7600">
+    <div>
+      <span class="chip-label c-violet">
+        <i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="M21 12a8 8 0 0 1-11.5 7.2L4 21l1.8-5.5A8 8 0 1 1 21 12z"></path></svg></i>
+        {t.label}
+      </span>
+      <h3 class="t-title" id="pc-h">{t.title}</h3>
+      <p class="lead en-lead">{t.lead}</p>
+      <div class="en-tabs" role="tablist" aria-label={t.tabsLabel}>
+        {
+          t.tabs.map((tab, i) => (
+            <button class="en-tab" type="button" role="tab" id={`en-t${i}`} aria-controls={`en-p${i}`} aria-selected={i === 0 ? 'true' : 'false'} tabindex={i === 0 ? 0 : -1}>
+              <span class="hd">
+                <strong>{tab}</strong>
+                <em>{`0${i + 1}`}</em>
+              </span>
+              <span class="at-bar"><i /></span>
+            </button>
+          ))
+        }
+      </div>
+    </div>
+    <div class="media-frame en-media">
+      <video muted playsinline loop preload="none" data-clip data-poster="/home/media/engage-bg.webp">
+        <source src="/home/media/engage-bg.webm" type="video/webm" />
+        <source src="/home/media/engage-bg.mp4" type="video/mp4" />
+      </video>
+      <div class="vid-shade"></div>
+      <div class="dphone" aria-hidden="true">
+        <div class="scr">
+          <i class="island"></i>
+          <div class="sb"><span>9:41</span><span>●●● ▮</span></div>
+          <div class="ph-scn on" data-panel data-scn="chat" role="tabpanel" id="en-p0" aria-labelledby="en-t0">
+            <div class="ph-top"><span class="av av-violet">DM</span><div><b>{p.chat.name}</b><small>{p.chat.sub}</small></div></div>
+            <div class="ph-body">
+              <div class="dmsg in" data-el="m1"><span class="who">{p.chat.who}</span>{p.chat.m1}</div>
+              <div class="typing" data-el="t1"><i></i><i></i><i></i></div>
+              <div class="dmsg me" data-el="m2">{p.chat.m2}</div>
+              <div class="typing" data-el="t2"><i></i><i></i><i></i></div>
+              <div class="dmsg in" data-el="m3"><span class="who">{p.chat.who}</span>{p.chat.m3}</div>
+            </div>
+            <div class="ph-input">{p.chat.input}</div>
+          </div>
+          <div class="ph-scn" data-panel data-scn="feed" role="tabpanel" id="en-p1" aria-labelledby="en-t1">
+            <div class="ph-top"><span class="av av-cyan">SG</span><div><b>{p.feed.name}</b><small>{p.feed.sub}</small></div></div>
+            <div class="ph-body">
+              <div class="post" data-el="p1">
+                <div class="ph" style="--img:url(/home/img/night-huddle-800.webp)"></div>
+                <div class="pb">
+                  <b>{p.feed.author}</b>{p.feed.post}
+                  <div class="reacts">
+                    <span data-el="rc1">🔥 <b class="tn fnum" style="--to:12"></b></span>
+                    <span>👏 <b class="tn fnum" style="--to:9"></b></span>
+                    <span>💪 <b class="tn fnum" style="--to:6"></b></span>
+                  </div>
+                </div>
+              </div>
+              <div class="dmsg in" data-el="p2"><span class="who">{p.feed.marta}</span>{p.feed.comment}</div>
+            </div>
+            <div class="ph-input">{p.feed.input}</div>
+          </div>
+          <div class="ph-scn" data-panel data-scn="bc" role="tabpanel" id="en-p2" aria-labelledby="en-t2">
+            <div class="ph-top"><span class="av av-mint">BC</span><div><b>{p.bc.name}</b><small>{p.bc.sub}</small></div></div>
+            <div class="ph-body">
+              <div class="bc-card" data-el="b1">
+                <div class="to">{p.bc.to}</div>
+                <p class="bc-text">{p.bc.text}</p>
+                <div class="bc-prog"><i data-el="bp"></i></div>
+                <div class="bc-meta">
+                  <span class="bc-status"><span data-el="bs1">{p.bc.sending}</span><span data-el="bs2">{p.bc.delivered}</span></span>
+                  <span><b class="tn fnum" style="--to:18" data-el="bn"></b> {p.bc.deliveredCount}</span>
+                </div>
+              </div>
+              <div class="dmsg in" data-el="b2"><span class="who">{p.bc.leo}</span>{p.bc.leoMsg}</div>
+              <div class="dmsg in" data-el="b3"><span class="who">{p.bc.sofia}</span>{p.bc.sofiaMsg}</div>
+            </div>
+            <div class="ph-input">{p.bc.input}</div>
+          </div>
+          <div class="ph-scn" data-panel data-scn="ann" role="tabpanel" id="en-p3" aria-labelledby="en-t3">
+            <div class="ph-top"><span class="av av-red">AN</span><div><b>{p.ann.name}</b><small>{p.ann.sub}</small></div></div>
+            <div class="ph-body">
+              <div class="ann" data-el="a1">
+                <span class="pin">📌</span>
+                <small>{p.ann.pinned}</small>
+                <p class="ann-text">{p.ann.text}</p>
+                <small data-el="a2">{p.ann.seen} <b class="tn fnum" style="--to:64"></b></small>
+              </div>
+              <div class="bc-card" data-el="a3">
+                <div class="to">{p.ann.earlier}</div>
+                <p class="bc-earlier">{p.ann.earlierText}</p>
+              </div>
+            </div>
+            <div class="ph-input ph-input-c">{p.ann.input}</div>
+          </div>
+        </div>
+      </div>
+      {
+        scenes.map((k, i) => (
+          <div class:list={['bubble-out', 'pop', `bo-${bubblePos[k]}`, { on: i === 0 }]} data-bubble={k} data-depth={bubbleDepth[k]} aria-hidden="true">
+            <b>{t.bubbles[k][0]}</b>
+            <div>{t.bubbles[k][1]}</div>
+          </div>
+        ))
+      }
+      <span class="badge-demo">{demo}</span>
+    </div>
+  </div>
+</article>
