@@ -85,15 +85,10 @@
 .marquee:hover .marquee-track,.marquee:focus-within .marquee-track{animation-play-state:paused}
 @keyframes marq{to{transform:translateX(-50%)}}
 
-/* 6.5 auto-advancing tabs with progress bars */
+/* 6.5 auto-advancing tabs with progress bars. The kit (autotabs) owns the fill: it writes the bar's transform from its own
+   clock, so the bar pauses, resumes and resets together with the tab timer. */
 .at-bar{position:relative;height:3px;border-radius:3px;background:color-mix(in srgb,currentColor 18%,transparent);overflow:hidden}
 .at-bar i{position:absolute;inset:0;background:var(--grad-brand);transform-origin:0 50%;transform:scaleX(0)}
-[aria-selected="true"] .at-bar i,.is-active .at-bar i{animation:atFill var(--at,6s) linear forwards}
-.at-done .at-bar i{transform:scaleX(1)}
-[data-autotabs].at-paused [aria-selected="true"] .at-bar i,[data-autotabs].at-paused .is-active .at-bar i{animation-play-state:paused}
-[data-autotabs].at-stopped .at-bar i{animation:none!important;transform:scaleX(0)}
-[data-autotabs].at-stopped [aria-selected="true"] .at-bar i,[data-autotabs].at-stopped .is-active .at-bar i{transform:scaleX(1)}
-@keyframes atFill{to{transform:scaleX(1)}}
 
 /* 6.6 glow orb (AI) */
 .orb{position:relative;width:var(--s,120px);aspect-ratio:1;border-radius:50%;isolation:isolate}
@@ -177,6 +172,6 @@
   }
   [aria-selected='true'] .at-bar i,
   .is-active .at-bar i {
-    transform: scaleX(1);
+    transform: scaleX(1) !important;
   }
 }

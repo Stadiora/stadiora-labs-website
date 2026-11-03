@@ -55,7 +55,6 @@ const CLAIMS = [
   [/\bin range\b|\ben rango\b/i, 'an "in range" claim'],
   [/\b(all|every|any) (wearables?|watches|devices)\b|\btod(os los|as las) (wearables|relojes|dispositivos)\b/i, 'a blanket wearable claim (only Apple Health and Health Connect sync)'],
   [/(trusted by|used by|join|confían en|usado por|únete a)\s+\d[\d,.]*\+?\s/i, 'an invented customer count'],
-  [/\b\d{3,}[\d,.]*\+?\s+(coaches|teams|clubs|athletes|entrenadores|equipos|clubes|atletas)\b/i, 'an invented customer count'],
   [/\bcase study\b|\bestudio de caso\b/i, 'a case study (none exist)'],
 ];
 

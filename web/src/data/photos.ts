@@ -3,19 +3,6 @@ import generatedAlt from './photo-alt.json';
 export type PhotoLocale = 'en' | 'es';
 type Alt = Record<PhotoLocale, string>;
 
-/** Hero word key -> photo set prefix (shot list H in ASSETS.md; order follows DECISIONS #9). */
-export const heroSets = [
-  { word: 'coaches', prefix: 'h1-coaches' },
-  { word: 'highSchool', prefix: 'h3-highschool' },
-  { word: 'soccer', prefix: 'h2-academies' },
-  { word: 'track', prefix: 'h4-track' },
-  { word: 'gyms', prefix: 'h5-gyms' },
-  { word: 'nutrition', prefix: 'h6-nutrition' },
-  { word: 'universities', prefix: 'h7-universities' },
-] as const;
-
-export type HeroWord = (typeof heroSets)[number]['word'];
-
 /** Fallback alt text, used only for a slot missing from the asset MANIFEST. */
 const fallbackAlt: Record<string, Alt> = {
   'h1-coaches-big': {
@@ -126,50 +113,7 @@ const fallbackAlt: Record<string, Alt> = {
   'm2-engage': { en: 'Teens gathered around a phone', es: 'Adolescentes reunidos alrededor de un teléfono' },
   'm3-manage': { en: 'An athletic director with a tablet in a gym', es: 'Un director deportivo con una tableta en un gimnasio' },
   'm4-scale': { en: 'A gym owner with a tablet in a strength room', es: 'Una dueña de gimnasio con una tableta en una sala de fuerza' },
-  'retro-1-starting-block': {
-    en: 'A worn track starting block with the Stadiora mark painted on the footplate',
-    es: 'Un taco de salida gastado con la marca de Stadiora pintada en el apoyo',
-  },
-  'retro-2-stopwatch': {
-    en: 'A mechanical stopwatch with the Stadiora mark on the dial',
-    es: 'Un cronómetro mecánico con la marca de Stadiora en la carátula',
-  },
-  'retro-3-jersey-crest': {
-    en: 'A retro soccer jersey with the Stadiora mark embroidered as the crest',
-    es: 'Una camiseta de fútbol retro con la marca de Stadiora bordada como escudo',
-  },
-  'retro-4-tennis-ball': {
-    en: 'A tennis ball at impact with the Stadiora mark printed on the felt',
-    es: 'Una pelota de tenis en el impacto con la marca de Stadiora impresa en el fieltro',
-  },
-  'retro-5-pennant': {
-    en: 'A felt pennant with the Stadiora mark sewn on',
-    es: 'Un banderín de fieltro con la marca de Stadiora cosida',
-  },
-  'retro-6-traffic-light': {
-    en: 'A vintage traffic light with the Stadiora mark in the green lens',
-    es: 'Un semáforo antiguo con la marca de Stadiora en la luz verde',
-  },
-  'retro-7-lifting-belt': {
-    en: 'A leather lifting belt with the Stadiora mark embossed in it',
-    es: 'Un cinturón de levantamiento de cuero con la marca de Stadiora en relieve',
-  },
-  'retro-8-bottle-cones': {
-    en: 'A dented water bottle with the Stadiora mark beside training cones',
-    es: 'Una botella abollada con la marca de Stadiora junto a conos de entrenamiento',
-  },
 };
 
 /** Alt text per slot, EN and ES. `photo-alt.json` comes from the asset lane's MANIFEST.md. */
 export const photoAlt: Record<string, Alt> = { ...fallbackAlt, ...(generatedAlt as Record<string, Alt>) };
-
-export const retroSlots = [
-  'retro-1-starting-block',
-  'retro-2-stopwatch',
-  'retro-3-jersey-crest',
-  'retro-4-tennis-ball',
-  'retro-5-pennant',
-  'retro-6-traffic-light',
-  'retro-7-lifting-belt',
-  'retro-8-bottle-cones',
-] as const;
