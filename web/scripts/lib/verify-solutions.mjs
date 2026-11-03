@@ -1,6 +1,7 @@
 // Post-build checks for the solutions, resources and company pages (EN and ES). Called from verify-dist.mjs.
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
+import { CONTACT_EMAIL, approvedNote, approvedOpening, findDeliveryClaims } from './contact-contract.mjs';
 
 const ORIGIN = 'https://stadioralabs.com';
 
@@ -34,12 +35,32 @@ const banned = [
   [/hydration/i, 'hydration (not shipped)'],
 ];
 
-// The honest-contact rule: nothing is sent from the page, so the page must not claim a delivery or a reply time.
-const contactBanned = [
-  [/thank you|thanks for/i, 'a thank-you message'],
-  [/message (was )?sent|request (was )?sent|we(’|')ll (reply|get back)/i, 'a sent or reply-time claim'],
-  [/within \d+ (hours?|days?|business)/i, 'a reply-time promise'],
-];
+const decodeEntities = (s) =>
+  s
+    .replaceAll('&quot;', '"')
+    .replaceAll('&#39;', "'")
+    .replaceAll('&lt;', '<')
+    .replaceAll('&gt;', '>')
+    .replaceAll('&amp;', '&');
+
+// The page's own text: markup, scripts and styles removed, entities decoded.
+const pageText = (html) =>
+  decodeEntities(
+    html
+      .replace(/<(script|style)\b[\s\S]*?<\/\1>/g, ' ')
+      .replace(/<[^>]+>/g, ' ')
+      .replace(/\s+/g, ' '),
+  );
+
+// Every script the page runs: inline bodies and the local files it links.
+const pageScripts = (html, dist) => {
+  const bodies = [...html.matchAll(/<script\b(?![^>]*\bsrc=)(?![^>]*ld\+json)[^>]*>([\s\S]*?)<\/script>/g)].map((m) => m[1]);
+  for (const m of html.matchAll(/<script\b[^>]*\bsrc="(\/[^"]+)"/g)) {
+    const file = join(dist, m[1]);
+    if (existsSync(file)) bodies.push(readFileSync(file, 'utf8'));
+  }
+  return bodies;
+};
 
 export function verifySolutions({ dist, fail }) {
   for (const route of routes) {
@@ -90,9 +111,25 @@ export function verifySolutions({ dist, fail }) {
       }
 
       if (route.path === '/contact/') {
-        for (const [re, what] of contactBanned) need(!re.test(html), `contains ${what}`);
         need(/<form[^>]*action="mailto:/.test(html), 'form must fall back to mailto');
         need(count(html, /<input[^>]*type="radio"[^>]*name="topic"/g) === 2, 'two topic radios');
+
+        // Honest contact: nothing is delivered from the page. The post-submit status must be the approved text,
+        // word for word (contact-contract.mjs), and no text or script may claim a delivery, receipt or reply time.
+        let payload = null;
+        try {
+          payload = JSON.parse(decodeEntities(/\bdata-mail="([^"]*)"/.exec(html)?.[1] ?? ''));
+        } catch {
+          payload = null;
+        }
+        need(payload?.opening === approvedOpening[lang], `post-submit status must be exactly "${approvedOpening[lang]}", found ${JSON.stringify(payload?.opening)}`);
+        need(payload?.to === CONTACT_EMAIL, `mail recipient must be exactly ${CONTACT_EMAIL}, found ${JSON.stringify(payload?.to)}`);
+        const text = pageText(html);
+        need(text.includes(approvedNote[lang]), `mailto note must read exactly "${approvedNote[lang]}"`);
+        for (const what of findDeliveryClaims(text, lang)) need(false, `page text claims receipt or delivery: ${what}`);
+        for (const script of pageScripts(html, dist)) {
+          for (const what of findDeliveryClaims(script, lang)) need(false, `a script on the page claims receipt or delivery: ${what}`);
+        }
       }
 
       if (route.path === '/solutions/schools/' && lang === 'en') {

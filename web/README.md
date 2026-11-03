@@ -33,6 +33,9 @@ node scripts/evidence.mjs --pricing-only   # just /pricing/ and /es/pricing/: pr
 - Case studies: the production page is an honest "coming soon" state, noindex and out of the sitemap. Placeholder cards and a
   sample story page render only under `npm run dev`, and the build never emits them.
 - Contact has no form endpoint yet: a valid submit opens the visitor's email app (mailto) and never claims a message was sent.
+  The approved post-submit status (EN and ES) is written out in `scripts/lib/contact-contract.mjs`, independent of
+  `src/i18n/pages/contact.ts`; verify and evidence compare the page with it word for word, so editing that copy means
+  editing the contract too.
 - Design tokens: `src/styles/tokens.css` (light and dark). Text accent on light is `#0077A8`; `#00BEF3` is decorative only.
 - Photos: drop a file named after its slot into `src/assets/photos/`; `src/data/photo-alt.json` holds EN and ES alt text.
   A missing slot renders a labelled placeholder and `npm run verify` fails on it.

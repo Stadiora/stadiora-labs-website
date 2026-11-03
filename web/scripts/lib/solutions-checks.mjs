@@ -1,6 +1,7 @@
 // Evidence checks and screenshots for the solutions, resources and company pages (schools, coaches, clubs,
 // athletes, case studies, about, contact; EN and ES). Called from evidence.mjs with its page opener and recorders.
 import { mkdir } from 'node:fs/promises';
+import { CONTACT_EMAIL, findDeliveryClaims, statusText } from './contact-contract.mjs';
 
 const pages = [
   ['schools', '/solutions/schools/'],
@@ -341,16 +342,17 @@ export async function solutionsChecks({ open, settle, check, sleep, metrics, mea
       focused: document.activeElement?.id,
       invalid: ['f-name', 'f-email', 'f-role'].map((id) => document.getElementById(id).getAttribute('aria-invalid')),
       mail: window.__mail,
+      status: document.querySelector('[data-status]').textContent.trim(),
     }));
-    check('solutions-contact', `${locale} contact: empty submit shows three field errors tied by aria-describedby, focuses the first, opens nothing`, errors.shown.every(Boolean) && errors.focused === 'f-name' && errors.invalid.every((v) => v === 'true') && !errors.mail, JSON.stringify(errors));
+    check('solutions-contact', `${locale} contact: empty submit shows three field errors tied by aria-describedby, focuses the first, opens nothing and shows no status`, errors.shown.every(Boolean) && errors.focused === 'f-name' && errors.invalid.every((v) => v === 'true') && !errors.mail && errors.status === '', JSON.stringify(errors));
     await page.screenshot({ path: `${shotsDir}interaction-contact-errors-${locale}.jpg`, type: 'jpeg', quality: 82 });
 
     await page.fill('#f-name', 'Ana López');
     await page.fill('#f-email', 'not-an-email');
     await page.selectOption('#f-role', { index: 1 });
     await page.locator('#contact-form button[type="submit"]').click();
-    const badEmail = await page.evaluate(() => ({ email: !document.getElementById('e-email').hidden, name: document.getElementById('e-name').hidden, focused: document.activeElement?.id, mail: window.__mail }));
-    check('solutions-contact', `${locale} contact: an invalid email is rejected on its own and does not open the mail app`, badEmail.email && badEmail.name && badEmail.focused === 'f-email' && !badEmail.mail, JSON.stringify(badEmail));
+    const badEmail = await page.evaluate(() => ({ email: !document.getElementById('e-email').hidden, name: document.getElementById('e-name').hidden, focused: document.activeElement?.id, mail: window.__mail, status: document.querySelector('[data-status]').textContent.trim() }));
+    check('solutions-contact', `${locale} contact: an invalid email is rejected on its own, does not open the mail app and shows no status`, badEmail.email && badEmail.name && badEmail.focused === 'f-email' && !badEmail.mail && badEmail.status === '', JSON.stringify(badEmail));
 
     await page.fill('#f-email', 'ana@escuela.example');
     await page.fill('#f-org', 'Colegio Norte');
@@ -361,13 +363,22 @@ export async function solutionsChecks({ open, settle, check, sleep, metrics, mea
     const mail = sent.mail ? new URL(sent.mail) : null;
     const body = mail ? decodeURIComponent(mail.search.match(/body=([^&]*)/)?.[1] ?? '') : '';
     const subject = mail ? decodeURIComponent(mail.search.match(/subject=([^&]*)/)?.[1] ?? '') : '';
-    const fakeSuccess = /thank you|thanks!|gracias por|we.ll (be in touch|reply|get back)|te responderemos|message sent|mensaje enviado|within \d|en menos de|24 ?h/i.test(sent.body);
     check(
       'solutions-contact',
-      `${locale} contact: a valid submit builds a mailto: to anthony@stadioralabs.com with name, email, role, organization and message, and never claims it was sent`,
-      mail?.protocol === 'mailto:' && mail.pathname === 'anthony@stadioralabs.com' && /Ana López/.test(body) && /ana@escuela\.example/.test(body) && /Colegio Norte/.test(body) && /3 equipos/.test(body) && /Ana López/.test(subject) && sent.status.length > 5 && !fakeSuccess,
-      JSON.stringify({ mail: sent.mail?.slice(0, 120), status: sent.status, fakeSuccess }),
+      `${locale} contact: a valid submit builds a mailto: to ${CONTACT_EMAIL} with name, email, role, organization and message`,
+      mail?.protocol === 'mailto:' && mail.pathname === CONTACT_EMAIL && /Ana López/.test(body) && /ana@escuela\.example/.test(body) && /Colegio Norte/.test(body) && /3 equipos/.test(body) && /Ana López/.test(subject),
+      JSON.stringify({ mail: sent.mail?.slice(0, 120) }),
     );
+    // The status is compared with the approved text from contact-contract.mjs, not with the page's own copy file,
+    // so a changed status fails here even when it reads like a normal sentence.
+    check(
+      'solutions-contact',
+      `${locale} contact: the post-submit status is exactly the approved text (email app opened, nothing claimed as sent)`,
+      sent.status === statusText(locale),
+      JSON.stringify({ expected: statusText(locale), status: sent.status }),
+    );
+    const claims = findDeliveryClaims(sent.body, locale);
+    check('solutions-contact', `${locale} contact: after a valid submit the page claims no receipt, delivery or reply time`, claims.length === 0, JSON.stringify({ claims }));
     await page.context().close();
   }
 
