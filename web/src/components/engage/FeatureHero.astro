@@ -1,0 +1,181 @@
+---
+interface Cta {
+  label: string;
+  href: string;
+  kind?: 'primary' | 'secondary';
+}
+interface Props {
+  variant?: 'split' | 'overlap' | 'compact' | 'fan';
+  eyebrow: string;
+  title: { pre: string; lane: string; post: string };
+  sub: string;
+  ctas: Cta[];
+}
+const { variant = 'split', eyebrow, title, sub, ctas } = Astro.props;
+---
+
+<section class={`fh fh--${variant}`} aria-labelledby="page-title">
+  <div class="container fh__grid">
+    <div class="fh__copy">
+      <p class="fh__eyebrow">{eyebrow}</p>
+      <h1 id="page-title" class="fh__title">{title.pre}<span class="lane-under">{title.lane}</span>{title.post}</h1>
+      <p class="fh__sub">{sub}</p>
+      <div class="fh__ctas">
+        {ctas.map((c, i) => <a class:list={['btn', 'btn--lg', c.kind === 'secondary' || (!c.kind && i > 0) ? 'btn--secondary' : 'btn--primary']} href={c.href} rel={c.href.startsWith('http') ? 'noopener' : undefined}>{c.label}</a>)}
+      </div>
+      <slot name="after" />
+    </div>
+    <div class="fh__media"><slot name="media" /></div>
+  </div>
+  <slot name="below" />
+</section>
+
+<style>
+  .fh {
+    padding-top: clamp(28px, 4vw, 56px);
+  }
+  .fh__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+    gap: clamp(32px, 4.5vw, 72px);
+    align-items: center;
+  }
+  .fh__eyebrow {
+    color: var(--ink-2);
+    font-size: 20px;
+    line-height: 28px;
+  }
+  .fh__title {
+    margin-top: 12px;
+    font-size: clamp(40px, 4.1vw, 58px);
+    line-height: 1.07;
+    letter-spacing: -0.02em;
+    text-wrap: balance;
+  }
+  .fh__sub {
+    margin-top: 20px;
+    max-width: 30em;
+    color: var(--ink-2);
+    font-size: 22px;
+    line-height: 32px;
+  }
+  .fh__ctas {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-top: 32px;
+  }
+  .fh__media {
+    position: relative;
+    min-width: 0;
+    overflow: hidden;
+    border-radius: var(--radius-card);
+    background: var(--surface-2);
+    aspect-ratio: 3 / 2;
+    max-height: 520px;
+    justify-self: stretch;
+  }
+  .fh__media :global(.fh__fill) {
+    position: absolute;
+    inset: 0;
+  }
+  .fh__media :global(.photo) {
+    width: 100%;
+    height: 100%;
+    object-position: var(--focus, 50% 50%);
+  }
+
+  .fh--compact .fh__grid {
+    grid-template-columns: minmax(0, 6fr) minmax(0, 5fr);
+  }
+  .fh--compact .fh__media {
+    aspect-ratio: 4 / 3;
+    max-height: 420px;
+  }
+
+  /* The phone fan has no frame of its own. */
+  .fh--fan .fh__grid {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+  }
+  .fh--fan .fh__title {
+    font-size: clamp(36px, 3.7vw, 52px);
+  }
+  .fh--fan .fh__media {
+    aspect-ratio: auto;
+    max-height: none;
+    overflow: visible;
+    background: none;
+    border-radius: 0;
+  }
+
+  /* The product panel rises over the bottom edge of the photo. */
+  .fh--overlap {
+    --ov: 96px;
+  }
+  .fh--overlap .fh__grid {
+    grid-template-columns: minmax(0, 6fr) minmax(0, 5fr);
+    grid-template-rows: auto var(--ov);
+    align-items: start;
+  }
+  .fh--overlap .fh__copy {
+    grid-row: 1;
+    padding-block: clamp(16px, 3vw, 40px);
+  }
+  .fh--overlap .fh__title {
+    font-size: clamp(36px, 3.7vw, 52px);
+  }
+  .fh--overlap .fh__media {
+    grid-row: 1 / span 2;
+    align-self: stretch;
+    aspect-ratio: auto;
+    max-height: none;
+    min-height: 380px;
+  }
+
+  @media (max-width: 1024px) {
+    .fh__grid,
+    .fh--compact .fh__grid,
+    .fh--fan .fh__grid,
+    .fh--overlap .fh__grid {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .fh__media,
+    .fh--compact .fh__media,
+    .fh--overlap .fh__media {
+      aspect-ratio: 4 / 3;
+      max-height: 460px;
+    }
+    .fh--fan .fh__media {
+      aspect-ratio: auto;
+      max-height: none;
+    }
+    .fh--overlap .fh__grid {
+      grid-template-rows: none;
+    }
+    .fh--overlap .fh__copy {
+      padding-block: 0;
+    }
+    .fh--overlap .fh__media {
+      grid-row: auto;
+      aspect-ratio: 4 / 3;
+      max-height: 460px;
+      min-height: 0;
+    }
+  }
+  @media (max-width: 720px) {
+    .fh__title {
+      font-size: 40px;
+      line-height: 44px;
+    }
+    .fh__eyebrow {
+      font-size: 18px;
+    }
+    .fh__sub {
+      font-size: 18px;
+      line-height: 26px;
+    }
+    .fh__ctas .btn {
+      flex: 1 1 100%;
+    }
+  }
+</style>

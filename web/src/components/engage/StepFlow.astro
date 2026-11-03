@@ -1,0 +1,87 @@
+---
+interface Props {
+  steps: readonly string[];
+  label?: string;
+}
+const { steps, label } = Astro.props;
+---
+
+<ol class="flow" aria-label={label}>
+  {
+    steps.map((s, i) => (
+      <li class="flow__step">
+        <span class="flow__num num" aria-hidden="true">{i + 1}</span>
+        <span class="flow__text">{s}</span>
+      </li>
+    ))
+  }
+</ol>
+
+<style>
+  .flow {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 20px;
+    counter-reset: step;
+  }
+  .flow__step {
+    position: relative;
+    display: grid;
+    justify-items: start;
+    gap: 14px;
+  }
+  /* The lane runs through the step markers. */
+  .flow__step::before {
+    content: '';
+    position: absolute;
+    top: 19px;
+    left: 44px;
+    right: -20px;
+    height: var(--lane);
+    background: var(--cyan);
+  }
+  .flow__step:last-child::before {
+    display: none;
+  }
+  .flow__num {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    border: 2px solid var(--cyan);
+    border-radius: 50%;
+    background: var(--bg);
+    color: var(--ink);
+    font-size: 18px;
+    font-weight: 700;
+  }
+  .flow__text {
+    max-width: 14em;
+    font-size: 17px;
+    line-height: 24px;
+    font-weight: 500;
+  }
+  @media (max-width: 720px) {
+    .flow {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 24px;
+    }
+    .flow__step {
+      grid-template-columns: 40px minmax(0, 1fr);
+      align-items: center;
+      gap: 16px;
+    }
+    .flow__step::before {
+      top: 44px;
+      left: 19px;
+      right: auto;
+      width: var(--lane);
+      height: 28px;
+    }
+    .flow__text {
+      max-width: none;
+    }
+  }
+</style>

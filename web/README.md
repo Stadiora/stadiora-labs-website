@@ -13,6 +13,7 @@ npm run verify     # asserts the built pages: SEO tags, hreflang, OG, no placeho
 npm run evidence   # needs a build; Playwright screenshots, interaction checks and measured budgets in .evidence/
 node scripts/evidence.mjs --nav-only   # just the header checks: geometry 1025 to 1440, panel height, drawer and panel focus
 node scripts/evidence.mjs --pricing-only   # just /pricing/ and /es/pricing/: prices, region, dialogs, fallback, layout, contrast, tab walk; add --checks-only to skip the screenshots, and --pricing-group=dialogs (data, region, prices, behaviour, dialogs, fallback, layout, contrast, links) to run one group, e.g. in a loop to look for flakes
+node scripts/evidence.mjs --engage-only # just the Platform page checks, EN and ES (see below); add --checks-only to skip screenshots
 ```
 
 - Pages: `/` and `/pricing/` (EN), `/es/` and `/es/pricing/` (ES). Copy lives in `src/i18n/{en,es}.ts`; `es.ts` is typed against `en.ts`, so `astro check` flags a missing key. Page copy lives in `src/i18n/pages/` (`pricing.ts`: EN and ES typed together).
@@ -25,6 +26,12 @@ node scripts/evidence.mjs --pricing-only   # just /pricing/ and /es/pricing/: pr
   ```
 
   `prices.coreFrom` and `prices.highSchool` are derived from the table, so they cannot drift. `src/components/pricing/` is for the pricing page only.
+- Platform pages (`src/pages/{,es/}platform/{messaging,guardian-portal,teams,custom-branded-apps,integrations}/`): thin
+  wrappers around `src/components/engage/*Page.astro`; all copy is in `src/i18n/pages/engage.ts` (EN and ES, ES typed against EN).
+  Every claim on them is backed by Aria code, see the PR's claims table. `scripts/lib/engage-verify.mjs` (run by `npm run verify`)
+  fails the build on an unbacked claim, a user or customer count, a competitor name, "all wearables", or a broken link, and
+  `scripts/lib/engage-checks.mjs` (run by `evidence`) covers overflow at 390/1024/1280/1440, WCAG AA in both themes, alt text,
+  heading order, the Guardian child switcher and the Teams school price (`?region=latam` shows the LatAm price).
 - Design tokens: `src/styles/tokens.css` (light and dark). Text accent on light is `#0077A8`; `#00BEF3` is decorative only.
 - Photos: drop a file named after its slot into `src/assets/photos/`; `src/data/photo-alt.json` holds EN and ES alt text.
   A missing slot renders a labelled placeholder and `npm run verify` fails on it.

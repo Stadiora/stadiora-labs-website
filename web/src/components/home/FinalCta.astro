@@ -5,8 +5,10 @@ import Icon from '../ui/Icon.astro';
 
 interface Props {
   locale: Locale;
+  // Replaces the coach button, e.g. "Talk to us" on the custom-branded apps page.
+  middle?: { label: string; href: string };
 }
-const { locale } = Astro.props;
+const { locale, middle } = Astro.props;
 const t = useDict(locale);
 const c = t.cta;
 ---
@@ -16,7 +18,7 @@ const c = t.cta;
     <h2 id="cta-title" class="cta__title h-lane">{c.title}</h2>
     <div class="cta__actions">
       <a class="btn btn--lg btn--white" href="#get-app" data-open-sheet>{c.download}</a>
-      <a class="btn btn--lg btn--on-band" href={site.signUp}>{c.coach}</a>
+      <a class="btn btn--lg btn--on-band" href={middle?.href ?? site.signUp}>{middle?.label ?? c.coach}</a>
       <a class="btn btn--lg btn--on-band" href={site.booking} rel="noopener">{c.school}</a>
     </div>
   </div>

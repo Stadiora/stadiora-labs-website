@@ -1,0 +1,10 @@
+---
+import Base from '../../../layouts/Base.astro';
+import GuardianPage from '../../../components/engage/GuardianPage.astro';
+import { engageEn } from '../../../i18n/pages/engage';
+const m = engageEn.guardian;
+---
+
+<Base locale="en" path="/platform/guardian-portal/" title={m.meta.title} description={m.meta.description}>
+  <GuardianPage locale="en" />
+</Base>

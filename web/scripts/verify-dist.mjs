@@ -4,6 +4,7 @@ import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parse } from 'yaml';
 import { verifyPricing } from './lib/pricing-verify.mjs';
+import { engagePages, verifyEngagePages } from './lib/engage-verify.mjs';
 
 const dist = fileURLToPath(new URL('../dist/', import.meta.url));
 const errors = [];
@@ -73,6 +74,7 @@ for (const page of pages) {
 }
 
 verifyPricing(dist, fail);
+verifyEngagePages({ dist, fail });
 
 if (!existsSync(join(dist, 'sitemap-index.xml'))) fail('sitemap-index.xml: missing');
 
@@ -121,4 +123,4 @@ if (errors.length) {
   for (const e of errors) console.error(`  - ${e}`);
   process.exit(1);
 }
-console.log('verify-dist: ok (2 pages, hreflang, OG, sitemap, no placeholders)');
+console.log(`verify-dist: ok (${pages.length} home pages + ${engagePages.length} platform pages, hreflang, OG, sitemap, no placeholders)`);

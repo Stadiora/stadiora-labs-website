@@ -1,0 +1,10 @@
+---
+import Base from '../../../layouts/Base.astro';
+import BrandedPage from '../../../components/engage/BrandedPage.astro';
+import { engageEn } from '../../../i18n/pages/engage';
+const m = engageEn.branded;
+---
+
+<Base locale="en" path="/platform/custom-branded-apps/" title={m.meta.title} description={m.meta.description}>
+  <BrandedPage locale="en" />
+</Base>
