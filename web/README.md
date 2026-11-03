@@ -24,7 +24,15 @@ node scripts/evidence.mjs --pricing-only   # just /pricing/ and /es/pricing/: pr
   import { detectRegion } from '../lib/region';        // server: detectRegion('', 'America/New_York'); client: detectRegion(window.location.search)
   ```
 
-  `prices.coreFrom` and `prices.highSchool` are derived from the table, so they cannot drift. `src/components/pricing/` is for the pricing page only.
+- Pages: `/` (EN) and `/es/`. Copy lives in `src/i18n/{en,es}.ts`; `es.ts` is typed against `en.ts`, so `astro check` flags a missing key.
+- Solutions (schools, coaches, teams-and-clubs, athletes), Resources (case studies), About and Contact exist in EN and ES.
+  Copy is in `src/i18n/pages/*.ts`, page bodies in `src/components/pages/`, and `src/pages/**` are thin route files.
+  `npm run verify` and `npm run evidence` cover them (`scripts/lib/verify-solutions.mjs`, `scripts/lib/solutions-checks.mjs`).
+- Prices: `src/lib/region.ts` picks US or LatAm from the browser timezone (`?region=us|latam` overrides). The HTML always
+  ships the US price, so no-JS visitors see it.
+- Case studies: the production page is an honest "coming soon" state, noindex and out of the sitemap. Placeholder cards and a
+  sample story page render only under `npm run dev`, and the build never emits them.
+- Contact has no form endpoint yet: a valid submit opens the visitor's email app (mailto) and never claims a message was sent.
 - Design tokens: `src/styles/tokens.css` (light and dark). Text accent on light is `#0077A8`; `#00BEF3` is decorative only.
 - Photos: drop a file named after its slot into `src/assets/photos/`; `src/data/photo-alt.json` holds EN and ES alt text.
   A missing slot renders a labelled placeholder and `npm run verify` fails on it.
