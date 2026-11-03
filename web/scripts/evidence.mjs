@@ -414,7 +414,7 @@ for (const [path, locale] of [
   const ratio = (L([255, 255, 255]) + 0.05) / (L(onLight) + 0.05);
   check('logos', 'mono-dark (#0B1220) at 70-80% opacity keeps AA contrast on white', logos.opacity >= 0.7 && logos.opacity <= 0.8 && ratio >= 4.5, `opacity ${logos.opacity}, ${ratio.toFixed(1)}:1`);
   const load = await page.evaluate(() => document.querySelector('.pcard--load')?.textContent ?? '');
-  check('claims', 'training load card carries no unbacked "In range" verdict', !/in range|en rango/i.test(load) && /RPE/.test(load), load.replace(/\s+/g, ' ').trim());
+  check('claims', 'training load card carries no unbacked "In range" verdict', !/in range|en rango/i.test(load) && /effort|esfuerzo/i.test(load), load.replace(/\s+/g, ' ').trim());
   await page.context().close();
 }
 
