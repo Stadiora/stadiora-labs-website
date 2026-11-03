@@ -16,6 +16,25 @@ const widths = [
 const locales = ['en', 'es'];
 const pathOf = (slug, locale) => `${locale === 'es' ? '/es' : ''}/platform/${slug}/`;
 
+// Scroll each [data-reveal] block into view (the page-wide scroll in evidence.mjs can outrun the IntersectionObserver
+// on a busy machine) and return how many never revealed.
+async function revealAll(page, sleep) {
+  for (let pass = 0; pass < 4; pass++) {
+    const left = await page.evaluate(async () => {
+      for (const n of document.querySelectorAll('[data-reveal]:not(.is-in)')) {
+        n.scrollIntoView({ block: 'center' });
+        await new Promise((r) => setTimeout(r, 150));
+      }
+      return document.querySelectorAll('[data-reveal]:not(.is-in)').length;
+    });
+    if (!left) break;
+  }
+  const stuck = await page.evaluate(() => document.querySelectorAll('[data-reveal]:not(.is-in)').length);
+  await page.evaluate(() => window.scrollTo(0, 0));
+  await sleep(1500);
+  return stuck;
+}
+
 // Routes the foundation registry marks `planned` (src/data/site.ts) belong to later slices and 404 until they land.
 const repoRoot = fileURLToPath(new URL('../../../', import.meta.url));
 const planned = new Set(
@@ -403,6 +422,19 @@ export async function platformCoachChecks({ open, check, shot, el, sleep, settle
       });
       check('coach-hover', `${locale}/readiness 390: the row scrolls as one labelled focus stop, cards are not tab stops`, s.tab === 0 && s.role === 'group' && Boolean(s.label) && s.cardTab === 0 && s.scroll, JSON.stringify(s));
       await narrow.context().close();
+
+      // Reduced motion on a wide screen: the three cards fill the row, nothing scrolls, so the row is not a tab stop.
+      const still = await open({ width: 1440, height: 900, reduced: true }, path);
+      await settle(still);
+      await sleep(300);
+      const f = await still.evaluate(() => {
+        const r = document.querySelector('[data-hrr]');
+        const box = r.getBoundingClientRect();
+        const cs = [...r.querySelectorAll('[data-hrc]')].map((c) => c.getBoundingClientRect());
+        return { gap: Math.round(box.right - cs[cs.length - 1].right), n: cs.length, scroll: r.scrollWidth > r.clientWidth + 1, tab: r.tabIndex, cardTab: [...r.querySelectorAll('[data-hrc]')].filter((c) => c.tabIndex >= 0).length };
+      });
+      check('coach-hover', `${locale}/readiness 1440 reduced motion: cards fill the row, no scroll, no stray tab stop`, f.n === 3 && f.gap <= 8 && !f.scroll && f.tab < 0 && f.cardTab === 0, JSON.stringify(f));
+      await still.context().close();
     }
 
     // Power lab count-up: the HTML already holds the final value, every frame of the motion stays between 0 and
@@ -436,13 +468,28 @@ export async function platformCoachChecks({ open, check, shot, el, sleep, settle
     for (const locale of locales) {
       for (const scheme of ['light', 'dark']) {
         for (const [width, height] of [widths[3], widths[0]]) {
-          const page = await open({ width, height, scheme, reduced: true, mobile: width < 500 }, pathOf(slug, locale));
+          const page = await open({ width, height, scheme, mobile: width < 500 }, pathOf(slug, locale));
           await settle(page);
-          await shot(page, `coach-${slug}-${locale}-${scheme}-${width}`, { fullPage: true });
+          const stuck = await revealAll(page, sleep);
+          check('coach-reveal', `${slug}/${locale} ${scheme} ${width}: every scroll-reveal block reveals once scrolled to`, stuck === 0, `${stuck} stuck`);
+          // A tall viewport, not `fullPage`: Playwright's beyond-viewport capture draws the clipped hover-card phones.
+          const full = await page.evaluate(() => Math.ceil(document.documentElement.scrollHeight));
+          await page.setViewportSize({ width, height: full });
+          await sleep(900);
+          await shot(page, `coach-${slug}-${locale}-${scheme}-${width}`);
           await page.context().close();
         }
       }
     }
+  }
+  {
+    // The reduced-motion layout of the hover-reveal cards (the phone shows under each label).
+    const page = await open({ width: 1440, height: 900, reduced: true }, pathOf('readiness', 'en'));
+    await settle(page);
+    const row = page.locator('[data-hrr]').first();
+    await row.scrollIntoViewIfNeeded();
+    await el(page, '[data-hrr]', 'coach-readiness-en-light-1440-reduced-motion-cards');
+    await page.context().close();
   }
   for (const [slug, locale, scheme, width, height] of [
     ['programs', 'en', 'light', 1440, 900],

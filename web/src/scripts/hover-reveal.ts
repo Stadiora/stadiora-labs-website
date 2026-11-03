@@ -36,9 +36,16 @@ function init(row: HTMLElement) {
     const isStatic = staticQuery.matches;
     closeAll();
     if (isStatic) {
-      row.tabIndex = 0;
-      row.setAttribute('role', 'group');
-      row.setAttribute('aria-label', row.dataset.label ?? '');
+      // Only a row that actually scrolls needs to be a focus stop.
+      if (row.scrollWidth > row.clientWidth + 1) {
+        row.tabIndex = 0;
+        row.setAttribute('role', 'group');
+        row.setAttribute('aria-label', row.dataset.label ?? '');
+      } else {
+        row.removeAttribute('tabindex');
+        row.removeAttribute('role');
+        row.removeAttribute('aria-label');
+      }
       cards.forEach((card) => {
         card.removeAttribute('tabindex');
         card.removeAttribute('role');
@@ -57,6 +64,7 @@ function init(row: HTMLElement) {
   };
   apply();
   staticQuery.addEventListener('change', apply);
+  new ResizeObserver(apply).observe(row);
 }
 
 document.querySelectorAll<HTMLElement>('[data-hrr]').forEach(init);

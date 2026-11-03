@@ -102,6 +102,14 @@ const phones = await Promise.all(cards.map((_, i) => Astro.slots.render(`phone-$
     margin: 18px auto 0;
   }
 
+  /* Static on wider screens (reduced motion): the three cards share the row instead of scrolling. */
+  @media (min-width: 721px) {
+    .hrc {
+      flex: 1 1 0;
+      min-width: 0;
+    }
+  }
+
   /* Interactive: three columns, the phone rises over the photo. */
   @media (min-width: 721px) and (prefers-reduced-motion: no-preference) {
     :global(html.js) .hrr {
