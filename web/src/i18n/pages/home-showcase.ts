@@ -200,7 +200,7 @@ const en: ShowcaseCopy = {
         sleepBig: '7 H 40 M',
         sleepSub: 'Mood: good · Legs: a bit sore',
       },
-      load: { alt: 'A sprinter exploding out of a crouched start.', h: 'Training load · this week', days: ['M', 'T', 'W', 'T', 'F', 'S', 'S'], st: 'In range' },
+      load: { alt: 'A sprinter exploding out of a crouched start.', h: 'Training load · this week', days: ['M', 'T', 'W', 'T', 'F', 'S', 'S'], st: 'Effort × minutes' },
       goal: { alt: 'A hurdler clearing a hurdle on the track.', h: 'Goal', text: 'Run 400 m under 58 s' },
       checkin: {
         alt: 'An athlete in a locker room after practice, holding a phone.',
@@ -477,7 +477,7 @@ const es: ShowcaseCopy = {
         sleepBig: '7 H 40 MIN',
         sleepSub: 'Ánimo: bien · Piernas: algo cargadas',
       },
-      load: { alt: 'Un velocista explotando desde una salida en cuclillas.', h: 'Carga de entrenamiento · esta semana', days: ['L', 'M', 'M', 'J', 'V', 'S', 'D'], st: 'En rango' },
+      load: { alt: 'Un velocista explotando desde una salida en cuclillas.', h: 'Carga de entrenamiento · esta semana', days: ['L', 'M', 'M', 'J', 'V', 'S', 'D'], st: 'Esfuerzo × minutos' },
       goal: { alt: 'Un vallista saltando una valla en la pista.', h: 'Meta', text: 'Correr 400 m en menos de 58 s' },
       checkin: {
         alt: 'Un atleta en el vestuario después del entrenamiento, con el teléfono en la mano.',
