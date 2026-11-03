@@ -1,344 +1,216 @@
 ---
-import { heroSets } from '../../data/photos';
+import '../../styles/home/hero.css';
+import type { Locale } from '../../i18n';
 import { site } from '../../data/site';
-import { useDict, type Locale } from '../../i18n';
-import Photo from '../ui/Photo.astro';
-import Icon from '../ui/Icon.astro';
-import ReadinessCard from '../ui/ReadinessCard.astro';
+import { clientLogos } from '../../data/logos';
+import { contactHref } from '../../lib/links';
+import { homeHero } from '../../i18n/pages/home-hero';
 
 interface Props {
   locale: Locale;
 }
 const { locale } = Astro.props;
-const t = useDict(locale);
+const t = homeHero[locale];
 
-const slots = [
-  { key: 'big', suffix: 'big', ratio: '4/5', sizes: '(max-width: 1100px) 86vw, 600px', widths: [480, 800, 1200], delay: 0 },
-  { key: 'sq', suffix: 'tile-sq', ratio: '1/1', sizes: '(max-width: 1100px) 40vw, 300px', widths: [320, 560], delay: 80 },
-  { key: 'tall', suffix: 'tile-45', ratio: '4/5', sizes: '(max-width: 1100px) 40vw, 300px', widths: [320, 560], delay: 160 },
-] as const;
+const IMG = '/home/img/';
+const MEDIA = '/home/media/';
+const slugs = ['hero1-coaches', 'hero2-high-school-teams', 'hero3-soccer-academies', 'hero4-track-and-field', 'hero5-gyms-and-studios', 'hero6-nutrition-coaches', 'hero7-universities'];
+
+// Centre lane: [clone of the last block] + 7 blocks + [clones of the first two], so the step after the last word keeps going down.
+const blocks = [slugs.length - 1, ...slugs.map((_, i) => i), 0, 1];
+const ACTIVE = 1;
+
+// Side lanes loop three copies of their tiles (the run moves by exactly one copy). The only clip is the chalk tile in copy 0;
+// every other tile of it shows the poster, so at most one clip decodes in the hero.
+interface SideTile {
+  src: string;
+  shape: 'sq' | 'p45';
+  w: number;
+  h: number;
+  clip?: string;
+  tag?: boolean;
+}
+const laneA: SideTile[] = [
+  { src: `${IMG}bd-coach-cyan-800.webp`, shape: 'p45', w: 800, h: 1200 },
+  { src: `${IMG}cv-bowl-flash-480.webp`, shape: 'sq', w: 480, h: 480 },
+  { src: `${MEDIA}tile-chalk.webp`, shape: 'p45', w: 480, h: 600, clip: 'tile-chalk', tag: true },
+  { src: `${IMG}hero5-gyms-and-studios-tile-1x1-480.webp`, shape: 'sq', w: 480, h: 480 },
+  { src: `${IMG}bd-soccer-mint-800.webp`, shape: 'p45', w: 800, h: 1200 },
+  { src: `${IMG}hero6-nutrition-coaches-tile-1x1-480.webp`, shape: 'sq', w: 480, h: 480 },
+];
+const laneB: SideTile[] = [
+  { src: `${IMG}cv-spikes-480.webp`, shape: 'sq', w: 480, h: 720 },
+  { src: `${IMG}bd-sprinter-violet-800.webp`, shape: 'p45', w: 800, h: 1200 },
+  { src: `${IMG}hero2-high-school-teams-tile-1x1-480.webp`, shape: 'sq', w: 480, h: 480 },
+  { src: `${MEDIA}tile-hurdler.webp`, shape: 'p45', w: 480, h: 600 },
+  { src: `${IMG}hero3-soccer-academies-tile-1x1-480.webp`, shape: 'sq', w: 480, h: 480 },
+  { src: `${IMG}bd-jumper-flare-800.webp`, shape: 'p45', w: 800, h: 1200 },
+];
+const copies = [0, 1, 2];
+
+// The first word, split into letters exactly the way hero.ts builds the next ones (letter index k colours the word along the gradient).
+function split(word: string) {
+  let k = 0;
+  const parts = word.split(' ').map((part, i) => {
+    const sp = i > 0 ? k : -1;
+    const letters = [...part].map((ch) => ({ ch, k: k++ }));
+    return { sp, letters };
+  });
+  return { m: Math.max(k - 1, 1), parts };
+}
+const first = split(t.words[0]);
 ---
 
-<section class="hero" data-hero aria-labelledby="hero-title">
-  <div class="container hero__grid">
-    <div class="hero__copy">
-      <h1 id="hero-title" class="hero__title">
-        <span class="sr-only">{t.hero.sentence}</span>
-        <span class="hero__visual" aria-hidden="true">
-          <span class="hero__lead">{t.hero.lead}</span>
-          <span class="hero__words" data-hero-words>
-            <span class="hero__static">{t.hero.words[heroSets[0].word]}</span>
-            {
-              heroSets.map((set, i) => (
-                <span class="hero__word" data-active={i === 0 ? '' : undefined}>
-                  {t.hero.words[set.word]}
-                </span>
-              ))
-            }
-            <span class="hero__lane" data-hero-lane></span>
+<section class="hero impact" id="hero" data-section aria-labelledby="hero-h">
+  <div class="mesh" aria-hidden="true">
+    <i class="b b5"></i><i class="b b1"></i><i class="b b2"></i><i class="b b3"></i><i class="b b4"></i><i class="vig"></i>
+  </div>
+  <div class="orbits" aria-hidden="true">
+    <svg viewBox="0 0 1600 800"><ellipse cx="800" cy="400" rx="760" ry="250"></ellipse><ellipse class="dash" cx="800" cy="400" rx="620" ry="190"></ellipse><ellipse cx="800" cy="400" rx="470" ry="140"></ellipse></svg>
+  </div>
+
+  <div class="hero-cv" aria-hidden="true" data-hero-cv>
+    <div class="hero-lane">
+      <div class="hero-run">
+        {
+          copies.map((c) =>
+            laneA.map((tile, i) => (
+              <div class={`hero-tile ${tile.shape}`}>
+                {tile.clip && c === 0 ? (
+                  <video muted playsinline loop preload="none" data-clip poster={tile.src} width={tile.w} height={tile.h}>
+                    <source src={`${MEDIA}${tile.clip}.webm`} type="video/webm" />
+                    <source src={`${MEDIA}${tile.clip}.mp4`} type="video/mp4" />
+                  </video>
+                ) : (
+                  <img src={tile.src} alt="" width={tile.w} height={tile.h} loading={c === 0 && i < 2 ? 'eager' : 'lazy'} decoding="async" />
+                )}
+                {tile.tag && <span class="hero-tag">● {t.live}</span>}
+              </div>
+            )),
+          )
+        }
+      </div>
+    </div>
+    <div class="hero-lane hero-mid">
+      <div class="hero-col" data-hero-col>
+        {
+          blocks.map((j, bi) => (
+            <>
+              <div class:list={['hero-tile', 'sm', 'sq', { on: bi === ACTIVE }]}>
+                <img src={`${IMG}${slugs[j]}-tile-1x1-480.webp`} alt="" width="480" height="480" loading={bi === ACTIVE ? 'eager' : 'lazy'} decoding="async" />
+              </div>
+              <div class:list={['hero-tile', 'big', { on: bi === ACTIVE }]} data-big>
+                <img
+                  src={`${IMG}${slugs[j]}-big-560.webp`}
+                  alt=""
+                  width="560"
+                  height="700"
+                  loading={bi === ACTIVE || bi === ACTIVE + 1 ? 'eager' : 'lazy'}
+                  fetchpriority={bi === ACTIVE ? 'high' : undefined}
+                  decoding="async"
+                />
+                <i class="hero-sweep"></i>
+              </div>
+              <div class:list={['hero-tile', 'sm', 'p45', { on: bi === ACTIVE }]}>
+                <img src={`${IMG}${slugs[j]}-tile-4x5-480.webp`} alt="" width="480" height="600" loading={bi === ACTIVE ? 'eager' : 'lazy'} decoding="async" />
+              </div>
+            </>
+          ))
+        }
+      </div>
+    </div>
+    <div class="hero-lane">
+      <div class="hero-run down">
+        {
+          copies.map((c) =>
+            laneB.map((tile, i) => (
+              <div class={`hero-tile ${tile.shape}`}>
+                <img src={tile.src} alt="" width={tile.w} height={tile.h} loading={c === 0 && i < 2 ? 'eager' : 'lazy'} decoding="async" />
+              </div>
+            )),
+          )
+        }
+      </div>
+    </div>
+  </div>
+
+  <div class="hero-chip hero-chip--ready pop" data-depth="18" aria-hidden="true">
+    <span class="hero-demo">{t.demoData}</span>
+    <div class="hero-ready">
+      <div class="dring" style="--v:82"></div>
+      <div>
+        <small>{t.ready.label}</small>
+        <div class="big fnum"><span class="count" style="--to:82;--cd:1.6s"></span></div>
+        <div class="st"><i class="dot-live"></i>{t.ready.status}</div>
+      </div>
+    </div>
+  </div>
+  <div class="hero-chip hero-chip--toast glass" data-depth="30" aria-hidden="true">
+    <span class="hero-demo">{t.demoData}</span>
+    <div class="hero-toast">
+      <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg></span>
+      <div class="tx" data-toast data-toasts={JSON.stringify(t.toasts)}><b>{t.toasts[0].title}</b><span>{t.toasts[0].text}</span></div>
+    </div>
+  </div>
+
+  <div class="wrap hero-grid">
+    <div class="hero-copy" data-hero-copy>
+      <p class="eyebrow">{t.eyebrow}</p>
+      <h1 class="d hero-h1" id="hero-h">
+        <span class="sr">{t.title}</span>
+        <span aria-hidden="true">
+          <span class="hero-ln">{t.lead[0]}</span>
+          <span class="hero-ln">{t.lead[1]}</span>
+          <span class="hero-slot" data-hero-words data-hero-count={t.words.length} data-words={JSON.stringify(t.words)}>
+            <span class="hero-w" data-hero-word data-word-index="0" data-active style={`--m:${first.m}`}>
+              {
+                first.parts.map((p) => (
+                  <>
+                    {p.sp >= 0 && <span class="hero-sp" style={`--k:${p.sp}`}>{'\u00a0'}</span>}
+                    <span class="hero-part">
+                      {p.letters.map((l) => (
+                        <span class="hero-ch" style={`--k:${l.k}`}>
+                          {l.ch}
+                        </span>
+                      ))}
+                    </span>
+                  </>
+                ))
+              }
+            </span>
           </span>
         </span>
       </h1>
-      <p class="hero__sub">{t.hero.sub}</p>
-      <div class="hero__cta">
-        <a class="btn btn--primary btn--lg" href={site.signUp}>{t.hero.ctaPrimary}</a>
-        <a class="btn btn--secondary btn--lg" href={site.booking}>{t.hero.ctaSecondary}</a>
-        <button
-          class="hero__pause"
-          type="button"
-          aria-pressed="false"
-          aria-label={t.a11y.pauseMotion}
-          data-label-pause={t.a11y.pauseMotion}
-          data-label-play={t.a11y.playMotion}
-          data-hero-pause
-        >
-          <Icon name="pause" size={20} class="hero__pause-pause" />
-          <Icon name="play" size={20} class="hero__pause-play" />
-        </button>
+      <p class="lead">{t.sub}</p>
+      <div class="hero-ctas">
+        <a class="btn btn--white btn--lg" href={site.signUp}>{t.start} <span class="arr" aria-hidden="true">→</span></a>
+        <a class="btn btn--ghost btn--lg" href={contactHref(locale, 'demo')}>{t.demo}</a>
       </div>
+      <p class="hero-note"><i class="dot-live"></i>{t.note}</p>
     </div>
+  </div>
 
-    <div class="hero__collage">
-      {
-        slots.map((slot) => (
-          <div class={`hero__slot hero__slot--${slot.key} xf`} data-hero-slot style={`--xf-dur:${slot.key === 'big' ? 600 : 450}ms;--xf-delay:${slot.delay}ms`}>
-            {heroSets.map((set, i) =>
-              i === 0 ? (
-                <div class="hero__ph" data-set={i} data-active>
-                  <Photo
-                    slot={`${set.prefix}-${slot.suffix}`}
-                    ratio={slot.ratio}
-                    sizes={slot.sizes}
-                    widths={[...slot.widths]}
-                    locale={locale}
-                    eager
-                    priority={slot.key === 'big' ? 'high' : 'auto'}
-                  />
-                </div>
-              ) : (
-                <template data-set={i}>
-                  <div class="hero__ph" data-set={i}>
-                    <Photo
-                      slot={`${set.prefix}-${slot.suffix}`}
-                      ratio={slot.ratio}
-                      sizes={slot.sizes}
-                      widths={[...slot.widths]}
-                      locale={locale}
-                    />
-                  </div>
-                </template>
-              ),
-            )}
+  <div class="hero-band">
+    <div class="wrap hero-band-in">
+      <div class="hero-cp"><span class="hero-cp-n grad-text">{t.customers.count}</span><small>{t.customers.label}</small></div>
+      <div class="marquee hero-logos" role="group" aria-label={t.customers.listLabel} tabindex="0">
+        <div class="marquee-track">
+          <div class="hero-logos-set">
+            {
+              clientLogos.map((l) => (
+                <img src={`/logos/${l.slug}-mono-light.${l.ext}`} alt={l.name} width={Math.round((l.h * l.width) / l.height)} height={l.h} style={`--lh:${l.h}px`} decoding="async" />
+              ))
+            }
           </div>
-        ))
-      }
-      <ReadinessCard class="hero__card" label={t.hero.readiness.label} value={t.hero.readiness.value} status={t.hero.readiness.status} />
+          <div class="hero-logos-set" aria-hidden="true" inert>
+            {
+              clientLogos.map((l) => (
+                <img src={`/logos/${l.slug}-mono-light.${l.ext}`} alt="" width={Math.round((l.h * l.width) / l.height)} height={l.h} style={`--lh:${l.h}px`} decoding="async" />
+              ))
+            }
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </section>
-
-<style>
-  .hero {
-    padding-block: 56px 72px;
-  }
-  .hero__grid {
-    display: grid;
-    grid-template-columns: minmax(0, 1.22fr) minmax(0, 1fr);
-    gap: 56px;
-    align-items: center;
-  }
-  .hero__title {
-    font-size: clamp(34px, 3.45vw, 54px);
-    line-height: 1.1;
-  }
-  .hero__visual {
-    display: block;
-  }
-  .hero__lead {
-    display: block;
-    text-wrap: balance;
-  }
-  @media (max-width: 1100px) {
-    .hero__lead {
-      max-width: 11.5em;
-    }
-  }
-  .hero__words {
-    position: relative;
-    display: grid;
-    justify-items: start;
-    padding-bottom: 14px;
-    margin-top: 4px;
-  }
-  .hero__static,
-  .hero__word {
-    grid-area: 1 / 1;
-    white-space: nowrap;
-  }
-  .hero__static {
-    position: relative;
-  }
-  .hero__static::after,
-  .hero__lane {
-    content: '';
-    position: absolute;
-    left: 0;
-    bottom: -14px;
-    height: calc(var(--lane) + 1px);
-    background: var(--cyan);
-  }
-  .hero__static::after {
-    width: 100%;
-  }
-  .hero__word,
-  .hero__lane {
-    display: none;
-  }
-  .hero__sub {
-    max-width: 34em;
-    margin-top: 28px;
-    color: var(--ink-2);
-    font-size: 21px;
-    line-height: 32px;
-  }
-  .hero__cta {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 16px;
-    margin-top: 36px;
-  }
-  .hero__pause {
-    display: none;
-    place-items: center;
-    width: 44px;
-    height: 44px;
-    border: 1px solid var(--line);
-    border-radius: 50%;
-    background: var(--bg);
-    color: var(--ink-2);
-    cursor: pointer;
-  }
-  .hero__pause:hover {
-    color: var(--ink);
-    background: var(--surface);
-  }
-  .hero__pause :global(.hero__pause-play),
-  .hero__pause[aria-pressed='true'] :global(.hero__pause-pause) {
-    display: none;
-  }
-  .hero__pause[aria-pressed='true'] :global(.hero__pause-play) {
-    display: block;
-  }
-
-  /* Rotation is an enhancement: only with JavaScript and without a reduced-motion request. */
-  @media (prefers-reduced-motion: no-preference) {
-    :global(html.js) .hero__static {
-      display: none;
-    }
-    :global(html.js) .hero__word {
-      display: block;
-      opacity: 0;
-      visibility: hidden;
-      filter: blur(8px);
-      transform: translateY(12px);
-      transition:
-        opacity 0.45s var(--ease-out),
-        filter 0.45s var(--ease-out),
-        transform 0.45s var(--ease-out),
-        visibility 0s linear 0.45s;
-    }
-    :global(html.js) .hero__word[data-active] {
-      opacity: 1;
-      visibility: visible;
-      filter: blur(0);
-      transform: none;
-      transition-delay: 0s;
-    }
-    :global(html.js) .hero__word[data-leaving] {
-      transform: translateY(-12px);
-    }
-    :global(html.js) .hero__lane {
-      display: block;
-      width: var(--lane-w, 0);
-    }
-    :global(html.js) .hero__words.is-ready .hero__lane {
-      transition: width 0.45s var(--ease-out);
-    }
-    :global(html.js) .hero__pause {
-      display: grid;
-    }
-  }
-
-  .hero__collage {
-    position: relative;
-    display: grid;
-    grid-template-columns: 1.8fr 1fr;
-    grid-template-rows: auto auto;
-    gap: 12px;
-  }
-  .hero__slot {
-    overflow: hidden;
-    border-radius: var(--radius-card);
-    background: var(--surface-2);
-  }
-  .hero__slot--big {
-    grid-row: 1 / span 2;
-    min-height: 100%;
-  }
-  .hero__ph {
-    height: 100%;
-  }
-  .hero__ph :global(.photo) {
-    height: 100%;
-  }
-  .hero__slot--big .hero__ph {
-    min-height: 100%;
-  }
-  .hero__collage :global(.hero__card) {
-    position: absolute;
-    left: -36px;
-    bottom: 12%;
-    z-index: 2;
-  }
-
-  @media (max-width: 1100px) {
-    .hero {
-      padding-block: 24px 56px;
-    }
-    .hero__grid {
-      grid-template-columns: minmax(0, 1fr);
-      gap: 40px;
-    }
-    .hero__collage {
-      order: -1;
-      max-width: 640px;
-      width: 100%;
-      margin-inline: auto;
-    }
-    .hero__title {
-      font-size: clamp(34px, 7vw, 56px);
-    }
-    .hero__collage :global(.hero__card) {
-      left: -12px;
-    }
-  }
-  @media (max-width: 720px) {
-    .hero__title {
-      font-size: clamp(26px, 7.8vw, 44px);
-    }
-    .hero__sub {
-      font-size: 18px;
-      line-height: 28px;
-      margin-top: 20px;
-    }
-    .hero__cta {
-      flex-direction: column;
-      align-items: stretch;
-      margin-top: 28px;
-    }
-    .hero__cta .btn {
-      width: 100%;
-    }
-    .hero__pause {
-      align-self: flex-start;
-    }
-    /* Phone: one big photo plus one overlapping tile; the second tile is dropped. */
-    .hero__collage {
-      display: block;
-      aspect-ratio: 5 / 4.4;
-      max-width: none;
-    }
-    .hero__slot--big {
-      width: 74%;
-      aspect-ratio: 4 / 5;
-      min-height: 0;
-    }
-    .hero__slot--sq {
-      position: absolute;
-      right: 0;
-      top: 0;
-      width: 38%;
-      aspect-ratio: 1;
-      border: 3px solid var(--bg);
-    }
-    .hero__slot--tall {
-      display: none;
-    }
-    .hero__collage :global(.hero__card) {
-      left: auto;
-      right: 0;
-      bottom: -8px;
-      width: 200px;
-      padding: 12px 16px 14px;
-    }
-    .hero__collage :global(.hero__card .rcard__value) {
-      font-size: 44px;
-      line-height: 50px;
-    }
-  }
-</style>
-
-<script>
-  import '../../scripts/hero';
-</script>
