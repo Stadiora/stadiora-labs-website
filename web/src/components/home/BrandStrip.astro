@@ -1,8 +1,88 @@
 ---
+import '../../styles/home/brand.css';
 import type { Locale } from '../../i18n';
+import { hrefFor } from '../../data/nav';
+import { homeBrand } from '../../i18n/pages/home-brand';
+
 interface Props {
   locale: Locale;
 }
+const { locale } = Astro.props;
+const t = homeBrand[locale];
+
+// Order the O window cycles through; the first one shows without JS.
+const retro = [
+  { n: 4, slug: 'tennis-ball' },
+  { n: 1, slug: 'starting-block' },
+  { n: 6, slug: 'traffic-light' },
+  { n: 2, slug: 'stopwatch' },
+  { n: 3, slug: 'jersey-crest' },
+  { n: 7, slug: 'lifting-belt' },
+  { n: 5, slug: 'pennant' },
+  { n: 8, slug: 'bottle-cones' },
+] as const;
 ---
 
-<section class="bstrip impact" id="brand" data-section aria-label="Stub"></section>
+<section class="bstrip impact" id="brand" data-section aria-labelledby="bs-h">
+  <div class="wrap">
+    <div class="bs-card rv">
+      <div class="bs-left">
+        <p class="eyebrow">{t.eyebrow}</p>
+        <h2 class="d" id="bs-h" data-scramble>{t.title}</h2>
+        <p>{t.text}</p>
+        <a class="mega-cta" href={hrefFor('solutions', locale)} data-magnet>
+          <span class="fill" aria-hidden="true"></span>
+          <span class="ico" aria-hidden="true">
+            <i class="o"></i>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 12h14M13 6l6 6-6 6"></path></svg>
+          </span>
+          <span data-scramble-self>{t.cta}</span>
+        </a>
+      </div>
+      <div class="bs-right">
+        <div class="bs-meta"><span>{t.meta[0]}</span><span>{t.meta[1]}</span></div>
+        <div class="giant" role="group" aria-label={t.giantLabel}>
+          <span class="gl" data-g aria-hidden="true">S</span><span class="gl" data-g aria-hidden="true">P</span>
+          <span class="owin" data-brand-o>
+            {
+              retro.map((r, k) => (
+                <img
+                  class={k === 0 ? 'on' : undefined}
+                  src={`/home/img/retro-${r.n}-${r.slug}.webp`}
+                  data-thermal={`/home/img/retro-${r.n}-${r.slug}-thermal.webp`}
+                  data-brand-img
+                  width="640"
+                  height="640"
+                  alt={t.alts[r.slug]}
+                  aria-hidden={k === 0 ? undefined : 'true'}
+                  loading="lazy"
+                  decoding="async"
+                />
+              ))
+            }
+            <i class="th" aria-hidden="true"></i>
+            <canvas class="px" width="72" height="66" aria-hidden="true"></canvas>
+          </span>
+          <span class="gl" data-g aria-hidden="true">R</span><span class="gl" data-g aria-hidden="true">T</span>
+        </div>
+        <div class="bs-ticker" role="group" aria-label={t.tickerLabel}>
+          <div class="marquee" style="--dur:30s">
+            <div class="marquee-track">
+              {
+                [false, true, true, true].map((hidden) => (
+                  <span aria-hidden={hidden ? 'true' : undefined} inert={hidden}>
+                    {t.ticker.map((w) => (
+                      <>
+                        {w} <b aria-hidden="true">●</b>{' '}
+                      </>
+                    ))}
+                  </span>
+                ))
+              }
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

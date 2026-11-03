@@ -1,0 +1,41 @@
+/* =============== PILLARS =============== */
+.pillars{background:var(--bg);padding-top:0;font:400 16px/1.55 var(--f-text)}
+.pil-grid{display:grid;grid-template-columns:minmax(0,400px) 1fr;gap:clamp(28px,4vw,64px);align-items:center}
+/* The tablist wraps only the tabs; display:contents lets each panel sit under its own tab. */
+.pil-list{display:grid;min-width:0}
+.pil-tabs{display:contents}
+.pil-tab{order:calc(var(--k) * 2);position:relative;display:block;width:100%;text-align:left;padding:20px 0 24px;color:var(--ink);background:none;border:0;border-radius:0;cursor:pointer;font:inherit;transition:padding-bottom 500ms var(--e-out)}
+.pil-tab[aria-selected="true"]{padding-bottom:0}
+.pil-tab .at-bar{display:block;margin-bottom:18px}
+/* The kit drives the bar with an inline transform; the shared CSS fill animation would fight it. */
+.pil-grid .pil-tab .at-bar i{animation:none}
+.pil-tab .hd{display:flex;align-items:baseline;gap:14px}
+.pil-tab .hd em{font:500 12px/1 var(--f-mono);font-style:normal;color:var(--ink3)}
+.pil-tab .hd strong{font:800 clamp(24px,2.2vw,34px)/1 var(--f-display);font-variation-settings:"wdth" 80;letter-spacing:-.01em;transition:color 300ms}
+.pil-tab[aria-selected="false"] .hd strong{color:color-mix(in srgb,var(--ink) 55%,transparent)}
+.pil-panel{order:calc(var(--k) * 2 + 1);display:grid;grid-template-rows:0fr;visibility:hidden;transition:grid-template-rows 500ms var(--e-out),visibility 0s linear 500ms}
+.pil-panel.on{grid-template-rows:1fr;visibility:visible;transition-delay:0s}
+.pil-panel > div{overflow:hidden;min-height:0}
+.pil-panel p{color:var(--ink2);padding:12px 0 10px 32px;max-width:38ch}
+.pil-panel .link-arrow{margin:0 0 24px 32px;font-size:15px;font-weight:600;color:var(--link,var(--ink));text-decoration:none}
+.pil-media{position:relative;aspect-ratio:16/10;border-radius:var(--r-xl);overflow:hidden;background:var(--pc,#00BEF3);box-shadow:0 50px 100px -50px rgba(8,19,43,.55);transition:opacity 700ms var(--e-out),transform 900ms var(--e-out),background-color 700ms;transition-delay:calc(var(--i,0) * 70ms),calc(var(--i,0) * 70ms),0s}
+.pil-clip{position:absolute;inset:0;opacity:0;transform:scale(1.05);transition:opacity 600ms var(--e-out),transform 1200ms var(--e-out)}
+.pil-clip.on{opacity:1;transform:none}
+.pil-clip video{display:block;width:100%;height:100%;object-fit:cover}
+
+/* Without JS every pillar reads open and the first clip stays. */
+html:not(.js) .pil-panel{grid-template-rows:1fr;visibility:visible}
+html:not(.js) .pil-tab{padding-bottom:0}
+
+@media (max-width:1080px){
+  .pil-grid{grid-template-columns:1fr}
+}
+@media (max-width:640px){
+  .pil-grid{display:flex;flex-direction:column-reverse;align-items:stretch}
+  .pil-media{aspect-ratio:16/10}
+}
+@media (prefers-reduced-motion:reduce){
+  .pil-tab,.pil-panel,.pil-clip,.pil-media{transition:none}
+  .pil-clip{transform:none}
+  .pil-tab[aria-selected="true"] .at-bar i{transform:scaleX(1)!important}
+}
