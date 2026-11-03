@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>coach-programs</title>
+<link rel="stylesheet" href="stage.css" />
+<style>
+.ph{background-image:url(../src/cine-team-floodlight.webp);--bp:50% 6%;--kx:-1.6%;--ky:-1.2%}
+.vg{position:absolute;inset:0;background:radial-gradient(120% 90% at 50% 45%,transparent 45%,rgba(2,6,15,.72) 100%),linear-gradient(180deg,rgba(2,6,15,.28),transparent 30%,rgba(2,6,15,.5))}
+</style>
+</head>
+<body>
+<div class="st" id="st">
+<div class="ph kb"></div>
+<div class="layer">
+  <div class="blob" style="left:-6%;bottom:-18%;width:46%;height:56%;background:rgba(0,190,243,.34);--bx:70px;--by:-30px"></div>
+  <div class="blob" style="right:-8%;top:-14%;width:40%;height:50%;background:rgba(139,92,246,.30);--bx:-60px;--by:40px"></div>
+  <div class="beam" style="left:-22%;transform-origin:50% 0"></div>
+  <div class="beam" style="left:66%;animation-delay:-4s"></div>
+  <div class="streak" style="top:62%;--sd:4s;--dl:-1s"></div>
+  <div class="streak" style="top:74%;--sd:8s;--dl:-3s;width:60%"></div>
+  <div id="particles"></div>
+  <div class="vg"></div>
+</div>
+</div>
+<script>
+// Deterministic particles so every render is identical.
+let s = 11;
+const rnd = () => ((s = (s * 1664525 + 1013904223) >>> 0) / 4294967296);
+const host = document.getElementById('particles');
+for (let i = 0; i < 26; i++) {
+  const d = document.createElement('i');
+  d.className = 'dust';
+  const per = [4, 8, 8, 4][i % 4];
+  d.style.cssText = `left:${(rnd() * 96 + 2).toFixed(1)}%;top:${(rnd() * 70 + 22).toFixed(1)}%;--s:${(2 + rnd() * 4).toFixed(1)}px;--dd:${per}s;--dl:-${(rnd() * per).toFixed(2)}s;--dx:${(rnd() * 60 - 30).toFixed(0)}px;--dy:${(-60 - rnd() * 120).toFixed(0)}px`;
+  host.appendChild(d);
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,315 @@
+/* Floodlight layer for the Platform "Coach" pages (lane VB-2): programs, nutrition, readiness, power lab.
+   Everything here is cf-*. It reads the foundation tokens and kit classes (.impact, .mesh, .orbits, .rv, .lines, .d,
+   .lead, .eyebrow, .media-frame, .glass, .pop, .btn--white) and never redeclares them. */
+
+.cf-page {
+  --ac: var(--cyan);
+  --ac-ink: var(--cyan-ink);
+}
+.cf-page[data-accent='mint'] {
+  --ac: var(--mint);
+  --ac-ink: var(--mint-ink);
+}
+.cf-page[data-accent='violet'] {
+  --ac: var(--violet);
+  --ac-ink: var(--violet-ink);
+}
+.cf-page[data-accent='tartan'] {
+  --ac: var(--tartan);
+  --ac-ink: var(--tartan);
+}
+
+/* The reveals wait for a script; without one every section just shows. */
+html:not(.js) .cf-page .rv,
+html:not(.js) .cf-page .lines > span > span {
+  opacity: 1;
+  transform: none;
+}
+html:not(.js) .cf-page .rv-mask {
+  clip-path: none;
+}
+
+/* ---------- Hero: dark, mesh + orbits, copy beside a moving media frame ---------- */
+.cf-hero {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  padding: calc(var(--nav-h) + clamp(28px, 5vw, 72px)) 0 clamp(56px, 7vw, 104px);
+}
+.cf-hero .mesh .b {
+  --o: 0.3;
+}
+.cf-page[data-accent='cyan'] .cf-hero .mesh .b1,
+.cf-page[data-accent='mint'] .cf-hero .mesh .b3,
+.cf-page[data-accent='violet'] .cf-hero .mesh .b2,
+.cf-page[data-accent='tartan'] .cf-hero .mesh .b4 {
+  --o: 0.85;
+}
+.cf-page[data-accent='tartan'] .cf-hero .mesh .b4 {
+  width: 62vmax;
+  height: 62vmax;
+  left: auto;
+  right: -14vmax;
+  bottom: -26vmax;
+}
+.cf-hero .orbits svg {
+  width: 120%;
+  left: -10%;
+}
+.cf-hero__grid {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: minmax(0, 6fr) minmax(0, 6fr);
+  align-items: center;
+  gap: clamp(32px, 5vw, 80px);
+}
+.cf-hero__copy > * + * {
+  margin-top: clamp(18px, 2vw, 28px);
+}
+.cf-hero .d {
+  font-size: clamp(40px, 5.2vw, 88px);
+  color: #fff;
+}
+.cf-hero .lead {
+  color: var(--ink-2);
+}
+.cf-ctas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  padding-top: 6px;
+}
+.cf-hero__media {
+  position: relative;
+  min-width: 0;
+}
+.cf-frame {
+  aspect-ratio: 16 / 11;
+  border-radius: var(--r-xl);
+  box-shadow:
+    0 50px 120px -40px color-mix(in srgb, var(--ac) 60%, transparent),
+    0 0 0 1px rgb(255 255 255 / 0.1);
+}
+.cf-hero__media > .cf-frame {
+  transform: perspective(1100px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
+  transition: transform 0.4s var(--e-out);
+}
+.cf-frame > .vid-shade {
+  background: linear-gradient(180deg, rgb(4 10 26 / 0.05), rgb(4 10 26 / 0.5));
+}
+.cf-frame .cf-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+}
+.cf-chip {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  max-width: calc(100% - 32px);
+  padding: 10px 14px;
+  border-radius: 16px;
+  font-size: 14px;
+  line-height: 1.25;
+  animation: cfFloat 7s ease-in-out infinite;
+  animation-delay: var(--fd, 0s);
+}
+.cf-chip[data-depth] {
+  transform: translate(var(--px, 0px), var(--py, 0px));
+}
+.cf-chip b {
+  display: block;
+  font-weight: 600;
+}
+.cf-chip small {
+  display: block;
+  font-size: 12px;
+  color: rgb(255 255 255 / 0.78);
+}
+.cf-chip svg {
+  flex: none;
+}
+@keyframes cfFloat {
+  0%,
+  100% {
+    translate: 0 0;
+  }
+  50% {
+    translate: 0 -8px;
+  }
+}
+
+/* ---------- Section heads and dark stages ---------- */
+.cf-head {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 18px 40px;
+  margin-bottom: clamp(32px, 4.5vw, 60px);
+}
+.cf-head > div {
+  min-width: 0;
+}
+.cf-head .d {
+  margin-top: 16px;
+}
+.cf-head .lead {
+  max-width: 40ch;
+}
+.cf-stage {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  padding: var(--sec) 0;
+}
+.cf-stage > .wrap {
+  position: relative;
+  z-index: 1;
+}
+.cf-stage .mesh .b {
+  --o: 0.2;
+}
+.cf-stage[data-accent='cyan'] .mesh .b1,
+.cf-stage[data-accent='mint'] .mesh .b3,
+.cf-stage[data-accent='violet'] .mesh .b2,
+.cf-stage[data-accent='tartan'] .mesh .b4 {
+  --o: 0.75;
+}
+.cf-sec {
+  padding: var(--sec) 0;
+  position: relative;
+}
+.cf-sec--tight {
+  padding-block: clamp(56px, 7vw, 104px);
+}
+.cf-sec--alt {
+  background: var(--surface);
+}
+.cf-demo {
+  margin-top: 18px;
+  font: 500 12px/1.4 var(--f-mono);
+  letter-spacing: 0.06em;
+  color: var(--ink-3);
+  text-align: center;
+}
+.impact .cf-demo {
+  color: var(--ink-2);
+}
+
+/* A product panel inside a dark stage: follows the page theme (white in light, navy in dark). */
+.cf-panel {
+  border-radius: var(--r-lg);
+  background: var(--bg);
+  color: var(--ink);
+  box-shadow:
+    0 40px 90px -30px rgb(2 6 15 / 0.7),
+    0 0 0 1px rgb(255 255 255 / 0.08);
+}
+
+/* ---------- Also in Aria ---------- */
+.cf-also__list {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  margin: 28px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.cf-also__card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  height: 100%;
+  padding: 22px 24px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  background: var(--bg);
+  color: var(--ink);
+  text-decoration: none;
+  transition:
+    transform 0.3s var(--e-out),
+    border-color 0.3s,
+    box-shadow 0.3s;
+}
+.cf-also__card:hover {
+  transform: translateY(-4px);
+  border-color: var(--ac);
+  box-shadow: 0 18px 40px -20px color-mix(in srgb, var(--ac) 70%, transparent);
+}
+.cf-also__card svg {
+  flex: none;
+  color: var(--ac-ink);
+  transition: transform 0.3s var(--e-out);
+}
+.cf-also__card:hover svg {
+  transform: translateX(4px);
+}
+.cf-also__name {
+  display: block;
+  font: 700 20px/1.2 var(--f-display);
+}
+.cf-also__desc {
+  display: block;
+  margin-top: 6px;
+  color: var(--ink-2);
+  font-size: 15px;
+  line-height: 1.4;
+}
+
+/* ---------- Final: night-stadium clip (the foundation .final does the heavy lifting) ---------- */
+.cf-final .d1 {
+  font-size: clamp(46px, 8vw, 148px);
+}
+
+@media (max-width: 960px) {
+  .cf-hero__grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .cf-frame {
+    aspect-ratio: 16 / 12;
+  }
+  .cf-also__list {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+@media (max-width: 640px) {
+  /* The demo badge wraps to two lines here; a square frame keeps the floating chips and the badge apart. */
+  .cf-frame {
+    aspect-ratio: 1 / 1;
+  }
+  .cf-ctas .btn {
+    flex: 1 1 100%;
+  }
+  .cf-chip {
+    font-size: 13px;
+    padding: 8px 12px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cf-chip {
+    animation: none;
+  }
+}
+
+/* ---------- Count-up: static final value until the kit adds .go as the number scrolls into view ---------- */
+.cf-page .count {
+  counter-reset: n var(--to);
+  animation: none;
+}
+.cf-page .count.go {
+  counter-reset: n var(--n);
+  animation: countUp var(--cd, 1.4s) var(--e-out) both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .cf-page .count.go {
+    animation: none;
+    counter-reset: n var(--to);
+  }
+}

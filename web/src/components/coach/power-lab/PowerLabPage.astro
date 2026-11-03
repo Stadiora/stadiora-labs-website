@@ -1,13 +1,12 @@
 ---
 import { powerLabCopy } from '../../../i18n/pages/power-lab';
 import { coachCommon } from '../../../i18n/pages/coach-common';
-import { site } from '../../../data/site';
 import type { Locale } from '../../../i18n';
-import FeatureHero from '../FeatureHero.astro';
+import CoachHero from '../CoachHero.astro';
+import CoachFinal from '../CoachFinal.astro';
 import StepFlow from '../StepFlow.astro';
 import ChartBaseline from '../ChartBaseline.astro';
 import AlsoInAria from '../AlsoInAria.astro';
-import CtaBand from '../CtaBand.astro';
 import CoachIcon from '../CoachIcon.astro';
 import CameraScreen from './CameraScreen.astro';
 import FrameScreen from './FrameScreen.astro';
@@ -19,139 +18,171 @@ interface Props {
 const { locale } = Astro.props;
 const c = powerLabCopy[locale];
 const common = coachCommon[locale];
+const jump = c.flow.result.metrics[0];
+const jumpInt = Math.trunc(jump.value);
+const jumpText = new Intl.NumberFormat(locale, { minimumFractionDigits: jump.decimals, maximumFractionDigits: jump.decimals }).format(jump.value);
 ---
 
-<FeatureHero
-  locale={locale}
-  variant="banner"
-  eyebrow={c.hero.eyebrow}
-  title={c.hero.title}
-  emphasis={c.hero.emphasis}
-  sub={c.hero.sub}
-  primary={{ label: common.startFree, href: site.signUp }}
-  secondary={{ label: c.hero.secondary, href: `#${c.flow.id}` }}
-  photo={{ slot: 'f4-powerlab', alt: c.hero.photoAlt, ratio: '1600/612', sizes: '(max-width: 900px) 100vw, 1376px' }}
-  pos="60% 50%"
-  posMobile="58% 50%"
-  zoom={1.14}
-  copyMax="54%"
-/>
+<div class="cf-page pl" data-accent="tartan">
+  <CoachHero
+    locale={locale}
+    eyebrow={c.hero.eyebrow}
+    title={c.hero.title}
+    emphasis={c.hero.emphasis}
+    sub={c.hero.sub}
+    secondary={{ label: c.hero.secondary, href: `#${c.flow.id}` }}
+    clip="coach-powerlab"
+  >
+    <Fragment slot="overlay">
+      <div class="cf-chip glass" style="left:5%;top:8%" data-depth="12">
+        <i class="dot-live"></i>
+        <span><b>{c.flow.camera.pill}</b><small>{c.flow.camera.label}</small></span>
+      </div>
+      <div class="cf-chip glass pl-jump" style="right:5%;bottom:22%;--fd:-3.5s" data-depth="18">
+        <span><small>{jump.label}</small><b class="pl-jump__n"><span aria-hidden="true"><span class="count" style={`--to:${jumpInt};--cd:1.8s`}></span>{jumpText.slice(String(jumpInt).length)}</span><span class="sr-only">{jumpText}</span> {jump.unit}</b></span>
+      </div>
+    </Fragment>
+  </CoachHero>
 
-<section id={c.flow.id} class="section pl-flow" aria-labelledby="pl-flow-title">
-  <div class="container">
-    <h2 id="pl-flow-title" class="sr-only">{c.flow.title}</h2>
-    <div class="pl-flow__grid">
+  <section id={c.flow.id} class="cf-stage impact pl-flow" data-section data-accent="tartan" aria-labelledby="pl-flow-title">
+    <div class="mesh" aria-hidden="true"><i class="b b5"></i><i class="b b1"></i><i class="b b2"></i><i class="b b3"></i><i class="b b4"></i><i class="vig"></i></div>
+    <div class="wrap">
+      <div class="cf-head">
+        <div>
+          <h2 id="pl-flow-title" class="d d2 lines"><span><span>{c.flow.title}</span></span></h2>
+        </div>
+      </div>
       <StepFlow steps={c.flow.steps} stepWord={common.stepWord} variant="card">
-        <CameraScreen slot="step-0" locale={locale} copy={c.flow.camera} />
-        <FrameScreen slot="step-1" locale={locale} copy={c.flow.frames} />
-        <ResultScreen slot="step-2" locale={locale} copy={c.flow.result} />
+        <div slot="step-0" class="reading pl-screen"><CameraScreen locale={locale} copy={c.flow.camera} /></div>
+        <div slot="step-1" class="reading pl-screen"><FrameScreen locale={locale} copy={c.flow.frames} /></div>
+        <div slot="step-2" class="reading pl-screen"><ResultScreen locale={locale} copy={c.flow.result} /></div>
       </StepFlow>
-      <div class="pl-flow__chart">
-        <ChartBaseline
-          title={c.chart.title}
-          unit={c.chart.unit}
-          baseline={c.chart.baseline}
-          above={c.chart.above}
-          xLabels={c.chart.weeks}
-          values={c.chart.values}
-          band={c.chart.band}
-          range={c.chart.range}
-          label={c.chart.label}
-          demo={c.flow.result.demo}
-        />
+
+      <div class="pl-flow__grid">
+        <div class="pl-flow__chart reading rv">
+          <ChartBaseline
+            title={c.chart.title}
+            unit={c.chart.unit}
+            baseline={c.chart.baseline}
+            above={c.chart.above}
+            xLabels={c.chart.weeks}
+            values={c.chart.values}
+            band={c.chart.band}
+            range={c.chart.range}
+            label={c.chart.label}
+            demo={c.flow.result.demo}
+          />
+        </div>
+        <div class="pl-flow__side rv" style="--i:1">
+          <p class="lead pl-chart-line">{c.chart.line}</p>
+          <div class="pl-honest glass">
+            <CoachIcon name="info" size={22} />
+            <p class="pl-honest__text">{c.honest.text}</p>
+            <p class="pl-honest__sports">{c.honest.sports}</p>
+          </div>
+        </div>
+      </div>
+      <p class="cf-demo">{common.demoNote}</p>
+    </div>
+  </section>
+
+  <section class="cf-sec cf-sec--alt pl-tests" aria-labelledby="pl-tests-title">
+    <div class="wrap pl-tests__grid">
+      <h2 id="pl-tests-title" class="d d3 lines"><span><span>{c.tests.title}</span></span></h2>
+      <div>
+        <ul class="pl-tests__list">
+          {
+            c.tests.items.map((item, i) => (
+              <li class="rv" style={`--i:${i}`}>
+                <span class="pl-tests__icon">
+                  <CoachIcon name="activity" size={18} />
+                </span>
+                {item}
+              </li>
+            ))
+          }
+        </ul>
+        <p class="pl-tests__note rv">{c.tests.note}</p>
       </div>
     </div>
-    <p class="pl-chart-line">{c.chart.line}</p>
-    <div class="pl-honest">
-      <CoachIcon name="info" size={22} />
-      <p class="pl-honest__text">{c.honest.text}</p>
-      <p class="pl-honest__sports">{c.honest.sports}</p>
-    </div>
-  </div>
-</section>
+  </section>
 
-<section class="section section--surface pl-tests" aria-labelledby="pl-tests-title">
-  <div class="container pl-tests__grid">
-    <h2 id="pl-tests-title" class="pl-tests__title" data-reveal>{c.tests.title}</h2>
-    <div>
-      <ul class="pl-tests__list">
-        {
-          c.tests.items.map((item, i) => (
-            <li data-reveal style={`--reveal-i:${i}`}>
-              <span class="pl-tests__icon">
-                <CoachIcon name="activity" size={18} />
-              </span>
-              {item}
-            </li>
-          ))
-        }
-      </ul>
-      <p class="pl-tests__note">{c.tests.note}</p>
-    </div>
-  </div>
-</section>
-
-<AlsoInAria locale={locale} ids={c.also} />
-<CtaBand locale={locale} />
+  <AlsoInAria locale={locale} ids={c.also} />
+  <CoachFinal locale={locale} />
+</div>
 
 <style>
-  .pl-flow {
-    padding-top: 40px;
-    padding-bottom: 56px;
+  .pl-jump__n {
+    font: 900 28px/1 var(--f-display);
+    font-variation-settings: 'wdth' 70;
+    font-stretch: 70%;
+    font-variant-numeric: tabular-nums;
+  }
+  .pl-jump small {
+    margin-bottom: 4px;
+  }
+  .pl-screen {
+    width: 100%;
+    padding: 14px;
+    border-radius: var(--r-md);
+    background: var(--bg);
+    box-shadow: 0 0 0 1px rgb(255 255 255 / 0.08);
   }
   .pl-flow__grid {
     display: grid;
-    grid-template-columns: minmax(0, 58fr) minmax(0, 42fr);
-    gap: 16px;
-    align-items: stretch;
+    grid-template-columns: minmax(0, 7fr) minmax(0, 5fr);
+    gap: clamp(20px, 3vw, 48px);
+    align-items: center;
+    margin-top: clamp(28px, 4vw, 56px);
   }
   .pl-flow__chart {
     display: flex;
     min-width: 0;
+    border-radius: var(--r-lg);
+    background: none;
   }
   .pl-flow__chart :global(.cb) {
     flex: 1;
+    background: var(--bg);
+    border-radius: var(--r-lg);
+    box-shadow:
+      0 40px 90px -30px rgb(2 6 15 / 0.7),
+      0 0 0 1px rgb(255 255 255 / 0.08);
   }
   .pl-chart-line {
-    margin-top: 16px;
-    color: var(--ink-2);
-    font-size: 16px;
-    line-height: 24px;
+    margin: 0 0 22px;
+    color: var(--ink);
+    font-size: clamp(18px, 1.6vw, 22px);
   }
   .pl-honest {
     display: flex;
-    gap: 14px;
-    align-items: center;
-    margin-top: 24px;
-    padding: 16px 22px;
-    border-radius: var(--radius-card);
-    background: var(--surface);
-    color: var(--ink-2);
+    flex-wrap: wrap;
+    gap: 6px 14px;
+    align-items: flex-start;
+    padding: 16px 20px;
+    border-radius: var(--r-md);
+    color: var(--ink);
   }
   .pl-honest :global(svg) {
     flex: none;
-    color: var(--ink);
+    margin-top: 2px;
   }
   .pl-honest__text {
-    flex: 1;
+    flex: 1 1 calc(100% - 40px);
     font-size: 16px;
     line-height: 24px;
   }
   .pl-honest__sports {
-    flex: none;
-    font-size: 15px;
-    line-height: 22px;
+    padding-left: 36px;
+    color: var(--ink-2);
+    font-size: 14px;
+    line-height: 20px;
   }
   .pl-tests__grid {
     display: grid;
     grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
     gap: clamp(32px, 6vw, 96px);
     align-items: start;
-  }
-  .pl-tests__title {
-    max-width: 12ch;
-    font-size: clamp(28px, 3vw, 40px);
-    line-height: 1.15;
   }
   .pl-tests__list {
     display: grid;
@@ -174,11 +205,12 @@ const common = coachCommon[locale];
     display: grid;
     flex: none;
     place-items: center;
-    width: 36px;
-    height: 36px;
-    border-radius: 10px;
-    background: var(--cyan-tint);
-    color: var(--cyan-ink);
+    width: 38px;
+    height: 38px;
+    border-radius: 12px;
+    background: color-mix(in srgb, var(--ac) 18%, transparent);
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--ac) 45%, transparent);
+    color: var(--ink);
   }
   .pl-tests__note {
     margin-top: 28px;
@@ -189,7 +221,7 @@ const common = coachCommon[locale];
     line-height: 22px;
   }
 
-  @media (max-width: 1200px) {
+  @media (max-width: 1100px) {
     .pl-flow__grid {
       grid-template-columns: minmax(0, 1fr);
     }
@@ -198,21 +230,8 @@ const common = coachCommon[locale];
     .pl-tests__grid {
       grid-template-columns: minmax(0, 1fr);
     }
-    .pl-tests__title {
-      max-width: none;
-    }
   }
   @media (max-width: 640px) {
-    .pl-honest {
-      flex-wrap: wrap;
-      align-items: flex-start;
-    }
-    .pl-honest__text {
-      flex: 1 1 calc(100% - 40px);
-    }
-    .pl-honest__sports {
-      padding-left: 36px;
-    }
     .pl-tests__list {
       grid-template-columns: minmax(0, 1fr);
       gap: 14px;

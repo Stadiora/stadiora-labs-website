@@ -1,0 +1,74 @@
+---
+import '../../styles/coach/cf.css';
+import { site } from '../../data/site';
+import { coachCommon } from '../../i18n/pages/coach-common';
+import type { Locale } from '../../i18n';
+
+interface Props {
+  locale: Locale;
+  eyebrow: string;
+  title: string;
+  /** Phrase inside the title that gets the gradient. Without it, the last sentence does. */
+  emphasis?: string;
+  sub?: string;
+  secondary: { label: string; href: string };
+  /** Name of a clip in public/home/media (WebM + MP4 + WebP poster). */
+  clip: string;
+  /** Where the demo note sits when the hero shows demo data. */
+  demo?: boolean;
+}
+const { locale, eyebrow, title, emphasis, sub, secondary, clip, demo = true } = Astro.props;
+const common = coachCommon[locale];
+
+// The h1 is one masked line group: [before, gradient, after].
+let parts: [string, string, string];
+const at = emphasis ? title.indexOf(emphasis) : -1;
+if (emphasis && at >= 0) {
+  parts = [title.slice(0, at), emphasis, title.slice(at + emphasis.length)];
+} else {
+  const sentences = title.split(/(?<=[.!?])\s+/);
+  const last = sentences.pop() ?? '';
+  parts = [sentences.length ? `${sentences.join(' ')} ` : '', last, ''];
+}
+---
+
+<section class="cf-hero impact" data-section aria-labelledby="cf-h">
+  <div class="mesh" aria-hidden="true">
+    <i class="b b5"></i><i class="b b1"></i><i class="b b2"></i><i class="b b3"></i><i class="b b4"></i><i class="vig"></i>
+  </div>
+  <div class="orbits" aria-hidden="true">
+    <svg viewBox="0 0 1600 800">
+      <ellipse cx="800" cy="400" rx="760" ry="250"></ellipse>
+      <ellipse class="dash" cx="800" cy="400" rx="620" ry="190"></ellipse>
+      <ellipse cx="800" cy="400" rx="470" ry="140"></ellipse>
+    </svg>
+  </div>
+  <div class="wrap cf-hero__grid">
+    <div class="cf-hero__copy">
+      <p class="eyebrow rv">{eyebrow}</p>
+      <h1 class="d lines" id="cf-h">
+        <span><span>{parts[0]}<span class="grad-text">{parts[1]}</span>{parts[2]}</span></span>
+      </h1>
+      {sub && <p class="lead rv" style="--i:1">{sub}</p>}
+      <div class="cf-ctas rv" style="--i:2">
+        <a class="btn btn--white btn--lg" href={site.signUp}>{common.startFree}</a>
+        <a class="btn btn--ghost btn--lg" href={secondary.href}>{secondary.label}</a>
+      </div>
+    </div>
+    <div class="cf-hero__media rv" style="--i:2" data-tilt>
+      <div class="media-frame cf-frame">
+        <video muted playsinline loop preload="none" data-clip poster={`/home/media/${clip}.webp`} aria-hidden="true" tabindex="-1">
+          <source src={`/home/media/${clip}.webm`} type="video/webm" />
+          <source src={`/home/media/${clip}.mp4`} type="video/mp4" />
+        </video>
+        <div class="vid-shade"></div>
+        <div class="cf-overlay"><slot name="overlay" /></div>
+        {demo && <span class="badge-demo">{common.demoNote}</span>}
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  import '../../scripts/coach';
+</script>

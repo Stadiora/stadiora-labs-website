@@ -44,7 +44,7 @@ const { steps, stepWord, variant = 'open', label } = Astro.props;
     display: grid;
     grid-template-columns: repeat(var(--sf-cols, 3), minmax(0, 1fr));
     grid-template-rows: auto 1fr auto;
-    column-gap: 40px;
+    column-gap: clamp(20px, 3vw, 40px);
     margin: 0;
     padding: 0;
     list-style: none;
@@ -68,15 +68,17 @@ const { steps, stepWord, variant = 'open', label } = Astro.props;
     place-items: center;
     width: 40px;
     height: 40px;
+    border: 1px solid color-mix(in srgb, var(--ac, var(--cyan)) 70%, transparent);
     border-radius: 50%;
-    background: var(--cyan-tint);
-    color: var(--cyan-ink);
+    background: color-mix(in srgb, var(--ac, var(--cyan)) 24%, transparent);
+    color: var(--ink);
     font-size: 18px;
-    font-weight: 600;
+    font-weight: 700;
+    box-shadow: 0 0 24px -4px color-mix(in srgb, var(--ac, var(--cyan)) 70%, transparent);
   }
   .sf__title {
-    font-size: 22px;
-    line-height: 28px;
+    font: 700 22px/28px var(--f-display, var(--font-display));
+    color: var(--ink);
   }
   .sf__screen {
     display: grid;
@@ -91,24 +93,76 @@ const { steps, stepWord, variant = 'open', label } = Astro.props;
     line-height: 26px;
   }
 
-  /* Dotted connector: drawn left to right once, when the list scrolls into view. */
+  /* Connector: drawn left to right once when the list scrolls in, then a light keeps travelling along it. */
   .sf__dots {
+    position: relative;
     flex: 1 1 24px;
     min-width: 24px;
-    height: 0;
+    height: 2px;
     margin: 0 -32px 0 4px;
-    border-top: 2px dotted var(--cyan);
+    border-radius: 2px;
+    background: linear-gradient(90deg, var(--ac, var(--cyan)), color-mix(in srgb, var(--ac, var(--cyan)) 10%, transparent));
+  }
+  .sf__dots::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: -3px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #fff;
+    box-shadow: 0 0 14px 2px var(--ac, var(--cyan));
+    animation: sfRun 3.6s var(--e-inout, ease-in-out) infinite;
+    animation-delay: calc(var(--i, 0) * 0.9s + 1.4s);
+    opacity: 0;
+  }
+  @keyframes sfRun {
+    0% {
+      left: 0;
+      opacity: 0;
+    }
+    12% {
+      opacity: 1;
+    }
+    70% {
+      left: calc(100% - 8px);
+      opacity: 1;
+    }
+    80%,
+    100% {
+      left: calc(100% - 8px);
+      opacity: 0;
+    }
   }
   :global(html.js) .sf[data-reveal] .sf__dots {
-    clip-path: inset(0 100% 0 0);
-    transition: clip-path 0.6s var(--ease-out) calc(var(--i, 0) * 200ms + 300ms);
+    clip-path: inset(-8px 100% -8px 0);
+    transition: clip-path 0.7s var(--e-out, ease-out) calc(var(--i, 0) * 220ms + 300ms);
+  }
+  :global(html.js) .sf[data-reveal] .sf__step {
+    opacity: 0;
+    translate: 0 18px;
+    transition:
+      opacity 0.6s var(--e-out, ease-out) calc(var(--i, 0) * 160ms),
+      translate 0.6s var(--e-out, ease-out) calc(var(--i, 0) * 160ms);
   }
   :global(html.js) .sf[data-reveal].is-in .sf__dots {
-    clip-path: inset(0);
+    clip-path: inset(-8px 0);
+  }
+  :global(html.js) .sf[data-reveal].is-in .sf__step {
+    opacity: 1;
+    translate: 0 0;
   }
   @media (prefers-reduced-motion: reduce) {
     :global(html.js) .sf[data-reveal] .sf__dots {
-      clip-path: inset(0);
+      clip-path: inset(-8px 0);
+    }
+    :global(html.js) .sf[data-reveal] .sf__step {
+      opacity: 1;
+      translate: 0 0;
+    }
+    .sf__dots::after {
+      display: none;
     }
   }
 
@@ -119,8 +173,9 @@ const { steps, stepWord, variant = 'open', label } = Astro.props;
   .sf--card .sf__step {
     padding: 20px;
     border: 1px solid var(--line);
-    border-radius: var(--radius-card);
-    background: var(--bg);
+    border-radius: var(--r-lg, var(--radius-card));
+    background: color-mix(in srgb, var(--bg) 82%, transparent);
+    backdrop-filter: blur(8px);
   }
   .sf--card .sf__num {
     width: 36px;

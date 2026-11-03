@@ -1,5 +1,5 @@
 ---
-import '../../styles/coach.css';
+import '../../styles/coach/cf.css';
 import { hrefFor } from '../../data/nav';
 import type { ItemId } from '../../data/site';
 import { useDict, type Locale } from '../../i18n';
@@ -16,17 +16,17 @@ const common = coachCommon[locale];
 const items = t.nav.items as Record<string, { name: string; desc: string }>;
 ---
 
-<section class="section aia" aria-labelledby="aia-title">
-  <div class="container">
-    <h2 id="aia-title" class="aia__title">{common.also}</h2>
-    <ul class="aia__list">
+<section class="cf-sec cf-sec--tight" aria-labelledby="aia-title">
+  <div class="wrap">
+    <h2 id="aia-title" class="t-title rv">{common.also}</h2>
+    <ul class="cf-also__list">
       {
         ids.map((id, i) => (
-          <li data-reveal style={`--reveal-i:${i}`}>
-            <a class="aia__card" href={hrefFor(id, locale)}>
-              <span class="aia__text">
-                <span class="aia__name">{items[id].name}</span>
-                <span class="aia__desc">{items[id].desc}</span>
+          <li class="rv" style={`--i:${i}`}>
+            <a class="cf-also__card" href={hrefFor(id, locale)}>
+              <span>
+                <span class="cf-also__name">{items[id].name}</span>
+                <span class="cf-also__desc">{items[id].desc}</span>
               </span>
               <Icon name="arrow-right" size={22} />
             </a>
@@ -36,76 +36,3 @@ const items = t.nav.items as Record<string, { name: string; desc: string }>;
     </ul>
   </div>
 </section>
-
-<style>
-  .aia {
-    padding-block: 72px 80px;
-  }
-  .aia__title {
-    font-size: 24px;
-    line-height: 30px;
-  }
-  .aia__list {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 20px;
-    margin: 28px 0 0;
-    padding: 0;
-    list-style: none;
-  }
-  .aia__card {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 16px;
-    height: 100%;
-    min-height: 88px;
-    padding: 20px 24px;
-    border: 1px solid var(--line);
-    border-radius: var(--radius-card);
-    background: var(--bg);
-    color: var(--ink);
-    text-decoration: none;
-    transition:
-      border-color 0.2s,
-      transform 0.2s var(--ease-out),
-      box-shadow 0.2s;
-  }
-  .aia__card:hover {
-    border-color: var(--cyan);
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-pop);
-  }
-  .aia__card :global(svg) {
-    flex: none;
-    color: var(--cyan-ink);
-    transition: transform 0.2s var(--ease-out);
-  }
-  .aia__card:hover :global(svg) {
-    transform: translateX(4px);
-  }
-  .aia__text {
-    display: grid;
-    gap: 4px;
-  }
-  .aia__name {
-    font-family: var(--font-display);
-    font-size: 18px;
-    font-weight: 600;
-    line-height: 24px;
-  }
-  .aia__desc {
-    color: var(--ink-2);
-    font-size: 15px;
-    line-height: 22px;
-  }
-  @media (max-width: 900px) {
-    .aia {
-      padding-block: 56px 64px;
-    }
-    .aia__list {
-      grid-template-columns: minmax(0, 1fr);
-      gap: 12px;
-    }
-  }
-</style>

@@ -1,5 +1,6 @@
 ---
 import '../../styles/coach.css';
+import '../../styles/coach/cf.css';
 import CoachIcon from './CoachIcon.astro';
 
 interface Item {
@@ -17,19 +18,19 @@ interface Props {
   open?: number;
   /** Accessible name for the group of rows. */
   label: string;
-  /** Soft surface plate behind the stage. */
-  plate?: boolean;
+  /** Clip in public/home/media shown behind the screens (WebM + MP4 + WebP poster). */
+  backdrop?: string;
   /** Wider stage column. */
   wide?: boolean;
 }
-const { id, items, open = 0, label, plate = false, wide = false } = Astro.props;
+const { id, items, open = 0, label, backdrop, wide = false } = Astro.props;
 
 // Each screen is rendered twice: once in the stage beside the rows (wide screens) and once inside
 // the open row (narrow screens). Screens are illustrations: no ids, nothing focusable.
 const screens = await Promise.all(items.map((_, i) => Astro.slots.render(`screen-${i}`)));
 ---
 
-<div class:list={['acc', { 'acc--plate': plate, 'acc--wide': wide }]} data-accordion role="group" aria-label={label}>
+<div class:list={['acc', { 'acc--wide': wide }]} data-accordion role="group" aria-label={label}>
   <div class="acc__list">
     {
       items.map((item, i) => (
@@ -66,10 +67,22 @@ const screens = await Promise.all(items.map((_, i) => Astro.slots.render(`screen
       ))
     }
   </div>
-  <div class="acc__stage" aria-hidden="true">
-    <div class="acc__plate xf">
+  <div class="acc__stage media-frame" aria-hidden="true">
+    {
+      backdrop && (
+        <>
+          <video muted playsinline loop preload="none" data-clip data-poster={`/home/media/${backdrop}.webp`} tabindex="-1">
+            <source src={`/home/media/${backdrop}.webm`} type="video/webm" />
+            <source src={`/home/media/${backdrop}.mp4`} type="video/mp4" />
+          </video>
+          <div class="vid-shade"></div>
+        </>
+      )
+    }
+    <div class="acc__plate xf reading">
       {screens.map((html, i) => <div class="acc__screen" data-active={i === open ? '' : undefined} set:html={html} />)}
     </div>
+    <slot name="overlay" />
   </div>
 </div>
 
@@ -77,32 +90,40 @@ const screens = await Promise.all(items.map((_, i) => Astro.slots.render(`screen
   .acc {
     display: grid;
     grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
-    gap: clamp(32px, 5vw, 72px);
+    gap: clamp(28px, 4.5vw, 72px);
     align-items: center;
   }
   .acc--wide {
     grid-template-columns: minmax(0, 4fr) minmax(0, 8fr);
   }
   .acc__list {
-    border-top: 1px solid var(--line);
+    display: grid;
+    gap: 10px;
   }
   .acc__item {
     position: relative;
-    border-bottom: 1px solid var(--line);
-    transition: background-color 0.25s;
+    overflow: hidden;
+    border: 1px solid var(--line);
+    border-radius: var(--r-md);
+    transition:
+      background-color 0.3s,
+      border-color 0.3s,
+      box-shadow 0.3s;
   }
   .acc__item::before {
     content: '';
     position: absolute;
     inset: 0 auto 0 0;
-    width: var(--lane);
-    background: var(--cyan);
+    width: 4px;
+    background: var(--ac);
     transform: scaleY(0);
     transform-origin: top;
-    transition: transform 0.25s var(--ease-out);
+    transition: transform 0.35s var(--e-out);
   }
   .acc__item[data-open] {
+    border-color: color-mix(in srgb, var(--ac) 55%, var(--line));
     background: var(--surface);
+    box-shadow: 0 24px 50px -30px color-mix(in srgb, var(--ac) 80%, transparent);
   }
   .acc__item[data-open]::before {
     transform: none;
@@ -123,29 +144,34 @@ const screens = await Promise.all(items.map((_, i) => Astro.slots.render(`screen
     border-radius: 0;
     background: none;
     color: var(--ink);
-    font-family: var(--font-display);
-    font-size: 20px;
-    font-weight: 600;
-    line-height: 26px;
+    font-family: var(--f-display);
+    font-size: clamp(18px, 1.5vw, 21px);
+    font-weight: 700;
+    line-height: 1.2;
     text-align: left;
     cursor: pointer;
   }
   .acc__btn:hover .acc__title {
-    color: var(--cyan-ink);
+    color: var(--ac-ink);
   }
   .acc__btn:focus-visible {
     outline-offset: -3px;
-    border-radius: 0;
+    border-radius: var(--r-md);
   }
   .acc__icon {
     display: grid;
     flex: none;
     place-items: center;
-    color: var(--ink-2);
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    background: color-mix(in srgb, var(--ac) 16%, transparent);
+    color: var(--ac-ink);
   }
   .acc__title {
     flex: 1;
     min-width: 0;
+    transition: color 0.2s;
   }
   .acc__ai {
     display: grid;
@@ -170,7 +196,7 @@ const screens = await Promise.all(items.map((_, i) => Astro.slots.render(`screen
     border-radius: 1px;
     background: currentColor;
     transition:
-      transform 0.25s var(--ease-out),
+      transform 0.25s var(--e-out),
       opacity 0.25s;
   }
   .acc__pm::after {
@@ -186,8 +212,8 @@ const screens = await Promise.all(items.map((_, i) => Astro.slots.render(`screen
     grid-template-rows: 0fr;
     visibility: hidden;
     transition:
-      grid-template-rows 0.25s var(--ease-out),
-      visibility 0s linear 0.25s;
+      grid-template-rows 0.3s var(--e-out),
+      visibility 0s linear 0.3s;
   }
   .acc__item[data-open] .acc__panel {
     grid-template-rows: 1fr;
@@ -199,10 +225,10 @@ const screens = await Promise.all(items.map((_, i) => Astro.slots.render(`screen
     overflow: hidden;
   }
   .acc__body {
-    padding: 0 24px 22px;
+    padding: 0 24px 22px 78px;
     color: var(--ink-2);
-    font-size: 18px;
-    line-height: 27px;
+    font-size: 17px;
+    line-height: 26px;
   }
   .acc__inline {
     display: none;
@@ -214,23 +240,42 @@ const screens = await Promise.all(items.map((_, i) => Astro.slots.render(`screen
     visibility: visible;
   }
 
+  /* The stage is a dark media frame; the screens float over the clip and follow the page theme. */
   .acc__stage {
     min-width: 0;
+    padding: clamp(24px, 3.4vw, 52px);
+    border-radius: var(--r-xl);
+    background: #040a1a;
+    box-shadow: 0 50px 110px -50px color-mix(in srgb, var(--ac) 70%, transparent);
   }
-  .acc--plate .acc__plate {
-    padding: clamp(24px, 4vw, 56px);
-    border-radius: 20px;
-    background: var(--surface);
+  .acc__stage > video {
+    opacity: 0.85;
   }
   .acc__plate {
+    position: relative;
+    z-index: 2;
     align-items: center;
     justify-items: center;
+    background: none;
   }
   .acc__screen {
     width: 100%;
     min-width: 0;
     display: grid;
     justify-items: center;
+  }
+  .acc__screen[data-active] {
+    animation: accIn 0.7s var(--e-out) both;
+  }
+  @keyframes accIn {
+    from {
+      transform: translateY(26px) scale(0.96);
+      filter: blur(6px);
+    }
+    to {
+      transform: none;
+      filter: none;
+    }
   }
 
   @media (max-width: 960px) {
@@ -251,7 +296,6 @@ const screens = await Promise.all(items.map((_, i) => Astro.slots.render(`screen
     }
     .acc__btn {
       padding-inline: 20px 16px;
-      font-size: 18px;
     }
   }
 </style>

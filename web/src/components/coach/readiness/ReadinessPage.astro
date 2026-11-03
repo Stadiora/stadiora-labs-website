@@ -1,14 +1,13 @@
 ---
 import { readinessCopy } from '../../../i18n/pages/readiness';
 import { coachCommon } from '../../../i18n/pages/coach-common';
-import { site } from '../../../data/site';
 import type { Locale } from '../../../i18n';
 import ReadinessCard from '../../ui/ReadinessCard.astro';
-import FeatureHero from '../FeatureHero.astro';
+import CoachHero from '../CoachHero.astro';
+import CoachFinal from '../CoachFinal.astro';
 import Accordion from '../Accordion.astro';
 import HoverRevealRow from '../HoverRevealRow.astro';
 import AlsoInAria from '../AlsoInAria.astro';
-import CtaBand from '../CtaBand.astro';
 import MetricPhone from './MetricPhone.astro';
 import CheckinPhone from './CheckinPhone.astro';
 import ReadinessPhone from './ReadinessPhone.astro';
@@ -28,81 +27,154 @@ const common = coachCommon[locale];
 const p = c.phones;
 ---
 
-<FeatureHero
-  locale={locale}
-  variant="split"
-  popAt="inside"
-  eyebrow={c.hero.eyebrow}
-  title={c.hero.title}
-  emphasis={c.hero.emphasis}
-  sub={c.hero.sub}
-  primary={{ label: common.startFree, href: site.signUp }}
-  secondary={{ label: c.hero.secondary, href: `#${c.tracks.id}` }}
-  photo={{ slot: 'p3-readiness', alt: c.hero.photoAlt, ratio: '4/3', sizes: '(max-width: 900px) 100vw, 680px' }}
-  pos="50% 50%"
->
-  <ReadinessCard slot="pop" label={c.hero.card.label} value={c.hero.card.value} status={c.hero.card.status} />
-</FeatureHero>
+<div class="cf-page rd" data-accent="violet">
+  <CoachHero
+    locale={locale}
+    eyebrow={c.hero.eyebrow}
+    title={c.hero.title}
+    emphasis={c.hero.emphasis}
+    sub={c.hero.sub}
+    secondary={{ label: c.hero.secondary, href: `#${c.tracks.id}` }}
+    clip="coach-readiness"
+  >
+    <Fragment slot="overlay">
+      <div class="rd-pop reading" data-depth="14">
+        <ReadinessCard label={c.hero.card.label} value={c.hero.card.value} status={c.hero.card.status} animate />
+      </div>
+      <div class="cf-chip glass rd-breath" style="right:5%;top:9%;--fd:-3s" data-depth="18">
+        <i class="rd-breath__orb"></i>
+        <span><b>{c.calm.cards[0].label}</b><small>{c.calm.cards[0].screen.cue}</small></span>
+      </div>
+    </Fragment>
+  </CoachHero>
 
-<section id={c.tracks.id} class="section rd-tracks" aria-labelledby="rd-tracks-title">
-  <div class="container">
-    <div class="section-head" data-reveal>
-      <p class="co-eyebrow">{c.tracks.eyebrow}</p>
-      <h2 id="rd-tracks-title">{c.tracks.title}</h2>
+  <section id={c.tracks.id} class="cf-stage impact rd-tracks" data-section data-accent="violet" aria-labelledby="rd-tracks-title">
+    <div class="mesh" aria-hidden="true"><i class="b b5"></i><i class="b b1"></i><i class="b b2"></i><i class="b b3"></i><i class="b b4"></i><i class="vig"></i></div>
+    <div class="wrap">
+      <div class="cf-head">
+        <div>
+          <p class="eyebrow rv">{c.tracks.eyebrow}</p>
+          <h2 id="rd-tracks-title" class="d d2 lines"><span><span>{c.tracks.title}</span></span></h2>
+        </div>
+      </div>
+      <div class="rv" style="--i:1">
+        <Accordion id="rd" items={c.tracks.rows} open={c.tracks.defaultOpen} label={c.tracks.title} backdrop="ai-bg">
+          <MetricPhone slot="screen-0" title={p.sleep.title} value={p.sleep.value} sub={p.sleep.sub} source={p.sleep.source} days={p.sleep.days} values={p.sleep.hours} max={9} />
+          <MetricPhone slot="screen-1" title={p.steps.title} value={p.steps.value} sub={p.steps.sub} source={p.steps.source} days={p.steps.days} values={p.steps.counts} max={12000} />
+          <CheckinPhone slot="screen-2" copy={p.checkin} />
+          <ReadinessPhone slot="screen-3" copy={p.readiness} date={p.date} />
+          <GoalsPhone slot="screen-4" copy={p.goals} />
+          <MindPhone slot="screen-5" copy={p.mind} />
+          <div slot="overlay" class="rd-stage-pop reading">
+            <ReadinessCard label={c.hero.card.label} value={c.hero.card.value} status={c.hero.card.status} animate />
+          </div>
+          <div slot="overlay" class="cf-chip glass rd-breath rd-stage-breath">
+            <i class="rd-breath__orb"></i>
+            <span><b>{c.calm.cards[0].label}</b><small>{c.calm.cards[0].screen.timer}</small></span>
+          </div>
+        </Accordion>
+      </div>
+      <p class="cf-demo">{common.demoNote}</p>
     </div>
-    <Accordion id="rd" items={c.tracks.rows} open={c.tracks.defaultOpen} label={c.tracks.title} plate>
-      <MetricPhone slot="screen-0" title={p.sleep.title} value={p.sleep.value} sub={p.sleep.sub} source={p.sleep.source} days={p.sleep.days} values={p.sleep.hours} max={9} />
-      <MetricPhone slot="screen-1" title={p.steps.title} value={p.steps.value} sub={p.steps.sub} source={p.steps.source} days={p.steps.days} values={p.steps.counts} max={12000} />
-      <CheckinPhone slot="screen-2" copy={p.checkin} />
-      <ReadinessPhone slot="screen-3" copy={p.readiness} date={p.date} />
-      <GoalsPhone slot="screen-4" copy={p.goals} />
-      <MindPhone slot="screen-5" copy={p.mind} />
-    </Accordion>
-    <p class="co-demo">{common.demoNote}</p>
-  </div>
-</section>
+  </section>
 
-<section class="section section--surface rd-calm" aria-labelledby="rd-calm-title">
-  <div class="container">
-    <div class="section-head" data-reveal>
-      <h2 id="rd-calm-title">{c.calm.title}</h2>
+  <section class="cf-sec rd-calm" aria-labelledby="rd-calm-title">
+    <div class="wrap">
+      <div class="cf-head">
+        <div>
+          <h2 id="rd-calm-title" class="d d3 lines"><span><span>{c.calm.title}</span></span></h2>
+        </div>
+      </div>
+      <div class="rv">
+        <HoverRevealRow locale={locale} label={c.calm.rowLabel} cards={c.calm.cards}>
+          <BreathingPhone slot="phone-0" copy={c.calm.cards[0].screen} />
+          <JournalPhone slot="phone-1" copy={c.calm.cards[1].screen} />
+          <MoodPhone slot="phone-2" copy={c.calm.cards[2].screen} />
+        </HoverRevealRow>
+      </div>
     </div>
-    <HoverRevealRow locale={locale} label={c.calm.rowLabel} cards={c.calm.cards}>
-      <BreathingPhone slot="phone-0" copy={c.calm.cards[0].screen} />
-      <JournalPhone slot="phone-1" copy={c.calm.cards[1].screen} />
-      <MoodPhone slot="phone-2" copy={c.calm.cards[2].screen} />
-    </HoverRevealRow>
-  </div>
-</section>
+  </section>
 
-<section class="section rd-coach" aria-labelledby="rd-coach-title">
-  <div class="container rd-coach__grid">
-    <div data-reveal>
-      <h2 id="rd-coach-title">{c.coach.title}</h2>
-      <p class="rd-coach__line">{c.coach.line}</p>
+  <section class="cf-sec cf-sec--alt rd-coach" aria-labelledby="rd-coach-title">
+    <div class="wrap rd-coach__grid">
+      <div class="rv">
+        <h2 id="rd-coach-title" class="d d3 lines"><span><span>{c.coach.title}</span></span></h2>
+        <p class="lead rd-coach__line">{c.coach.line}</p>
+      </div>
+      <div class="rv" style="--i:1">
+        <RosterTable copy={c.coach.table} />
+      </div>
     </div>
-    <div data-reveal style="--reveal-i:1">
-      <RosterTable copy={c.coach.table} />
+    <div class="wrap">
+      <p class="rd-foot">{c.footnote}</p>
     </div>
-  </div>
-  <div class="container">
-    <p class="rd-foot">{c.footnote}</p>
-  </div>
-</section>
+  </section>
 
-<AlsoInAria locale={locale} ids={c.also} />
-<CtaBand locale={locale} />
+  <AlsoInAria locale={locale} ids={c.also} />
+  <CoachFinal locale={locale} />
+</div>
 
 <style>
-  .rd-tracks {
-    padding-top: 64px;
+  .rd-pop {
+    position: absolute;
+    left: 5%;
+    bottom: 15%;
+    width: min(236px, 62%);
+    border-radius: var(--r-md);
+    background: none;
+    animation: cfFloat 7s ease-in-out infinite;
   }
-  .rd-tracks :global(.phone) {
-    --phone-w: 264px;
+  .rd-pop :global(.rcard) {
+    width: 100%;
+    padding: 14px 18px 16px;
   }
-  .rd-tracks .section-head,
-  .rd-calm .section-head {
-    margin-bottom: 40px;
+  .rd-pop :global(.rcard__value) {
+    font-size: 48px;
+    line-height: 54px;
+  }
+  .rd-stage-pop {
+    position: absolute;
+    left: 4%;
+    bottom: 9%;
+    z-index: 3;
+    border-radius: var(--r-md);
+    background: none;
+    animation: cfFloat 7s ease-in-out infinite;
+  }
+  .rd-stage-pop :global(.rcard) {
+    width: 210px;
+    padding: 12px 16px 14px;
+  }
+  .rd-stage-pop :global(.rcard__value) {
+    font-size: 44px;
+    line-height: 50px;
+  }
+  .rd-stage-breath {
+    right: 4%;
+    top: 8%;
+    z-index: 3;
+    --fd: -3s;
+  }
+  .rd-breath__orb {
+    flex: none;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #fff, var(--ac) 60%);
+    box-shadow: 0 0 18px 2px color-mix(in srgb, var(--ac) 70%, transparent);
+    animation: rdBreath 8s ease-in-out infinite;
+  }
+  @keyframes rdBreath {
+    0%,
+    100% {
+      scale: 0.7;
+    }
+    50% {
+      scale: 1.15;
+    }
+  }
+  .rd-calm :global(.hrc) {
+    border-radius: var(--r-lg);
   }
   .rd-coach__grid {
     display: grid;
@@ -110,17 +182,9 @@ const p = c.phones;
     gap: clamp(32px, 6vw, 96px);
     align-items: center;
   }
-  .rd-coach h2 {
-    max-width: 14ch;
-    font-size: clamp(28px, 3vw, 40px);
-    line-height: 1.15;
-  }
   .rd-coach__line {
-    margin-top: 16px;
+    margin-top: 20px;
     max-width: 34ch;
-    color: var(--ink-2);
-    font-size: 18px;
-    line-height: 28px;
   }
   .rd-foot {
     margin-top: 40px;
@@ -130,13 +194,16 @@ const p = c.phones;
     font-size: 14px;
     line-height: 20px;
   }
-
   @media (max-width: 960px) {
     .rd-coach__grid {
       grid-template-columns: minmax(0, 1fr);
     }
-    .rd-coach h2 {
-      max-width: none;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .rd-pop,
+    .rd-stage-pop,
+    .rd-breath__orb {
+      animation: none;
     }
   }
 </style>

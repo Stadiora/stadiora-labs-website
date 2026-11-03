@@ -58,13 +58,26 @@ node scripts/evidence.mjs --engage-only # just the Platform page checks, EN and 
   Floodlight components (glass pill nav styles, buttons, reveal, mesh and orbit motif, marquee), `motion.css` the reduced-motion rules.
 - Photos: drop a file named after its slot into `src/assets/photos/`; `src/data/photo-alt.json` holds EN and ES alt text.
   A missing slot renders a labelled placeholder and `npm run verify` fails on it.
-- Platform Coach pages (`src/pages/{,es/}platform/{programs,nutrition,readiness,power-lab}/`): thin wrappers around
-  `src/components/coach/{programs,nutrition,readiness,power-lab}/*Page.astro`; all copy is in `src/i18n/pages/` (EN and ES, ES typed
-  against EN) and the shared parts are in `src/components/coach/` and `src/styles/coach.css`. `scripts/lib/platform-coach-verify.mjs`
-  (run by `npm run verify`) fails the build on an unbacked claim, a competitor name, a missing "estimates" or "not a medical check"
-  footnote, a broken hreflang pair or a missing demo link. `scripts/lib/platform-coach-checks.mjs` (run by `evidence`) covers overflow,
-  sideways clipping and overlapping text at 390/1024/1280/1440, WCAG AA in both themes, alt text, heading order, the keyboard walk,
-  the accordion and hover-reveal behaviour, the count-up and a no-JavaScript render.
+- Platform Coach pages (`src/pages/{,es/}platform/{programs,nutrition,readiness,power-lab}/`): thin wrappers (they pass `hero` to `Base`
+  for the transparent nav) around `src/components/coach/{programs,nutrition,readiness,power-lab}/*Page.astro`; all copy is in
+  `src/i18n/pages/` (EN and ES, ES typed against EN). Every page is the Floodlight pattern: `CoachHero` (dark `.impact` hero with mesh,
+  orbits and a moving clip or live HTML stage on the right, with HTML overlay words from i18n), one or more dark `.cf-stage.impact` stages,
+  `AlsoInAria` and `CoachFinal` (the home closing band over the `night-stadium` clip). The product screens (`StepFlow`, `Accordion`,
+  `HoverRevealRow`, `ChartBaseline`, the phone and browser frames) are unchanged in content; `Accordion` has an `overlay` slot for live
+  cards over its stage. Styles: the Floodlight layer is `src/styles/coach/cf.css` (every selector starts `cf-` or `.cf-page`), the
+  product-screen styles stay in `src/styles/coach.css`. Scripts: `src/scripts/coach/index.ts` (imported by `CoachHero`) starts the AI
+  demo and the motion kit. Add new coach motion as CSS keyframes that stop under `.is-off`, or through the kit's `.rv`, `.lines`,
+  `.count` and `[data-depth]`/`[data-tilt]`.
+- Coach clips are `public/home/media/coach-{programs,nutrition,readiness,powerlab}.{webm,mp4,webp}`: text-free, rendered by
+  `node scripts/clips/render.mjs` from `scripts/clips/stages/*.html` (stage HTML over the photos in `scripts/clips/src/`; needs
+  Playwright and ffmpeg). Never use the clips with words in the picture (`pillar-*`, `ai-demo`, `planner-demo`) on these pages.
+- Coach guards: `scripts/lib/platform-coach-verify.mjs` (run by `npm run verify`) fails the build on an unbacked claim, a competitor
+  name, a missing "estimates" or "not a medical check" footnote, a broken hreflang pair or a missing demo link;
+  `scripts/lib/platform-coach-floodlight.mjs` (called from it) fails on a page without the dark hero, mesh, orbits, a dark stage, the
+  `night-stadium` closing band, its own moving hero clip, or on a baked-text clip or an opening ¿ or ¡ in Spanish, and on a coach
+  stylesheet without its no-JS and reduced-motion rules. `scripts/lib/platform-coach-checks.mjs` (run by `evidence`) covers overflow,
+  sideways clipping and overlapping text at 390/1024/1280/1440, WCAG AA in both themes (the shared `contrast.mjs` probe), alt text,
+  heading order, the keyboard walk, the accordion and hover-reveal behaviour, the count-up and a no-JavaScript render.
 - Motion library: `src/scripts/motion/kit.ts` (small TypeScript, no dependencies). Anything that moves on its own is an `autoplayer()`
   (or a `group()`, `autotabs()` or a `video[data-clip]`, which use it): it runs only while on screen, with the tab visible, with no
   pointer hovering and no focus inside its scope, and never under `prefers-reduced-motion`. It mirrors its state to `data-ap`
