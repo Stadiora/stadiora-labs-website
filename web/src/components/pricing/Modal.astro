@@ -1,0 +1,115 @@
+---
+interface Props {
+  id: string;
+  title: string;
+  closeLabel: string;
+}
+const { id, title, closeLabel } = Astro.props;
+---
+
+<dialog class="modal" id={id} aria-labelledby={`${id}-title`} data-modal>
+  <div class="modal__card">
+    <button class="modal__close" type="button" aria-label={closeLabel} data-modal-close>
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" aria-hidden="true" focusable="false">
+        <path d="M6 6l12 12M18 6 6 18"></path>
+      </svg>
+    </button>
+    <h3 class="modal__title" id={`${id}-title`}>{title}</h3>
+    <div class="modal__body"><slot /></div>
+  </div>
+</dialog>
+
+<style>
+  .modal {
+    width: min(520px, calc(100% - 32px));
+    max-height: calc(100dvh - 32px);
+    padding: 0;
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    background: var(--bg);
+    color: var(--ink);
+    box-shadow: var(--shadow-lift);
+    overflow: auto;
+  }
+  .modal::backdrop {
+    background: rgb(3 9 21 / 0.6);
+  }
+  .modal__card {
+    position: relative;
+    padding: 36px 32px 32px;
+  }
+  .modal__close {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    border: 0;
+    border-radius: 50%;
+    background: none;
+    color: var(--ink-2);
+    cursor: pointer;
+  }
+  .modal__close:hover {
+    background: var(--surface);
+    color: var(--ink);
+  }
+  .modal__title {
+    padding-right: 36px;
+    font-size: 26px;
+    line-height: 1.2;
+  }
+  .modal__body {
+    margin-top: 12px;
+    color: var(--ink-2);
+    font-size: 17px;
+    line-height: 26px;
+  }
+  .modal__body > :global(* + *) {
+    margin-top: 14px;
+  }
+  .modal__body :global(.modal__fact) {
+    color: var(--ink);
+    font-family: var(--font-display);
+    font-size: 22px;
+    line-height: 30px;
+    font-weight: 600;
+  }
+  .modal__body :global(.modal__note) {
+    font-size: 15px;
+    line-height: 22px;
+  }
+  .modal__body :global(.modal__actions) {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 22px;
+  }
+
+  /* Without JavaScript the details are shown inline instead of in a dialog. */
+  :global(html:not(.js)) .modal {
+    display: block;
+    position: static;
+    width: 100%;
+    max-height: none;
+    margin: 0;
+    box-shadow: none;
+  }
+  :global(html:not(.js)) .modal__close {
+    display: none;
+  }
+  :global(html:has(dialog.modal[open])) {
+    overflow: hidden;
+  }
+
+  @media (max-width: 720px) {
+    .modal__card {
+      padding: 32px 20px 24px;
+    }
+    .modal__title {
+      font-size: 22px;
+    }
+  }
+</style>

@@ -129,7 +129,7 @@ const appStores: Record<string, { label: string; href: string }[]> = {
         </li>
 
         <li class="nav__item">
-          <a class="nav__link" href={hrefFor('pricing', locale)}>{t.nav.pricing}</a>
+          <a class="nav__link" href={hrefFor('pricing', locale)} aria-current={path === '/pricing/' ? 'page' : undefined}>{t.nav.pricing}</a>
         </li>
 
         <li class="nav__item" data-mega-item>

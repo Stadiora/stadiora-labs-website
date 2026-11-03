@@ -1,0 +1,213 @@
+---
+import type { Locale } from '../../i18n';
+import { athleteBands, defaultBand } from '../../data/pricing';
+import type { PricingCopy } from '../../i18n/pages/pricing';
+import Icon from '../ui/Icon.astro';
+
+interface Props {
+  locale: Locale;
+  copy: PricingCopy;
+}
+const { copy } = Astro.props;
+const c = copy.controls;
+---
+
+<div class="controls" role="group" aria-label={c.label} data-controls>
+  <fieldset class="seg">
+    <legend class="sr-only">{c.billingLegend}</legend>
+    <label class="seg__opt">
+      <input type="radio" name="pricing-billing" value="monthly" checked data-billing />
+      <span>{c.monthly}</span>
+    </label>
+    <label class="seg__opt">
+      <input type="radio" name="pricing-billing" value="annual" data-billing />
+      <span>{c.annual}</span>
+    </label>
+  </fieldset>
+  <p class="saves"><span class="saves__dot" aria-hidden="true"></span>{c.annualSaves}</p>
+  <span class="controls__rule" aria-hidden="true"></span>
+  <label class="athletes">
+    <span class="athletes__label">{c.athletes}</span>
+    <select name="pricing-athletes" data-athletes>
+      {athleteBands.map((n) => <option value={n} selected={n === defaultBand}>{n.toLocaleString('en-US')}</option>)}
+    </select>
+    <Icon name="chevron-down" size={18} class="athletes__chev" />
+  </label>
+  <p class="currency">{c.currency}</p>
+</div>
+<p class="controls-note">{c.noScript}</p>
+
+<style>
+  .controls {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 14px 22px;
+  }
+
+  .seg {
+    display: inline-flex;
+    margin: 0;
+    padding: 3px;
+    min-width: 0;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: var(--bg);
+  }
+  .seg__opt {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 112px;
+    min-height: 44px;
+    padding: 0 22px;
+    border-radius: 9px;
+    color: var(--ink);
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition:
+      background-color 0.2s,
+      color 0.2s;
+  }
+  .seg__opt input {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    opacity: 0;
+    cursor: pointer;
+  }
+  .seg__opt:has(input:checked) {
+    background: var(--btn-bg);
+    color: var(--btn-ink);
+  }
+  .seg__opt:has(input:focus-visible) {
+    outline: 3px solid var(--cyan);
+    outline-offset: 2px;
+    box-shadow: 0 0 0 2px var(--ink);
+  }
+  .seg__opt input:focus-visible {
+    outline: none;
+    box-shadow: none;
+  }
+
+  .saves {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--mint-ink);
+    font-size: 15px;
+    font-weight: 500;
+  }
+  .saves__dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--mint);
+  }
+  .controls__rule {
+    width: 1px;
+    height: 28px;
+    background: var(--line);
+  }
+
+  .athletes {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 50px;
+    padding: 0 14px 0 18px;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: var(--bg);
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+  }
+  .athletes:has(select:focus-visible) {
+    outline: 3px solid var(--cyan);
+    outline-offset: 2px;
+    box-shadow: 0 0 0 2px var(--ink);
+  }
+  .athletes__label {
+    color: var(--ink);
+  }
+  .athletes select {
+    min-height: 44px;
+    padding: 0 26px 0 0;
+    border: 0;
+    background: transparent;
+    color: var(--ink);
+    font: inherit;
+    appearance: none;
+    cursor: pointer;
+  }
+  .athletes select:focus-visible {
+    outline: none;
+    box-shadow: none;
+  }
+  .athletes select option {
+    background: var(--bg);
+    color: var(--ink);
+  }
+  .athletes :global(.athletes__chev) {
+    position: absolute;
+    right: 14px;
+    top: 50%;
+    translate: 0 -50%;
+    pointer-events: none;
+  }
+
+  .currency {
+    color: var(--ink-3);
+    font-size: 14px;
+    line-height: 20px;
+  }
+
+  .controls-note {
+    display: none;
+    max-width: 640px;
+    margin: 0 auto;
+    color: var(--ink-2);
+    font-size: 16px;
+    line-height: 24px;
+    text-align: center;
+  }
+  :global(html:not(.js)) .controls {
+    display: none;
+  }
+  :global(html:not(.js)) .controls-note {
+    display: block;
+  }
+
+  @media (max-width: 720px) {
+    .controls {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 12px;
+    }
+    .seg {
+      display: flex;
+    }
+    .seg__opt {
+      flex: 1;
+      min-width: 0;
+    }
+    .saves,
+    .currency {
+      justify-content: center;
+      text-align: center;
+    }
+    .controls__rule {
+      display: none;
+    }
+    .athletes {
+      justify-content: flex-start;
+    }
+  }
+</style>

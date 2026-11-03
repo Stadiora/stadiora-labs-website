@@ -1,0 +1,114 @@
+---
+import type { Locale } from '../../i18n';
+import { addOns, education, usd } from '../../data/pricing';
+import type { PricingCopy } from '../../i18n/pages/pricing';
+import Modal from './Modal.astro';
+import { pricingLinks } from './links';
+
+interface Props {
+  locale: Locale;
+  copy: PricingCopy;
+}
+const { locale, copy } = Astro.props;
+const links = pricingLinks(locale);
+const a = copy.addons;
+const close = copy.modal.close;
+// The price leads the sentence, so it can be swapped by region without touching the rest.
+const extraCoachRest = a.extraCoach.priceLine.replace('{amount}', '').trim();
+---
+
+<div class="modals">
+  <Modal id="addon-extra-coach" title={a.extraCoach.modalTitle} closeLabel={close}>
+    <p>{a.extraCoach.body}</p>
+    <p class="modal__fact num"><span data-extra-coach>{usd(addOns.extraCoach.us)}</span> {extraCoachRest}</p>
+    <p class="modal__note">{a.extraCoach.note}</p>
+  </Modal>
+
+  <Modal id="addon-branded-app" title={a.brandedApp.modalTitle} closeLabel={close}>
+    <p>{a.brandedApp.body}</p>
+    <p class="modal__fact num">{a.brandedApp.priceLine}</p>
+    <div class="modal__actions">
+      <a class="btn btn--primary" href={links.talk}>{a.brandedApp.cta}</a>
+    </div>
+  </Modal>
+
+  <Modal id="addon-credits" title={a.credits.modalTitle} closeLabel={close}>
+    <p>{a.credits.body}</p>
+    <div class="modal__actions">
+      <a class="btn btn--primary" href={links.talk}>{a.credits.cta}</a>
+    </div>
+  </Modal>
+
+  <Modal id="education-rates" title={copy.education.modalTitle} closeLabel={close}>
+    <p>{copy.education.intro}</p>
+    <table class="edu">
+      <caption class="sr-only">{copy.education.caption}</caption>
+      <thead>
+        <tr>
+          <th scope="col">{copy.education.colType}</th>
+          <th scope="col" class="edu__n">{copy.education.colAthletes}</th>
+          <th scope="col" class="edu__n">{copy.education.colPrice}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {
+          education.us.map((row) => (
+            <tr>
+              <th scope="row">{copy.education.rows[row.key]}</th>
+              <td class="edu__n num">{row.athletes.toLocaleString('en-US')}</td>
+              <td class="edu__n num" data-edu-rate={row.key}>{usd(row.monthly)}</td>
+            </tr>
+          ))
+        }
+      </tbody>
+    </table>
+    <p class="modal__note">{copy.education.note}</p>
+    <div class="modal__actions">
+      <a class="btn btn--primary" href={links.schools} rel="noopener">{copy.education.cta}</a>
+    </div>
+  </Modal>
+</div>
+
+<style>
+  .modals {
+    display: contents;
+  }
+  .edu {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 16px;
+    line-height: 24px;
+  }
+  .edu th,
+  .edu td {
+    padding: 12px 8px;
+    border-bottom: 1px solid var(--line);
+    text-align: left;
+  }
+  .edu thead th {
+    color: var(--ink-3);
+    font-size: 14px;
+    font-weight: 500;
+  }
+  .edu tbody th {
+    color: var(--ink);
+    font-weight: 500;
+  }
+  .edu td {
+    color: var(--ink);
+  }
+  .edu .edu__n {
+    text-align: right;
+  }
+  .edu td.edu__n[data-edu-rate] {
+    font-weight: 600;
+  }
+
+  /* Without JavaScript the four dialogs are plain content under the add-ons row. */
+  :global(html:not(.js)) .modals {
+    display: grid;
+    gap: 20px;
+    width: min(100% - 2 * var(--gutter), var(--content-max));
+    margin: 28px auto 0;
+  }
+</style>

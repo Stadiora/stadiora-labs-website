@@ -1,0 +1,180 @@
+---
+import type { Locale } from '../../i18n';
+import { addOns, usd } from '../../data/pricing';
+import type { PricingCopy } from '../../i18n/pages/pricing';
+import Icon from '../ui/Icon.astro';
+import PricingIcon from './PricingIcon.astro';
+
+interface Props {
+  locale: Locale;
+  copy: PricingCopy;
+}
+const { copy } = Astro.props;
+const a = copy.addons;
+---
+
+<section class="addons" aria-labelledby="addons-title" data-reveal>
+  <div class="container">
+    <div class="addons__panel">
+      <h2 class="addons__title" id="addons-title">{a.title}</h2>
+      <ul class="addons__list">
+        <li class="addon">
+          <span class="addon__icon"><PricingIcon name="users" /></span>
+          <div class="addon__text">
+            <p class="addon__name">{a.extraCoach.name}</p>
+            <p class="addon__price num"><span data-extra-coach>{usd(addOns.extraCoach.us)}</span><span class="addon__unit">{copy.price.unit}</span></p>
+          </div>
+          <button class="addon__more" type="button" data-open-modal="addon-extra-coach" aria-haspopup="dialog">
+            {a.more}<span class="sr-only">: {a.extraCoach.name}</span>
+            <Icon name="arrow-right" size={16} />
+          </button>
+        </li>
+        <li class="addon">
+          <span class="addon__icon"><PricingIcon name="phone" /></span>
+          <div class="addon__text">
+            <p class="addon__name">{a.brandedApp.name}</p>
+            <p class="addon__price num">{a.brandedApp.price}</p>
+          </div>
+          <button class="addon__more" type="button" data-open-modal="addon-branded-app" aria-haspopup="dialog">
+            {a.more}<span class="sr-only">: {a.brandedApp.name}</span>
+            <Icon name="arrow-right" size={16} />
+          </button>
+        </li>
+        <li class="addon">
+          <span class="addon__icon"><PricingIcon name="bars" /></span>
+          <div class="addon__text">
+            <p class="addon__name">{a.credits.name}</p>
+            <p class="addon__price addon__price--text">{a.credits.price}</p>
+          </div>
+          <button class="addon__more" type="button" data-open-modal="addon-credits" aria-haspopup="dialog">
+            {a.more}<span class="sr-only">: {a.credits.name}</span>
+            <Icon name="arrow-right" size={16} />
+          </button>
+        </li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<style>
+  .addons {
+    padding-block: 32px 0;
+  }
+  .addons__panel {
+    display: flex;
+    align-items: center;
+    gap: 16px 32px;
+    padding: 26px 32px;
+    border-radius: 18px;
+    background: var(--surface);
+  }
+  .addons__title {
+    flex: none;
+    font-size: 28px;
+    line-height: 34px;
+  }
+  .addons__list {
+    display: grid;
+    flex: 1;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    min-width: 0;
+  }
+  .addon {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+    gap: 14px;
+    min-width: 0;
+    padding-inline: 28px;
+    border-left: 1px solid var(--line);
+  }
+  .addon__icon {
+    color: var(--cyan-ink);
+  }
+  .addon__name {
+    font-size: 15px;
+    font-weight: 500;
+    line-height: 22px;
+  }
+  .addon__more {
+    grid-column: 2;
+  }
+  .addon__price {
+    color: var(--ink);
+    font-size: 20px;
+    font-weight: 600;
+    line-height: 28px;
+    letter-spacing: -0.01em;
+  }
+  .addon__price--text {
+    color: var(--ink-2);
+    font-family: var(--font-body);
+    font-size: 20px;
+    font-weight: 400;
+  }
+  .addon__unit {
+    margin-left: 4px;
+    color: var(--ink-2);
+    font-size: 16px;
+    font-weight: 400;
+  }
+  .addon__more {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 44px;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--cyan-ink);
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    text-align: left;
+  }
+  .addon__more:hover {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  /* The dialogs open from JavaScript; without it the details are listed in full below the row. */
+  :global(html:not(.js)) .addon__more {
+    display: none;
+  }
+
+  @media (max-width: 1280px) {
+    .addons__panel {
+      flex-direction: column;
+      align-items: stretch;
+    }
+    .addons__list {
+      grid-template-columns: 1fr;
+    }
+    .addon {
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      padding: 14px 0;
+      border-left: 0;
+      border-top: 1px solid var(--line);
+    }
+    .addon__more {
+      grid-column: auto;
+    }
+  }
+  @media (max-width: 720px) {
+    .addons {
+      padding-block: 24px 0;
+    }
+    .addons__panel {
+      padding: 22px 20px 8px;
+    }
+    .addons__title {
+      font-size: 24px;
+    }
+    .addon {
+      gap: 12px;
+      padding-block: 12px;
+    }
+    .addon__more {
+      font-size: 14px;
+    }
+  }
+</style>
