@@ -1,34 +1,31 @@
-/* Design tokens (DESIGN.md section 0). Light is the default; dark follows section 6.
-   Colour tokens use light-dark(); the active scheme comes from html[data-theme] (set by the
-   inline script in <head>) and falls back to the OS preference when JavaScript is off. */
+/* Design tokens: Floodlight (design/round4/DESIGN-4.md section 1). Light is the default reading theme; dark follows.
+   Colour tokens use light-dark(); the active scheme comes from html[data-theme] (set by the inline script in <head>)
+   and falls back to the OS preference when JavaScript is off. Because light-dark() resolves where a token is used,
+   `.impact` (always dark) and `.reading` (the page theme, inside an impact section) only need to set color-scheme. */
 
 @font-face {
-  font-family: 'Sora';
-  src: url('../assets/fonts/sora-latin-wght-normal.woff2') format('woff2');
-  font-weight: 100 800;
+  font-family: 'Archivo';
+  src: url('../assets/fonts/archivo-var.woff2') format('woff2');
+  font-weight: 100 900;
+  font-stretch: 62% 125%;
   font-style: normal;
   font-display: swap;
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308,
-    U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
 @font-face {
   font-family: 'Inter';
-  src: url('../assets/fonts/inter-latin-wght-normal.woff2') format('woff2');
+  src: url('../assets/fonts/inter-var.woff2') format('woff2');
   font-weight: 100 900;
   font-style: normal;
   font-display: swap;
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308,
-    U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
-/* Metric-matched fallbacks so the swap does not move the layout. */
 @font-face {
-  font-family: 'Sora Fallback';
-  src: local('Arial'), local('Liberation Sans'), local('Helvetica');
-  size-adjust: 121%;
-  ascent-override: 80%;
-  descent-override: 24%;
-  line-gap-override: 0%;
+  font-family: 'JBM';
+  src: url('../assets/fonts/jbmono-var.woff2') format('woff2');
+  font-weight: 100 800;
+  font-style: normal;
+  font-display: swap;
 }
+/* Metric-matched fallback so the swap does not move the body text. */
 @font-face {
   font-family: 'Inter Fallback';
   src: local('Arial'), local('Liberation Sans'), local('Helvetica');
@@ -38,28 +35,68 @@
   line-gap-override: 0%;
 }
 
+/* Typed custom properties: they let CSS animate an angle, a counter and a ring value. */
+@property --a {
+  syntax: '<angle>';
+  inherits: false;
+  initial-value: 0deg;
+}
+@property --n {
+  syntax: '<integer>';
+  inherits: false;
+  initial-value: 0;
+}
+@property --p {
+  syntax: '<number>';
+  inherits: false;
+  initial-value: 0;
+}
+
 :root {
   color-scheme: light;
 
+  /* Reading theme */
   --bg: light-dark(#ffffff, #060e20);
-  --surface: light-dark(#f4f7fb, #0b1730);
-  --surface-2: light-dark(#e9eef5, #12203d);
+  --surface: light-dark(#f3f6fa, #0b1730);
+  --surface-2: light-dark(#e8edf4, #12203d);
+  --surface2: var(--surface-2);
   --line: light-dark(#dce3ec, #1e2b47);
   --ink: light-dark(#08132b, #f4f7fb);
-  --ink-2: light-dark(#4a5568, #a9b4c6);
-  --ink-3: light-dark(#5b6678, #9aa7bd);
+  --ink-2: light-dark(#46536a, #a9b4c6);
+  --ink-3: light-dark(#5b6678, #93a0b6);
+  --ink2: var(--ink-2);
+  --ink3: var(--ink-3);
+  --panel: light-dark(#ffffff, #0b1730);
+  --panel-line: light-dark(#e3e9f1, #1e2b47);
 
-  --cyan: #00bef3; /* decorative only: lane line, rings, bars, focus ring */
-  --cyan-ink: light-dark(#0077a8, #33cfff); /* links and cyan text */
-  --cyan-tint: light-dark(#e6f8fe, rgb(0 190 243 / 0.12));
-  --violet: #8b5cf6; /* AI moments only */
-  --violet-ink: light-dark(#6d28d9, #b39dfb);
+  /* Brand, vivid (decorative: fills, rings, gradients, focus) and ink variants (text and links) */
+  --cyan: #00bef3;
   --mint: #34d399;
-  --mint-ink: light-dark(#047857, #34d399);
+  --violet: #8b5cf6;
+  --tartan: #ff4d5e;
   --amber: #f59e0b;
-  --amber-ink: light-dark(#b45309, #fbbf24);
+  --cyan-ink: light-dark(#0077a8, #33cfff);
+  --mint-ink: light-dark(#047857, #34d399);
+  --violet-ink: light-dark(#6d28d9, #b69cff);
+  --tartan-ink: light-dark(#c81e36, #ff7a86);
+  --amber-ink: light-dark(#b45309, #f5b454);
+  --cyan-tint: light-dark(#e6f8fe, rgb(0 190 243 / 0.12));
+  --link: var(--cyan-ink);
 
-  --band: light-dark(#08132b, #030915); /* final CTA + footer only */
+  /* Night scale: impact sections, theme-invariant */
+  --ink0: #02060f;
+  --night: #040a1a;
+  --navy: #08132b;
+  --navy2: #0b1730;
+  --navy3: #12203d;
+  --navy-line: #1e2b47;
+
+  --grad-brand: linear-gradient(100deg, #00bef3 0%, #34d399 48%, #8b5cf6 100%);
+  --grad-heat: linear-gradient(100deg, #8b5cf6 0%, #ff4d5e 55%, #ffb86b 100%);
+  --grad-iris: conic-gradient(from var(--a), #00bef3, #8b5cf6, #ff4d5e, #34d399, #00bef3);
+
+  /* Chrome that is dark in both themes: final CTA, footer */
+  --band: #02060f;
   --band-ink: #ffffff;
   --band-ink-2: #b9c4d8;
   --band-line: rgb(255 255 255 / 0.14);
@@ -69,28 +106,56 @@
   --btn-ink: light-dark(#ffffff, #08132b);
   --btn-line: var(--ink);
 
-  --nav-bg: light-dark(rgb(255 255 255 / 0.85), rgb(6 14 32 / 0.85));
-  --scrim: rgb(8 19 43 / 0.4);
+  --nav-bg: rgb(4 10 26 / 0.9);
+  --scrim: rgb(2 6 15 / 0.45);
 
+  --shadow-1: light-dark(0 1px 2px rgb(8 19 43 / 0.06), 0 1px 0 rgb(255 255 255 / 0.04) inset), 0 8px 24px light-dark(rgb(8 19 43 / 0.08), rgb(0 0 0 / 0.4));
   --shadow-pop: 0 12px 32px light-dark(rgb(8 19 43 / 0.1), rgb(0 0 0 / 0.45));
   --shadow-lift: 0 18px 40px light-dark(rgb(8 19 43 / 0.16), rgb(0 0 0 / 0.55));
   --pop-border: light-dark(transparent, var(--line));
 
-  --radius-card: 14px;
-  --radius-ctl: 10px;
+  /* Shape */
+  --radius-card: 16px;
+  --radius-ctl: 12px;
+  --r-xl: 32px;
+  --r-lg: 24px;
+  --r-md: 16px;
+  --r-sm: 10px;
+  --r-pill: 999px;
   --lane: 3px;
 
-  --font-display: 'Sora', 'Sora Fallback', system-ui, sans-serif;
-  --font-body: 'Inter', 'Inter Fallback', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  /* Type */
+  --f-display: 'Archivo', Impact, 'Arial Narrow', sans-serif;
+  --f-text: 'Inter', 'Inter Fallback', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --f-mono: 'JBM', ui-monospace, Menlo, monospace;
+  --font-display: var(--f-display);
+  --font-body: var(--f-text);
+  --fs-hero: clamp(54px, 7.6vw, 128px);
+  --fs-d1: clamp(48px, 7.2vw, 124px);
+  --fs-d2: clamp(40px, 5.4vw, 92px);
+  --fs-d3: clamp(32px, 3.7vw, 60px);
+  --fs-h3: clamp(28px, 2.6vw, 44px);
+  --fs-lead: clamp(17px, 1.35vw, 20px);
 
-  --nav-h: 80px;
-  --nav-h-compact: 60px;
-  --gutter: 80px;
+  /* Space */
+  --nav-h: 88px;
+  --nav-h-compact: 76px;
+  --gutter: clamp(20px, 5.5vw, 80px);
   --section-pad: 96px;
+  --sec: clamp(80px, 10vw, 152px);
   --content-max: 1376px;
+  --maxw: 1376px;
 
+  /* Motion */
   --ease-out: cubic-bezier(0.2, 0.7, 0.2, 1);
   --ease-spring: cubic-bezier(0.34, 1.4, 0.64, 1);
+  --e-out: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --e-inout: cubic-bezier(0.7, 0, 0.2, 1);
+  --e-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --e-slam: cubic-bezier(0.55, 0, 0.1, 1);
+  --t-fast: 200ms;
+  --t-med: 450ms;
+  --t-slow: 900ms;
 }
 
 :root[data-theme='dark'] {
@@ -102,17 +167,40 @@
   }
 }
 
+/* Impact sections are dark in both themes (the theme matrix in DESIGN-4). */
+.impact {
+  --bg: #040a1a;
+  --ink-2: #b7c2d4;
+  color-scheme: dark;
+  background: var(--bg);
+  color: var(--ink);
+}
+/* A reading panel inside a dark stage follows the page theme: white in light, navy in dark. It also
+   undoes the two tokens `.impact` overrides. */
+.reading {
+  --bg: light-dark(#ffffff, #0b1730);
+  --ink-2: light-dark(#46536a, #a9b4c6);
+  color-scheme: light;
+  color: var(--ink);
+}
+:root[data-theme='dark'] .reading {
+  color-scheme: dark;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) .reading {
+    color-scheme: dark;
+  }
+}
+
 @media (max-width: 1100px) {
   :root {
-    --gutter: 40px;
     --section-pad: 96px;
   }
 }
 @media (max-width: 720px) {
   :root {
-    --gutter: 20px;
     --section-pad: 72px;
-    --nav-h: 64px;
-    --nav-h-compact: 56px;
+    --nav-h: 76px;
+    --nav-h-compact: 68px;
   }
 }

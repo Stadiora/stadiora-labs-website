@@ -1,6 +1,8 @@
 // In-page WCAG AA text-contrast probe, run with page.evaluate(contrastProbe, opts). It must stay self-contained.
 // includeAriaHidden: also measure decorative (aria-hidden) demo text, which sighted users still read.
-export const contrastProbe = ({ includeAriaHidden = false } = {}) => {
+// scope: a selector; only text inside it is measured (its backdrop is still resolved through the page).
+// [data-decorative] marks purely decorative display type (WCAG 1.4.3 exempts it); it is skipped.
+export const contrastProbe = ({ includeAriaHidden = false, scope = null } = {}) => {
   const canvas = document.createElement('canvas');
   canvas.width = canvas.height = 1;
   const ctx = canvas.getContext('2d', { willReadFrequently: true });
@@ -33,29 +35,73 @@ export const contrastProbe = ({ includeAriaHidden = false } = {}) => {
     for (let n = e; n && n !== document.documentElement; n = n.parentElement) {
       const cs = getComputedStyle(n);
       if (cs.display === 'none' || cs.visibility === 'hidden' || parseFloat(cs.opacity) === 0) return true;
-      if ((!includeAriaHidden && n.getAttribute('aria-hidden') === 'true') || n.hasAttribute('inert') || n.tagName === 'TEMPLATE') return true;
+      if ((!includeAriaHidden && n.getAttribute('aria-hidden') === 'true') || n.hasAttribute('inert') || n.hasAttribute('data-decorative') || n.tagName === 'TEMPLATE') return true;
     }
     return false;
   };
+  const fillOf = (cs) => {
+    // Link underlines are a zero-width gradient until hover; only real image or gradient fills defeat the check.
+    const fill = cs.backgroundImage;
+    return fill !== 'none' && (/url\(/.test(fill) || !/^0(px|%) /.test(cs.backgroundSize));
+  };
   const bgOf = (e) => {
-    let stack = [];
+    const stack = [];
+    const box = e.getBoundingClientRect();
+    // A glass fill only counts as the backdrop when it spans the whole text box (a 3px lane line does not).
+    const covers = (pseudo) => {
+      const w = parseFloat(pseudo.width);
+      const h = parseFloat(pseudo.height);
+      return w >= box.width - 1 && h >= box.height - 1;
+    };
     let imageBg = false;
+    let opaque = false;
+    let fixedRoot = null;
     for (let n = e; n; n = n.parentElement) {
       const cs = getComputedStyle(n);
-      // Link underlines are a zero-width gradient until hover; only real image or gradient fills defeat the check.
-      const fill = cs.backgroundImage;
-      if (fill !== 'none' && (/url\(/.test(fill) || !/^0(px|%) /.test(cs.backgroundSize))) imageBg = true;
+      if (fillOf(cs)) imageBg = true;
+      // A glass bar paints its fill on an absolutely positioned ::before; count it unless it is faded out.
+      const pseudo = getComputedStyle(n, '::before');
+      if (pseudo.content !== 'none' && pseudo.position === 'absolute' && !fillOf(pseudo) && covers(pseudo)) {
+        const [r, g, b, a] = rgba(pseudo.backgroundColor);
+        const alpha = a * parseFloat(pseudo.opacity);
+        if (alpha > 0) stack.push([r, g, b, alpha]);
+        // Near-opaque glass is judged against a white worst case instead of sampling the page behind it.
+        if (alpha >= 0.85) opaque = true;
+      }
       stack.push(rgba(cs.backgroundColor));
-      if (rgba(cs.backgroundColor)[3] >= 0.99) break;
+      if (rgba(cs.backgroundColor)[3] >= 0.99) {
+        opaque = true;
+        break;
+      }
+      // A fixed or sticky bar paints over the page, so the ancestors beyond it are not its backdrop.
+      if (cs.position === 'fixed' || cs.position === 'sticky') {
+        fixedRoot = n;
+        break;
+      }
     }
     let bg = [255, 255, 255, 1];
+    // Nothing opaque behind a fixed bar: whatever scrolls underneath is the real backdrop.
+    if (!opaque && fixedRoot) {
+      const r = e.getBoundingClientRect();
+      const under = document
+        .elementsFromPoint(Math.min(innerWidth - 1, Math.max(0, r.left + r.width / 2)), Math.min(innerHeight - 1, Math.max(0, r.top + r.height / 2)))
+        .filter((n) => !fixedRoot.contains(n));
+      const base = [];
+      for (const n of under) {
+        const cs = getComputedStyle(n);
+        if (fillOf(cs)) imageBg = true;
+        base.push(rgba(cs.backgroundColor));
+        if (rgba(cs.backgroundColor)[3] >= 0.99) break;
+      }
+      for (const layer of base.reverse()) bg = over(layer, bg);
+    }
     for (const layer of stack.reverse()) bg = over(layer, bg);
     return { bg, imageBg };
   };
   const rows = [];
   let skippedImage = 0;
   let decorative = 0;
-  const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+  const walker = document.createTreeWalker(scope ? document.querySelector(scope) : document.body, NodeFilter.SHOW_TEXT);
   const seen = new Set();
   for (let node = walker.nextNode(); node; node = walker.nextNode()) {
     if (!node.textContent.trim()) continue;
@@ -64,6 +110,7 @@ export const contrastProbe = ({ includeAriaHidden = false } = {}) => {
     seen.add(e);
     const rect = e.getBoundingClientRect();
     if (rect.width === 0 || rect.height === 0) continue;
+    if (rect.width <= 1 && rect.height <= 1) continue; // visually-hidden text (the 1px clip pattern)
     if (hidden(e)) {
       if (e.closest('[aria-hidden="true"]') && getComputedStyle(e).display !== 'none') decorative++;
       continue;

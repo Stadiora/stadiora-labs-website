@@ -1,0 +1,118 @@
+---
+import type { ShowcaseCopy } from '../../../i18n/pages/home-showcase';
+interface Props {
+  t: ShowcaseCopy['plan'];
+  demo: string;
+}
+const { t, demo } = Astro.props;
+const st = t.stage;
+// Planner hooks the timeline in showcase/planner.ts moves (by data-el).
+const hook = (wi: number, bi: number) => (wi === 0 && bi === 1 ? 'srcblk' : wi > 0 && bi < 2 ? `w${wi + 1}${bi === 0 ? 'a' : 'b'}` : undefined);
+const bars = [62, 72, 84, 48];
+const seeks = [0, 3.6, 6.4, 9.2];
+---
+
+<article class="panel reading rv" id="plan" aria-labelledby="pa-h">
+  <div class="panel-hd">
+    <div>
+      <span class="chip-label c-cyan">
+        <i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="3"></rect><path d="M3 10h18"></path></svg></i>
+        {t.label}
+      </span>
+      <h3 class="t-title" id="pa-h">{t.title}</h3>
+    </div>
+    <p class="lead">{t.lead}</p>
+  </div>
+  <div class="media-frame pl-frame" data-tl-host="planner">
+    <video muted playsinline loop preload="none" data-clip data-poster="/home/media/night-stadium.webp">
+      <source src="/home/media/night-stadium.webm" type="video/webm" />
+      <source src="/home/media/night-stadium.mp4" type="video/mp4" />
+    </video>
+    <div class="vid-shade"></div>
+    <div class="stage-fit" data-fit="1100" data-fit-h="560">
+      <div class="stage pl-stage" aria-hidden="true">
+        <div class="pl-app">
+          <div class="cal-hd">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8B5CF6" stroke-width="2"><path d="M4 19V9M10 19V5M16 19v-7M22 19H2"></path></svg>
+            <b>{st.title}</b>
+            <span class="sp">
+              <span class="avs">{st.avatars.map((a) => <i>{a}</i>)}</span>
+              <span class="seg"><span>{st.seg[0]}</span><span class="on">{st.seg[1]}</span></span>
+            </span>
+          </div>
+          <div class="pl-cols">
+            {
+              st.weeks.map((w, wi) => (
+                <div class="pl-col">
+                  <h5>{w.h}</h5>
+                  {w.blocks.map((b, bi) => (
+                    <div class:list={['pl-blk', { iri: wi > 0 && bi === 0, ghost: wi === 3 && bi === 1 }]} data-el={hook(wi, bi)}>
+                      {w.badge && bi === 0 && (
+                        <span class="pl-badge" data-el={`b${wi + 1}`}>
+                          {w.badge}
+                        </span>
+                      )}
+                      <div class="h">{b.h}</div>
+                      {b.ex.length ? (
+                        b.ex.map((e) => (
+                          <div class="pl-ex">
+                            <b>{e.n}</b>
+                            <span>{e.q}</span>
+                          </div>
+                        ))
+                      ) : (
+                        <div class="pl-ex">
+                          <b>—</b>
+                          <span />
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              ))
+            }
+          </div>
+        </div>
+        <div class="pl-blk pl-drag" data-el="drag">
+          <div class="h">{st.weeks[2].blocks[1].h}</div>
+          {
+            st.weeks[2].blocks[1].ex.map((e) => (
+              <div class="pl-ex">
+                <b>{e.n}</b>
+                <span>{e.q}</span>
+              </div>
+            ))
+          }
+        </div>
+        <svg class="pl-cursor" data-el="cur" viewBox="0 0 24 24"><path d="M4 2l16 9-7 2-3 7z" fill="#fff" stroke="#08132B" stroke-width="1.5"></path></svg>
+        <div class="pl-pop" data-el="pop">
+          <h6><span class="pl-tri">▲</span> {st.popTitle}</h6>
+          <div class="pl-bars">
+            {bars.map((h, i) => <i class:list={{ dl: i === 3 }} style={`--h:${h}`} />)}
+          </div>
+          <div class="lbls">{st.popWeeks.map((w) => <span>{w}</span>)}</div>
+        </div>
+        <div class="pl-person" data-el="person">
+          <div class="r">
+            <span class="av">{st.person.initials}</span>
+            <div><b>{st.person.name}</b><small>{st.person.note}</small></div>
+          </div>
+          <div class="chg">{st.person.change}<br />{st.person.only}</div>
+        </div>
+        <div class="pl-send" data-el="send">{st.send}</div>
+      </div>
+    </div>
+    <span class="badge-demo">{demo}</span>
+  </div>
+  <div class="pl-steps" role="group" aria-label={t.stepsLabel} data-steps="planner">
+    {
+      t.steps.map((s, i) => (
+        <button class="pl-step" type="button" data-seek={seeks[i]}>
+          <span class="at-bar"><i /></span>
+          <b>{s.b}</b>
+          <span class="s">{s.s}</span>
+        </button>
+      ))
+    }
+  </div>
+</article>

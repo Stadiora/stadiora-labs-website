@@ -33,7 +33,7 @@ const layout = () => {
   for (let node = walker.nextNode(); node; node = walker.nextNode()) {
     const e = node.parentElement;
     if (!node.textContent.trim() || !e || ['SCRIPT', 'STYLE', 'NOSCRIPT', 'OPTION'].includes(e.tagName)) continue;
-    if (!shown(e) || e.closest('.skip-link, .sr-only') || getComputedStyle(e).position === 'fixed') continue;
+    if (!shown(e) || e.closest('.skip-link, .sr-only, [data-decorative]') || getComputedStyle(e).position === 'fixed') continue;
     // Closed <details> bodies and text cut off by an overflow:hidden ancestor are not painted.
     const closed = e.closest('details:not([open])');
     if (closed && !e.closest('summary')) continue;

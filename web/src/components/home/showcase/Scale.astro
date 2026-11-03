@@ -1,0 +1,139 @@
+---
+import type { ShowcaseCopy } from '../../../i18n/pages/home-showcase';
+interface Props {
+  t: ShowcaseCopy['scale'];
+  note: string;
+}
+const { t, note } = Astro.props;
+const r = t.rail;
+const calendarOn = [0, 3, 5, 8, 10, 12, 15, 17, 19];
+const jumps = [52, 58, 55, 63, 61, 68, 72];
+---
+
+<article class="panel reading rv" id="scale" aria-labelledby="pd-h">
+  <div class="panel-hd">
+    <div>
+      <span class="chip-label c-tartan">
+        <i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="2"></rect><rect x="14" y="3" width="7" height="7" rx="2"></rect><rect x="3" y="14" width="7" height="7" rx="2"></rect><rect x="14" y="14" width="7" height="7" rx="2"></rect></svg></i>
+        {t.label}
+      </span>
+      <h3 class="t-title" id="pd-h">{t.title}</h3>
+    </div>
+    <p class="lead">{t.lead}</p>
+  </div>
+  <div class="bento" data-tilt>
+    <div class="bt b-a rv" style="--i:0">
+      <h4>{t.org.h}</h4>
+      <p>{t.org.p}</p>
+      <div class="shot" aria-hidden="true">
+        <div class="org-rows">
+          <div class="org-hd"><b>{t.org.school}</b><span>{t.org.meta}</span></div>
+          {
+            t.org.rows.map((row, k) => (
+              <div class="org-row" style={`--k:${k}`}>
+                <b>{row.name}</b>
+                <span>{row.n}</span>
+                <span class:list={['st-dot', { warn: row.warn }]}>{row.st}</span>
+              </div>
+            ))
+          }
+        </div>
+      </div>
+    </div>
+    <div class="bt b-b rv" style="--i:1">
+      <h4>{t.guardian.h}</h4>
+      <p>{t.guardian.p}</p>
+      <div class="shot" aria-hidden="true">
+        <div class="mini-phone">
+          <div class="s">
+            <div class="c"><b>{t.guardian.child}</b><div class="sub">{t.guardian.week}</div></div>
+            <div class="c"><b>{t.guardian.coach}</b><div class="sub">{t.guardian.msg}</div></div>
+            <div class="c c-row"><span>{t.guardian.consent}</span><b class="ok">{t.guardian.signed}</b></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="bt b-c rv" style="--i:2">
+      <h4>{t.reports.h}</h4>
+      <p>{t.reports.p}</p>
+      <div class="shot" aria-hidden="true">
+        <div class="org-rows pad-14">
+          <div class="cap">{t.reports.cap}</div>
+          <svg class="chart-svg" viewBox="0 0 300 120"><path d="M0 100 H300" stroke="#E3E9F1"></path><path class="ln" d="M0 92 C40 80 60 86 90 66 S150 58 180 44 S240 40 300 18" fill="none" stroke="#00BEF3" stroke-width="3"></path><circle cx="300" cy="18" r="5" fill="#34D399"></circle></svg>
+        </div>
+      </div>
+    </div>
+    <div class="bt b-d rv" style="--i:3">
+      <h4>{t.power.h}</h4>
+      <p>{t.power.p}</p>
+      <div class="shot" aria-hidden="true">
+        <div class="org-rows pad-16 center">
+          <div class="cap">{t.power.cap}</div>
+          <div class="pc-big pc-jump fnum"><span class="count" style="--to:41"></span><span class="unit">{t.power.unit}</span></div>
+          <div class="pc-st">{t.power.best}</div>
+        </div>
+      </div>
+    </div>
+    <div class="bt b-e rv" style="--i:4">
+      <h4>{t.consent.h}</h4>
+      <p>{t.consent.p}</p>
+      <div class="shot" aria-hidden="true">
+        <div class="org-rows pad-14">
+          {
+            t.consent.rows.map((row) => (
+              <div class="org-row org-row-2">
+                <b>{row.name}</b>
+                <span class:list={['st-dot', row.tone]}>{row.st}</span>
+              </div>
+            ))
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="marquee rail" data-rail style="--dur:56s" tabindex="0" role="group" aria-label={t.railLabel}>
+    <div class="marquee-track">
+      {
+        [false, true].map((dup) => (
+          <div class="set" aria-hidden={dup ? 'true' : undefined} inert={dup}>
+            <div class="shot-card">
+              <h6>{r.templates.h}</h6>
+              {r.templates.rows.map(([a, b]) => <div class="rl-row"><b>{a}</b><span>{b}</span></div>)}
+            </div>
+            <div class="shot-card">
+              <h6>{r.calendar.h}</h6>
+              <div class="cal-grid">
+                {Array.from({ length: 21 }, (_, i) => <i class:list={[{ [`c${i % 4}`]: calendarOn.includes(i) }]} />)}
+              </div>
+            </div>
+            <div class="shot-card">
+              <h6>{r.meals.h}</h6>
+              {r.meals.rows.map(([a, b]) => <div class="rl-row"><b>{a}</b><span>{b}</span></div>)}
+            </div>
+            <div class="shot-card">
+              <h6>{r.trend.h}</h6>
+              <svg class="trend" viewBox="0 0 260 100"><path d="M0 70 C30 60 50 72 80 50 S140 40 170 46 S220 24 260 20" fill="none" stroke="#34D399" stroke-width="3"></path><path class="base" d="M0 85 H260"></path></svg>
+            </div>
+            <div class="shot-card">
+              <h6>{r.jumps.h}</h6>
+              <div class="mini-bars">{jumps.map((h, i) => <i class:list={{ last: i === jumps.length - 1 }} style={`--h:${h}`} />)}</div>
+            </div>
+            <div class="shot-card">
+              <h6>{r.roster.h}</h6>
+              {r.roster.rows.map(([a, b, tone]) => <div class="rl-row"><b>{a}</b><span class:list={[tone]}>{b}</span></div>)}
+            </div>
+            <div class="shot-card">
+              <h6>{r.checkin.h}</h6>
+              {r.checkin.rows.map(([a, b]) => <div class="rl-row"><b>{a}</b><span>{b}</span></div>)}
+            </div>
+            <div class="shot-card">
+              <h6>{r.guardians.h}</h6>
+              {r.guardians.rows.map(([a, b, tone]) => <div class="rl-row"><b>{a}</b><span class:list={[tone]}>{b}</span></div>)}
+            </div>
+          </div>
+        ))
+      }
+    </div>
+  </div>
+  <p class="dnote">{note}</p>
+</article>

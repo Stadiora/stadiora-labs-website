@@ -1,0 +1,65 @@
+---
+import '../../styles/home/proof.css';
+import type { Locale } from '../../i18n';
+import { contactHref } from '../../lib/links';
+import { homeProof } from '../../i18n/pages/home-proof';
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const t = homeProof[locale];
+
+// Words are real text separated by real spaces; the script only dims and lights them.
+const words = t.quote.split(' ').map((w) => ({ w, hl: t.highlight.includes(w.toLowerCase()) }));
+---
+
+<section class="sec proof" id="proof" data-section aria-labelledby="proof-h">
+  <div class="proof-bg marquee" aria-hidden="true">
+    <div class="marquee-track">
+      <div class="proof-set">{t.outline.map((w) => <span>{w}</span>)}</div>
+      <div class="proof-set" aria-hidden="true" inert>{t.outline.map((w) => <span>{w}</span>)}</div>
+    </div>
+  </div>
+  <div class="wrap proof-wrap">
+    <div class="sec-head">
+      <div>
+        <p class="eyebrow rv">{t.eyebrow}</p>
+        <h2 class="d d2 lines" id="proof-h"><span><span>{t.title[0]}</span></span><span><span style="--i:1">{t.title[1]}</span></span></h2>
+      </div>
+    </div>
+    <div class="proof-card rv">
+      <div class="proof-photo">
+        <img
+          src="/home/img/proof-masters-back-800.webp"
+          srcset="/home/img/proof-masters-back-480.webp 480w, /home/img/proof-masters-back-800.webp 800w"
+          sizes="(max-width: 1080px) 100vw, 36vw"
+          alt={t.photoAlt}
+          width="800"
+          height="1200"
+          loading="lazy"
+          decoding="async"
+        />
+        <div class="orbits" aria-hidden="true">
+          <svg viewBox="0 0 1600 800"><ellipse cx="800" cy="400" rx="700" ry="230"></ellipse><ellipse class="dash" cx="800" cy="400" rx="560" ry="170"></ellipse></svg>
+        </div>
+      </div>
+      <div class="proof-body">
+        <div class="proof-mark" aria-hidden="true">“</div>
+        <blockquote class="proof-text" data-quote>
+          {words.map((x, i) => <><span class:list={['wd', { hl: x.hl }]}>{x.w}</span>{i < words.length - 1 ? ' ' : ''}</>)}
+        </blockquote>
+        <div class="proof-who">
+          <span class="proof-av" aria-hidden="true">{t.initials}</span>
+          <div><b>{t.name}</b><span class="proof-role">{t.role}</span></div>
+          <span class="proof-chip">{t.chip}</span>
+        </div>
+        <div class="proof-nav" aria-hidden="true"><span>01</span><div class="at-bar"><i></i></div><span>01</span></div>
+      </div>
+    </div>
+    <div class="proof-story rv">
+      <div><b>{t.story.title}</b><span class="proof-sub">{t.story.text}</span></div>
+      <a class="btn btn--primary" href={contactHref(locale, 'question')}>{t.story.cta} <span class="arr" aria-hidden="true">→</span></a>
+    </div>
+  </div>
+</section>

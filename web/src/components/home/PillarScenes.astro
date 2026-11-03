@@ -1,0 +1,169 @@
+---
+// The demo cards drawn over the four pillar clips. The clips carry no text, so every label, number and card below comes
+// from the page's own locale (src/i18n/pages/home-pillars.ts) and is live HTML. The markup is the finished frame; the
+// timelines in scripts/home/pillars.ts only run when motion is allowed. Each text-bearing element has a data-ov key, which
+// the home guards use to confirm every overlay exists in both locales.
+import type { HomePillarsCopy } from '../../i18n/pages/home-pillars';
+
+interface Props {
+  t: HomePillarsCopy;
+}
+const { t } = Astro.props;
+const s = t.scenes;
+const rowColors = ['#00BEF3', '#34D399', '#8B5CF6', '#FF4D5E'];
+const bars = [62, 70, 55, 78, 74, 66, 88];
+const roster = [
+  { ini: 'AR', name: 'Ana R.', ok: true, bg: '#00BEF3' },
+  { ini: 'LM', name: 'Lucía M.', ok: false, bg: '#8B5CF6' },
+  { ini: 'SP', name: 'Sofía P.', ok: true, bg: '#34D399' },
+  { ini: 'VC', name: 'Valentina C.', ok: true, bg: '#FF4D5E' },
+];
+const macroColors = ['#00BEF3', '#34D399', '#8B5CF6'];
+const macroWidths = [56, 82, 34];
+const scenes = [
+  { key: 'training', color: '#00BEF3', ink: '#04101F' },
+  { key: 'nutrition', color: '#34D399', ink: '#04101F' },
+  { key: 'readiness', color: '#8B5CF6', ink: '#FFFFFF' },
+  { key: 'team', color: '#FF4D5E', ink: '#04101F' },
+] as const;
+---
+
+{
+  scenes.map((sc, k) => (
+    <div class={`pm-scene${k === 0 ? ' on' : ''}`} data-scene={sc.key} style={`--pc:${sc.color};--pi:${sc.ink}`}>
+      <span class="pm-big" data-ov={`${sc.key}.big`}>{`0${k + 1}`}</span>
+      <span class="pm-lbl" data-ov={`${sc.key}.label`}>{t.items[k].tab}</span>
+
+      {sc.key === 'training' && (
+        <>
+          <div class="pm-card pm-plan" data-el="plan" style="left:600px;top:110px;width:600px">
+            <p class="pm-h" data-ov="training.head">{s.training.head}</p>
+            <p class="pm-ttl pm-ttl-xl" data-ov="training.title">{s.training.title}</p>
+            {s.training.rows.map((r, i) => (
+              <div class="pm-row" data-el={`row${i}`} data-ov={`training.row${i + 1}`} style={`--sc:${rowColors[i]}`}>
+                <span class="pm-day">{r.day}</span>
+                <span>{r.name}</span>
+                <span>{r.reps}</span>
+              </div>
+            ))}
+            <div class="pm-send" data-el="send" data-ov="training.send">{s.training.send}</div>
+          </div>
+          <div class="pm-chip" data-el="toast" style="left:760px;top:650px">
+            <span class="pm-av" style="background:#34D399;color:#04101F">✓</span>
+            <div>
+              <span data-ov="training.sentTitle">{s.training.sent.title}</span>
+              <small data-ov="training.sentSub">{s.training.sent.sub}</small>
+            </div>
+          </div>
+          <div class="pm-chip pm-chip-w" data-el="coach" style="left:100px;top:620px">
+            <span class="pm-av" style="background:#8B5CF6;color:#fff">DM</span>
+            <div>
+              <span data-ov="training.coachName">{s.training.coach.name}</span>
+              <small data-ov="training.coachSub">{s.training.coach.sub}</small>
+            </div>
+          </div>
+          <svg class="pm-cursor" data-el="cur" viewBox="0 0 24 24">
+            <path d="M4 2l16 9-7 2-3 7z" fill="#fff" stroke="#08132B" stroke-width="1.5" />
+          </svg>
+        </>
+      )}
+
+      {sc.key === 'nutrition' && (
+        <>
+          <p class="pm-snap" data-el="snap" data-ov="nutrition.snap">{s.nutrition.snap}</p>
+          <div class="pm-card pm-est" data-el="est" style="left:470px;top:430px;width:460px">
+            <p class="pm-h" data-ov="nutrition.head">{s.nutrition.head}</p>
+            <p class="pm-ttl pm-ttl-kc" data-ov="nutrition.unit">
+              <span class="pm-cnt" data-el="kc" style="--n:640" />{' '}{s.nutrition.unit}
+            </p>
+            {s.nutrition.macros.map((m, i) => (
+              <div class="pm-macro" data-ov={`nutrition.macro${i + 1}`}>
+                <span>{m.name}</span>
+                <span class="pm-tr">
+                  <i data-el={`m${i}`} style={`background:${macroColors[i]};width:${macroWidths[i]}%`} />
+                </span>
+                <b>{m.value}</b>
+              </div>
+            ))}
+          </div>
+          <div class="pm-chip" data-el="logged" style="left:120px;top:630px">
+            <span class="pm-av" style="background:#34D399;color:#04101F">✓</span>
+            <div>
+              <span data-ov="nutrition.loggedTitle">{s.nutrition.logged.title}</span>
+              <small data-ov="nutrition.loggedSub">{s.nutrition.logged.sub}</small>
+            </div>
+          </div>
+        </>
+      )}
+
+      {sc.key === 'readiness' && (
+        <>
+          <div class="pm-card pm-rd" data-el="rd" style="left:600px;top:110px;width:470px">
+            <div class="pm-ring" data-el="ring" style="--v:82" />
+            <div>
+              <p class="pm-h" data-ov="readiness.head">{s.readiness.head}</p>
+              <p class="pm-num">
+                <span class="pm-cnt" data-el="rn" style="--n:82" />
+              </p>
+              <p class="pm-ok">
+                <i class="pm-dot" />
+                <span data-ov="readiness.status">{s.readiness.status}</span>
+              </p>
+            </div>
+          </div>
+          <div class="pm-card pm-sl" data-el="sl" style="left:860px;top:420px;width:360px">
+            <p class="pm-h" data-ov="readiness.sleepHead">{s.readiness.sleepHead}</p>
+            <p class="pm-ttl" data-ov="readiness.sleepValue">{s.readiness.sleepValue}</p>
+            <div class="pm-bars">{bars.map((h) => <i style={`height:${h}%`} />)}</div>
+          </div>
+          <div class="pm-mood" data-el="mood" style="left:430px;top:640px">
+            <span data-ov="readiness.mood1">{s.readiness.moods[0]}</span>
+            <span class="pm-good" data-el="good" data-ov="readiness.mood2">{s.readiness.moods[1]}</span>
+            <span data-ov="readiness.mood3">{s.readiness.moods[2]}</span>
+          </div>
+          <div class="pm-breathe" data-el="br" style="left:100px;top:110px">
+            <i class="pm-bc" data-el="bc" />
+            <div>
+              <b data-ov="readiness.breatheTitle">{s.readiness.breathe.title}</b>
+              <small data-ov="readiness.breatheSub">{s.readiness.breathe.sub}</small>
+            </div>
+          </div>
+        </>
+      )}
+
+      {sc.key === 'team' && (
+        <>
+          <div class="pm-card pm-pl" data-el="pl" style="left:600px;top:96px;width:520px;height:330px">
+            <p class="pm-h" data-ov="team.head">{s.team.head}</p>
+            <div class="pm-jump">
+              <span class="pm-cnt pm-jn" data-el="jn" style="--n:41" />
+              <span class="pm-jc" data-ov="team.unit">{s.team.unit}</span>
+              <span class="pm-best" data-ov="team.best">{s.team.best}</span>
+            </div>
+            <svg class="pm-curve" viewBox="0 0 470 130">
+              <path d="M0 110 H470" stroke="#EEF2F7" stroke-width="2" />
+              <path data-el="jc" d="M0 108 C60 108 80 118 110 112 S150 20 200 14 S260 40 280 106 S330 110 470 108" fill="none" stroke="#FF4D5E" stroke-width="5" stroke-linecap="round" pathLength="1" stroke-dasharray="1" stroke-dashoffset="0" />
+            </svg>
+          </div>
+          <div class="pm-card pm-roster" data-el="ro" style="left:780px;top:450px;width:420px">
+            <p class="pm-h" data-ov="team.rosterHead">{s.team.rosterHead}</p>
+            {roster.map((r, i) => (
+              <div class="pm-r" data-el={`rr${i}`}>
+                <span class="pm-av" style={`background:${r.bg}`}>{r.ini}</span>
+                <span>{r.name}</span>
+                <span class="pm-stt" data-ov={`team.status${i + 1}`} style={`--dc:${r.ok ? '#34D399' : '#F59E0B'}`}>{r.ok ? s.team.ready : s.team.checkIn}</span>
+              </div>
+            ))}
+          </div>
+          <div class="pm-chip" data-el="md" style="left:110px;top:630px">
+            <span class="pm-av" style="background:#FF4D5E" data-ov="team.day">{s.team.match.day}</span>
+            <div>
+              <span data-ov="team.matchTitle">{s.team.match.title}</span>
+              <small data-ov="team.matchSub">{s.team.match.sub}</small>
+            </div>
+          </div>
+        </>
+      )}
+    </div>
+  ))
+}

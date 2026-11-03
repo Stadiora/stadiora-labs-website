@@ -1,7 +1,7 @@
 ---
 import '../styles/global.css';
-import soraUrl from '../assets/fonts/sora-latin-wght-normal.woff2?url';
-import interUrl from '../assets/fonts/inter-latin-wght-normal.woff2?url';
+import archivoUrl from '../assets/fonts/archivo-var.woff2?url';
+import interUrl from '../assets/fonts/inter-var.woff2?url';
 import { localePath, locales, useDict, type Locale } from '../i18n';
 import { site } from '../data/site';
 import Nav from '../components/layout/Nav.astro';
@@ -16,9 +16,11 @@ interface Props {
   ogImage?: string;
   /** Keeps the page out of search results. Case-study pages use it until a real story ships. */
   noindex?: boolean;
+  /** Full-bleed dark hero under the floating nav (the home page): the page gets no top padding. */
+  hero?: boolean;
 }
 
-const { locale, path, title, description, ogImage, noindex = false } = Astro.props;
+const { locale, path, title, description, ogImage, noindex = false, hero = false } = Astro.props;
 const t = useDict(locale);
 const pageTitle = title ?? t.meta.title;
 const pageDescription = description ?? t.meta.description;
@@ -74,7 +76,7 @@ const jsonLd = {
     <link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
 
-    <link rel="preload" href={soraUrl} as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href={archivoUrl} as="font" type="font/woff2" crossorigin />
     <link rel="preload" href={interUrl} as="font" type="font/woff2" crossorigin />
 
     <!-- Sets html.js and the theme before first paint, so there is no flash. -->
@@ -95,7 +97,7 @@ const jsonLd = {
 
     <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
   </head>
-  <body>
+  <body data-hero={hero ? '' : undefined}>
     <a class="skip-link" href="#main">{t.a11y.skip}</a>
     <Nav locale={locale} path={path} />
     <main id="main" tabindex="-1">

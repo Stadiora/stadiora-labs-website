@@ -1,0 +1,24 @@
+/* Final reel (round-4 Floodlight): the dark closing section over the reel clip.
+   The base look (.final, its overlay, .lead, .final-ctas) comes from floodlight.css; this adds what is specific here. */
+
+.final.media-frame {
+  border-radius: 0;
+}
+.final .fdot--a {
+  offset-path: path('M40,400 a760,260 0 1,0 1520,0 a760,260 0 1,0 -1520,0');
+  --d: 22s;
+}
+.final .fdot--b {
+  offset-path: path('M200,400 a600,200 0 1,0 1200,0 a600,200 0 1,0 -1200,0');
+  --d: 16s;
+}
+/* "empiece tu temporada." is the longest line in either language: keep it inside the clipped line mask */
+.final:lang(es) .d1 {
+  font-size: clamp(44px, 7.4vw, 132px);
+}
+
+@media (max-width: 640px) {
+  .final-ctas .btn {
+    flex: 1 1 100%;
+  }
+}

@@ -176,17 +176,24 @@ const contrast = () => {
   const hidden = (e) => {
     for (let n = e; n && n !== document.documentElement; n = n.parentElement) {
       const cs = getComputedStyle(n);
-      if (cs.display === 'none' || cs.visibility === 'hidden' || parseFloat(cs.opacity) === 0) return true;
+      if (cs.display === 'none' || cs.visibility === 'hidden' || parseFloat(cs.opacity) === 0 || n.hasAttribute('data-decorative')) return true;
     }
     return false;
   };
   const bgOf = (e) => {
     const stack = [];
     let imageBg = false;
+    const box = e.getBoundingClientRect();
     for (let n = e; n; n = n.parentElement) {
       const cs = getComputedStyle(n);
       const fill = cs.backgroundImage;
       if (fill !== 'none' && (/url\(/.test(fill) || !/^0(px|%) /.test(cs.backgroundSize))) imageBg = true;
+      // The nav's glass is an absolutely positioned ::before; count it when it spans the whole text box.
+      const pseudo = getComputedStyle(n, '::before');
+      if (pseudo.content !== 'none' && pseudo.position === 'absolute' && pseudo.backgroundImage === 'none' && parseFloat(pseudo.width) >= box.width - 1 && parseFloat(pseudo.height) >= box.height - 1) {
+        const [r, g, b, a] = rgba(pseudo.backgroundColor);
+        stack.push([r, g, b, a * parseFloat(pseudo.opacity)]);
+      }
       stack.push(rgba(cs.backgroundColor));
       if (rgba(cs.backgroundColor)[3] >= 0.99) break;
     }

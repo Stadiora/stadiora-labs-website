@@ -1,0 +1,127 @@
+---
+import type { ShowcaseCopy } from '../../../i18n/pages/home-showcase';
+interface Props {
+  t: ShowcaseCopy['measure'];
+  note: string;
+}
+const { t, note } = Astro.props;
+const s = t.slides;
+// Tab icons (one per tab, same order as t.tabs).
+const icons = [
+  '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+  '<path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/>',
+  '<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/>',
+  '<path d="M9 11l3 3 8-8"/><path d="M20 12v7a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h9"/>',
+  '<path d="M12 21s-7-4.5-9-9.5C1.6 8 4 4 7.5 4c2 0 3.5 1.2 4.5 2.6C13 5.2 14.5 4 16.5 4 20 4 22.4 8 21 11.5 19 16.5 12 21 12 21z"/>',
+];
+---
+
+<article class="panel reading rv" id="measure" aria-labelledby="pb-h">
+  <div class="ms-grid" data-autotabs data-at="5200">
+    <div>
+      <span class="chip-label c-mint">
+        <i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="M3 17l6-6 4 4 8-8"></path></svg></i>
+        {t.label}
+      </span>
+      <h3 class="t-title" id="pb-h">{t.title}</h3>
+      <div class="acc" role="tablist" aria-label={t.tabsLabel}>
+        {
+          t.tabs.map((tab, i) => (
+            <button class="acc-row" type="button" role="tab" id={`ms-t${i}`} aria-controls={`ms-p${i}`} aria-labelledby={`ms-n${i}`} aria-describedby={`ms-d${i}`} aria-selected={i === 0 ? 'true' : 'false'} tabindex={i === 0 ? 0 : -1}>
+              <span class="hd">
+                <i>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" set:html={icons[i]} />
+                </i>
+                <span id={`ms-n${i}`}>{tab.t}</span>
+              </span>
+              <span class="bd">
+                <span class="bd-in">
+                  <span class="bd-p" id={`ms-d${i}`}>{tab.p}</span>
+                  <span class="at-bar"><i /></span>
+                </span>
+              </span>
+            </button>
+          ))
+        }
+      </div>
+    </div>
+    <div class="ms-media" data-parallax-host>
+      <div class="ms-slide ms-s1 on" data-panel role="tabpanel" id="ms-p0" aria-labelledby="ms-t0">
+        <img src="/home/img/panel-sprinter-night-800.webp" alt={s.readiness.alt} width="800" height="1200" loading="lazy" decoding="async" />
+        <div class="pop a" data-depth="20">
+          <div class="pc-h">{s.readiness.h}</div>
+          <div class="pc-row pc-row-top">
+            <div class="dring draw" style="--v:82;--rs:84px"></div>
+            <div>
+              <div class="pc-big fnum"><span class="count" style="--to:82"></span></div>
+              <div class="pc-st"><i class="dot-live"></i>{s.readiness.st}</div>
+            </div>
+          </div>
+        </div>
+        <div class="pop b" data-depth="34">
+          <div class="pc-h">{s.readiness.sleepH}</div>
+          <div class="pc-big pc-sleep">{s.readiness.sleepBig}</div>
+          <div class="pc-sub">{s.readiness.sleepSub}</div>
+        </div>
+      </div>
+      <div class="ms-slide ms-s2" data-panel role="tabpanel" id="ms-p1" aria-labelledby="ms-t1">
+        <img src="/home/img/bd-sprinter-violet-800.webp" alt={s.load.alt} width="800" height="1200" loading="lazy" decoding="async" />
+        <div class="pop a" data-depth="26">
+          <div class="pc-h">{s.load.h}</div>
+          <div class="load-bars">
+            {[42, 58, 50, 72, 64, 30, 80].map((h, k) => <i style={`--h:${h};--k:${k}`} />)}
+          </div>
+          <div class="load-lbl">{s.load.days.map((d) => <span>{d}</span>)}</div>
+          <div class="pc-st pc-st-note"><i class="dot-live"></i>{s.load.st}</div>
+        </div>
+      </div>
+      <div class="ms-slide ms-s3" data-panel role="tabpanel" id="ms-p2" aria-labelledby="ms-t2">
+        <img src="/home/img/hero4-track-and-field-big-800.webp" alt={s.goal.alt} width="800" height="1000" loading="lazy" decoding="async" />
+        <div class="pop a" data-depth="22">
+          <div class="pc-h">{s.goal.h}</div>
+          <div class="pc-row pc-row-goal">
+            <div class="dring draw" style="--v:72;--c:#00BEF3;--rs:90px"></div>
+            <div><div class="pc-big pc-goal fnum"><span class="count" style="--to:72"></span>%</div></div>
+          </div>
+          <div class="pc-goal-text">{s.goal.text}</div>
+        </div>
+      </div>
+      <div class="ms-slide ms-s4" data-panel role="tabpanel" id="ms-p3" aria-labelledby="ms-t3">
+        <img src="/home/img/panel-phone-locker-800.webp" alt={s.checkin.alt} width="800" height="1200" loading="lazy" decoding="async" />
+        <div class="pop a" data-depth="18">
+          <div class="pc-row">
+            <span class="pc-tick">✓</span>
+            <div><b class="pc-who">{s.checkin.who}</b><div class="pc-sub pc-when">{s.checkin.when}</div></div>
+          </div>
+        </div>
+        <div class="pop b" data-depth="32">
+          <div class="pc-h">{s.checkin.h}</div>
+          <div class="pc-list">
+            {
+              s.checkin.rows.map(([k, v]) => (
+                <div><span>{k}</span><b>{v}</b></div>
+              ))
+            }
+          </div>
+        </div>
+      </div>
+      <div class="ms-slide ms-s5" data-panel role="tabpanel" id="ms-p4" aria-labelledby="ms-t4">
+        <img src="/home/img/panel-wrist-closeup-800.webp" alt={s.integ.alt} width="800" height="1200" loading="lazy" decoding="async" />
+        <div class="int-orbit">
+          <i class="ring-path"></i>
+          <div class="hub">
+            <svg viewBox="0 0 48 48" fill="none" aria-hidden="true"><ellipse cx="24" cy="24" rx="20" ry="10.5" transform="rotate(-24 24 24)" stroke="#00BEF3" stroke-width="2.6"></ellipse><ellipse cx="24" cy="23" rx="9" ry="5.6" stroke="#08132B" stroke-width="4"></ellipse><circle cx="40" cy="9.5" r="3.6" fill="#00BEF3"></circle><circle cx="7.5" cy="31" r="3.6" fill="#8B5CF6"></circle></svg>
+          </div>
+          <div class="sat sat-a">
+            <span class="ic ic-apple"><svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7-4.5-9-9.5C1.6 8 4 4 7.5 4c2 0 3.5 1.2 4.5 2.6C13 5.2 14.5 4 16.5 4 20 4 22.4 8 21 11.5 19 16.5 12 21 12 21z" fill="#FF2D55"></path></svg></span>{s.integ.apple}
+          </div>
+          <div class="sat sat-b">
+            <span class="ic ic-hc"><svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7-4.5-9-9.5C1.6 8 4 4 7.5 4c2 0 3.5 1.2 4.5 2.6C13 5.2 14.5 4 16.5 4 20 4 22.4 8 21 11.5 19 16.5 12 21 12 21z" fill="none" stroke="#1A73E8" stroke-width="2.4"></path></svg></span>{s.integ.health}
+          </div>
+        </div>
+        <p class="int-soon">{s.integ.soon}</p>
+      </div>
+    </div>
+  </div>
+  <p class="dnote">{note}</p>
+</article>

@@ -24,12 +24,15 @@ if (nav) {
   let hoverTimer = 0;
   let leaveTimer = 0;
 
-  // Compaction: 80px to 60px past 24px of scroll.
+  // Compaction: the floating pill shrinks past 24px of scroll; --progress drives its gradient line.
   let ticking = false;
+  const bar = document.querySelector<HTMLElement>('.nav__bar');
   const applyScroll = () => {
     ticking = false;
     if (window.scrollY > 24) root.setAttribute('data-scrolled', '');
     else root.removeAttribute('data-scrolled');
+    const max = document.documentElement.scrollHeight - window.innerHeight;
+    bar?.style.setProperty('--progress', max > 0 ? String(Math.min(1, Math.max(0, window.scrollY / max))) : '0');
   };
   window.addEventListener(
     'scroll',

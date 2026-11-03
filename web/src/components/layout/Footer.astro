@@ -48,9 +48,7 @@ const columns: { title: string; links: { label: string; href: string }[] }[] = [
 ---
 
 <footer class="band footer" aria-label={t.a11y.footerNav}>
-  <div class="footer__wordmark" aria-hidden="true">
-    <Image src={logoWhite} alt="" width={900} format="webp" loading="lazy" />
-  </div>
+  <div class="footer__wordmark d" aria-hidden="true" data-decorative>Stadiora</div>
   <div class="container footer__inner">
     <div class="footer__top">
       <a class="footer__logo" href={localePath('/', locale)} aria-label={t.a11y.homeLink}>
@@ -104,14 +102,17 @@ const columns: { title: string; links: { label: string; href: string }[] }[] = [
     overflow: hidden;
     background: var(--band);
     color: var(--band-ink);
-    border-top: 1px solid var(--band-line);
+    color-scheme: dark;
   }
+  /* The giant ghost word that closes the page (decorative, display type). */
   .footer__wordmark {
     position: absolute;
-    right: -4%;
-    bottom: -9%;
-    width: min(900px, 70vw);
-    opacity: 0.06;
+    right: -1vw;
+    bottom: -3.2vw;
+    font-size: 18vw;
+    line-height: 0.8;
+    color: rgb(255 255 255 / 0.035);
+    white-space: nowrap;
     pointer-events: none;
     user-select: none;
   }
@@ -141,13 +142,13 @@ const columns: { title: string; links: { label: string; href: string }[] }[] = [
     gap: 32px;
   }
   .footer__h {
-    margin-bottom: 14px;
-    color: #fff;
-    font-family: var(--font-body);
-    font-size: 13px;
-    line-height: 18px;
+    margin-bottom: 18px;
+    color: #8d99ae;
+    font-family: var(--f-mono);
+    font-size: 12px;
+    line-height: 16px;
     font-weight: 600;
-    letter-spacing: 0.12em;
+    letter-spacing: 0.14em;
     text-transform: uppercase;
   }
   .footer__col ul {

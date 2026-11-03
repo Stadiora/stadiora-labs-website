@@ -52,7 +52,10 @@ node scripts/evidence.mjs --engage-only # just the Platform page checks, EN and 
   `src/data/prices.ts` (`education`, `addOns`) with `{tokens}` in `engage.ts`, and the Teams script picks the region with
   `detectRegion` from `src/lib/region.ts`, the same two modules `/pricing/` uses. `npm run verify` fails on a dollar amount in
   `engage.ts`, and on a rendered price that disagrees with the oracle in `scripts/lib/pricing-oracle.mjs`.
-- Design tokens: `src/styles/tokens.css` (light and dark). Text accent on light is `#0077A8`; `#00BEF3` is decorative only.
+- Design tokens (Floodlight, DESIGN-4): `src/styles/tokens.css`. Light is the default and the toggle is kept; the `.impact` sections (hero,
+  dark stages, final CTA, footer) are dark in both themes, and `.reading` panels follow the page theme. Text uses the `*-ink` tokens
+  (`--cyan-ink` is `#0077A8` on light); the vivid brand colours are fills and decoration only. `floodlight.css` holds the shared
+  Floodlight components (glass pill nav styles, buttons, reveal, mesh and orbit motif, marquee), `motion.css` the reduced-motion rules.
 - Photos: drop a file named after its slot into `src/assets/photos/`; `src/data/photo-alt.json` holds EN and ES alt text.
   A missing slot renders a labelled placeholder and `npm run verify` fails on it.
 - Platform Coach pages (`src/pages/{,es/}platform/{programs,nutrition,readiness,power-lab}/`): thin wrappers around
@@ -62,6 +65,17 @@ node scripts/evidence.mjs --engage-only # just the Platform page checks, EN and 
   footnote, a broken hreflang pair or a missing demo link. `scripts/lib/platform-coach-checks.mjs` (run by `evidence`) covers overflow,
   sideways clipping and overlapping text at 390/1024/1280/1440, WCAG AA in both themes, alt text, heading order, the keyboard walk,
   the accordion and hover-reveal behaviour, the count-up and a no-JavaScript render.
-- Motion: markup is server-rendered in its final state. `html.js` enables animation, `prefers-reduced-motion`
-  keeps the static state, and every moving element has a pause control.
-- Fonts (Sora, Inter; SIL OFL, licences in `src/assets/fonts/`) are self-hosted woff2 files and preloaded.
+- Motion library: `src/scripts/motion/kit.ts` (small TypeScript, no dependencies). Anything that moves on its own is an `autoplayer()`
+  (or a `group()`, `autotabs()` or a `video[data-clip]`, which use it): it runs only while on screen, with the tab visible, with no
+  pointer hovering and no focus inside its scope, and never under `prefers-reduced-motion`. It mirrors its state to `data-ap`
+  (`on`/`off`) and `data-ap-why` (`reduced`, `hidden`, `offscreen`, `hover`, `focus`), and marks the hover/focus element with
+  `data-ap-scope`; the guards read those attributes. Markup is server-rendered in its finished state; the base CSS is the still frame
+  and JS only animates. Reduced motion: no autoplay, no loops, posters instead of clips, smooth scrolling off.
+- Home page (`src/components/home/Home.astro`): hero, AI program, pillars, brand strip, showcase, proof and final reel, EN and ES.
+  Copy is in `src/i18n/pages/home-*.ts`, section styles in `src/styles/home/`, section scripts in `src/scripts/home/` (entry `index.ts`).
+- Home clips live in `public/home/media/` as WebM + MP4 + WebP poster (`<video muted playsinline loop preload="none" data-clip>`, the kit
+  applies the poster near the viewport and plays on visibility). Budget: 1.6 MB per clip, posters 120 KB; `npm run verify` enforces
+  it (`scripts/lib/home-verify.mjs`) together with the clip markup contract and broken `/home/*` references. Photos for the home are in
+  `public/home/img/` (WebP).
+- Fonts (Archivo variable for display, Inter variable for text, JetBrains Mono variable for labels; SIL OFL, licences in
+  `src/assets/fonts/`) are self-hosted woff2 files; Archivo and Inter are preloaded.
