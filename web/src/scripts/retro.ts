@@ -1,10 +1,10 @@
 // Retro stack: every 2400ms the front card lifts, tilts and slides to the back (200ms + 400ms).
 // Pauses on hover/focus, when offscreen, or when the user presses the pause button.
-// Reduced motion keeps the five-card fan static and this script does nothing.
+// Reduced motion keeps the five-card fan static; the timer stops and starts when the preference changes.
 const root = document.querySelector<HTMLElement>('[data-retro]');
 const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
 
-if (root && !reduced.matches) {
+if (root) {
   const cards = Array.from(root.querySelectorAll<HTMLElement>('.retro__card'));
   const pauseBtn = document.querySelector<HTMLButtonElement>('[data-retro-pause]');
   const count = cards.length;
@@ -35,7 +35,7 @@ if (root && !reduced.matches) {
   };
   const sync = () => {
     stop();
-    if (inView && !document.hidden && !hovering && !userPaused) timer = window.setInterval(advance, 2400);
+    if (!reduced.matches && inView && !document.hidden && !hovering && !userPaused) timer = window.setInterval(advance, 2400);
   };
 
   root.addEventListener('pointerenter', (e) => {
@@ -48,6 +48,7 @@ if (root && !reduced.matches) {
     sync();
   });
   document.addEventListener('visibilitychange', sync);
+  reduced.addEventListener('change', sync);
 
   pauseBtn?.addEventListener('click', () => {
     userPaused = !userPaused;
