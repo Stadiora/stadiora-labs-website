@@ -185,16 +185,25 @@ await homeChecks({ open, check, sleep, settle, metrics });
   check('a11y', 'focused control shows a focus ring (>= 2px outline)', ring);
 
   // SECTION-INTERACTIONS-START
-  // Pillar tabs (mouse and keyboard)
-  const pillarRoot = page.locator('.pillars [data-tabs]');
+  // Pillar tabs (mouse and keyboard): the kit's auto-advancing tabs, each with a text panel and its own clip
+  const pillarRoot = page.locator('#pillars [data-autotabs]');
   await pillarRoot.evaluate((e) => e.scrollIntoView({ block: 'center' }));
   await sleep(400);
   const ptabs = pillarRoot.locator('[role="tab"]');
+  const shown = () =>
+    page.evaluate(() => ({
+      panels: [...document.querySelectorAll('#pillars .pil-panel')].map((p) => getComputedStyle(p).display !== 'none'),
+      clips: [...document.querySelectorAll('#pillars .pil-clip')].map((c) => c.classList.contains('on')),
+    }));
   check('pillars', 'four tabs, first selected', (await ptabs.count()) === 4 && (await ptabs.nth(0).getAttribute('aria-selected')) === 'true');
   await ptabs.nth(1).click();
   await sleep(600);
   check('pillars', 'click selects the second tab', (await ptabs.nth(1).getAttribute('aria-selected')) === 'true' && (await ptabs.nth(0).getAttribute('tabindex')) === '-1');
-  if (!checksOnly) await el(page, '.pillars', 'state-pillars-2-nutrition');
+  const second = await shown();
+  check('pillars', 'the second tab opens its own text panel and clip', JSON.stringify(second.panels) === '[false,true,false,false]' && JSON.stringify(second.clips) === '[false,true,false,false]', JSON.stringify(second));
+  const wired = await page.evaluate(() => [...document.querySelectorAll('#pillars [role="tab"]')].every((t) => document.getElementById(t.getAttribute('aria-controls'))?.getAttribute('aria-labelledby') === t.id));
+  check('pillars', 'every tab controls a panel that is labelled by it', wired);
+  if (!checksOnly) await el(page, '#pillars', 'state-pillars-2-nutrition');
   await ptabs.nth(1).focus();
   await page.keyboard.press('ArrowRight');
   check('pillars', 'ArrowRight moves to the third tab', (await ptabs.nth(2).getAttribute('aria-selected')) === 'true');
@@ -202,8 +211,8 @@ await homeChecks({ open, check, sleep, settle, metrics });
   check('pillars', 'End moves to the last tab', (await ptabs.nth(3).getAttribute('aria-selected')) === 'true');
   await page.keyboard.press('Home');
   check('pillars', 'Home moves to the first tab', (await ptabs.nth(0).getAttribute('aria-selected')) === 'true');
-  const activePanels = await page.evaluate(() => [...document.querySelectorAll('.pillars [role="tabpanel"]')].filter((p) => !p.hasAttribute('inert')).length);
-  check('pillars', 'only the active panel is interactive', activePanels === 1, `${activePanels} non-inert panels`);
+  const open1 = (await shown()).panels.filter(Boolean).length;
+  check('pillars', 'only the active panel is shown', open1 === 1, `${open1} panels shown`);
 
   // Store chooser dialog
   await page.locator('#final').evaluate((e) => e.scrollIntoView({ block: 'center' }));

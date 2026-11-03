@@ -424,34 +424,34 @@ export async function navChecks({ open, check, shot, sleep, checksOnly, metrics 
       });
   }
 
-  // ---------------------------------------------------------------- E. retro stack follows prefers-reduced-motion changes
+  // ---------------------------------------------------------------- E. the SPORT strip follows prefers-reduced-motion changes
   {
     const page = await open({ width: 1440, height: 900 }, '/');
-    await page.locator('.brand').evaluate((e) => e.scrollIntoView({ block: 'center' }));
+    await page.locator('#brand .bs-card').evaluate((e) => e.scrollIntoView({ block: 'center' }));
     await sleep(500);
-    const pos = () => page.evaluate(() => [...document.querySelectorAll('.retro__card')].map((c) => c.dataset.pos).join(','));
+    const pos = () => page.evaluate(() => [...document.querySelectorAll('#brand [data-brand-img]')].findIndex((i) => i.classList.contains('on')));
     const a = await pos();
     await sleep(3200);
     const b = await pos();
-    check('retro-motion', 'normal motion: the stack advances on its own', a !== b, `${a} -> ${b}`);
+    check('retro-motion', 'normal motion: the retro images swap inside the O on their own', a !== b, `${a} -> ${b}`);
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await sleep(700);
     const c = await pos();
     await sleep(6000);
     const d = await pos();
-    check('retro-motion', 'switching to reduced motion stops the stack (no card moves in 6 s)', c === d, `${c} -> ${d}`);
+    check('retro-motion', 'switching to reduced motion stops the swap (the image holds for 6 s)', c === d, `${c} -> ${d}`);
     await page.emulateMedia({ reducedMotion: 'no-preference' });
     await sleep(3400);
     const e = await pos();
-    check('retro-motion', 'switching back to normal motion restarts the stack', e !== d, `${d} -> ${e}`);
+    check('retro-motion', 'switching back to normal motion restarts the swap', e !== d, `${d} -> ${e}`);
     await page.context().close();
   }
 
-  // ---------------------------------------------------------------- F. Spanish alt text on the retro stack
+  // ---------------------------------------------------------------- F. Spanish alt text on the retro images
   {
     const alts = async (path) => {
       const page = await open({ width: 1440, height: 900, reduced: true }, path);
-      const list = await page.evaluate(() => [...document.querySelectorAll('.retro__card img')].map((i) => i.getAttribute('alt') ?? ''));
+      const list = await page.evaluate(() => [...document.querySelectorAll('#brand [data-brand-img]')].map((i) => i.getAttribute('alt') ?? ''));
       await page.context().close();
       return list;
     };
