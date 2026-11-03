@@ -1,0 +1,188 @@
+---
+import { programsCopy } from '../../../i18n/pages/programs';
+import { coachCommon } from '../../../i18n/pages/coach-common';
+import { site } from '../../../data/site';
+import type { Locale } from '../../../i18n';
+import FeatureHero from '../FeatureHero.astro';
+import Accordion from '../Accordion.astro';
+import AlsoInAria from '../AlsoInAria.astro';
+import CtaBand from '../CtaBand.astro';
+import CoachIcon from '../CoachIcon.astro';
+import BrowserFrame from '../BrowserFrame.astro';
+import FramePhone from './FramePhone.astro';
+import TemplatesScreen from './TemplatesScreen.astro';
+import AiScreen from './AiScreen.astro';
+import SendScreen from './SendScreen.astro';
+import ImportScreen from './ImportScreen.astro';
+import AthletePhone from './AthletePhone.astro';
+import LogPhone from './LogPhone.astro';
+import PlanCalendar from './PlanCalendar.astro';
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const c = programsCopy[locale];
+const common = coachCommon[locale];
+const items = c.rows.map((r) => ({ title: r.title, body: r.body, ai: r.key === 'ai' }));
+---
+
+<FeatureHero
+  locale={locale}
+  variant="banner"
+  eyebrow={c.hero.eyebrow}
+  title={c.hero.title}
+  primary={{ label: common.startFree, href: site.signUp }}
+  secondary={{ label: c.hero.secondary, href: '#proof' }}
+  photo={{ slot: 'f1-programs', alt: c.hero.photoAlt, ratio: '1600/612', sizes: '(max-width: 900px) 100vw, 1376px' }}
+  pos="30% 50%"
+  posMobile="14% 50%"
+  mirror
+/>
+
+<section class="section pg-acc" aria-labelledby="pg-acc-title">
+  <div class="container">
+    <h2 id="pg-acc-title" class="sr-only">{c.rowsLabel}</h2>
+    <Accordion id="pg" items={items} open={0} label={c.rowsLabel} wide>
+      <FramePhone slot="screen-0" locale={locale} copy={c} active={2}><TemplatesScreen copy={c.screens.templates} /></FramePhone>
+      <FramePhone slot="screen-1" locale={locale} copy={c} active={2}><AiScreen locale={locale} copy={c.screens.ai} /></FramePhone>
+      <FramePhone slot="screen-2" locale={locale} copy={c} active={2}><SendScreen copy={c.screens.send} /></FramePhone>
+      <FramePhone slot="screen-3" locale={locale} copy={c} active={2}><ImportScreen copy={c.screens.import} /></FramePhone>
+      <div slot="screen-4" class="pg-phones">
+        <AthletePhone copy={c.screens.phone} />
+        <LogPhone copy={c.screens.logPhone} workout={c.screens.phone.workout} />
+      </div>
+    </Accordion>
+    <p class="co-demo">{common.demoNote}</p>
+  </div>
+</section>
+
+<section id={c.proof.id} class="section section--surface pg-proof" aria-labelledby="pg-proof-title">
+  <div class="container">
+    <div class="section-head" data-reveal>
+      <h2 id="pg-proof-title">{c.proof.title}</h2>
+      <p>{c.proof.sub}</p>
+    </div>
+    <div class="pg-proof__grid" data-reveal style="--reveal-i:1">
+      <div class="pg-proof__plan">
+        <p class="pg-proof__label">{c.proof.plan}</p>
+        <BrowserFrame url={c.browserUrl} side={c.screens.sidebar} sideActive={2} decorative={false}>
+          <PlanCalendar locale={locale} title={c.proof.calendar} bare />
+        </BrowserFrame>
+      </div>
+      <div class="pg-proof__see">
+        <p class="pg-proof__label">{c.proof.see}</p>
+        <AthletePhone copy={c.screens.phone} />
+      </div>
+    </div>
+    <p class="co-demo">{common.demoNote}</p>
+    <h3 class="pg-proof__list-title">{c.proof.listTitle}</h3>
+    <ul class="pg-proof__list">
+      {
+        c.proof.list.map((line) => (
+          <li>
+            <CoachIcon name="check" size={18} />
+            <span>{line}</span>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>
+
+<AlsoInAria locale={locale} ids={c.also} />
+<CtaBand locale={locale} />
+
+<style>
+  .pg-acc {
+    padding-top: 40px;
+    padding-bottom: 80px;
+  }
+  .pg-phones {
+    display: flex;
+    justify-content: center;
+    gap: clamp(12px, 3vw, 32px);
+    container-type: inline-size;
+    width: 100%;
+    padding-bottom: 8px;
+    --phone-w: clamp(150px, 42cqw, 240px);
+  }
+  .pg-proof__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-rows: auto auto;
+    column-gap: clamp(32px, 6vw, 96px);
+    margin-top: 40px;
+  }
+  .pg-proof__plan,
+  .pg-proof__see {
+    display: grid;
+    grid-template-rows: subgrid;
+    grid-row: span 2;
+    row-gap: 14px;
+  }
+  .pg-proof__plan > :global(:not(.pg-proof__label)),
+  .pg-proof__see > :global(:not(.pg-proof__label)) {
+    align-self: center;
+  }
+  .pg-proof__label {
+    align-self: end;
+    margin: 0;
+    color: var(--ink-2);
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+  .pg-proof__see {
+    --phone-w: 232px;
+  }
+  .pg-proof__list-title {
+    margin-top: 40px;
+    font-size: 22px;
+    line-height: 28px;
+  }
+  .pg-proof__list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px 40px;
+    margin: 20px 0 0;
+    padding: 0;
+    list-style: none;
+  }
+  .pg-proof__list li {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    color: var(--ink);
+    font-size: 18px;
+    line-height: 26px;
+  }
+  .pg-proof__list :global(svg) {
+    flex: none;
+    margin-top: 4px;
+    color: var(--mint-ink);
+  }
+  @media (max-width: 900px) {
+    .pg-acc {
+      padding-top: 16px;
+      padding-bottom: 56px;
+    }
+    .pg-proof__grid {
+      grid-template-columns: minmax(0, 1fr);
+      grid-template-rows: none;
+      row-gap: 32px;
+    }
+    .pg-proof__plan,
+    .pg-proof__see {
+      grid-template-rows: auto auto;
+      grid-row: auto;
+    }
+    .pg-proof__see {
+      justify-self: center;
+    }
+    .pg-proof__list {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+</style>

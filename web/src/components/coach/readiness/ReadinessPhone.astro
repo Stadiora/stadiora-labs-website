@@ -1,0 +1,116 @@
+---
+import CoachIcon from '../CoachIcon.astro';
+import Ring from '../../ui/Ring.astro';
+import Phone from '../../ui/Phone.astro';
+import PhoneHead from './PhoneHead.astro';
+import type { ReadinessCopy } from '../../../i18n/pages/readiness';
+
+interface Props {
+  copy: ReadinessCopy['phones']['readiness'];
+  date: string;
+}
+const { copy, date } = Astro.props;
+---
+
+<Phone>
+  <div class="rp">
+    <PhoneHead title={copy.title} />
+    <p class="rp__date">
+      <CoachIcon name="chevron-left" size={12} />
+      <span>{date}</span>
+      <CoachIcon name="chevron-right" size={12} />
+    </p>
+    <div class="rp__ring">
+      <Ring value={Number(copy.value)} size={120} stroke={12} />
+      <span class="rp__num num">{copy.value}</span>
+    </div>
+    <p class="rp__status"><span class="rp__dot"></span>{copy.status}</p>
+    <ul class="rp__rows">
+      {
+        copy.rows.map((r) => (
+          <li>
+            <CoachIcon name={r.icon as any} size={16} />
+            <span class="rp__label">{r.label}</span>
+            <span class="rp__value">{r.value}</span>
+            <CoachIcon name="chevron-right" size={12} />
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</Phone>
+
+<style>
+  .rp {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    padding: 0.2em 1em 1em;
+    font-size: 0.95em;
+  }
+  .rp__date {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.9em;
+    margin: 0.1em 0 0.6em;
+    color: var(--ink-2);
+    font-size: 0.92em;
+  }
+  .rp__ring {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: 9.4em;
+    margin: 0 auto;
+  }
+  .rp__ring :global(svg) {
+    width: 100%;
+    height: auto;
+  }
+  .rp__num {
+    position: absolute;
+    color: var(--ink);
+    font-family: var(--font-display);
+    font-size: 3.1em;
+    font-weight: 600;
+    line-height: 1;
+  }
+  .rp__status {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5em;
+    margin: 0.8em 0 0.9em;
+    color: var(--ink);
+    font-weight: 500;
+  }
+  .rp__dot {
+    width: 0.7em;
+    height: 0.7em;
+    border-radius: 50%;
+    background: var(--mint);
+  }
+  .rp__rows {
+    margin: 0;
+    padding: 0;
+    border-top: 1px solid var(--line);
+    list-style: none;
+  }
+  .rp__rows li {
+    display: flex;
+    align-items: center;
+    gap: 0.7em;
+    padding: 0.8em 0;
+    border-bottom: 1px solid var(--line);
+    color: var(--ink-3);
+  }
+  .rp__label {
+    flex: 1;
+    color: var(--ink-2);
+  }
+  .rp__value {
+    color: var(--ink);
+    font-weight: 500;
+  }
+</style>

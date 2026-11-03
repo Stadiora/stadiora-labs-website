@@ -1,0 +1,72 @@
+---
+import Phone from '../../ui/Phone.astro';
+import PhoneHead from './PhoneHead.astro';
+import type { ReadinessCopy } from '../../../i18n/pages/readiness';
+
+interface Props {
+  copy: ReadinessCopy['calm']['cards'][0]['screen'];
+}
+const { copy } = Astro.props;
+---
+
+<Phone>
+  <div class="bp">
+    <PhoneHead title={copy.title} />
+    <div class="bp__orb">
+      <span class="bp__ring bp__ring--3"></span>
+      <span class="bp__ring bp__ring--2"></span>
+      <span class="bp__ring bp__ring--1"></span>
+      <span class="bp__cue">{copy.cue}</span>
+    </div>
+    <p class="bp__timer num">{copy.timer}</p>
+  </div>
+</Phone>
+
+<style>
+  .bp {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    padding: 0.2em 1em 1.2em;
+    font-size: 0.95em;
+  }
+  .bp__orb {
+    position: relative;
+    display: grid;
+    flex: none;
+    place-items: center;
+    height: 10.5em;
+  }
+  .bp__ring {
+    position: absolute;
+    border-radius: 50%;
+  }
+  .bp__ring--1 {
+    width: 6em;
+    height: 6em;
+    background: color-mix(in srgb, var(--cyan) 30%, var(--bg));
+  }
+  .bp__ring--2 {
+    width: 8em;
+    height: 8em;
+    background: color-mix(in srgb, var(--cyan) 16%, var(--bg));
+  }
+  .bp__ring--3 {
+    width: 10em;
+    height: 10em;
+    background: color-mix(in srgb, var(--cyan) 8%, var(--bg));
+  }
+  .bp__cue {
+    position: relative;
+    color: var(--ink);
+    font-family: var(--font-display);
+    font-size: 1.1em;
+    font-weight: 600;
+  }
+  .bp__timer {
+    margin-top: 0.8em;
+    color: var(--ink-2);
+    font-size: 1.4em;
+    text-align: center;
+  }
+</style>

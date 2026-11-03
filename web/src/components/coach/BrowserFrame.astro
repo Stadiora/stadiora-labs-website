@@ -1,0 +1,133 @@
+---
+import '../../styles/coach.css';
+import CoachIcon from './CoachIcon.astro';
+
+interface Props {
+  url: string;
+  /** Items for the sidebar, shown when the frame is wide enough. */
+  side?: string[];
+  sideIcons?: string[];
+  sideActive?: number;
+  /** Decorative frames are hidden from assistive tech. */
+  decorative?: boolean;
+  class?: string;
+}
+const {
+  url,
+  side,
+  sideIcons = ['home', 'run', 'clipboard-check', 'chat', 'users'],
+  sideActive = 2,
+  decorative = true,
+  class: cls,
+} = Astro.props;
+---
+
+<div class:list={['bf', cls]} aria-hidden={decorative ? 'true' : undefined}>
+  <div class="bf__bar">
+    <span class="bf__dots"><i></i><i></i><i></i></span>
+    <span class="bf__url">{url}</span>
+  </div>
+  <div class="bf__body">
+    {
+      side && (
+        <div class="bf__side">
+          {side.map((label, i) => (
+            <span class:list={['bf__item', { 'is-active': i === sideActive }]}>
+              <CoachIcon name={sideIcons[i] as any} size={16} />
+              {label}
+            </span>
+          ))}
+        </div>
+      )
+    }
+    <div class="bf__main"><slot /></div>
+  </div>
+</div>
+
+<style>
+  .bf {
+    container: bf / inline-size;
+    width: 100%;
+    overflow: hidden;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: var(--bg);
+    box-shadow: var(--shadow-pop);
+    font-family: var(--font-body);
+    font-size: 13px;
+    line-height: 1.4;
+    text-align: left;
+  }
+  .bf__bar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--line);
+    background: var(--surface);
+  }
+  .bf__dots {
+    display: flex;
+    gap: 6px;
+  }
+  .bf__dots i {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--surface-2);
+    box-shadow: inset 0 0 0 1px var(--line);
+  }
+  .bf__url {
+    flex: 0 1 280px;
+    min-width: 0;
+    overflow: hidden;
+    padding: 3px 12px;
+    border-radius: 999px;
+    background: var(--bg);
+    color: var(--ink-3);
+    font-size: 12px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .bf__body {
+    display: flex;
+    min-height: 320px;
+  }
+  .bf__side {
+    display: none;
+    flex: none;
+    width: 148px;
+    padding: 16px 10px;
+    border-right: 1px solid var(--line);
+    background: var(--surface);
+  }
+  .bf__item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    height: 36px;
+    padding: 0 10px;
+    border-radius: 8px;
+    color: var(--ink-2);
+    font-weight: 500;
+  }
+  .bf__item.is-active {
+    background: var(--cyan-tint);
+    color: var(--cyan-ink);
+  }
+  .bf__main {
+    flex: 1;
+    min-width: 0;
+    padding: 18px;
+  }
+  @container bf (min-width: 560px) {
+    .bf__side {
+      display: grid;
+      align-content: start;
+      gap: 2px;
+    }
+    .bf__main {
+      padding: 22px 24px;
+    }
+  }
+</style>

@@ -1,0 +1,55 @@
+---
+interface Props {
+  values: number[];
+  labels: string[];
+  max: number;
+}
+const { values, labels, max } = Astro.props;
+const last = values.length - 1;
+---
+
+<!-- Seven-day bars for a phone screen. Decorative: the headline number carries the meaning. -->
+<ul class="mb">
+  {
+    values.map((v, i) => (
+      <li class:list={['mb__col', { 'is-last': i === last }]}>
+        <span class="mb__bar" style={`height:${Math.round((v / max) * 100)}%`}></span>
+        <span class="mb__day">{labels[i]}</span>
+      </li>
+    ))
+  }
+</ul>
+
+<style>
+  .mb {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 0.5em;
+    height: 14em;
+    margin: 0;
+    padding: 0 0 1.5em;
+    list-style: none;
+  }
+  .mb__col {
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+  }
+  .mb__bar {
+    width: 100%;
+    max-width: 1.7em;
+    border-radius: 0.3em 0.3em 0 0;
+    background: color-mix(in srgb, var(--cyan) 38%, var(--bg));
+  }
+  .mb__col.is-last .mb__bar {
+    background: var(--cyan);
+  }
+  .mb__day {
+    position: absolute;
+    top: calc(100% + 0.35em);
+    color: var(--ink-2);
+    font-size: 0.82em;
+    line-height: 1;
+  }
+</style>

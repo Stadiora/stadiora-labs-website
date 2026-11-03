@@ -1,0 +1,11 @@
+---
+import Base from '../../../layouts/Base.astro';
+import ProgramsPage from '../../../components/coach/programs/ProgramsPage.astro';
+import { programsCopy } from '../../../i18n/pages/programs';
+
+const { meta } = programsCopy.en;
+---
+
+<Base locale="en" path="/platform/programs/" title={meta.title} description={meta.description}>
+  <ProgramsPage locale="en" />
+</Base>

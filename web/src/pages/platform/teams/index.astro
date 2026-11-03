@@ -1,0 +1,10 @@
+---
+import Base from '../../../layouts/Base.astro';
+import TeamsPage from '../../../components/engage/TeamsPage.astro';
+import { engageEn } from '../../../i18n/pages/engage';
+const m = engageEn.teams;
+---
+
+<Base locale="en" path="/platform/teams/" title={m.meta.title} description={m.meta.description}>
+  <TeamsPage locale="en" />
+</Base>

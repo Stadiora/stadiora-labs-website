@@ -1,0 +1,513 @@
+---
+import type { Locale } from '../../i18n';
+import { useEngage } from '../../i18n/pages/engage';
+import { hrefFor } from '../../data/nav';
+import { education, usd } from '../../data/prices';
+import { segments } from '../../lib/template';
+import { contactHref } from './links';
+import Photo from '../ui/Photo.astro';
+import Icon from '../ui/Icon.astro';
+import FinalCta from '../home/FinalCta.astro';
+import FeatureHero from './FeatureHero.astro';
+import AlsoInAria from './AlsoInAria.astro';
+import InfoTile from './InfoTile.astro';
+import EIcon from './EIcon.astro';
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const e = useEngage(locale);
+const t = e.teams;
+const c = e.common;
+const rowIcons = ['run', 'ball', 'ball', 'ball', 'dumbbell'] as const;
+const sidebarIcons = ['home', 'users', 'user', 'calendar', 'file'] as const;
+// The HTML always holds the US rate; the script below swaps in the visitor's region (same table as /pricing).
+const highSchool = education.us.find((r) => r.key === 'highSchool')!;
+const schoolValues: Record<string, string> = { price: usd(highSchool.monthly), athletes: String(highSchool.athletes) };
+---
+
+<FeatureHero
+  variant="overlap"
+  eyebrow={t.eyebrow}
+  title={t.title}
+  sub={t.sub}
+  ctas={[
+    { label: t.ctaPrimary, href: contactHref(locale, 'demo') },
+    { label: t.ctaSecondary, href: hrefFor('pricing', locale), kind: 'secondary' },
+  ]}
+>
+  <div slot="media" class="fh__fill" style="--focus:50% 35%">
+    <Photo
+      slot="m3-manage"
+      ratio="16/10"
+      sizes="(max-width: 1024px) 94vw, 720px"
+      widths={[480, 800, 1200]}
+      alt={t.photoAlt}
+      eager
+      priority="high"
+      locale={locale}
+    />
+  </div>
+
+  <div slot="below" class="container tp">
+    <div class="tp__panel" role="group" aria-label={t.panelLabel} data-reveal>
+      <aside class="side" aria-hidden="true">
+        <ul>
+          {t.sidebar.map((label, i) => (<li class:list={[i === 0 && 'is-on']}><EIcon name={sidebarIcons[i]} size={18} />{label}</li>))}
+        </ul>
+      </aside>
+      <div class="main">
+        <header class="main__head">
+          <h2 class="main__title">{t.school}</h2>
+          <p class="main__user" aria-hidden="true"><EIcon name="search" size={18} /><span class="av">{t.initials}</span>{t.coach}</p>
+        </header>
+        <ul class="main__tabs" aria-hidden="true">
+          {t.tabs.map((label, i) => (<li class:list={[i === 0 && 'is-on']}>{label}</li>))}
+        </ul>
+        <ul class="stats">
+          {
+            t.stats.map((s) => (
+              <li class="stat">
+                <span class="stat__icon"><EIcon name={s.icon as 'users'} size={24} /></span>
+                <span class="stat__body"><span class="stat__value num">{s.value}</span><span class="stat__label">{s.label}</span></span>
+              </li>
+            ))
+          }
+        </ul>
+        <div class="tbl">
+          <table>
+            <caption class="sr-only">{t.table.caption}</caption>
+            <thead>
+              <tr>{t.table.head.map((h) => (<th scope="col">{h}</th>))}</tr>
+            </thead>
+            <tbody>
+              {
+                t.table.rows.map((r, i) => (
+                  <tr>
+                    <td><span class="tbl__team"><EIcon name={rowIcons[i]} size={18} class="tbl__ico" />{r.team}</span></td>
+                    <td class="num">{r.athletes}</td>
+                    <td>{r.coach}</td>
+                    <td class="tbl__status"><i aria-hidden="true"></i>{t.table.active}</td>
+                  </tr>
+                ))
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="tp__pops">
+      <section class="pcard" aria-labelledby="staff-title" data-reveal style="--reveal-i:1">
+        <h3 id="staff-title" class="pcard__title"><EIcon name="users" size={22} />{t.staff.title}</h3>
+        <ul class="pcard__list">{t.staff.roles.map((r) => (<li>{r}</li>))}</ul>
+      </section>
+      <section class="pcard" aria-labelledby="rep-title" data-reveal style="--reveal-i:2">
+        <h3 id="rep-title" class="pcard__title"><EIcon name="file" size={22} />{t.reports.title}</h3>
+        <ul class="pcard__list">{t.reports.items.map((r) => (<li>{r}</li>))}</ul>
+        <span class="pcard__btn">{t.reports.export}</span>
+      </section>
+    </div>
+
+    <div class="tp__notes">
+      <p class="demo-note">{c.demoNote}</p>
+      <p class="demo-note tp__consent">{t.consent}</p>
+    </div>
+  </div>
+</FeatureHero>
+
+<section class="section jobs" aria-labelledby="jobs-title">
+  <div class="container">
+    <h2 id="jobs-title" class="sr-only">{t.jobsTitle}</h2>
+    <ul class="jobs__grid">
+      {
+        t.jobs.map((j, i) => (
+          <li id={i === 2 ? 'reports' : undefined} data-reveal style={`--reveal-i:${i}`}>
+            <InfoTile icon={j.icon as 'users'} title={j.title} body={j.body} />
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>
+
+<section class="band-surface" aria-labelledby="schools-title">
+  <div class="container schools">
+    <div>
+      <h2 id="schools-title" class="schools__title">{t.schools.title}</h2>
+      <p class="schools__body">{segments(t.schools.body).map((s) => ('token' in s ? (s.token === 'price' ? <strong class="num" data-school={s.token}>{schoolValues[s.token]}</strong> : <span data-school={s.token}>{schoolValues[s.token]}</span>) : s.text))}</p>
+    </div>
+    <a class="link link-arrow" href={hrefFor('pricing', locale)}>{t.schools.see}<Icon name="arrow-right" size={18} /></a>
+  </div>
+</section>
+
+<AlsoInAria locale={locale} items={t.also} />
+<FinalCta locale={locale} demoHref={contactHref(locale, 'demo')} />
+
+<style>
+  .tp {
+    position: relative;
+    z-index: 2;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 288px;
+    gap: 0 32px;
+    margin-top: calc(-1 * var(--ov, 96px));
+    padding-top: 0;
+  }
+  .tp__panel {
+    display: grid;
+    grid-template-columns: 200px minmax(0, 1fr);
+    grid-column: 1;
+    grid-row: 1 / span 2;
+    align-self: start;
+    min-width: 0;
+    overflow: hidden;
+    border: 1px solid var(--pop-border);
+    border-radius: 18px;
+    background: var(--bg);
+    box-shadow: var(--shadow-lift);
+  }
+  .side {
+    padding: 22px 14px;
+    border-right: 1px solid var(--line);
+    background: var(--surface);
+  }
+  .side ul {
+    display: grid;
+    gap: 6px;
+  }
+  .side li {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    color: var(--ink-2);
+    font-size: 15px;
+  }
+  .side li.is-on {
+    background: var(--cyan-tint);
+    color: var(--cyan-ink);
+    font-weight: 600;
+  }
+  .main {
+    min-width: 0;
+    padding: 22px 24px 24px;
+  }
+  .main__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
+  .main__title {
+    font-size: 24px;
+    line-height: 30px;
+  }
+  .main__user {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: var(--ink-2);
+    font-size: 15px;
+    white-space: nowrap;
+  }
+  .av {
+    display: grid;
+    place-items: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--cyan-ink);
+    color: var(--bg);
+    font-size: 12px;
+    font-weight: 700;
+  }
+  .main__tabs {
+    display: flex;
+    gap: 28px;
+    margin-top: 14px;
+    border-bottom: 1px solid var(--line);
+    font-size: 15px;
+    color: var(--ink-2);
+  }
+  .main__tabs li {
+    padding-bottom: 10px;
+  }
+  .main__tabs li.is-on {
+    margin-bottom: -1px;
+    border-bottom: var(--lane) solid var(--cyan);
+    color: var(--ink);
+    font-weight: 600;
+  }
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 14px;
+    margin-top: 18px;
+  }
+  .stat {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 16px;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+  }
+  .stat__icon {
+    flex: none;
+    color: var(--cyan-ink);
+  }
+  .stat__body {
+    display: grid;
+    line-height: 1.15;
+  }
+  .stat__value {
+    font-size: 26px;
+    font-weight: 600;
+  }
+  .stat__label {
+    color: var(--ink-2);
+    font-size: 14px;
+    line-height: 18px;
+  }
+  .tbl {
+    margin-top: 18px;
+    overflow-x: auto;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+  }
+  table {
+    width: 100%;
+    min-width: 520px;
+    border-collapse: collapse;
+    font-size: 15px;
+  }
+  th {
+    padding: 10px 16px;
+    background: var(--surface);
+    color: var(--ink-2);
+    font-size: 13px;
+    font-weight: 500;
+    text-align: left;
+  }
+  td {
+    padding: 11px 16px;
+    border-top: 1px solid var(--line);
+  }
+  /* A long team name ("Fuerza y acondicionamiento") wraps; numbers and the status stay on one line. */
+  td.num,
+  .tbl__status {
+    white-space: nowrap;
+  }
+  .tbl__team {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .tbl__team :global(.tbl__ico) {
+    flex: none;
+    color: var(--ink-2);
+  }
+  .tbl__status {
+    color: var(--ink-2);
+  }
+  .tbl__status i {
+    display: inline-block;
+    width: 9px;
+    height: 9px;
+    margin-right: 8px;
+    border-radius: 50%;
+    background: var(--mint);
+  }
+
+  @media (max-width: 1360px) and (min-width: 1025px) {
+    .tp {
+      grid-template-columns: minmax(0, 1fr) 248px;
+      gap: 0 24px;
+    }
+    .tp__panel {
+      grid-template-columns: 176px minmax(0, 1fr);
+    }
+    .main {
+      padding-inline: 18px;
+    }
+    .stat {
+      gap: 10px;
+      padding: 12px;
+    }
+    .stat__label {
+      font-size: 13px;
+    }
+    th,
+    td {
+      padding-inline: 12px;
+    }
+  }
+
+  .tp__pops {
+    display: grid;
+    grid-column: 2;
+    grid-row: 1;
+    gap: 20px;
+    align-self: start;
+    margin-top: 24px;
+  }
+  .pcard {
+    padding: 20px 22px 22px;
+    border: 1px solid var(--pop-border);
+    border-radius: var(--radius-card);
+    background: var(--bg);
+    box-shadow: var(--shadow-pop);
+  }
+  .pcard__title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 19px;
+    line-height: 26px;
+  }
+  .pcard__title :global(svg) {
+    color: var(--cyan-ink);
+  }
+  .pcard__list {
+    display: grid;
+    gap: 6px;
+    margin-top: 12px;
+    color: var(--ink-2);
+    font-size: 15px;
+    line-height: 22px;
+  }
+  .pcard__btn {
+    display: block;
+    margin-top: 16px;
+    padding: 10px 14px;
+    border: 1.5px solid var(--ink);
+    border-radius: var(--radius-ctl);
+    font-weight: 600;
+    text-align: center;
+  }
+  .tp__notes {
+    grid-column: 1 / -1;
+    margin-top: 24px;
+    text-align: center;
+  }
+  .tp__notes .demo-note {
+    margin-top: 2px;
+  }
+  .tp__consent {
+    color: var(--ink-2);
+  }
+
+  .jobs {
+    padding-block: clamp(48px, 6vw, 80px) 24px;
+  }
+  .jobs__grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 24px;
+  }
+  .jobs__grid li {
+    display: grid;
+    scroll-margin-top: calc(var(--nav-h, 72px) + 24px);
+  }
+  .band-surface {
+    margin-top: 48px;
+    padding-block: 32px;
+    background: var(--surface);
+  }
+  .schools {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px 40px;
+  }
+  .schools__title {
+    font-size: 28px;
+    line-height: 34px;
+  }
+  .schools__body {
+    margin-top: 6px;
+    color: var(--ink-2);
+    font-size: 19px;
+    line-height: 28px;
+  }
+  .schools__body strong {
+    color: var(--ink);
+  }
+
+  @media (max-width: 1180px) {
+    .stats {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  @media (max-width: 1024px) {
+    .tp {
+      grid-template-columns: minmax(0, 1fr);
+      margin-top: 40px;
+    }
+    .tp__panel {
+      grid-row: auto;
+    }
+    .tp__pops {
+      grid-column: 1;
+      grid-row: auto;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      margin-top: 24px;
+    }
+    .jobs__grid {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+  @media (max-width: 720px) {
+    .tp__panel {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .side {
+      display: none;
+    }
+    .main {
+      padding: 18px 16px;
+    }
+    .main__user {
+      display: none;
+    }
+    .main__tabs {
+      gap: 12px;
+      font-size: 14px;
+    }
+    .tbl {
+      overflow-x: visible;
+    }
+    table {
+      min-width: 0;
+    }
+    th:nth-child(n + 3),
+    td:nth-child(n + 3) {
+      display: none;
+    }
+    .tp__pops {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+  /* Five tabs ("Cuerpo técnico" included) need about 380px; the panel offers about 325px at 390. Calendar is the one that goes. */
+  @media (max-width: 480px) {
+    .main__tabs li:nth-child(4) {
+      display: none;
+    }
+  }
+</style>
+
+<script>
+  import { education, usd } from '../../data/prices';
+  import { detectRegion } from '../../lib/region';
+
+  const rate = education[detectRegion(window.location.search)].find((r) => r.key === 'highSchool');
+  const text: Record<string, string> = rate ? { price: usd(rate.monthly), athletes: String(rate.athletes) } : {};
+  document.querySelectorAll<HTMLElement>('[data-school]').forEach((el) => {
+    const value = text[el.dataset.school ?? ''];
+    if (value) el.textContent = value;
+  });
+</script>

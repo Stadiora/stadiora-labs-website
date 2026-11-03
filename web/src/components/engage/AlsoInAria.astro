@@ -1,0 +1,128 @@
+---
+import { useDict, type Locale } from '../../i18n';
+import { useEngage } from '../../i18n/pages/engage';
+import { hrefFor } from '../../data/nav';
+import type { ItemId } from '../../data/site';
+import EIcon from './EIcon.astro';
+
+interface Props {
+  locale: Locale;
+  items: readonly string[];
+}
+const { locale, items } = Astro.props;
+const t = useDict(locale);
+const e = useEngage(locale);
+const icons: Record<string, 'chat' | 'users' | 'heart' | 'file' | 'calendar' | 'link' | 'dumbbell' | 'chart'> = {
+  messaging: 'chat',
+  guardian: 'users',
+  teams: 'calendar',
+  readiness: 'heart',
+  branded: 'file',
+  integrations: 'link',
+  programs: 'chart',
+  powerlab: 'dumbbell',
+};
+---
+
+<section class="section also" aria-labelledby="also-title">
+  <div class="container">
+    <h2 id="also-title" class="also__title">{e.common.alsoTitle}</h2>
+    <ul class="also__grid">
+      {
+        items.map((id) => {
+          const item = t.nav.items[id as ItemId];
+          return (
+            <li>
+              <a class="also__card" href={hrefFor(id as ItemId, locale)}>
+                <span class="also__icon"><EIcon name={icons[id] ?? 'link'} size={22} /></span>
+                <span class="also__text">
+                  <span class="also__name">{item.name}</span>
+                  <span class="also__desc">{item.desc}</span>
+                </span>
+                <EIcon name="arrow-right" size={18} class="also__arrow" />
+              </a>
+            </li>
+          );
+        })
+      }
+    </ul>
+  </div>
+</section>
+
+<style>
+  .also {
+    padding-block: 48px 72px;
+  }
+  .also__title {
+    font-size: 28px;
+    line-height: 34px;
+  }
+  .also__grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 20px;
+    margin-top: 24px;
+  }
+  .also__card {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    min-height: 88px;
+    padding: 18px 22px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-card);
+    background: var(--bg);
+    text-decoration: none;
+    transition:
+      transform 0.2s var(--ease-out),
+      box-shadow 0.2s var(--ease-out);
+  }
+  .also__card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-pop);
+  }
+  .also__icon {
+    display: grid;
+    place-items: center;
+    flex: none;
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    background: var(--cyan-tint);
+    color: var(--cyan-ink);
+  }
+  .also__text {
+    display: grid;
+    flex: 1;
+    min-width: 0;
+    gap: 2px;
+  }
+  .also__name {
+    font-family: var(--font-display);
+    font-size: 18px;
+    line-height: 24px;
+    font-weight: 600;
+  }
+  .also__desc {
+    color: var(--ink-2);
+    font-size: 15px;
+    line-height: 22px;
+  }
+  .also__card :global(.also__arrow) {
+    flex: none;
+    color: var(--ink-2);
+  }
+  @media (max-width: 900px) {
+    .also__grid {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .also__card {
+      transition: none;
+    }
+    .also__card:hover {
+      transform: none;
+    }
+  }
+</style>

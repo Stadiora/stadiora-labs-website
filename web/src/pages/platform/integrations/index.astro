@@ -1,0 +1,10 @@
+---
+import Base from '../../../layouts/Base.astro';
+import IntegrationsPage from '../../../components/engage/IntegrationsPage.astro';
+import { engageEn } from '../../../i18n/pages/engage';
+const m = engageEn.integrations;
+---
+
+<Base locale="en" path="/platform/integrations/" title={m.meta.title} description={m.meta.description}>
+  <IntegrationsPage locale="en" />
+</Base>

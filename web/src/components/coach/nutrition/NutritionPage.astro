@@ -1,0 +1,160 @@
+---
+import { nutritionCopy } from '../../../i18n/pages/nutrition';
+import { coachCommon } from '../../../i18n/pages/coach-common';
+import { site } from '../../../data/site';
+import type { Locale } from '../../../i18n';
+import FeatureHero from '../FeatureHero.astro';
+import StepFlow from '../StepFlow.astro';
+import AlsoInAria from '../AlsoInAria.astro';
+import CtaBand from '../CtaBand.astro';
+import CoachIcon from '../CoachIcon.astro';
+import MealPopCard from './MealPopCard.astro';
+import PlanScreen from './PlanScreen.astro';
+import DiaryPhone from './DiaryPhone.astro';
+import WeekChart from './WeekChart.astro';
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const c = nutritionCopy[locale];
+const common = coachCommon[locale];
+---
+
+<FeatureHero
+  locale={locale}
+  variant="split"
+  popAt="inside"
+  eyebrow={c.hero.eyebrow}
+  title={c.hero.title}
+  emphasis={c.hero.emphasis}
+  sub={c.hero.sub}
+  primary={{ label: common.startFree, href: site.signUp }}
+  secondary={{ label: c.hero.secondary, href: `#${c.flow.id}` }}
+  photo={{ slot: 'f2-nutrition', alt: c.hero.photoAlt, ratio: '4/3', sizes: '(max-width: 900px) 100vw, 680px' }}
+  pos="50% 50%"
+>
+  <MealPopCard slot="pop" copy={c.hero.meal} />
+</FeatureHero>
+
+<section id={c.flow.id} class="section section--surface nu-flow" aria-labelledby="nu-flow-title">
+  <div class="container">
+    <h2 id="nu-flow-title" class="nu-flow__title" data-reveal>{c.flow.title}</h2>
+    <StepFlow steps={c.flow.steps} stepWord={common.stepWord}>
+      <PlanScreen slot="step-0" copy={c.flow.plan} />
+      <DiaryPhone slot="step-1" copy={c.flow.diary} />
+      <WeekChart slot="step-2" copy={c.flow.week} />
+    </StepFlow>
+    <p class="co-demo">{common.demoNote}</p>
+  </div>
+</section>
+
+<section class="section nu-inside" aria-labelledby="nu-inside-title">
+  <div class="container nu-inside__grid">
+    <h2 id="nu-inside-title" class="nu-inside__title" data-reveal>{c.inside.title}</h2>
+    <div>
+      <ul class="nu-inside__list">
+        {
+          c.inside.items.map((item, i) => (
+            <li data-reveal style={`--reveal-i:${i}`}>
+              <span class="nu-inside__icon">
+                <CoachIcon name={item.icon as any} size={20} />
+              </span>
+              <span>
+                <span class="nu-inside__name">{item.name}</span>
+                <span class="nu-inside__line">{item.line}</span>
+              </span>
+            </li>
+          ))
+        }
+      </ul>
+      <p class="nu-inside__note">{c.inside.note}</p>
+    </div>
+  </div>
+</section>
+
+<AlsoInAria locale={locale} ids={c.also} />
+<CtaBand locale={locale} />
+
+<style>
+  .nu-flow {
+    padding-top: 56px;
+    padding-bottom: 64px;
+  }
+  .nu-flow__title {
+    margin-bottom: 36px;
+    text-align: center;
+    font-size: clamp(30px, 3.2vw, 44px);
+    line-height: 1.12;
+  }
+  .nu-inside__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    gap: clamp(32px, 6vw, 96px);
+    align-items: start;
+  }
+  .nu-inside__title {
+    font-size: clamp(28px, 3vw, 40px);
+    line-height: 1.15;
+    max-width: 14ch;
+  }
+  .nu-inside__list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 28px 40px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .nu-inside__list li {
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+  }
+  .nu-inside__icon {
+    display: grid;
+    flex: none;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    background: var(--cyan-tint);
+    color: var(--cyan-ink);
+  }
+  .nu-inside__name {
+    display: block;
+    color: var(--ink);
+    font-size: 18px;
+    font-weight: 600;
+    line-height: 26px;
+  }
+  .nu-inside__line {
+    display: block;
+    color: var(--ink-2);
+    font-size: 16px;
+    line-height: 24px;
+  }
+  .nu-inside__note {
+    margin-top: 32px;
+    padding-top: 20px;
+    border-top: 1px solid var(--line);
+    color: var(--ink-2);
+    font-size: 14px;
+    line-height: 20px;
+  }
+
+  @media (max-width: 960px) {
+    .nu-inside__grid {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .nu-inside__title {
+      max-width: none;
+    }
+  }
+  @media (max-width: 560px) {
+    .nu-inside__list {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 22px;
+    }
+  }
+</style>

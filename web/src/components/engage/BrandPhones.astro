@@ -1,0 +1,334 @@
+---
+import { Image } from 'astro:assets';
+import { useDict, type Locale } from '../../i18n';
+import { site } from '../../data/site';
+import Phone from '../ui/Phone.astro';
+import Photo from '../ui/Photo.astro';
+import Icon from '../ui/Icon.astro';
+import runIcon from '../../assets/apps/app-run.webp';
+import aria12Icon from '../../assets/apps/app-aria12.webp';
+import liftIcon from '../../assets/apps/app-lift.webp';
+import fitmgIcon from '../../assets/apps/app-fitmg.webp';
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const t = useDict(locale);
+const a = t.apps;
+const names = t.nav.apps;
+const apps = ['run', 'aria12', 'lift', 'fitmg'] as const;
+const icons = { run: runIcon, aria12: aria12Icon, lift: liftIcon, fitmg: fitmgIcon };
+const nav = ['activity', 'run', 'chat', 'menu'] as const;
+
+// Availability text is split so each store word becomes a link; "Coming soon" has none.
+const storeLinks: Record<string, string> = {
+  run: `${a.store.ios}|${site.stores.runIos};${a.store.android}|${site.stores.runAndroid}`,
+  fitmg: `${a.store.android}|${site.stores.fitmgAndroid};${a.store.iosBeta}|${site.stores.fitmgIosBeta}`,
+};
+function parts(key: (typeof apps)[number]) {
+  const map = new Map((storeLinks[key] ?? '').split(';').filter(Boolean).map((p) => p.split('|') as [string, string]));
+  return names[key].status.split(/(iOS beta|iOS|Android)/).map((text) => ({ text, href: map.get(text) }));
+}
+const heroPhotos = {
+  run: { slot: 'p1-training', pos: '18% 55%' },
+  aria12: { slot: 'h2-academies-tile-sq', pos: '50% 80%' },
+  lift: { slot: 'h5-gyms-big', pos: '50% 36%' },
+} as const;
+const thumbs = [
+  { slot: 'h5-gyms-tile-sq', pos: '60% 40%' },
+  { slot: 'h7-universities-tile-sq', pos: '50% 22%' },
+  { slot: 'h5-gyms-tile-45', pos: '50% 30%' },
+  { slot: 'h7-universities-tile-45', pos: '30% 28%' },
+] as const;
+---
+
+<ul class="fan">
+  {
+    apps.map((key) => (
+      <li class="fan__item">
+        <Phone class="fan__phone" bg={key === 'fitmg' ? '#0a0a0a' : '#ffffff'} ink={key === 'fitmg' ? '#ffffff' : '#08132b'}>
+          <div class={`bp bp--${key}`}>
+            <div class="bp__head">
+              <Image class="bp__icon" src={icons[key]} alt="" width={64} height={64} widths={[64, 128]} sizes="32px" loading="lazy" decoding="async" />
+              <span class="bp__name">{names[key].name}</span>
+            </div>
+            <p class="bp__today">
+              {a.screen.today}
+            </p>
+            {key !== 'fitmg' && (
+              <div class="bp__hero" style={`--pos:${heroPhotos[key].pos}`}>
+                <Photo slot={heroPhotos[key].slot} ratio="2/1" sizes="220px" widths={[240, 480]} alt="" />
+              </div>
+            )}
+            <div class="bp__body">
+              {key === 'run' && (
+                <>
+                  <p class="bp__strong">{a.screen.run.title}</p>
+                  <p class="bp__tag num">{a.screen.run.session} · {a.screen.run.note}</p>
+                  <span class="bp__cta">{a.screen.run.cta}</span>
+                </>
+              )}
+              {key === 'aria12' && (
+                <>
+                  <p class="bp__strong">{a.screen.aria12.title}</p>
+                  <p class="bp__tag">{a.screen.aria12.session}</p>
+                  <p class="bp__tag">{a.screen.aria12.note}</p>
+                  <span class="bp__cta">{a.screen.aria12.cta}</span>
+                </>
+              )}
+              {key === 'lift' && (
+                <>
+                  <p class="bp__strong">{a.screen.lift.title}</p>
+                  <ul class="bp__list">
+                    {a.screen.lift.rows.map((row, n) => (
+                      <li>
+                        <span>{row}</span>
+                        <span class="num">{a.screen.lift.sets[n]}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </>
+              )}
+              {key === 'fitmg' && (
+                <>
+                  <p class="bp__strong">{a.screen.fitmg.title}</p>
+                  <ul class="bp__list bp__list--tiles">
+                    {a.screen.fitmg.rows.slice(0, 3).map((row, n) => (
+                      <li>
+                        <b style={`--pos:${thumbs[n % thumbs.length].pos}`}>
+                          <Photo slot={thumbs[n % thumbs.length].slot} ratio="1/1" sizes="64px" widths={[64, 128]} alt="" />
+                        </b>
+                        <span>
+                          {row}
+                          <small class="num">{a.screen.fitmg.sets[n]}</small>
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                </>
+              )}
+            </div>
+            <div class="bp__tabs">
+              {nav.map((n) => (
+                <Icon name={n} size={14} />
+              ))}
+            </div>
+          </div>
+        </Phone>
+        <p class="fan__name">
+          <Image class="fan__icon" src={icons[key]} alt="" width={28} height={28} widths={[28, 56, 84]} sizes="28px" loading="lazy" decoding="async" />
+          {names[key].name}
+        </p>
+        <p class="fan__status">
+          {parts(key).map((p) => (p.href ? <a class="fan__store" href={p.href} rel="noopener">{p.text}</a> : p.text))}
+        </p>
+      </li>
+    ))
+  }
+</ul>
+
+<style>
+  .fan {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: clamp(10px, 1.6vw, 24px);
+    align-items: start;
+  }
+  .fan__item {
+    min-width: 0;
+    text-align: center;
+  }
+  /* A gentle fan: the middle phones sit a touch lower. */
+  .fan__item:nth-child(2),
+  .fan__item:nth-child(3) {
+    margin-top: 10px;
+  }
+  .fan__item :global(.fan__phone) {
+    --phone-w: clamp(132px, 11.4vw, 176px);
+    margin-inline: auto;
+  }
+  .fan__name {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 16px;
+    font-family: var(--font-display);
+    font-weight: 600;
+    letter-spacing: -0.015em;
+    color: var(--ink);
+    font-size: 17px;
+    line-height: 22px;
+  }
+  .fan__name :global(.fan__icon) {
+    flex: none;
+    width: 28px;
+    height: 28px;
+    border-radius: 7px;
+  }
+  .fan__status {
+    margin-top: 2px;
+    color: var(--ink-2);
+    font-size: 15px;
+    line-height: 22px;
+  }
+  .fan__store {
+    padding: 10px 3px;
+    margin: -10px -3px;
+    color: var(--cyan-ink);
+    font-weight: 500;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  /* Four branded screens drawn in HTML. Each brand keeps its own palette in both themes. */
+  .bp {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    min-height: 0;
+    height: 100%;
+    color: inherit;
+  }
+  .bp__head {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5em;
+    padding: 0.55em 0.8em 0.8em;
+    background: var(--hdr);
+    color: var(--hdr-ink, #ffffff);
+    font-family: var(--font-display);
+    font-size: 0.95em;
+    font-weight: 600;
+  }
+  .bp__head :global(.bp__icon) {
+    width: 1.7em;
+    height: 1.7em;
+    border-radius: 0.4em;
+  }
+  .bp__today {
+    padding: 0.7em 1em 0.4em;
+    font-size: 0.85em;
+    font-weight: 600;
+  }
+  .bp__hero {
+    flex: none;
+    height: 6.6em;
+    margin: 0 0.8em;
+    overflow: hidden;
+    border-radius: 0.5em;
+    background: #3a3a3a;
+  }
+  .bp__hero :global(.photo),
+  .bp__list--tiles b :global(.photo) {
+    height: 100%;
+    object-position: var(--pos, 50% 50%);
+  }
+  .bp__body {
+    flex: 1;
+    min-height: 0;
+    padding: 0.7em 1em 0;
+    font-size: 0.82em;
+  }
+  .bp__strong {
+    font-weight: 600;
+  }
+  .bp__tag {
+    opacity: 0.75;
+    font-size: 0.92em;
+  }
+  .bp__cta {
+    display: block;
+    margin-top: 0.7em;
+    padding: 0.7em;
+    border-radius: 0.6em;
+    background: var(--accent);
+    color: var(--on, #ffffff);
+    text-align: center;
+    font-weight: 600;
+  }
+  .bp__list {
+    display: grid;
+    gap: 0.3em;
+    margin-top: 0.5em;
+  }
+  .bp__list li {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.6em;
+    padding: 0.45em 0.1em;
+    border-bottom: 1px solid rgb(128 128 128 / 0.25);
+    font-size: 0.95em;
+  }
+  .bp__list--tiles li {
+    justify-content: flex-start;
+    padding: 0.4em;
+    border: 0;
+    border-radius: 0.6em;
+    background: rgb(255 255 255 / 0.1);
+  }
+  .bp__list--tiles b {
+    flex: none;
+    width: 2.4em;
+    height: 2.4em;
+    overflow: hidden;
+    border-radius: 0.4em;
+    background: linear-gradient(135deg, #3a3a3a, #1c1c1c);
+  }
+  .bp__list--tiles span {
+    display: grid;
+    line-height: 1.2;
+  }
+  .bp__list--tiles small {
+    opacity: 0.7;
+    font-size: 0.85em;
+  }
+  .bp__tabs {
+    display: flex;
+    flex: none;
+    justify-content: space-around;
+    padding: 0.7em 0.6em 0.9em;
+    border-top: 1px solid rgb(128 128 128 / 0.25);
+    opacity: 0.75;
+  }
+
+  .bp--run {
+    --hdr: #0a1a3a;
+    --accent: #1a73d9;
+  }
+  .bp--aria12 {
+    --hdr: #0e5a34;
+    --accent: #15803d;
+    --on: #ffffff;
+  }
+  .bp--lift {
+    --hdr: #ff5a3c;
+    --hdr-ink: #08132b;
+    --accent: #ff5a3c;
+    --on: #08132b;
+  }
+  .bp--fitmg {
+    --hdr: #0a0a0a;
+    --accent: #e11d2e;
+  }
+  .bp--fitmg .bp__today {
+    color: #ffffff;
+  }
+
+  @media (max-width: 720px) {
+    .fan {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      row-gap: 32px;
+    }
+    .fan__item:nth-child(2),
+    .fan__item:nth-child(3) {
+      margin-top: 0;
+    }
+    .fan__item :global(.fan__phone) {
+      --phone-w: min(38vw, 176px);
+    }
+  }
+</style>

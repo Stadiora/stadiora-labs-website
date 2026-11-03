@@ -1,0 +1,104 @@
+---
+import '../../../styles/coach.css';
+import CoachIcon from '../CoachIcon.astro';
+import MealRow from './MealRow.astro';
+import type { NutritionCopy } from '../../../i18n/pages/nutrition';
+
+interface Props {
+  copy: NutritionCopy['flow']['plan'];
+}
+const { copy } = Astro.props;
+---
+
+<!-- Coach meal plan, as it appears in the coach app. Illustration only. -->
+<div class="ps co-card" aria-hidden="true">
+  <div class="ps__head">
+    <div>
+      <p class="ps__title">{copy.title}</p>
+      <p class="ps__meta num">{copy.meta}</p>
+    </div>
+    <span class="ps__more"><i></i><i></i><i></i></span>
+  </div>
+  <ul class="ps__meals">
+    {
+      copy.meals.map((m) => (
+        <li class="ps__row">
+          <MealRow name={m.name} food={m.food} kcal={m.kcal} chevron />
+        </li>
+      ))
+    }
+  </ul>
+  <div class="ps__ask">
+    <CoachIcon name="sparkle" size={20} />
+    <span>{copy.ask}</span>
+    <CoachIcon name="chevron-right" size={16} />
+  </div>
+</div>
+
+<style>
+  .ps {
+    padding: 16px;
+    font-size: 14px;
+    line-height: 20px;
+  }
+  .ps__head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .ps__title {
+    color: var(--ink);
+    font-family: var(--font-display);
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 22px;
+  }
+  .ps__meta {
+    margin-top: 2px;
+    color: var(--ink-2);
+  }
+  .ps__more {
+    display: inline-flex;
+    gap: 3px;
+    padding-top: 8px;
+  }
+  .ps__more i {
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: var(--ink-3);
+  }
+  .ps__meals {
+    display: grid;
+    gap: 8px;
+    margin: 14px 0 0;
+    padding: 0;
+    list-style: none;
+  }
+  .ps__row {
+    padding: 8px 10px;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+  }
+  .ps__ask {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 12px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    background: light-dark(#f6f2fe, rgb(139 92 246 / 0.14));
+    color: var(--ink);
+    font-weight: 500;
+  }
+  .ps__ask :global(svg:first-child) {
+    color: var(--violet);
+  }
+  .ps__ask span {
+    flex: 1;
+  }
+  .ps__ask :global(svg:last-child) {
+    color: var(--ink-3);
+  }
+</style>

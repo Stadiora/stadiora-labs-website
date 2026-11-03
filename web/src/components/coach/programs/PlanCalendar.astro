@@ -1,0 +1,134 @@
+---
+import { useDict, type Locale } from '../../../i18n';
+
+interface Props {
+  locale: Locale;
+  title: string;
+  /** Drop the card chrome when the calendar sits inside a browser frame. */
+  bare?: boolean;
+}
+const { locale, title, bare = false } = Astro.props;
+const a = useDict(locale).ai;
+const sessions = [
+  { day: 0, key: 'acceleration', spec: '6×30 m' },
+  { day: 1, key: 'tempo', spec: '6×200 m' },
+  { day: 3, key: 'speedEndurance', spec: '3×300 m' },
+  { day: 5, key: 'raceModel', spec: '2×350 m' },
+] as const;
+const byDay = new Map<number, (typeof sessions)[number]>(sessions.map((s) => [s.day, s]));
+---
+
+<!-- Read-only week view. Same sessions as the AI demo on the home page. -->
+<div class:list={['pc', { 'co-card': !bare, 'pc--bare': bare }]}>
+  <p class="pc__title">{title}</p>
+  <ul class="pc__week">
+    {
+      a.days.map((day, i) => {
+        const s = byDay.get(i);
+        return (
+          <li class:list={['pc__day', { 'pc__day--empty': !s }]}>
+            <span class="pc__label">{day}</span>
+            {s && (
+              <span class="pc__chip">
+                <span class="pc__name">{a.sessions[s.key]}</span>
+                <span class="pc__spec num">{s.spec}</span>
+              </span>
+            )}
+          </li>
+        );
+      })
+    }
+  </ul>
+</div>
+
+<style>
+  .pc {
+    container-type: inline-size;
+    padding: 20px;
+  }
+  .pc__title {
+    color: var(--ink);
+    font-family: var(--font-display);
+    font-size: 17px;
+    font-weight: 600;
+    line-height: 24px;
+  }
+  .pc__week {
+    display: grid;
+    gap: 8px;
+    margin: 16px 0 0;
+    padding: 0;
+    list-style: none;
+  }
+  .pc__day {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .pc__day--empty {
+    display: none;
+  }
+  .pc__label {
+    width: 34px;
+    color: var(--ink-2);
+    font-size: 13px;
+    font-weight: 500;
+  }
+  .pc__chip {
+    display: flex;
+    flex: 1;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 10px 12px;
+    border-left: 3px solid var(--cyan);
+    border-radius: 0 8px 8px 0;
+    background: var(--cyan-tint);
+    color: var(--ink);
+    font-size: 14px;
+    font-weight: 500;
+  }
+  .pc__spec {
+    color: var(--ink-2);
+    font-size: 13px;
+  }
+
+  @container (min-width: 520px) {
+    .pc__week {
+      grid-template-columns: repeat(7, minmax(0, 1fr));
+      gap: 6px;
+    }
+    .pc__day,
+    .pc__day--empty {
+      display: grid;
+      align-content: start;
+      gap: 8px;
+      min-height: 168px;
+    }
+    .pc--bare .pc__day,
+    .pc--bare .pc__day--empty {
+      min-height: 280px;
+      padding: 8px 6px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+    }
+    .pc__label {
+      width: auto;
+      text-align: center;
+    }
+    .pc__chip {
+      display: grid;
+      gap: 2px;
+      padding: 8px 6px;
+      border-left: 0;
+      border-top: 3px solid var(--cyan);
+      border-radius: 6px;
+      font-size: 12px;
+      line-height: 16px;
+      text-align: center;
+    }
+    .pc__spec {
+      font-size: 12px;
+    }
+  }
+</style>

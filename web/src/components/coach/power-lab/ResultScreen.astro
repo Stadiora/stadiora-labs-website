@@ -1,0 +1,87 @@
+---
+import type { Locale } from '../../../i18n';
+import type { PowerLabCopy } from '../../../i18n/pages/power-lab';
+
+interface Props {
+  locale: Locale;
+  copy: PowerLabCopy['flow']['result'];
+}
+const { locale, copy } = Astro.props;
+const fmt = (m: { value: number; decimals: number }) =>
+  new Intl.NumberFormat(locale, { minimumFractionDigits: m.decimals, maximumFractionDigits: m.decimals }).format(m.value);
+---
+
+<!-- Fictional values for the demo jump. The number text is final in the HTML; the script only adds motion. -->
+<div class="pr">
+  <p class="pr__title">{copy.title}</p>
+  <dl class="pr__list">
+    {
+      copy.metrics.map((m) => (
+        <div class="pr__metric">
+          <dt class="pr__label">{m.label}</dt>
+          <dd class="pr__value">
+            <span class="num" data-countup-dec={m.value} data-decimals={m.decimals}>{fmt(m)}</span>
+            <span class="pr__unit">{m.unit}</span>
+          </dd>
+        </div>
+      ))
+    }
+  </dl>
+  <p class="pr__demo">{copy.demo}</p>
+</div>
+
+<script>
+  import '../../../scripts/countup-decimal';
+</script>
+
+<style>
+  .pr {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 4px 0 0;
+  }
+  .pr__title {
+    color: var(--ink-2);
+    font-size: 14px;
+    line-height: 20px;
+  }
+  .pr__list {
+    display: grid;
+    gap: 0;
+    margin: 0;
+  }
+  .pr__metric {
+    display: flex;
+    flex-direction: column-reverse;
+    padding: 14px 0;
+    border-top: 1px solid var(--line);
+  }
+  .pr__metric:first-child {
+    padding-top: 0;
+    border-top: 0;
+  }
+  .pr__value {
+    margin: 0;
+    color: var(--ink);
+    font-family: var(--font-display);
+    font-size: clamp(34px, 3.2vw, 44px);
+    font-weight: 600;
+    line-height: 1.1;
+  }
+  .pr__unit {
+    margin-left: 0.2em;
+    font-size: 0.8em;
+  }
+  .pr__label {
+    margin-top: 2px;
+    color: var(--ink-2);
+    font-size: 16px;
+    line-height: 24px;
+  }
+  .pr__demo {
+    color: var(--ink-3);
+    font-size: 13px;
+    line-height: 18px;
+  }
+</style>

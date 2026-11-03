@@ -1,0 +1,11 @@
+---
+import Base from '../../../../layouts/Base.astro';
+import ReadinessPage from '../../../../components/coach/readiness/ReadinessPage.astro';
+import { readinessCopy } from '../../../../i18n/pages/readiness';
+
+const { meta } = readinessCopy.es;
+---
+
+<Base locale="es" path="/platform/readiness/" title={meta.title} description={meta.description}>
+  <ReadinessPage locale="es" />
+</Base>

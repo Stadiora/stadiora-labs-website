@@ -1,0 +1,237 @@
+---
+import type { Locale } from '../../i18n';
+import { useEngage } from '../../i18n/pages/engage';
+import { site } from '../../data/site';
+import { contactHref } from './links';
+import Photo from '../ui/Photo.astro';
+import FinalCta from '../home/FinalCta.astro';
+import FeatureHero from './FeatureHero.astro';
+import AlsoInAria from './AlsoInAria.astro';
+import ConsentStrip from './ConsentStrip.astro';
+import EIcon from './EIcon.astro';
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const e = useEngage(locale);
+const g = e.integrations;
+---
+
+<FeatureHero
+  variant="compact"
+  eyebrow={g.eyebrow}
+  title={g.title}
+  sub={g.sub}
+  ctas={[{ label: g.ctaPrimary, href: site.signUp }]}
+>
+  <div slot="media" class="fh__fill" style="--focus:50% 50%">
+    <Photo
+      slot="f9-integrations"
+      ratio="4/3"
+      sizes="(max-width: 1024px) 94vw, 600px"
+      widths={[480, 800, 1200]}
+      alt={g.photoAlt}
+      eager
+      priority="high"
+      locale={locale}
+    />
+  </div>
+</FeatureHero>
+
+<section class="section live" aria-labelledby="live-title">
+  <div class="container">
+    <h2 id="live-title" class="sr-only">{g.liveLabel}</h2>
+    <ul class="live__grid">
+      {
+        g.sources.map((s, i) => (
+          <li class="src" data-reveal style={`--reveal-i:${i}`}>
+            <header class="src__head">
+              <span class="src__tile"><EIcon name="phone" size={26} /></span>
+              <div class="src__name">
+                <h3>{s.name}</h3>
+                <p>{s.platform}</p>
+              </div>
+              <span class="pill"><EIcon name="check" size={14} />{g.live}</span>
+            </header>
+            <ul class="src__rows">
+              {g.rows.map((r) => (<li><EIcon name={r.icon as 'moon'} size={22} /><span>{r.label}</span></li>))}
+            </ul>
+          </li>
+        ))
+      }
+      <li class="src" data-reveal style="--reveal-i:2">
+        <header class="src__head">
+          <span class="src__tile"><EIcon name="file" size={26} /></span>
+          <div class="src__name">
+            <h3>{g.import.title}</h3>
+          </div>
+        </header>
+        <div class="drop">
+          <ul class="drop__formats">
+            {g.import.formats.map((f) => (<li class="num"><EIcon name="file" size={20} />{f}</li>))}
+          </ul>
+          <p>{g.import.body}</p>
+        </div>
+      </li>
+    </ul>
+    <p class="live__coming">{g.coming}</p>
+  </div>
+</section>
+
+<section class="section section--surface mine" aria-labelledby="mine-title">
+  <div class="container mine__row">
+    <h2 id="mine-title" class="mine__title"><span class="lane-under">{g.dataTitle}</span></h2>
+    <ConsentStrip label={g.dataTitle} items={g.data} icons={['users', 'download']} />
+  </div>
+</section>
+
+<AlsoInAria locale={locale} items={g.also} />
+<FinalCta locale={locale} demoHref={contactHref(locale, 'demo')} />
+
+<style>
+  .live {
+    padding-block: clamp(40px, 5vw, 64px) clamp(32px, 4vw, 48px);
+  }
+  .live__grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 24px;
+  }
+  .src {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 24px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-card);
+    background: var(--bg);
+  }
+  .src__head {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .src__tile {
+    display: grid;
+    place-items: center;
+    flex: none;
+    width: 52px;
+    height: 52px;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    background: var(--surface);
+    color: var(--ink);
+  }
+  .src__name {
+    flex: 1;
+    min-width: 0;
+  }
+  .src__name h3 {
+    font-size: 22px;
+    line-height: 28px;
+  }
+  .src__name p {
+    color: var(--ink-2);
+    font-size: 16px;
+    line-height: 22px;
+  }
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    flex: none;
+    padding: 4px 12px;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--mint) 18%, transparent);
+    color: var(--mint-ink);
+    font-size: 14px;
+    font-weight: 600;
+  }
+  .src__rows {
+    display: grid;
+    gap: 6px;
+  }
+  .src__rows li {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 12px 4px;
+    border-top: 1px solid var(--line);
+    font-size: 18px;
+  }
+  .src__rows li:first-child {
+    border-top: 0;
+  }
+  .src__rows :global(svg) {
+    flex: none;
+    color: var(--cyan-ink);
+  }
+  .drop {
+    display: grid;
+    flex: 1;
+    justify-items: center;
+    align-content: center;
+    gap: 16px;
+    min-height: 150px;
+    padding: 20px;
+    border: 1.5px dashed var(--ink-3);
+    border-radius: var(--radius-card);
+    color: var(--ink-2);
+    font-size: 17px;
+    line-height: 24px;
+    text-align: center;
+  }
+  .drop__formats {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px;
+  }
+  .drop__formats li {
+    display: grid;
+    justify-items: center;
+    gap: 2px;
+    min-width: 64px;
+    padding: 10px 12px;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    background: var(--bg);
+    color: var(--ink-2);
+    font-size: 14px;
+    font-weight: 600;
+  }
+  .drop__formats :global(svg) {
+    color: var(--ink-2);
+  }
+  .live__coming {
+    margin-top: 24px;
+    color: var(--ink-3);
+    font-size: 18px;
+    line-height: 26px;
+  }
+
+  .mine {
+    padding-block: 40px;
+  }
+  .mine__row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 20px 56px;
+  }
+  .mine__title {
+    font-size: 30px;
+    line-height: 36px;
+  }
+  .mine__row :global(.consent) {
+    flex: 1;
+    min-width: min(100%, 420px);
+  }
+
+  @media (max-width: 1024px) {
+    .live__grid {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+</style>

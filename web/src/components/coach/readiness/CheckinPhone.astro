@@ -1,0 +1,92 @@
+---
+import Phone from '../../ui/Phone.astro';
+import PhoneHead from './PhoneHead.astro';
+import type { ReadinessCopy } from '../../../i18n/pages/readiness';
+
+interface Props {
+  copy: ReadinessCopy['phones']['checkin'];
+}
+const { copy } = Astro.props;
+---
+
+<Phone>
+  <div class="cp">
+    <PhoneHead title={copy.title} />
+    <p class="cp__step">{copy.step}</p>
+    <ul class="cp__list">
+      {
+        copy.questions.map((q) => (
+          <li>
+            <p class="cp__q">{q.q}</p>
+            <div class="cp__opts">
+              {q.options.map((o, i) => (
+                <span class:list={['cp__opt', { 'is-on': i === q.picked }]}>{o}</span>
+              ))}
+            </div>
+          </li>
+        ))
+      }
+    </ul>
+    <span class="cp__done">{copy.done}</span>
+  </div>
+</Phone>
+
+<style>
+  .cp {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    padding: 0.2em 1em 1.1em;
+    font-size: 0.95em;
+  }
+  .cp__step {
+    margin: 0.3em 0 1em;
+    color: var(--ink-2);
+    text-align: center;
+  }
+  .cp__list {
+    display: grid;
+    gap: 1.1em;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .cp__q {
+    margin-bottom: 0.45em;
+    color: var(--ink);
+    font-weight: 600;
+  }
+  .cp__opts {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.4em;
+  }
+  .cp__opt {
+    display: grid;
+    place-items: center;
+    min-height: 2.6em;
+    padding: 0.3em 0.2em;
+    border: 1px solid var(--line);
+    border-radius: 0.6em;
+    color: var(--ink-2);
+    font-size: 0.9em;
+    line-height: 1.15;
+    text-align: center;
+  }
+  .cp__opt.is-on {
+    border-color: var(--cyan);
+    background: var(--cyan-tint);
+    color: var(--cyan-ink);
+    font-weight: 600;
+  }
+  .cp__done {
+    display: grid;
+    place-items: center;
+    height: 2.7em;
+    margin-top: auto;
+    border-radius: 0.7em;
+    background: var(--btn-bg);
+    color: var(--btn-ink);
+    font-weight: 600;
+  }
+</style>
