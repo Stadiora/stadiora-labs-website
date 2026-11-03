@@ -1,10 +1,33 @@
 // Post-build checks for the Floodlight home page (DESIGN-4 sections 5 and 7): clip budgets, the clip trio
 // (WebM + MP4 + poster), the video markup contract and broken media references. Called from verify-dist.mjs.
+import { createHash } from 'node:crypto';
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import { join, relative } from 'node:path';
 
 export const CLIP_BUDGET_BYTES = 1.6 * 1024 * 1024; // DESIGN-4 M17: "<=1.6 MB each"
 export const POSTER_BUDGET_BYTES = 120 * 1024;
+
+// Every home clip is on this list because it has no words, numbers or logos baked into the pixels: text in a video cannot be
+// localized, so every label sits in HTML from the i18n modules (src/components/home/PillarScenes.astro and friends). The hash is
+// over the WebM, MP4 and poster, so a swapped or re-rendered clip fails until someone checks it for text and updates the entry.
+export const TEXT_FREE_MEDIA = {
+  'ai-bg': '82d7531a7c3b2dde',
+  'engage-bg': '648bdbedf0a8614a',
+  'night-stadium': '62013905b740b5c4',
+  'pillar-nutrition': '3e372fae7c626474',
+  'pillar-readiness': '261596e3e8107ed6',
+  'pillar-team': '9c3f9fb26a6f5788',
+  'pillar-training': 'a93585da715cf727',
+  'reel': '0ef4adc15937f891',
+  'tile-chalk': '9d7a8c4ae586e09a',
+  'tile-hurdler': '11e02e70048b6aeb',
+};
+
+export function mediaDigest(dir, stem) {
+  const h = createHash('sha256');
+  for (const ext of ['webm', 'mp4', 'webp']) h.update(readFileSync(join(dir, `${stem}.${ext}`)));
+  return h.digest('hex').slice(0, 16);
+}
 
 export function verifyHomeMedia({ dist, fail }) {
   const dir = join(dist, 'home', 'media');
@@ -19,6 +42,17 @@ export function verifyHomeMedia({ dist, fail }) {
       if (!files.includes(`${stem}.${ext}`)) fail(`home/media/${stem}: missing ${ext} (every clip ships WebM, MP4 and a WebP poster)`);
     }
   }
+  for (const stem of stems) {
+    const want = TEXT_FREE_MEDIA[stem];
+    if (!want) {
+      fail(`home/media/${stem}: not on the text-free list. Baked-in text cannot be localized: render it without words, move the words to HTML overlays, then add it to TEXT_FREE_MEDIA in scripts/lib/home-verify.mjs`);
+      continue;
+    }
+    if (!['webm', 'mp4', 'webp'].every((ext) => files.includes(`${stem}.${ext}`))) continue;
+    const got = mediaDigest(dir, stem);
+    if (got !== want) fail(`home/media/${stem}: content changed (${got}, listed ${want}). Check the frames for baked-in text, then update TEXT_FREE_MEDIA`);
+  }
+  for (const stem of Object.keys(TEXT_FREE_MEDIA)) if (!stems.has(stem)) fail(`home/media/${stem}: on the text-free list but not shipped (remove the stale entry)`);
   for (const f of files) {
     const size = statSync(join(dir, f)).size;
     if (/\.(webm|mp4)$/.test(f) && size > CLIP_BUDGET_BYTES) fail(`home/media/${f}: ${(size / 1024 / 1024).toFixed(2)} MB is over the 1.6 MB clip budget`);

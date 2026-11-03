@@ -1,7 +1,7 @@
 // AI program builder: the 12 s "ask -> draft -> slam into the calendar" story.
 // Base CSS is the finished frame; this builds the paused timelines on one clock (kit group)
 // and keeps the three step indicators in sync with that clock.
-import { $, $$, clamp, group, pan, tl } from '../motion/kit';
+import { $, $$, clamp, group, isReduced, onMotionChange, pan, tl } from '../motion/kit';
 
 const DUR = 12;
 const RANGES: [number, number][] = [
@@ -64,28 +64,23 @@ export function initAi() {
     pan(host, DUR, [[0, 244], [3.0, 244], [3.6, 693], [5.9, 693], [6.9, 250], [8.3, 250], [9.6, 560], [11.4, 560], [12, 244]]),
   ]);
 
-  // Reduced motion: nothing animates and the static finished frame stays.
-  if (!g.anims.length) {
-    host.dataset.ap = 'off';
-    host.dataset.apWhy = 'reduced';
-    return;
-  }
-
   const stepsEl = $<HTMLElement>('[data-steps="ai"]');
   const steps = stepsEl ? $$<HTMLElement>('.ai-step', stepsEl) : [];
   if (!stepsEl || !steps.length) return;
   const bars = steps.map((s) => $<HTMLElement>('.at-bar i', s));
-  stepsEl.classList.add('is-live');
 
+  // The base CSS is the finished frame (all three steps shown, bars full). While the clock runs the indicators follow it;
+  // under reduced motion they are cleared back to that frame.
   const render = () => {
     const t = g.time();
     steps.forEach((s, k) => {
       const [a, b] = RANGES[k];
-      const on = t >= a && t < b;
+      const on = !isReduced() && t >= a && t < b;
       s.classList.toggle('on', on);
       if (on) s.setAttribute('aria-current', 'step');
       else s.removeAttribute('aria-current');
-      bars[k]?.style.setProperty('--p', String(clamp((t - a) / (b - a), 0, 1)));
+      if (isReduced()) bars[k]?.style.removeProperty('--p');
+      else bars[k]?.style.setProperty('--p', String(clamp((t - a) / (b - a), 0, 1)));
     });
   };
 
@@ -96,9 +91,11 @@ export function initAi() {
     raf = host.dataset.ap === 'on' ? requestAnimationFrame(loop) : 0;
   };
   const sync = () => {
+    stepsEl.classList.toggle('is-live', !isReduced());
     render();
     if (host.dataset.ap === 'on' && !raf) raf = requestAnimationFrame(loop);
   };
   new MutationObserver(sync).observe(host, { attributes: true, attributeFilter: ['data-ap'] });
+  onMotionChange(sync);
   sync();
 }

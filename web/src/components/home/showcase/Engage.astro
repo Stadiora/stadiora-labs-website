@@ -35,15 +35,16 @@ const bubbleDepth = { chat: 24, feed: 30, bc: 20, ann: 26 } as const;
       </div>
     </div>
     <div class="media-frame en-media">
-      <video muted playsinline loop preload="none" data-clip data-poster="/home/media/engage-bg.webp">
+      <video muted playsinline loop preload="none" data-clip data-poster="/home/media/engage-bg.webp" aria-hidden="true">
         <source src="/home/media/engage-bg.webm" type="video/webm" />
         <source src="/home/media/engage-bg.mp4" type="video/mp4" />
       </video>
-      <div class="vid-shade"></div>
-      <div class="dphone" aria-hidden="true">
+      <div class="vid-shade" aria-hidden="true"></div>
+      {/* The open scene is the tab's panel, so it stays in the accessibility tree; only the phone chrome and the video behind it are decoration. */}
+      <div class="dphone">
         <div class="scr">
-          <i class="island"></i>
-          <div class="sb"><span>9:41</span><span>●●● ▮</span></div>
+          <i class="island" aria-hidden="true"></i>
+          <div class="sb" aria-hidden="true"><span>9:41</span><span>●●● ▮</span></div>
           <div class="ph-scn on" data-panel data-scn="chat" role="tabpanel" id="en-p0" aria-labelledby="en-t0">
             <div class="ph-top"><span class="av av-violet">DM</span><div><b>{p.chat.name}</b><small>{p.chat.sub}</small></div></div>
             <div class="ph-body">

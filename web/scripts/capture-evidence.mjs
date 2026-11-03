@@ -2,7 +2,8 @@
 //   npm run build && node scripts/capture-evidence.mjs --out ../../evidence-out [--stills] [--motion] [--no-encode]
 // Stills: 1440x900 and 390x844, EN and ES, light and dark, `main > section` one by one plus the full page (reduced
 // motion, so every stage shows its finished frame and every clip its poster). Motion: Playwright recordVideo of a full
-// slow scroll with motion on, at 1440x900 and 390x844, encoded to MP4 with ffmpeg. Not part of `npm run evidence`.
+// slow scroll with motion on, at 1440x900 and 390x844 in English plus 1440x900 in Spanish, encoded to MP4 with ffmpeg.
+// Not part of `npm run evidence`.
 import { spawnSync } from 'node:child_process';
 import { mkdir, readdir, rename, rm } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
@@ -71,13 +72,13 @@ if (wantStills) {
 }
 
 if (wantMotion) {
-  for (const [name, width, height, mobile] of [['desktop', 1440, 900, false], ['phone', 390, 844, true]]) {
+  for (const [name, width, height, mobile, locale = 'en'] of [['desktop', 1440, 900, false], ['phone', 390, 844, true], ['desktop-es', 1440, 900, false, 'es']]) {
     const dir = `${out}/motion-${name}`;
     await rm(dir, { recursive: true, force: true });
     await mkdir(dir, { recursive: true });
     const context = await browser.newContext({ viewport: { width, height }, colorScheme: 'light', deviceScaleFactor: 1, isMobile: mobile, hasTouch: mobile, recordVideo: { dir, size: { width, height } } });
     const page = await context.newPage();
-    await page.goto(server.url + '/', { waitUntil: 'load' });
+    await page.goto(server.url + pathFor(locale), { waitUntil: 'load' });
     await page.evaluate(() => document.fonts.ready);
     await sleep(3500); // hero first
     // Ease to the top of each section, then dwell so its autoplayers and clips run.
@@ -99,7 +100,7 @@ if (wantMotion) {
           }),
         `main > section#${id}`,
       );
-      await sleep(id === 'showcase' ? 2500 : 5500);
+      await sleep(id === 'showcase' ? 2500 : id === 'pillars' ? 7000 : 5500); // the pillars dwell is one tab: its cards play in full
       if (id === 'showcase') {
         // The showcase is five stacked stages: walk through them slowly.
         for (const sub of ['plan', 'measure', 'engage', 'scale', 'apps']) {

@@ -1,8 +1,10 @@
 ---
 import '../../styles/home/pillars.css';
+import '../../styles/home/stage.css';
 import type { Locale } from '../../i18n';
 import { hrefFor } from '../../data/nav';
 import { homePillars } from '../../i18n/pages/home-pillars';
+import PillarScenes from './PillarScenes.astro';
 
 interface Props {
   locale: Locale;
@@ -88,6 +90,11 @@ const pillars = [
             </div>
           ))
         }
+        <div class="stage-fit" data-fit="1280">
+          <div class="stage pm-stage">
+            <PillarScenes t={t} />
+          </div>
+        </div>
       </div>
     </div>
     <p class="dnote">{t.demoNote}</p>

@@ -19,10 +19,27 @@ function syncReduced() {
   root.classList.toggle('rm', RMQ.matches);
 }
 syncReduced();
+
+// Scenes that keep state of their own (timelines, timers, swapped words) register here to jump to their still frame
+// when the preference flips to reduced, and to pick motion up again when it flips back. They run after every
+// autoplayer has refreshed (the `kit:motion-change` event), so a handler sees the final running/paused state.
+const motionHandlers: ((reduced: boolean) => void)[] = [];
+export function onMotionChange(fn: (reduced: boolean) => void) {
+  motionHandlers.push(fn);
+}
 RMQ.addEventListener('change', () => {
   syncReduced();
   document.dispatchEvent(new CustomEvent('kit:motion-change'));
+  for (const fn of motionHandlers) fn(RMQ.matches);
 });
+
+// CSS autoplayers (marquee, mesh, orbits, glows) have no script clock to pause, so a hidden tab stops them through
+// html.tab-hidden (floodlight.css). It reads document.hidden, the same source the autoplayers use.
+function syncHidden() {
+  root.classList.toggle('tab-hidden', document.hidden);
+}
+syncHidden();
+document.addEventListener('visibilitychange', syncHidden);
 
 /* ---------- autoplayer: one rule for everything that moves on its own ---------- */
 export interface AutoplayerOptions {
@@ -97,13 +114,44 @@ export function autoplayer(host: HTMLElement, opts: AutoplayerOptions): Autoplay
 }
 
 /* ---------- video clips: WebM + MP4 + poster, preload="none", start on visibility ---------- */
+// Sources taken out of a clip that was sent back to its poster; playVideo puts them back when the clip should run again.
+const parked = new WeakMap<HTMLVideoElement, Element[]>();
+
 export function playVideo(v: HTMLVideoElement) {
   if (RMQ.matches) return;
+  const sources = parked.get(v);
+  if (sources) {
+    parked.delete(v);
+    v.append(...sources);
+  }
   const p = v.play();
   if (p) p.catch(() => {});
 }
 
+/**
+ * Back to the poster: nothing decoded, currentTime 0, no playback. Chromium refetches a clip on `load()` even with
+ * preload="none", so a clip that had data is reset with its sources taken out (readyState 0 stays) and gets them back in playVideo.
+ */
+function settleVideo(v: HTMLVideoElement) {
+  v.pause();
+  if (v.dataset.poster) {
+    v.poster = v.dataset.poster;
+    delete v.dataset.poster;
+  }
+  if (v.readyState > 0 || v.currentTime > 0) {
+    const sources = $$<HTMLElement>('source', v);
+    if (sources.length) {
+      parked.set(v, sources);
+      sources.forEach((x) => x.remove());
+    }
+    v.load();
+  }
+}
+
 function initVideos() {
+  onMotionChange((reduced) => {
+    if (reduced) $$<HTMLVideoElement>('video[data-clip]').forEach(settleVideo);
+  });
   for (const v of $$<HTMLVideoElement>('video[data-clip]')) {
     v.muted = true;
     v.setAttribute('muted', '');
@@ -330,8 +378,10 @@ export interface Group {
 }
 export function group(host: HTMLElement, dur: number, build: () => (Animation | null)[], opt: { threshold?: number; within?: HTMLElement } = {}): Group {
   const g: Group = { anims: [], time: () => 0, seek: () => {}, ap: null };
-  if (RMQ.matches) return g;
-  g.anims = build().filter((a): a is Animation => !!a);
+  const mount = () => {
+    g.anims = RMQ.matches ? [] : build().filter((a): a is Animation => !!a);
+  };
+  mount();
   g.seek = (sec) => g.anims.forEach((a) => (a.currentTime = sec * 1000));
   g.time = () => (g.anims[0] ? ((Number(g.anims[0].currentTime) || 0) / 1000) % dur : 0);
   g.ap = autoplayer(host, {
@@ -339,6 +389,12 @@ export function group(host: HTMLElement, dur: number, build: () => (Animation | 
     within: opt.within,
     play: () => g.anims.forEach((a) => a.play()),
     pause: () => g.anims.forEach((a) => a.pause()),
+  });
+  // The base CSS is the finished frame, so cancelling the timelines settles the scene; moving back builds a fresh set.
+  onMotionChange(() => {
+    g.anims.forEach((a) => a.cancel());
+    mount();
+    if (g.ap?.running) g.anims.forEach((a) => a.play());
   });
   return g;
 }
@@ -352,7 +408,8 @@ export function scramble(el: HTMLElement, ms = 650) {
   if (!el.getAttribute('aria-label')) el.setAttribute('aria-label', orig);
   const t0 = performance.now();
   const step = (t: number) => {
-    const p = clamp((t - t0) / ms, 0, 1);
+    if (!el.dataset.scrambling) return; // cancelled by its owner
+    const p = RMQ.matches ? 1 : clamp((t - t0) / ms, 0, 1);
     el.textContent = [...orig].map((c, k) => (c === ' ' || k < p * orig.length ? c : GLYPHS[(Math.random() * GLYPHS.length) | 0])).join('');
     if (p < 1) requestAnimationFrame(step);
     else {
@@ -373,12 +430,12 @@ function initScramble() {
 
 /* ---------- parallax float, tilt, magnet ---------- */
 function initPointerFx() {
-  if (RMQ.matches) return;
   const depth = $$('[data-depth]');
   let mx = 0;
   let pending = false;
   const run = () => {
     pending = false;
+    if (RMQ.matches) return;
     const vh = innerHeight;
     for (const el of depth) {
       const host = el.closest('[data-section]') ?? el.parentElement;
@@ -391,7 +448,7 @@ function initPointerFx() {
     }
   };
   const queue = () => {
-    if (pending) return;
+    if (pending || RMQ.matches) return;
     pending = true;
     requestAnimationFrame(run);
   };
@@ -411,6 +468,7 @@ function initPointerFx() {
   }
   for (const c of $$('[data-tilt] > *')) {
     c.addEventListener('pointermove', (e) => {
+      if (RMQ.matches) return;
       const r = c.getBoundingClientRect();
       const pe = e as PointerEvent;
       c.style.setProperty('--ry', `${((pe.clientX - r.left) / r.width - 0.5) * 8}deg`);
@@ -423,6 +481,7 @@ function initPointerFx() {
   }
   for (const b of $$('[data-magnet]')) {
     b.addEventListener('pointermove', (e) => {
+      if (RMQ.matches) return;
       const r = b.getBoundingClientRect();
       const pe = e as PointerEvent;
       b.style.setProperty('--mx', `${((pe.clientX - r.left) / r.width - 0.5) * 14}px`);
@@ -433,25 +492,44 @@ function initPointerFx() {
       b.style.setProperty('--my', '0px');
     });
   }
+  // Under reduced motion nothing floats, tilts or pulls: drop whatever offsets the pointer left behind.
+  onMotionChange((reduced) => {
+    if (!reduced) return;
+    for (const el of depth) {
+      el.style.removeProperty('--px');
+      el.style.removeProperty('--py');
+    }
+    for (const c of $$('[data-tilt] > *')) {
+      c.style.removeProperty('--rx');
+      c.style.removeProperty('--ry');
+    }
+    for (const b of $$('[data-magnet]')) {
+      b.style.removeProperty('--mx');
+      b.style.removeProperty('--my');
+    }
+  });
 }
 
 /* ---------- fit fixed-size stages to their frame ---------- */
 function initFit() {
+  const fit = (host: HTMLElement) => {
+    const stage = host.firstElementChild as HTMLElement | null;
+    const fitH = Number(host.dataset.fitH);
+    // Narrow screens scale a stage to the frame height and pan across it; with reduced motion nothing pans, so the
+    // whole stage is fitted to the width instead and centred in the frame.
+    const panned = Boolean(fitH) && narrow.matches && !RMQ.matches;
+    const k = panned ? host.clientHeight / fitH : host.clientWidth / Number(host.dataset.fit);
+    stage?.style.setProperty('--k', k.toFixed(4));
+    if (stage && fitH && narrow.matches && RMQ.matches) stage.style.translate = `0px ${Math.max(0, (host.clientHeight - fitH * k) / 2).toFixed(1)}px`;
+    else stage?.style.removeProperty('translate');
+  };
   const ro = new ResizeObserver((entries) => {
-    for (const e of entries) {
-      const host = e.target as HTMLElement;
-      const stage = host.firstElementChild as HTMLElement | null;
-      const fitH = Number(host.dataset.fitH);
-      // Narrow screens scale a stage to the frame height and pan across it; with reduced motion nothing pans, so the
-      // whole stage is fitted to the width instead and centred in the frame.
-      const panned = Boolean(fitH) && narrow.matches && !RMQ.matches;
-      const k = panned ? host.clientHeight / fitH : host.clientWidth / Number(host.dataset.fit);
-      stage?.style.setProperty('--k', k.toFixed(4));
-      if (stage && fitH && narrow.matches && RMQ.matches) stage.style.translate = `0px ${Math.max(0, (host.clientHeight - fitH * k) / 2).toFixed(1)}px`;
-      else stage?.style.removeProperty('translate');
-    }
+    for (const e of entries) fit(e.target as HTMLElement);
   });
-  $$('[data-fit]').forEach((h) => ro.observe(h));
+  const hosts = $$<HTMLElement>('[data-fit]');
+  hosts.forEach((h) => ro.observe(h));
+  // The fit depends on the preference as well as the size, and a preference change does not resize anything.
+  onMotionChange(() => hosts.forEach(fit));
 }
 
 /** Phone "camera pan": scale the stage to the frame height and follow the action. */

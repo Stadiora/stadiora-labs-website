@@ -1,9 +1,13 @@
 // Floodlight home guards (R57 V1). Everything that moves on its own goes through the motion kit's autoplayer, which
 // mirrors its state to `data-ap` ("on" | "off") and `data-ap-why` ("reduced" | "hidden" | "offscreen" | "hover" |
 // "focus") and marks the element whose hover and focus pause it with `data-ap-scope`. These guards read that contract,
-// so a section that animates without the kit fails them. Called from evidence.mjs with its page opener and recorder.
+// so a section that animates without the kit fails them. The contract is only half of it: the "autoplay" and "hidden-tab"
+// groups also MEASURE what moves (animation clocks, element transforms, video currentTime, tab progress, DOM changes) under
+// hover, focus, offscreen and a hidden tab, because a flag can say "off" while the code underneath keeps running.
+// Called from evidence.mjs with its page opener and recorder.
 import { clipProbe } from './clip-probe.mjs';
 import { contrastProbe } from './contrast.mjs';
+import { motionChecks } from './home-motion-checks.mjs';
 
 export const homeSections = ['hero', 'ai', 'pillars', 'brand', 'showcase', 'proof', 'final'];
 
@@ -104,6 +108,7 @@ export async function homeChecks({ open, check, sleep, settle, metrics }) {
   };
 
   // HOME_ONLY=autoplay,marquee runs just those groups (used to mutation-prove one guard quickly); unset runs all.
+  // Groups: structure autoplay reduced marquee hero clipping contrast a11y integrations nojs pillars-media hidden-tab flip.
   const only = process.env.HOME_ONLY?.split(',');
   const on = (group) => !only || only.includes(group);
 
@@ -140,7 +145,8 @@ export async function homeChecks({ open, check, sleep, settle, metrics }) {
   }
 
   // ------------------------------------------------------------ 2. every autoplayer: starts visible, pauses on hover, focus, offscreen
-  if (on('autoplay')) {
+  // HOME_HOSTS (see home-motion-checks.mjs) narrows the measured behaviour to a few hosts; the flag walk is skipped then.
+  if (on('autoplay') && !process.env.HOME_HOSTS) {
     const page = await open({ width: 1440, height: 900 }, '/');
     await page.mouse.move(2, 2);
     await settle(page);
@@ -417,4 +423,203 @@ export async function homeChecks({ open, check, sleep, settle, metrics }) {
       await page.context().close();
     }
   }
+
+  // ------------------------------------------------------------ 8. Engage: the open scene is in the accessibility tree
+  // Read through Playwright's ARIA snapshot (what a screen reader is given), not through the DOM: the phone mock once sat under
+  // aria-hidden, which removed the selected tab panel and everything in it.
+  if (on('a11y')) for (const locale of ['en', 'es']) {
+    const page = await open({ width: 1440, height: 900, reduced: true }, pathFor(locale));
+    await settle(page);
+    await page.locator('#engage').scrollIntoViewIfNeeded();
+    const tabs = page.locator('#engage [role="tab"]');
+    const n = await tabs.count();
+    const bad = [];
+    for (let k = 0; k < n; k++) {
+      await tabs.nth(k).click();
+      await sleep(150);
+      const snap = await page.locator('#engage').ariaSnapshot();
+      const lines = snap.split('\n');
+      const panels = lines.filter((l) => /^\s*- tabpanel\b/.test(l));
+      const at = lines.findIndex((l) => /^\s*- tabpanel\b/.test(l));
+      const indent = at >= 0 ? lines[at].match(/^\s*/)[0].length : 0;
+      let end = at + 1;
+      while (at >= 0 && end < lines.length && (lines[end].match(/^\s*/)[0].length > indent || !lines[end].trim())) end++;
+      const panel = at >= 0 ? lines.slice(at, end).join(' ') : '';
+      // The longest line of the panel's visible text, as plain words: it has to be in the tree under the tab's panel.
+      const want = await page.evaluate((i) => {
+        const p = document.getElementById(`en-p${i}`);
+        const words = (t) => t.replace(/[^\p{L}\p{N}]+/gu, ' ').trim();
+        const lines = p.innerText.split('\n').map(words).filter((l) => l.length >= 6);
+        const body = lines.sort((a, b) => b.length - a.length)[0] ?? '';
+        return { name: words(p.querySelector('.ph-top b')?.textContent ?? ''), body };
+      }, k);
+      const flat = (t) => t.replace(/[^\p{L}\p{N}]+/gu, ' ');
+      const tabName = (snap.match(/- tab "([^"]+)" \[selected\]/) ?? [])[1] ?? '';
+      const problems = [];
+      if (panels.length !== 1) problems.push(`${panels.length} tab panels in the tree`);
+      if (!tabName || !panel.includes(`tabpanel "${tabName}"`)) problems.push(`panel not named by its tab "${tabName}"`);
+      if (!want.name || !flat(panel).includes(want.name)) problems.push(`panel header "${want.name}" missing`);
+      if (!want.body || !flat(panel).includes(want.body)) problems.push(`panel content "${want.body}" missing`);
+      if (/9:41/.test(snap)) problems.push('the phone status bar is exposed');
+      if (problems.length) bad.push(`tab ${k + 1}: ${problems.join(', ')}`);
+    }
+    check('a11y', `${locale}: Engage exposes exactly the selected tab panel and its content to assistive tech, on every tab, and hides the phone chrome`, n === 4 && bad.length === 0, bad.join(' | ') || `${n} tabs`);
+    await page.context().close();
+  }
+
+  // ------------------------------------------------------------ 9. Measure > Integrations fits a phone (both satellites inside the frame)
+  if (on('integrations')) {
+    for (const locale of ['en', 'es']) {
+      for (const scheme of ['light', 'dark']) {
+        const bad = [];
+        let probed = 0;
+        for (const width of [390, 360, 320]) {
+          const page = await open({ width, height: 844, scheme, reduced: true, mobile: true }, pathFor(locale));
+          await settle(page);
+          await page.locator('#measure').scrollIntoViewIfNeeded();
+          await page.locator('#ms-t4').click();
+          await sleep(250);
+          const geo = await page.evaluate(() => {
+            const frame = document.querySelector('.ms-media').getBoundingClientRect();
+            return [...document.querySelectorAll('.int-orbit .sat')].map((s) => {
+              const r = s.getBoundingClientRect();
+              return { text: s.textContent.trim(), left: r.left - frame.left, right: frame.right - r.right, visible: s.checkVisibility({ visibilityProperty: true, opacityProperty: true }) };
+            });
+          });
+          if (geo.length !== 2 || geo.some((g) => !g.visible || g.left < -0.5 || g.right < -0.5)) bad.push(`@${width} frame edge: ${geo.map((g) => `"${g.text}" ${g.left.toFixed(0)}/${g.right.toFixed(0)}px`).join(', ')}`);
+          if (width >= 360) {
+            // 320 only gets the geometry check above: the page's own marquee and buttons are not designed for it.
+            const k = await page.evaluate(clipProbe);
+            probed += k.checked;
+            if (k.cutCount) bad.push(`@${width} clipped: ${k.cut.slice(0, 3).join('; ')}`);
+          }
+          await page.context().close();
+        }
+        check('integrations', `${locale}/${scheme}: the Integrations slide keeps both satellites inside the frame at 390, 360 and 320 px, with no text cut off at 390 and 360`, bad.length === 0, bad.join(' | ') || `${probed} text boxes checked`);
+      }
+    }
+    // The satellites keep clear of the frame with motion on as well, at the sizes where the layout switches columns.
+    const bad = [];
+    for (const width of [1440, 1180, 1024, 768, 641, 390]) {
+      const page = await open({ width, height: 900, mobile: width < 600 }, '/');
+      await page.locator('#measure').scrollIntoViewIfNeeded();
+      await page.locator('#ms-t4').click();
+      await sleep(900);
+      const geo = await page.evaluate(() => {
+        const frame = document.querySelector('.ms-media').getBoundingClientRect();
+        return [...document.querySelectorAll('.int-orbit .sat')].map((s) => {
+          const r = s.getBoundingClientRect();
+          return { left: r.left - frame.left, right: frame.right - r.right, top: r.top - frame.top, bottom: frame.bottom - r.bottom };
+        });
+      });
+      if (geo.some((g) => Math.min(g.left, g.right, g.top, g.bottom) < -0.5)) bad.push(`@${width}: ${JSON.stringify(geo.map((g) => Object.values(g).map(Math.round)))}`);
+      await page.context().close();
+    }
+    check('integrations', 'with motion on, both satellites stay inside the frame from 1440 down to 390 px', bad.length === 0, bad.join(' | '));
+  }
+
+  // ------------------------------------------------------------ 10. no JavaScript: every reveal is simply visible
+  // The reveal classes hide their content until a script marks them in. Without a script nothing ever does, so the hiding must wait for html.js.
+  if (on('nojs')) for (const locale of ['en', 'es']) {
+    const page = await open({ width: 1440, height: 900, js: false }, pathFor(locale));
+    const hidden = await page.evaluate(() => {
+      const out = [];
+      const sel = '.rv, .rv-mask, .lines > span > span';
+      const nodes = [...document.querySelectorAll(sel)];
+      for (const e of nodes) {
+        const cs = getComputedStyle(e);
+        const bad = [];
+        if (cs.opacity !== '1') bad.push(`opacity ${cs.opacity}`);
+        if (cs.transform !== 'none') bad.push(`transform ${cs.transform}`);
+        if (cs.clipPath !== 'none') bad.push(`clip-path ${cs.clipPath}`);
+        if (bad.length) out.push(`${e.tagName.toLowerCase()}.${String(e.className).split(' ')[0]} "${(e.textContent ?? '').trim().slice(0, 24)}" ${bad.join(', ')}`);
+      }
+      return { total: nodes.length, out, jsClass: document.documentElement.classList.contains('js') };
+    });
+    check('nojs', `${locale}: with JavaScript off, every reveal element is fully shown (no opacity, transform or clip left over)`, !hidden.jsClass && hidden.total >= 20 && hidden.out.length === 0, hidden.out.slice(0, 4).join(' | ') || `${hidden.total} elements`);
+    await page.context().close();
+  }
+
+  // ------------------------------------------------------------ 11. pillar media is text-free; its words are localized HTML
+  // The four pillar clips carry no words (home-verify.mjs pins their bytes), so every label, card and number over them is a
+  // [data-ov] element from the page's own locale. This checks the overlay set exists in both locales, reads differently in ES,
+  // and sits inside the frame, clear of the other cards, on every tab at desktop and phone size.
+  if (on('pillars-media')) {
+    const OV = {
+      training: ['big', 'label', 'head', 'title', 'row1', 'row2', 'row3', 'row4', 'send', 'sentTitle', 'sentSub', 'coachName', 'coachSub'],
+      nutrition: ['big', 'label', 'snap', 'head', 'unit', 'macro1', 'macro2', 'macro3', 'loggedTitle', 'loggedSub'],
+      readiness: ['big', 'label', 'head', 'status', 'sleepHead', 'sleepValue', 'mood1', 'mood2', 'mood3', 'breatheTitle', 'breatheSub'],
+      team: ['big', 'label', 'head', 'unit', 'best', 'rosterHead', 'status1', 'status2', 'status3', 'status4', 'day', 'matchTitle', 'matchSub'],
+    };
+    const expected = Object.entries(OV).flatMap(([sc, ks]) => ks.map((k) => `${sc}.${k}`)).sort();
+    // Words and numbers that read the same in both languages (the 01-04 numerals, KCAL, a coach's name).
+    const same = new Set(['training.big', 'nutrition.big', 'readiness.big', 'team.big', 'nutrition.unit', 'training.coachName']);
+    const copy = {};
+    for (const locale of ['en', 'es']) {
+      const page = await open({ width: 1440, height: 900, reduced: true }, pathFor(locale));
+      const got = await page.evaluate(() => [...document.querySelectorAll('#pillars [data-ov]')].map((e) => [e.getAttribute('data-ov'), (e.textContent ?? '').replace(/\s+/g, ' ').trim()]));
+      copy[locale] = Object.fromEntries(got);
+      const keys = got.map((g) => g[0]).sort();
+      const missing = expected.filter((k) => !keys.includes(k));
+      const extra = keys.filter((k) => !expected.includes(k));
+      const dupes = keys.filter((k, i) => keys.indexOf(k) !== i);
+      check('pillars-media', `${locale}: every pillar demo card and label is a live overlay (${expected.length} keys, none missing, extra or repeated)`, !missing.length && !extra.length && !dupes.length, `missing ${missing.join(',') || '-'} extra ${extra.join(',') || '-'} repeated ${dupes.join(',') || '-'}`);
+      const empty = got.filter((g) => !g[1]).map((g) => g[0]);
+      check('pillars-media', `${locale}: no overlay is empty`, empty.length === 0, empty.join(','));
+      const tabs = await page.evaluate(() => [...document.querySelectorAll('#pillars [role="tab"] strong')].map((e) => e.textContent.trim()));
+      const labels = Object.keys(OV).map((sc) => copy[locale][`${sc}.label`]);
+      check('pillars-media', `${locale}: each scene label is its tab's name`, JSON.stringify(tabs) === JSON.stringify(labels), `${tabs.join(' | ')} vs ${labels.join(' | ')}`);
+      await page.context().close();
+    }
+    const stale = expected.filter((k) => !same.has(k) && copy.en[k] !== undefined && copy.en[k] === copy.es[k]);
+    check('pillars-media', 'every overlay reads differently in Spanish (only the numerals, KCAL and the coach name match)', stale.length === 0, stale.map((k) => `${k}="${copy.en[k]}"`).join(' | '));
+
+    for (const locale of ['en', 'es'])
+      for (const width of [1440, 390]) {
+        const page = await open({ width, height: width < 600 ? 844 : 900, reduced: true }, pathFor(locale));
+        await page.evaluate(() => document.querySelector('#pillars .pil-media').scrollIntoView({ block: 'center' }));
+        const bad = [];
+        for (let k = 0; k < 4; k++) {
+          await page.locator('#pillars [role="tab"]').nth(k).click();
+          await sleep(750);
+          const r = await page.evaluate((k) => {
+            const media = document.querySelector('#pillars .pil-media').getBoundingClientRect();
+            const scene = document.querySelectorAll('#pillars .pm-scene')[k];
+            const cs = getComputedStyle(scene);
+            const out = [];
+            const cards = [];
+            const inside = (b, o, what) => {
+              if (b.width === 0 || b.height === 0) out.push(`${what} has no size`);
+              else if (b.left < o.left - 1 || b.top < o.top - 1 || b.right > o.right + 1 || b.bottom > o.bottom + 1) out.push(`${what} leaves its frame`);
+            };
+            for (const e of scene.querySelectorAll('[data-ov]')) {
+              const range = document.createRange();
+              range.selectNodeContents(e);
+              const text = range.getBoundingClientRect();
+              const key = e.getAttribute('data-ov');
+              inside(text, media, key);
+              const box = e.closest('.pm-card, .pm-chip, .pm-breathe, .pm-mood > span');
+              if (box) inside(text, box.getBoundingClientRect(), `${key} text in its card`);
+              if (!/\.(big|label)$/.test(key)) cards.push({ key, text });
+            }
+            for (let i = 0; i < cards.length; i++)
+              for (let j = i + 1; j < cards.length; j++) {
+                const a = cards[i].text;
+                const b = cards[j].text;
+                if (a.left < b.right - 1 && b.left < a.right - 1 && a.top < b.bottom - 1 && b.top < a.bottom - 1) out.push(`${cards[i].key} overlaps ${cards[j].key}`);
+              }
+            const others = [...document.querySelectorAll('#pillars .pm-scene')].filter((s, i) => i !== k && getComputedStyle(s).visibility !== 'hidden').length;
+            return { vis: cs.visibility === 'visible' && cs.opacity === '1', others, n: scene.querySelectorAll('[data-ov]').length, out };
+          }, k);
+          if (!r.vis) bad.push(`tab ${k + 1}: scene not shown`);
+          if (r.others) bad.push(`tab ${k + 1}: ${r.others} other scene(s) still shown`);
+          bad.push(...r.out.slice(0, 3).map((o) => `tab ${k + 1}: ${o}`));
+        }
+        check('pillars-media', `${locale} ${width}: on every tab its scene shows, with every label and card inside the frame, clear of the others`, bad.length === 0, bad.slice(0, 5).join(' | '));
+        await page.context().close();
+      }
+  }
+
+  // ------------------------------------------------------------ 12. motion and hidden-tab behaviour, measured (home-motion-checks.mjs)
+  await motionChecks({ open, check, sleep, metrics, on, pathFor, helpers: { tagHosts, hostState, scopePoint, restPoint, focusIn, blurAll, centreHost, awayFromHost } });
 }

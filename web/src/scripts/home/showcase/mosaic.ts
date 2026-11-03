@@ -1,7 +1,7 @@
 // Neon pixel mosaic (DESIGN-4 M13): the photo resolves from coarse duotone blocks to sharp, then glitches
 // back, with neon cells and scan lines on top. It runs at ~20 fps under an autoplayer; under reduced motion
 // it draws one still frame (sharp, tinted, a few fixed cells, no scan lines).
-import { $, autoplayer, isReduced } from '../../motion/kit';
+import { $, autoplayer, isReduced, onMotionChange } from '../../motion/kit';
 
 const NEON = ['#FF4D5E', '#8B5CF6', '#00BEF3', '#34D399', '#FF4D5E', '#F472B6'];
 
@@ -126,6 +126,11 @@ export function initMosaic() {
       if (layers) raf = requestAnimationFrame(loop);
     },
     pause: () => cancelAnimationFrame(raf),
+  });
+
+  // Reduced motion mid-run: the canvas keeps the last animated frame until it is redrawn as the still one.
+  onMotionChange((reduced) => {
+    if (reduced) draw(performance.now(), true);
   });
 
   const build = () => {

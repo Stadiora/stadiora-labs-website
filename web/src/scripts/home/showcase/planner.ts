@@ -2,7 +2,7 @@
 // up week by week, one athlete's plan changes, and the update is sent. The step buttons follow the clock
 // and seek it. The still markup is the finished frame; the timelines only run (or, under reduced motion,
 // only seek) once they exist.
-import { $, $$, clamp, group, isReduced, pan, tl, type Frame } from '../../motion/kit';
+import { $, $$, clamp, group, isReduced, onMotionChange, pan, tl, type Frame, type Group } from '../../motion/kit';
 
 const O = 'opacity';
 const T = 'transform';
@@ -66,15 +66,29 @@ function buildPlanner(host: HTMLElement) {
   ];
 }
 
+/** Undoes what `buildPlanner` wrote to the markup, so the still frame is the same one a page loaded with reduced motion shows. */
+function unbuildPlanner(host: HTMLElement) {
+  const E = (n: string) => $<HTMLElement>(`[data-el="${n}"]`, host);
+  E('w3b')?.classList.remove('ghost');
+  for (const n of ['drag', 'cur', 'person']) {
+    const el = E(n);
+    for (const p of ['left', 'top', 'width', 'transform']) el?.style.removeProperty(p);
+  }
+}
+
 export function initPlanner() {
   const host = $<HTMLElement>('#plan [data-tl-host="planner"]');
   const box = $<HTMLElement>('#plan [data-steps="planner"]');
   if (!host || !box) return;
   const steps = $$<HTMLElement>('.pl-step', box);
   const bars = steps.map((s) => $<HTMLElement>('.at-bar i', s)!);
-  let seek: (sec: number) => void = () => {};
-  let time = () => 0;
+  let manual: Animation[] | null = null;
+  let g: Group | null = null;
 
+  const time = () => {
+    if (!isReduced()) return g?.time() ?? 0;
+    return manual?.[0] ? (Number(manual[0].currentTime) || 0) / 1000 : 0;
+  };
   const paint = () => {
     const t = time();
     steps.forEach((s, k) => {
@@ -86,49 +100,59 @@ export function initPlanner() {
       bars[k].style.setProperty('--p', String(clamp((t - a) / (b - a), 0, 1)));
     });
   };
-
-  const live = (g: { time: () => number; seek: (sec: number) => void }) => {
-    time = g.time;
-    seek = (sec) => {
-      g.seek(sec);
-      paint();
-    };
+  // Back to the finished frame: no step highlighted, every bar full (the base CSS).
+  const clear = () => {
+    box.classList.remove('live');
+    steps.forEach((s, k) => {
+      s.classList.remove('on');
+      s.removeAttribute('aria-current');
+      bars[k].style.removeProperty('--p');
+    });
+  };
+  const seek = (sec: number) => {
+    if (isReduced()) {
+      // Still frame by default; the steps still work by hand, building the timelines on first use.
+      manual ??= buildPlanner(host).filter((a): a is Animation => !!a);
+      manual.forEach((a) => (a.currentTime = sec * 1000));
+    } else g?.seek(sec);
     box.classList.add('live');
     paint();
   };
 
+  steps.forEach((s) => s.addEventListener('click', () => seek(Number(s.dataset.seek))));
+
   const ready = document.fonts ? document.fonts.ready : Promise.resolve();
   ready.then(() => {
-    if (isReduced()) {
-      // Still frame by default; the steps still work by hand, building the timelines on first use.
-      let anims: Animation[] | null = null;
-      const manual = {
-        time: () => (anims?.[0] ? (Number(anims[0].currentTime) || 0) / 1000 : 0),
-        seek: (sec: number) => {
-          anims ??= buildPlanner(host).filter((a): a is Animation => !!a);
-          anims.forEach((a) => (a.currentTime = sec * 1000));
-        },
-      };
-      steps.forEach((s) =>
-        s.addEventListener('click', () => {
-          if (!box.classList.contains('live')) live(manual);
-          seek(Number(s.dataset.seek));
-        }),
-      );
-      return;
-    }
-    const g = group(host, DUR, () => buildPlanner(host));
-    if (!g.anims.length) return;
-    live(g);
-    steps.forEach((s) => s.addEventListener('click', () => seek(Number(s.dataset.seek))));
+    g = group(host, DUR, () => buildPlanner(host));
     let raf = 0;
     const loop = () => {
+      if (isReduced()) {
+        raf = 0;
+        return;
+      }
       paint();
       raf = host.dataset.ap === 'on' ? requestAnimationFrame(loop) : 0;
     };
-    new MutationObserver(() => {
-      if (host.dataset.ap === 'on' && !raf) raf = requestAnimationFrame(loop);
-    }).observe(host, { attributes: true, attributeFilter: ['data-ap'] });
-    if (host.dataset.ap === 'on') raf = requestAnimationFrame(loop);
+    const watch = () => {
+      if (!isReduced() && host.dataset.ap === 'on' && !raf) raf = requestAnimationFrame(loop);
+    };
+    new MutationObserver(watch).observe(host, { attributes: true, attributeFilter: ['data-ap'] });
+    onMotionChange((reduced) => {
+      manual?.forEach((a) => a.cancel());
+      manual = null;
+      if (reduced) {
+        unbuildPlanner(host);
+        clear();
+      } else {
+        box.classList.add('live');
+        paint();
+        watch();
+      }
+    });
+    if (!isReduced()) {
+      box.classList.add('live');
+      paint();
+      watch();
+    }
   });
 }

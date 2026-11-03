@@ -1,6 +1,6 @@
 // Brand strip "SPORT" moment: retro images swap inside the letter O with a thermal glitch
 // and a pixel spray; the letters scramble on hover. Static first image under reduced motion.
-import { $, $$, autoplayer, isReduced, scramble } from '../motion/kit';
+import { $, $$, autoplayer, isReduced, onMotionChange, scramble } from '../motion/kit';
 
 const NEON = ['#00BEF3', '#8B5CF6', '#FF4D5E', '#34D399', '#FFFFFF'];
 const EVERY = 2200;
@@ -95,5 +95,16 @@ export function initBrand() {
   area.addEventListener('pointerenter', (e) => {
     if (e.pointerType !== 'mouse' || isReduced()) return;
     letters.forEach((l, i) => window.setTimeout(() => scramble(l, 520), i * 70));
+  });
+
+  // Reduced motion mid-swap: the autoplayer has stopped the cycle; the O settles on the first image (the one the page
+  // ships) and any letter mid-scramble lands.
+  onMotionChange((reduced) => {
+    if (!reduced) return;
+    if (k !== 0) show(0);
+    for (const l of letters) {
+      if (l.dataset.orig) l.textContent = l.dataset.orig;
+      delete l.dataset.scrambling;
+    }
   });
 }

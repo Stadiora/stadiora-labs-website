@@ -1,7 +1,7 @@
 // Hero (DESIGN-4 M3 + M4): the word swap and the photo conveyor step together; the side lanes loop in CSS.
 // The page ships the first word and the whole conveyor as HTML; this only positions the centre lane, builds the
 // next words and steps them. One autoplayer (host #hero, hover/focus on the copy) starts and stops the cycle.
-import { $, $$, autoplayer, isReduced } from '../motion/kit';
+import { $, $$, autoplayer, isReduced, onMotionChange } from '../motion/kit';
 
 const CYCLE_MS = 2800;
 const EASE = 'cubic-bezier(0.2, 0.7, 0.2, 1)';
@@ -58,6 +58,15 @@ export function initHero() {
   let pos = 1; // block 0 is a clone of the last photo, block 1 is the first word's
   let wi = 0;
   let timer = 0;
+  // Every step finishes through short timeouts; tracking them lets reduced motion cut a half-finished step short.
+  const pending = new Set<number>();
+  const later = (fn: () => void, ms: number) => {
+    const id = window.setTimeout(() => {
+      pending.delete(id);
+      fn();
+    }, ms);
+    pending.add(id);
+  };
 
   /** Centres the big tile of block `p` in the lane. */
   function place(p: number, animate: boolean) {
@@ -118,8 +127,8 @@ export function initHero() {
     next.dataset.active = '';
     old.classList.add('gone');
     next.classList.add('in');
-    setTimeout(() => next.classList.remove('in'), 1500);
-    setTimeout(() => old.remove(), 600);
+    later(() => next.classList.remove('in'), 1500);
+    later(() => old.remove(), 600);
   }
 
   function step() {
@@ -127,14 +136,14 @@ export function initHero() {
     if (!old) return;
     wi = (wi + 1) % words.length;
     old.classList.add('out');
-    setTimeout(() => {
+    later(() => {
       pos++;
       place(pos, true);
       warm(pos);
       sweep(bigs[pos]);
       if (pos === words.length + 1) {
         // the clone of the first photo is on screen: jump back to the real one without a transition
-        setTimeout(() => {
+        later(() => {
           col.classList.add('snap');
           pos = 1;
           place(pos, false);
@@ -142,11 +151,38 @@ export function initHero() {
         }, 1250);
       }
     }, 120);
-    setTimeout(() => {
+    later(() => {
       swapWord(old);
       swapToast(wi);
     }, 300);
   }
+
+  // Reduced motion mid-cycle: back to the first word, its photo and its toast, which is what the page ships (and what a page
+  // loaded with reduced motion shows).
+  const stillFrame = () => {
+    pending.forEach((id) => window.clearTimeout(id));
+    pending.clear();
+    const first = buildWord(words[0], 0);
+    first.dataset.active = '';
+    slot.replaceChildren(first);
+    wi = 0;
+    pos = 1;
+    col.classList.remove('snap');
+    place(pos, false);
+    const t = toasts[0];
+    if (toast && t) {
+      const b = $('b', toast);
+      const sp = $('span', toast);
+      if (b) b.textContent = t.title;
+      if (sp) sp.textContent = t.text;
+    }
+    for (const el of [toast, ...$$('.hero-sweep', col)]) el?.getAnimations().forEach((a) => a.cancel());
+    cv.style.removeProperty('--cvx');
+    cv.style.removeProperty('--cvy');
+  };
+  onMotionChange((reduced) => {
+    if (reduced) stillFrame();
+  });
 
   autoplayer(hero, {
     within: copy,

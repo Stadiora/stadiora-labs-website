@@ -2,7 +2,7 @@
 // tabs. Each scene is a 7.6 s set of paused, once-only timelines that share one autoplayer with the tabs, so
 // hover, focus, offscreen and hidden-tab pause both together. Counters animate the registered `--n` integer
 // (shown by a CSS counter) so they pause with everything else. The still markup is the finished scene.
-import { $, $$, autoplayer, autotabs, isReduced, tl, type Frame } from '../../motion/kit';
+import { $, $$, autoplayer, autotabs, isReduced, onMotionChange, tl, type Frame } from '../../motion/kit';
 
 const O = 'opacity';
 const T = 'transform';
@@ -85,11 +85,18 @@ export function initEngage() {
     play: () => anims.forEach((a) => a.play()),
     pause: () => anims.forEach((a) => a.pause()),
   });
-  autotabs(root);
+  const tabs = autotabs(root);
+  const fillBars = (i: number) => bars.forEach((b, k) => (b.style.transform = k === i ? 'scaleX(1)' : 'scaleX(0)'));
   root.addEventListener('at:change', (e) => {
     const { i } = (e as CustomEvent<{ i: number }>).detail;
-    if (isReduced()) bars.forEach((b, k) => (b.style.transform = k === i ? 'scaleX(1)' : 'scaleX(0)'));
+    if (isReduced()) fillBars(i);
     run(i);
+  });
+  // Reduced motion mid-scene: the timelines are cancelled (the markup is the finished scene) and the open tab's bar is full;
+  // back to motion, the open scene starts again.
+  onMotionChange((reduced) => {
+    if (reduced) fillBars(tabs.index);
+    run(tabs.index);
   });
   if (isReduced()) bars[0].style.transform = 'scaleX(1)';
   else run(0);

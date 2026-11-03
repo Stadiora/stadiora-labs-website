@@ -17,13 +17,6 @@
   font-size: clamp(44px, 7.4vw, 132px);
 }
 
-/* the reveals wait for a script; without one the section just shows */
-html:not(.js) .final .rv,
-html:not(.js) .final .lines > span > span {
-  opacity: 1;
-  transform: none;
-}
-
 @media (max-width: 640px) {
   .final-ctas .btn {
     flex: 1 1 100%;

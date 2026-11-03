@@ -146,13 +146,14 @@
 @property --v{syntax:"<number>";inherits:false;initial-value:0}
 .show .count{counter-reset:n var(--to);animation:none}
 .show .count.go{counter-reset:n var(--n);animation:countUp var(--cd,1.2s) var(--e-out) both}
-.int-orbit{position:absolute;left:50%;top:50%;width:420px;height:420px;transform:translate(-50%,-50%)}
+/* The orbit and its two satellites are sized from the frame, so on a phone nothing is wider than the frame it sits in. */
+.int-orbit{position:absolute;left:50%;top:50%;width:min(420px,100%);aspect-ratio:1;transform:translate(-50%,-50%)}
 .int-orbit .hub{position:absolute;left:50%;top:50%;width:96px;height:96px;margin:-48px;border-radius:28px;background:#fff;display:grid;place-items:center;box-shadow:0 20px 50px -10px rgba(0,0,0,.6)}
 .int-orbit .hub svg{width:62px}
 .int-orbit .ring-path{position:absolute;inset:0;border-radius:50%;border:1.5px dashed rgba(255,255,255,.4);animation:spinA 30s linear infinite}
-.int-orbit .sat{position:absolute;left:50%;top:50%;margin:-34px 0 0 -110px;width:220px;height:68px;border-radius:20px;display:flex;align-items:center;gap:12px;padding:0 16px;font-weight:600;font-size:14px;color:#08132B;background:#fff;box-shadow:0 20px 40px -12px rgba(0,0,0,.5)}
-.int-orbit .sat-a{transform:translate(-120px,-150px)}
-.int-orbit .sat-b{transform:translate(120px,150px)}
+.int-orbit .sat{position:absolute;width:min(220px,70%);height:68px;border-radius:20px;display:flex;align-items:center;gap:12px;padding:0 16px;font-weight:600;font-size:14px;color:#08132B;background:#fff;box-shadow:0 20px 40px -12px rgba(0,0,0,.5)}
+.int-orbit .sat-a{left:12px;top:6%}
+.int-orbit .sat-b{right:12px;bottom:6%}
 .int-orbit .sat .ic{width:40px;height:40px;border-radius:11px;display:grid;place-items:center;flex:none}
 .int-orbit .ic-apple{background:#FFE4EA}
 .int-orbit .ic-hc{background:#E3F6EA}
@@ -317,7 +318,7 @@
 @media (prefers-reduced-motion:reduce){
   .swap > span,.mosaic::after,.mosaic canvas{transition:none}
   .bt.in .org-row,.bt.in .chart-svg path.ln{animation:none}
-  .show .count.go{animation:none}
+  .show .count.go{animation:none;counter-reset:n var(--to)}
   .ms-slide.on .load-bars i,.ms-slide.on .dring.draw,.int-orbit .ring-path{animation:none}
   .ms-slide,.ms-slide.on,.ms-slide > img,.ms-slide .pop,.ms-slide.on .pop{transition:none}
   .acc-row .bd,.app-scr,.pl-step,.bubble-out,.show .bt{transition:none}

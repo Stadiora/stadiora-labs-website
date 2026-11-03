@@ -46,15 +46,17 @@
 
 /* ---------- 6. Motion library ---------- */
 /* 6.1 scroll reveal */
-.rv{opacity:0;transform:translateY(28px);transition:opacity 700ms var(--e-out),transform 900ms var(--e-out);transition-delay:calc(var(--i,0) * 70ms)}
-.rv.in{opacity:1;transform:none}
-.rv-mask{clip-path:inset(0 0 100% 0);transition:clip-path 1000ms var(--e-inout);transition-delay:calc(var(--i,0) * 90ms)}
-.rv-mask.in{clip-path:inset(0 0 0 0)}
+/* Hidden only once the inline script has set html.js: without JS nothing would ever add .in, so the page just shows. */
+html.js .rv{opacity:0;transform:translateY(28px);transition:opacity 700ms var(--e-out),transform 900ms var(--e-out);transition-delay:calc(var(--i,0) * 70ms)}
+html.js .rv.in{opacity:1;transform:none}
+html.js .rv-mask{clip-path:inset(0 0 100% 0);transition:clip-path 1000ms var(--e-inout);transition-delay:calc(var(--i,0) * 90ms)}
+html.js .rv-mask.in{clip-path:inset(0 0 0 0)}
 /* line-by-line display reveal */
 /* Headroom above the mask keeps accents on capitals (Í, Á) inside it; the negative margin leaves the layout alone. */
 .lines > span{display:block;overflow:hidden;padding:.16em 0 .04em;margin:-.16em 0 -.04em}
-.lines > span > span{display:block;transform:translateY(105%);transition:transform 1000ms var(--e-out);transition-delay:calc(var(--i,0) * 90ms)}
-.lines.in > span > span{transform:none}
+.lines > span > span{display:block}
+html.js .lines > span > span{transform:translateY(105%);transition:transform 1000ms var(--e-out);transition-delay:calc(var(--i,0) * 90ms)}
+html.js .lines.in > span > span{transform:none}
 
 /* 6.2 gradient mesh */
 .mesh{position:absolute;inset:0;overflow:hidden;background:radial-gradient(120% 90% at 70% 10%,#0A1636 0%,#040A1A 55%,#02060F 100%);z-index:0;contain:strict}
@@ -99,8 +101,9 @@
 .orb .halo{position:absolute;inset:-35%;border-radius:50%;background:radial-gradient(circle,rgba(139,92,246,.45),rgba(0,190,243,.18) 45%,transparent 70%);z-index:-1;animation:orbPulse 3.2s ease-in-out infinite reverse}
 @keyframes orbPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
 
-/* 6.7 pause offscreen + paused state */
-.is-off,.is-off *,.is-off *::before,.is-off *::after{animation-play-state:paused!important}
+/* 6.7 pause offscreen + paused state. html.tab-hidden is set by the kit while the tab is hidden, so the CSS loops hold their place. */
+.is-off,.is-off *,.is-off *::before,.is-off *::after,
+html.tab-hidden,html.tab-hidden *,html.tab-hidden *::before,html.tab-hidden *::after{animation-play-state:paused!important}
 
 /* 6.8 glass + pop cards (shared by sections and stages) */
 .pop{background:rgba(255,255,255,.96);color:#08132B;border-radius:18px;box-shadow:0 30px 70px -20px rgba(2,6,15,.55),0 0 0 1px rgba(8,19,43,.06);padding:16px 18px}

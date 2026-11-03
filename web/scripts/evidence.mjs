@@ -7,6 +7,7 @@
 //   node scripts/evidence.mjs --home-only      (the home guards only: structure, autoplayers, reduced motion, marquees, hero words, clipping, contrast)
 // Output goes to web/.evidence/ (git-ignored): PNGs plus summary.json. Exit code 1 when a check fails.
 import { mkdir, readdir, readFile, rm, stat, writeFile } from 'node:fs/promises';
+import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { chromium } from 'playwright';
 import { contrastProbe } from './lib/contrast.mjs';
@@ -37,7 +38,8 @@ const check = (group, name, pass, detail = '') => {
 };
 const metrics = {};
 
-const server = await serve(`${root}dist`);
+// DIST_DIR points the run at another build (a mutation build in its own folder, so the real dist stays untouched).
+const server = await serve(process.env.DIST_DIR ? resolve(process.env.DIST_DIR) : `${root}dist`);
 const browser = await chromium.launch();
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -194,13 +196,14 @@ await homeChecks({ open, check, sleep, settle, metrics });
     page.evaluate(() => ({
       panels: [...document.querySelectorAll('#pillars .pil-panel')].map((p) => p.classList.contains('on') && getComputedStyle(p).visibility === 'visible'),
       clips: [...document.querySelectorAll('#pillars .pil-clip')].map((c) => c.classList.contains('on')),
+      scenes: [...document.querySelectorAll('#pillars .pm-scene')].map((c) => c.classList.contains('on')),
     }));
   check('pillars', 'four tabs, first selected', (await ptabs.count()) === 4 && (await ptabs.nth(0).getAttribute('aria-selected')) === 'true');
   await ptabs.nth(1).click();
   await sleep(600);
   check('pillars', 'click selects the second tab', (await ptabs.nth(1).getAttribute('aria-selected')) === 'true' && (await ptabs.nth(0).getAttribute('tabindex')) === '-1');
   const second = await shown();
-  check('pillars', 'the second tab opens its own text panel and clip', JSON.stringify(second.panels) === '[false,true,false,false]' && JSON.stringify(second.clips) === '[false,true,false,false]', JSON.stringify(second));
+  check('pillars', 'the second tab opens its own text panel, clip and demo cards', JSON.stringify(second.panels) === '[false,true,false,false]' && JSON.stringify(second.clips) === '[false,true,false,false]' && JSON.stringify(second.scenes) === '[false,true,false,false]', JSON.stringify(second));
   const wired = await page.evaluate(() => [...document.querySelectorAll('#pillars [role="tab"]')].every((t) => document.getElementById(t.getAttribute('aria-controls'))?.getAttribute('aria-labelledby') === t.id));
   check('pillars', 'every tab controls a panel that is labelled by it', wired);
   if (!checksOnly) await el(page, '#pillars', 'state-pillars-2-nutrition');
@@ -212,8 +215,10 @@ await homeChecks({ open, check, sleep, settle, metrics });
   await page.keyboard.press('Home');
   check('pillars', 'Home moves to the first tab', (await ptabs.nth(0).getAttribute('aria-selected')) === 'true');
   await sleep(700);
-  const open1 = (await shown()).panels.filter(Boolean).length;
+  const end = await shown();
+  const open1 = end.panels.filter(Boolean).length;
   check('pillars', 'only the active panel is shown', open1 === 1, `${open1} panels shown`);
+  check('pillars', 'the demo cards follow the selected tab (Home returns to the first)', JSON.stringify(end.scenes) === '[true,false,false,false]', JSON.stringify(end.scenes));
 
   // Store chooser dialog
   await page.locator('#final').evaluate((e) => e.scrollIntoView({ block: 'center' }));

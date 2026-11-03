@@ -1,7 +1,7 @@
 // Custom-apps morph (DESIGN-4 M17): the white-label phone re-skins through each brand (colour, mark, name,
 // photo), the side phones and chips follow, and the label list highlights the active app. One autoplayer on
 // the phone, paused by hovering or focusing the stage. The still markup is the first brand.
-import { $, $$, autoplayer, scramble } from '../../motion/kit';
+import { $, $$, autoplayer, onMotionChange, scramble } from '../../motion/kit';
 
 interface Brand {
   n: string;
@@ -31,15 +31,16 @@ export function initApps() {
   let i = 0;
   let timer = 0;
 
-  const go = () => {
-    i = (i + 1) % brands.length;
+  const show = (n: number, animate: boolean) => {
+    i = n;
     const b = brands[i];
     scr.style.setProperty('--bc', b.c);
     mk.textContent = b.m;
     nm.textContent = b.n;
     delete nm.dataset.orig;
+    delete nm.dataset.scrambling;
     nm.removeAttribute('aria-label');
-    scramble(nm, 500);
+    if (animate) scramble(nm, 500);
     im.style.setProperty('--img', b.i);
     labs.forEach((l, k) => l.classList.toggle('on', k === i));
     sides.forEach((sd, k) => {
@@ -52,10 +53,21 @@ export function initApps() {
     });
     chips.forEach((c, k) => {
       c.style.setProperty('--bc', b.c);
-      c.animate([{ scale: 1 }, { scale: 1.12 }, { scale: 1 }], { duration: 500, delay: k * 90, easing: 'cubic-bezier(.34,1.56,.64,1)' });
+      if (animate) c.animate([{ scale: 1 }, { scale: 1.12 }, { scale: 1 }], { duration: 500, delay: k * 90, easing: 'cubic-bezier(.34,1.56,.64,1)' });
     });
-    scr.animate([{ clipPath: 'circle(0% at 50% 30%)' }, { clipPath: 'circle(140% at 50% 30%)' }], { duration: 700, easing: 'cubic-bezier(.7,0,.2,1)' });
+    if (animate) scr.animate([{ clipPath: 'circle(0% at 50% 30%)' }, { clipPath: 'circle(140% at 50% 30%)' }], { duration: 700, easing: 'cubic-bezier(.7,0,.2,1)' });
   };
+  const go = () => show((i + 1) % brands.length, true);
+
+  // Reduced motion mid-cycle: the phone settles on the first brand, which is what the page ships.
+  onMotionChange((reduced) => {
+    if (!reduced) return;
+    for (const el of [scr, ...chips]) el.getAnimations().forEach((a) => a.cancel());
+    if (i === 0) return;
+    show(0, false);
+    // The shipped chips carry no inline colour: their CSS default is the first brand's.
+    chips.forEach((c) => c.style.removeProperty('--bc'));
+  });
 
   autoplayer(phone, {
     within: stage,

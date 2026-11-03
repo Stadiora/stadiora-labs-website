@@ -1,7 +1,7 @@
 // FROM / TO word swaps in the "for every coach" heading (DESIGN-4 M13). Each list cycles on its own clock
 // (the second row is offset) through an autoplayer, so hovering or focusing the heading, scrolling away
 // or hiding the tab stops it. The words are stacked in one grid cell, so no measuring is needed.
-import { $, $$, autoplayer } from '../../motion/kit';
+import { $, $$, autoplayer, onMotionChange } from '../../motion/kit';
 
 export function initSwaps() {
   const heading = $<HTMLElement>('#showcase h2');
@@ -10,6 +10,7 @@ export function initSwaps() {
     if (words.length < 2) return;
     let i = words.findIndex((w) => w.classList.contains('on'));
     if (i < 0) i = 0;
+    const first = i;
     let timer = 0;
     const step = () => {
       const out = words[i];
@@ -20,6 +21,15 @@ export function initSwaps() {
       words[i].classList.add('on');
       timer = window.setTimeout(step, 3000);
     };
+    // Reduced motion mid-cycle: back to the word the page ships.
+    onMotionChange((reduced) => {
+      if (!reduced) return;
+      words.forEach((w, k) => {
+        w.classList.toggle('on', k === first);
+        w.classList.remove('off');
+      });
+      i = first;
+    });
     autoplayer(sw, {
       within: heading ?? sw,
       threshold: 0.25,
