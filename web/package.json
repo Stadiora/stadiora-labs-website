@@ -1,0 +1,27 @@
+{
+  "name": "stadiora-labs-web",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "stadioralabs.com (R57 rebuild). Not served until the Pages cutover.",
+  "engines": {
+    "node": ">=22.23.4"
+  },
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "check": "astro check",
+    "preview": "astro preview",
+    "verify": "node scripts/verify-dist.mjs",
+    "evidence": "node scripts/evidence.mjs"
+  },
+  "dependencies": {
+    "@astrojs/sitemap": "^3.7.4",
+    "astro": "^7.4.5"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.12",
+    "playwright": "^1.64.1",
+    "typescript": "^6.0.3"
+  }
+}

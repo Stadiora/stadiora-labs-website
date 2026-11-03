@@ -1,0 +1,96 @@
+---
+interface Props {
+  class?: string;
+  /** Screen background: follows the theme by default; brand phones pass their own colour. */
+  bg?: string;
+  ink?: string;
+  /** Decorative phones are hidden from assistive tech; pass false when the screen carries content. */
+  decorative?: boolean;
+}
+const { class: cls, bg, ink, decorative = true } = Astro.props;
+const style = [bg ? `--ph-bg:${bg}` : '', ink ? `--ph-ink:${ink}` : ''].filter(Boolean).join(';');
+---
+
+<!-- HTML phone. Everything inside is sized in em, so --phone-w scales the whole screen. -->
+<div class:list={['phone', cls]} aria-hidden={decorative ? 'true' : undefined} style={style || undefined}>
+  <div class="phone__bezel">
+    <div class="phone__screen">
+      <div class="phone__status">
+        <span class="phone__time">9:41</span>
+        <span class="phone__island"></span>
+        <span class="phone__sig"><i></i><i></i><i></i></span>
+      </div>
+      <slot />
+    </div>
+  </div>
+</div>
+
+<style is:global>
+  .phone {
+    --ph-bg: var(--bg);
+    --ph-ink: var(--ink);
+    width: var(--phone-w, 232px);
+    font-size: calc(var(--phone-w, 232px) / 17);
+    line-height: 1.3;
+  }
+  .phone__bezel {
+    padding: 0.55em;
+    border-radius: 2.5em;
+    background: #0b1220;
+    box-shadow:
+      0 0 0 1px rgb(255 255 255 / 0.12) inset,
+      var(--shadow-lift);
+  }
+  .phone__screen {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    aspect-ratio: 9 / 18.6;
+    overflow: hidden;
+    border-radius: 2em;
+    background: var(--ph-bg);
+    color: var(--ph-ink);
+    font-family: var(--font-body);
+    text-align: left;
+  }
+  .phone__status {
+    position: relative;
+    flex: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.9em 1.3em 0.2em;
+    font-size: 0.75em;
+    font-weight: 600;
+  }
+  .phone__island {
+    position: absolute;
+    left: 50%;
+    top: 0.55em;
+    width: 4.2em;
+    height: 1.2em;
+    margin-left: -2.1em;
+    border-radius: 1em;
+    background: #0b1220;
+  }
+  .phone__sig {
+    display: inline-flex;
+    gap: 2px;
+    align-items: flex-end;
+  }
+  .phone__sig i {
+    display: block;
+    width: 3px;
+    border-radius: 1px;
+    background: currentColor;
+  }
+  .phone__sig i:nth-child(1) {
+    height: 5px;
+  }
+  .phone__sig i:nth-child(2) {
+    height: 8px;
+  }
+  .phone__sig i:nth-child(3) {
+    height: 11px;
+  }
+</style>

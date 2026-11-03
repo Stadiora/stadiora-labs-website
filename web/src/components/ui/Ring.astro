@@ -1,0 +1,55 @@
+---
+interface Props {
+  /** 0 to 100 */
+  value: number;
+  size?: number;
+  stroke?: number;
+  class?: string;
+  /** Draw the arc on first view (JS adds .is-drawn). Without JS the arc is already drawn. */
+  animate?: boolean;
+  duration?: number;
+}
+const { value, size = 72, stroke = 8, class: cls, animate = false, duration = 900 } = Astro.props;
+const r = (size - stroke) / 2;
+const c = 2 * Math.PI * r;
+const dash = (c * value) / 100;
+---
+
+<svg
+  class:list={['ring', cls]}
+  viewBox={`0 0 ${size} ${size}`}
+  width={size}
+  height={size}
+  aria-hidden="true"
+  focusable="false"
+  data-ring={animate ? '' : undefined}
+  style={`--ring-c:${c.toFixed(2)};--ring-dash:${dash.toFixed(2)};--ring-dur:${duration}ms`}
+>
+  <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="var(--surface-2)" stroke-width={stroke}></circle>
+  <circle
+    class="ring__arc"
+    cx={size / 2}
+    cy={size / 2}
+    r={r}
+    fill="none"
+    stroke="var(--cyan)"
+    stroke-width={stroke}
+    stroke-linecap="round"
+    stroke-dasharray={`${dash.toFixed(2)} ${c.toFixed(2)}`}
+    transform={`rotate(-90 ${size / 2} ${size / 2})`}></circle>
+</svg>
+
+<style is:global>
+  html.js .ring[data-ring] .ring__arc {
+    stroke-dasharray: 0 var(--ring-c);
+    transition: stroke-dasharray var(--ring-dur) var(--ease-out);
+  }
+  html.js .ring[data-ring].is-drawn .ring__arc {
+    stroke-dasharray: var(--ring-dash) var(--ring-c);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html.js .ring[data-ring] .ring__arc {
+      stroke-dasharray: var(--ring-dash) var(--ring-c);
+    }
+  }
+</style>

@@ -1,0 +1,212 @@
+---
+import { clientLogos } from '../../data/logos';
+import { useDict, type Locale } from '../../i18n';
+import Icon from '../ui/Icon.astro';
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const t = useDict(locale);
+const H = 48;
+---
+
+<section class="logos" aria-labelledby="logos-label">
+  <div class="container logos__inner">
+    <div class="logos__count">
+      <p class="logos__label" id="logos-label">{t.logos.label}</p>
+      <p class="logos__num num">{t.logos.count}</p>
+    </div>
+    <div class="marquee logos__marquee" data-marquee>
+      <div class="marquee__track">
+        {
+          [false, true].map((dup) => (
+            <ul class="marquee__group" aria-hidden={dup ? 'true' : undefined}>
+              {clientLogos.map((logo) => (
+                <li class="logos__item">
+                  <img
+                    class="only-light"
+                    src={`/logos/${logo.slug}-mono-dark.${logo.ext}`}
+                    alt={dup ? '' : logo.name}
+                    width={Math.round((H * logo.width) / logo.height)}
+                    height={H}
+                    loading="lazy"
+                    decoding="async"
+                  />
+                  <img
+                    class="only-dark"
+                    src={`/logos/${logo.slug}-mono-light.${logo.ext}`}
+                    alt={dup ? '' : logo.name}
+                    width={Math.round((H * logo.width) / logo.height)}
+                    height={H}
+                    loading="lazy"
+                    decoding="async"
+                  />
+                </li>
+              ))}
+            </ul>
+          ))
+        }
+      </div>
+    </div>
+    <button
+      class="logos__pause"
+      type="button"
+      aria-pressed="false"
+      aria-label={t.a11y.pauseLogos}
+      data-label-pause={t.a11y.pauseLogos}
+      data-label-play={t.a11y.playLogos}
+      data-marquee-pause
+    >
+      <Icon name="pause" size={18} class="logos__pause-pause" />
+      <Icon name="play" size={18} class="logos__pause-play" />
+    </button>
+  </div>
+</section>
+
+<style>
+  .logos {
+    border-top: 1px solid var(--line);
+    padding-block: 40px 48px;
+  }
+  .logos__inner {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 40px;
+  }
+  .logos__count {
+    flex: none;
+    padding-right: 40px;
+    border-right: 1px solid var(--line);
+  }
+  .logos__label {
+    color: var(--ink-2);
+    font-size: 15px;
+    line-height: 20px;
+  }
+  .logos__num {
+    margin-top: 2px;
+    color: var(--ink);
+    font-size: 64px;
+    line-height: 68px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+  }
+  .logos__marquee {
+    flex: 1;
+    min-width: 0;
+    --marquee-gap: 72px;
+  }
+  .logos__item {
+    flex: none;
+    line-height: 0;
+  }
+  .logos__item img {
+    height: 48px;
+    width: auto;
+    opacity: 0.6;
+    transition: opacity 0.2s;
+  }
+  .logos__item img:hover {
+    opacity: 1;
+  }
+  .logos__pause {
+    display: none;
+    position: absolute;
+    right: -8px;
+    top: -14px;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    border: 0;
+    border-radius: 50%;
+    background: none;
+    color: var(--ink-3);
+    cursor: pointer;
+  }
+  .logos__pause:hover {
+    color: var(--ink);
+  }
+  .logos__pause :global(.logos__pause-play),
+  .logos__pause[aria-pressed='true'] :global(.logos__pause-pause) {
+    display: none;
+  }
+  .logos__pause[aria-pressed='true'] :global(.logos__pause-play) {
+    display: block;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    :global(html.js) .logos__pause {
+      display: grid;
+    }
+  }
+  .logos__marquee[data-paused] :global(.marquee__track) {
+    animation-play-state: paused;
+  }
+
+  @media (max-width: 1100px) {
+    .logos__inner {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 24px;
+    }
+    .logos__count {
+      display: flex;
+      align-items: baseline;
+      gap: 16px;
+      padding: 0;
+      border: 0;
+    }
+    .logos__num {
+      font-size: 48px;
+      line-height: 52px;
+    }
+  }
+  /* Phone: a static 3-column grid instead of a marquee. */
+  @media (max-width: 720px) {
+    .logos {
+      padding-block: 32px 40px;
+    }
+    .logos__count {
+      flex-direction: column;
+      gap: 0;
+    }
+    .logos__marquee {
+      -webkit-mask-image: none;
+      mask-image: none;
+    }
+    .logos__marquee :global(.marquee__track) {
+      width: auto;
+      animation: none;
+    }
+    .logos__marquee :global(.marquee__group) {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px 16px;
+      width: 100%;
+      padding-right: 0;
+      justify-items: center;
+      align-items: center;
+    }
+    .logos__marquee :global(.marquee__group[aria-hidden='true']) {
+      display: none;
+    }
+    .logos__item img {
+      height: 36px;
+      max-width: 100%;
+    }
+    .logos__pause {
+      display: none !important;
+    }
+  }
+</style>
+
+<script>
+  const marquee = document.querySelector<HTMLElement>('[data-marquee]');
+  const button = document.querySelector<HTMLButtonElement>('[data-marquee-pause]');
+  button?.addEventListener('click', () => {
+    const paused = marquee?.toggleAttribute('data-paused');
+    button.setAttribute('aria-pressed', String(!!paused));
+    button.setAttribute('aria-label', (paused ? button.dataset.labelPlay : button.dataset.labelPause) ?? '');
+  });
+</script>

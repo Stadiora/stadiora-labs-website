@@ -1,0 +1,472 @@
+---
+import { useDict, type Locale } from '../../i18n';
+import Icon from '../ui/Icon.astro';
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const t = useDict(locale);
+const a = t.ai;
+
+// Sessions are language-neutral apart from the names, which come from the dictionary.
+const sessions = [
+  { day: 0, key: 'acceleration', spec: '6×30 m' },
+  { day: 1, key: 'tempo', spec: '6×200 m' },
+  { day: 3, key: 'speedEndurance', spec: '3×300 m' },
+  { day: 5, key: 'raceModel', spec: '2×350 m' },
+] as const;
+---
+
+<section class="section ai" aria-labelledby="ai-title" data-ai>
+  <div class="container">
+    <div class="section-head" data-reveal>
+      <h2 id="ai-title">{a.title}</h2>
+      <p>{a.sub}</p>
+    </div>
+
+    <div class="ai__panel" data-ai-panel data-reveal style="--reveal-i:1">
+      <button
+        class="ai__pause"
+        type="button"
+        aria-pressed="false"
+        aria-label={t.a11y.pauseDemo}
+        data-label-pause={t.a11y.pauseDemo}
+        data-label-play={t.a11y.playDemo}
+        data-ai-pause
+      >
+        <Icon name="pause" size={18} class="ai__pause-pause" />
+        <Icon name="play" size={18} class="ai__pause-play" />
+      </button>
+
+      <div class="ai__step ai__ask">
+        <p class="ai__ask-title"><Icon name="sparkle" size={22} class="ai__spark" />{a.askLabel}</p>
+        <div class="ai__input">
+          <p class="sr-only">{a.prompt}</p>
+          <p class="ai__typed" aria-hidden="true" data-ai-typed data-full={a.prompt}>{a.prompt}</p>
+          <span class="ai__send" aria-hidden="true"><Icon name="send" size={20} /></span>
+        </div>
+      </div>
+
+      <svg class="ai__arrow" viewBox="0 0 48 14" width="48" height="14" fill="none" aria-hidden="true" focusable="false">
+        <path d="M1 7h38" stroke="var(--cyan)" stroke-width="2" stroke-dasharray="4 4" stroke-linecap="round"></path>
+        <path d="M36 2l7 5-7 5" stroke="var(--cyan)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+      </svg>
+
+      <div class="ai__step ai__program" data-ai-program>
+        <p class="ai__program-title" data-ai-row>{a.programTitle}</p>
+        <p class="ai__program-meta" data-ai-row>{a.programMeta}</p>
+        <ul class="ai__rows">
+          {
+            sessions.map((s) => (
+              <li class="ai__row" data-ai-row>
+                <span class="ai__day">{a.days[s.day]}</span>
+                <span class="ai__spec">
+                  {a.sessions[s.key]} <span class="num">{s.spec}</span>
+                </span>
+              </li>
+            ))
+          }
+        </ul>
+        <span class="btn btn--primary ai__add" data-ai-row data-ai-add>{a.addToCalendar}</span>
+      </div>
+
+      <svg class="ai__arrow" viewBox="0 0 48 14" width="48" height="14" fill="none" aria-hidden="true" focusable="false">
+        <path d="M1 7h38" stroke="var(--cyan)" stroke-width="2" stroke-dasharray="4 4" stroke-linecap="round"></path>
+        <path d="M36 2l7 5-7 5" stroke="var(--cyan)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+      </svg>
+
+      <div class="ai__step ai__cal">
+        <div class="ai__cal-head">
+          <p class="ai__cal-title">{a.calendarTitle}</p>
+          <span class="ai__cal-nav" aria-hidden="true">
+            <Icon name="chevron-left" size={18} />
+            <Icon name="chevron-right" size={18} />
+          </span>
+        </div>
+        <div class="ai__grid" role="table" aria-label={a.calendarTitle}>
+          <div class="ai__grid-head" role="row">
+            {a.days.map((d) => <span role="columnheader">{d}</span>)}
+          </div>
+          <div class="ai__grid-body" role="row">
+            {
+              a.days.map((_, i) => (
+                <div class="ai__cell" role="cell" data-day={i} data-name={a.days[i]}>
+                  {i === 3 && <span class="ai__slot" aria-hidden="true" data-ai-slot></span>}
+                  {sessions
+                    .filter((s) => s.day === i)
+                    .map((s) => (
+                      <span class="ai__event" data-ai-event data-key={s.key}>
+                        <span class="ai__event-name">{a.sessions[s.key]}</span>
+                        <span class="ai__event-spec num">{s.spec}</span>
+                      </span>
+                    ))}
+                </div>
+              ))
+            }
+          </div>
+        </div>
+      </div>
+
+    </div>
+    <p class="demo-note">{a.demoNote}</p>
+  </div>
+</section>
+
+<style>
+  .ai__panel {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 0.8fr) 36px minmax(0, 1.1fr) 36px minmax(0, 2.2fr);
+    align-items: center;
+    margin-top: 40px;
+    padding: 28px;
+    border-radius: 18px;
+    background: var(--surface);
+  }
+  .ai__step {
+    position: relative;
+    border: 1px solid var(--pop-border);
+    border-radius: var(--radius-card);
+    background: var(--bg);
+    box-shadow: var(--shadow-pop);
+  }
+  .ai__arrow {
+    justify-self: center;
+  }
+
+  .ai__ask {
+    padding: 22px 22px 22px 24px;
+    border-left: 2px solid var(--violet);
+  }
+  .ai__ask-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: var(--font-display);
+    font-size: 20px;
+    line-height: 26px;
+    font-weight: 600;
+  }
+  .ai__ask-title :global(.ai__spark) {
+    color: var(--violet);
+  }
+  .ai__input {
+    position: relative;
+    margin-top: 16px;
+    min-height: 118px;
+    padding: 14px 56px 14px 14px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-ctl);
+    background: var(--bg);
+  }
+  .ai__typed {
+    font-size: 16px;
+    line-height: 24px;
+    color: var(--ink);
+  }
+  .ai__typed.is-typing::after {
+    content: '';
+    display: inline-block;
+    width: 2px;
+    height: 1.1em;
+    margin-left: 2px;
+    vertical-align: text-bottom;
+    background: var(--violet);
+    animation: blink 0.9s steps(2) infinite;
+  }
+  @keyframes blink {
+    50% {
+      opacity: 0;
+    }
+  }
+  .ai__send {
+    position: absolute;
+    right: 12px;
+    bottom: 12px;
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--btn-bg);
+    color: var(--btn-ink);
+  }
+
+  .ai__program {
+    padding: 22px;
+  }
+  .ai__program-title {
+    font-family: var(--font-display);
+    font-size: 20px;
+    line-height: 26px;
+    font-weight: 600;
+  }
+  .ai__program-meta {
+    margin-top: 2px;
+    color: var(--ink-2);
+    font-size: 14px;
+    line-height: 20px;
+  }
+  .ai__rows {
+    display: grid;
+    gap: 8px;
+    margin-top: 14px;
+  }
+  .ai__row {
+    display: grid;
+    grid-template-columns: 52px 1fr;
+    gap: 8px;
+    font-size: 15px;
+    line-height: 20px;
+  }
+  .ai__day,
+  .ai__spec .num {
+    white-space: nowrap;
+  }
+  .ai__spec {
+    padding: 8px 10px;
+    border-radius: 8px;
+    background: var(--surface);
+  }
+  .ai__day {
+    color: var(--ink-2);
+    text-align: center;
+  }
+  .ai__spec {
+    color: var(--ink);
+  }
+  .ai__add {
+    width: 100%;
+    margin-top: 16px;
+    cursor: default;
+  }
+  .ai__add:hover {
+    transform: none;
+    background: var(--btn-bg);
+  }
+
+  .ai__cal {
+    padding: 18px 18px 18px;
+  }
+  .ai__cal-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+  }
+  .ai__cal-title {
+    font-family: var(--font-display);
+    font-size: 20px;
+    line-height: 26px;
+    font-weight: 600;
+  }
+  .ai__cal-nav {
+    display: inline-flex;
+    gap: 14px;
+    color: var(--ink-2);
+  }
+  .ai__grid {
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  .ai__grid-head,
+  .ai__grid-body {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+  }
+  .ai__grid-head span {
+    padding: 10px 0;
+    border-bottom: 1px solid var(--line);
+    color: var(--ink-2);
+    font-size: 14px;
+    text-align: center;
+  }
+  .ai__cell {
+    position: relative;
+    min-height: 168px;
+    padding: 6px 3px;
+    border-left: 1px solid var(--line);
+  }
+  .ai__cell:first-child {
+    border-left: 0;
+  }
+  .ai__slot {
+    position: absolute;
+    inset: 6px 4px 14px;
+    border: 1px dashed color-mix(in srgb, var(--cyan) 70%, transparent);
+    border-radius: 8px;
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  .ai__event {
+    position: relative;
+    display: block;
+    padding: 5px 2px 5px 5px;
+    border-left: var(--lane) solid var(--cyan);
+    border-radius: 6px;
+    background: var(--cyan-tint);
+    color: var(--ink);
+    font-size: 11px;
+    line-height: 15px;
+  }
+  .ai__event-name,
+  .ai__event-spec {
+    display: block;
+    overflow-wrap: break-word;
+  }
+  .ai__event-spec {
+    color: var(--ink-2);
+  }
+
+  /* Clone of the program card that travels to the calendar (created by the script). */
+  .ai__fly {
+    position: absolute;
+    z-index: 3;
+    margin: 0;
+    transform-origin: top left;
+    pointer-events: none;
+  }
+
+  .ai__pause {
+    display: none;
+    position: absolute;
+    right: 8px;
+    top: 8px;
+    z-index: 4;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    border: 0;
+    border-radius: 50%;
+    background: none;
+    color: var(--ink-3);
+    cursor: pointer;
+  }
+  .ai__pause:hover {
+    color: var(--ink);
+  }
+  .ai__pause :global(.ai__pause-play),
+  .ai__pause[aria-pressed='true'] :global(.ai__pause-pause) {
+    display: none;
+  }
+  .ai__pause[aria-pressed='true'] :global(.ai__pause-play) {
+    display: block;
+  }
+
+  /* Animated states exist only while the script has taken over (data-anim). */
+  @media (prefers-reduced-motion: no-preference) {
+    :global(html.js) .ai__pause {
+      display: grid;
+    }
+    .ai__panel[data-anim] [data-ai-row] {
+      opacity: 0;
+      transform: translateY(8px);
+      transition:
+        opacity 0.4s var(--ease-out) calc(var(--i, 0) * 120ms),
+        transform 0.4s var(--ease-out) calc(var(--i, 0) * 120ms);
+    }
+    .ai__panel[data-anim]:not([data-phase]) [data-ai-row],
+    .ai__panel[data-anim]:not([data-phase]) [data-ai-event] {
+      transition: none;
+    }
+    .ai__panel[data-anim] .ai__step {
+      transition: opacity 0.35s ease;
+    }
+    .ai__panel[data-fade] .ai__step {
+      opacity: 0;
+    }
+    .ai__panel[data-anim][data-phase='1'] [data-ai-row],
+    .ai__panel[data-anim][data-phase='2'] [data-ai-row] {
+      opacity: 1;
+      transform: none;
+    }
+    .ai__panel[data-anim] [data-ai-event] {
+      opacity: 0;
+      transform: translateY(6px) scale(0.96);
+      transition:
+        opacity 0.3s var(--ease-out) calc(var(--i, 0) * 70ms),
+        transform 0.3s var(--ease-out) calc(var(--i, 0) * 70ms);
+    }
+    .ai__panel[data-anim][data-phase='2'] [data-ai-event] {
+      opacity: 1;
+      transform: none;
+    }
+    .ai__panel[data-anim][data-phase='1'] [data-ai-slot],
+    .ai__panel[data-anim][data-flying] [data-ai-slot] {
+      opacity: 1;
+    }
+    .ai__panel[data-anim][data-phase='2'] [data-ai-slot] {
+      opacity: 0;
+    }
+    .ai__panel[data-anim][data-pressed] [data-ai-add] {
+      transform: scale(0.97);
+      background: var(--btn-bg-hover);
+    }
+  }
+
+  @media (max-width: 1100px) {
+    .ai__panel {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 12px;
+      padding: 20px;
+    }
+    .ai__arrow {
+      transform: rotate(90deg);
+      margin-block: 8px;
+    }
+  }
+  @media (max-width: 720px) {
+    .ai__panel {
+      padding: 14px;
+    }
+    /* Phone: the week becomes a list of the days that have a session. */
+    .ai__grid-head {
+      display: none;
+    }
+    .ai__grid-body {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .ai__cell {
+      display: grid;
+      grid-template-columns: 40px minmax(0, 1fr);
+      gap: 10px;
+      align-items: center;
+      min-height: 0;
+      padding: 8px 4px;
+      border-left: 0;
+      border-top: 1px solid var(--line);
+    }
+    .ai__cell:first-child {
+      border-top: 0;
+    }
+    .ai__cell:not(:has(.ai__event)) {
+      display: none;
+    }
+    .ai__cell::before {
+      content: attr(data-name);
+      color: var(--ink-2);
+      font-size: 14px;
+    }
+    .ai__event {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      column-gap: 8px;
+      padding: 6px 8px 6px 10px;
+      font-size: 14px;
+      line-height: 20px;
+    }
+    .ai__slot {
+      inset: 4px 0;
+    }
+    .ai__cal {
+      padding: 12px;
+    }
+  }
+</style>
+
+<script>
+  import '../../scripts/ai';
+</script>

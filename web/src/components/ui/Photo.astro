@@ -1,0 +1,53 @@
+---
+import { Picture } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+import { photoAlt } from '../../data/photos';
+import { getLocale } from '../../i18n';
+
+interface Props {
+  /** Slot id, e.g. `h1-coaches-big`. The file is `src/assets/photos/<slot>.{webp,jpg,png}`. */
+  slot: string;
+  ratio: string;
+  sizes: string;
+  widths?: number[];
+  alt?: string;
+  eager?: boolean;
+  /** Fetch priority for eager photos; only the LCP photo should be `high`. */
+  priority?: 'high' | 'auto';
+  locale?: string;
+  class?: string;
+}
+
+const { slot, ratio, sizes, widths = [480, 800, 1200], alt, eager = false, priority = 'high', locale, class: cls } = Astro.props;
+
+const files = import.meta.glob<{ default: ImageMetadata }>('../../assets/photos/*.{png,jpg,jpeg,webp}', {
+  eager: true,
+});
+const match = Object.entries(files).find(([path]) => path.split('/').pop()!.replace(/\.[a-z]+$/i, '') === slot);
+const image = match?.[1].default;
+const text = alt ?? photoAlt[slot]?.[getLocale(locale)] ?? '';
+const [rw, rh] = ratio.split('/').map(Number);
+---
+
+{
+  image ? (
+    <Picture
+      src={image}
+      alt={text}
+      widths={widths}
+      sizes={sizes}
+      formats={['avif', 'webp']}
+      fallbackFormat="webp"
+      loading={eager ? 'eager' : 'lazy'}
+      fetchpriority={eager ? priority : 'auto'}
+      decoding={eager ? 'sync' : 'async'}
+      class:list={['photo', cls]}
+      style={`aspect-ratio:${rw}/${rh}`}
+      pictureAttributes={{ class: 'photo-pic' }}
+    />
+  ) : (
+    <div class:list={['photo', 'photo--missing', cls]} role="img" aria-label={text} style={`aspect-ratio:${rw}/${rh}`} data-slot={slot}>
+      <span>{slot}</span>
+    </div>
+  )
+}

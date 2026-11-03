@@ -1,0 +1,676 @@
+---
+import { Image } from 'astro:assets';
+import logoLight from '../../assets/brand/logo-light.png';
+import logoWhite from '../../assets/brand/logo-white.png';
+import { localePath, useDict, type Locale } from '../../i18n';
+import { site } from '../../data/site';
+import { appLinks, hrefFor, platformColumns, resourceItems, solutionItems } from '../../data/nav';
+import Photo from '../ui/Photo.astro';
+import Icon from '../ui/Icon.astro';
+import LangSwitch from './LangSwitch.astro';
+import ThemeToggle from './ThemeToggle.astro';
+
+interface Props {
+  locale: Locale;
+  path: string;
+}
+const { locale, path } = Astro.props;
+const t = useDict(locale);
+const home = localePath('/', locale);
+const appStores: Record<string, { label: string; href: string }[]> = {
+  run: [
+    { label: t.apps.store.ios, href: site.stores.runIos },
+    { label: t.apps.store.android, href: site.stores.runAndroid },
+  ],
+  fitmg: [
+    { label: t.apps.store.android, href: site.stores.fitmgAndroid },
+    { label: t.apps.store.iosBeta, href: site.stores.fitmgIosBeta },
+  ],
+};
+---
+
+<div class="nav-scrim" data-nav-scrim></div>
+<header class="nav" data-nav>
+  <div class="nav__bar container">
+    <a class="nav__logo" href={home} aria-label={t.a11y.homeLink}>
+      <Image src={logoLight} alt="" width={216} densities={[1, 2]} format="webp" class="only-light" loading="eager" />
+      <Image src={logoWhite} alt="" width={216} densities={[1, 2]} format="webp" class="only-dark" loading="eager" />
+    </a>
+
+    <nav class="nav__menu" id="nav-menu" aria-label={t.a11y.mainNav} data-nav-menu>
+      <ul class="nav__list">
+        <li class="nav__item" data-mega-item>
+          <button class="nav__trigger" type="button" aria-expanded="false" aria-controls="mega-platform" data-mega-trigger>
+            <span>{t.nav.platform}</span><span class="pm" aria-hidden="true"></span>
+          </button>
+          <div class="mega mega--platform" id="mega-platform" data-mega-panel>
+            <div class="mega__cols">
+              {
+                platformColumns.map((col, i) => (
+                  <div class="mega__col" style={`--i:${i}`}>
+                    <div class="mega__photo">
+                      <Photo slot={col.photo} ratio="16/10" sizes="280px" widths={[280, 560]} locale={locale} />
+                    </div>
+                    <p class="mega__label">{t.nav.groups[col.key]}</p>
+                    <ul>
+                      {col.items.map((id) => (
+                        <li>
+                          <a class="mega__link" href={hrefFor(id, locale)} data-mega-link>
+                            <span class="mega__name">{t.nav.items[id].name}</span>
+                            <span class="mega__desc">{t.nav.items[id].desc}</span>
+                          </a>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ))
+              }
+            </div>
+            <div class="mega__foot">
+              <span>{t.nav.newToAria}</span>
+              <a class="link link-arrow" href={site.signUp} data-mega-link>{t.nav.startFree}<Icon name="arrow-right" size={18} /></a>
+            </div>
+          </div>
+        </li>
+
+        <li class="nav__item" data-mega-item>
+          <button class="nav__trigger" type="button" aria-expanded="false" aria-controls="mega-solutions" data-mega-trigger>
+            <span>{t.nav.solutions}</span><span class="pm" aria-hidden="true"></span>
+          </button>
+          <div class="mega mega--solutions" id="mega-solutions" data-mega-panel>
+            <div class="mega__cols mega__cols--2">
+              <div class="mega__col">
+                <p class="mega__label">{t.nav.groups.audiences}</p>
+                <ul>
+                  {
+                    solutionItems.map((id) => (
+                      <li>
+                        <a class="mega__link" href={hrefFor(id, locale)} data-mega-link>
+                          <span class="mega__name">{t.nav.items[id].name}</span>
+                          <span class="mega__desc">{t.nav.items[id].desc}</span>
+                        </a>
+                      </li>
+                    ))
+                  }
+                </ul>
+              </div>
+              <div class="mega__col">
+                <p class="mega__label">{t.nav.groups.apps}</p>
+                <ul>
+                  {
+                    appLinks.map((app) => (
+                      <li class="mega__app">
+                        <span class="mega__name">{t.nav.apps[app.key].name}</span>
+                        <span class="mega__desc">{t.nav.apps[app.key].status}</span>
+                        {app.live && (
+                          <span class="mega__stores">
+                            {appStores[app.key].map((s) => (
+                              <a class="link" href={s.href} rel="noopener" data-mega-link>
+                                {s.label}
+                              </a>
+                            ))}
+                          </span>
+                        )}
+                      </li>
+                    ))
+                  }
+                </ul>
+              </div>
+            </div>
+            <div class="mega__foot">
+              <span>{t.nav.newToAria}</span>
+              <a class="link link-arrow" href={site.signUp} data-mega-link>{t.nav.startFree}<Icon name="arrow-right" size={18} /></a>
+            </div>
+          </div>
+        </li>
+
+        <li class="nav__item">
+          <a class="nav__link" href={hrefFor('pricing', locale)}>{t.nav.pricing}</a>
+        </li>
+
+        <li class="nav__item" data-mega-item>
+          <button class="nav__trigger" type="button" aria-expanded="false" aria-controls="mega-resources" data-mega-trigger>
+            <span>{t.nav.resources}</span><span class="pm" aria-hidden="true"></span>
+          </button>
+          <div class="mega mega--resources" id="mega-resources" data-mega-panel>
+            <div class="mega__cols mega__cols--1">
+              <div class="mega__col">
+                <p class="mega__label">{t.nav.groups.learn}</p>
+                <ul>
+                  {
+                    resourceItems.map((id) => (
+                      <li>
+                        <a class="mega__link" href={hrefFor(id, locale)} data-mega-link>
+                          <span class="mega__name">{t.nav.items[id].name}</span>
+                          <span class="mega__desc">{t.nav.items[id].desc}</span>
+                        </a>
+                      </li>
+                    ))
+                  }
+                </ul>
+              </div>
+            </div>
+            <div class="mega__foot">
+              <span>{t.nav.newToAria}</span>
+              <a class="link link-arrow" href={site.signUp} data-mega-link>{t.nav.startFree}<Icon name="arrow-right" size={18} /></a>
+            </div>
+          </div>
+        </li>
+      </ul>
+
+      <div class="nav__drawer-extras">
+        <a class="btn btn--secondary nav__drawer-signin" href={site.signIn}>{t.nav.signIn}</a>
+        <div class="nav__drawer-row">
+          <LangSwitch locale={locale} path={path} />
+          <ThemeToggle locale={locale} />
+        </div>
+      </div>
+    </nav>
+
+    <div class="nav__actions">
+      <a class="nav__signin" href={site.signIn}>{t.nav.signIn}</a>
+      <a class="btn btn--primary nav__cta" href={site.signUp}>{t.nav.startFree}</a>
+      <span class="nav__bar-only"><LangSwitch locale={locale} path={path} /></span>
+      <span class="nav__bar-only"><ThemeToggle locale={locale} /></span>
+      <button
+        class="nav__burger"
+        type="button"
+        aria-expanded="false"
+        aria-controls="nav-menu"
+        aria-label={t.a11y.openMenu}
+        data-label-open={t.a11y.openMenu}
+        data-label-close={t.a11y.closeMenu}
+        data-nav-burger
+      >
+        <Icon name="menu" size={24} class="nav__burger-open" />
+        <Icon name="x" size={24} class="nav__burger-close" />
+      </button>
+    </div>
+  </div>
+</header>
+
+<style>
+  .nav-scrim {
+    position: fixed;
+    inset: 0;
+    z-index: 90;
+    background: var(--scrim);
+    -webkit-backdrop-filter: blur(4px);
+    backdrop-filter: blur(4px);
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    pointer-events: none;
+  }
+  .nav-scrim[data-on] {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .nav {
+    --nav-cur: var(--nav-h);
+    position: fixed;
+    inset: 0 0 auto 0;
+    z-index: 100;
+    height: var(--nav-cur);
+    border-bottom: 1px solid var(--line);
+    transition: height 0.3s var(--ease-out);
+  }
+  /* The translucent blurred background lives on a pseudo-element so backdrop-filter does not
+     become the containing block of the fixed mobile drawer. */
+  .nav::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: var(--bg);
+    transition: background-color 0.3s var(--ease-out);
+  }
+  :global(html[data-scrolled]) .nav {
+    --nav-cur: var(--nav-h-compact);
+  }
+  :global(html[data-scrolled]) .nav::before {
+    background: var(--nav-bg);
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+  }
+  .nav__bar {
+    display: flex;
+    align-items: center;
+    height: 100%;
+    gap: 24px;
+    width: min(100% - 2 * var(--gutter), 1440px);
+  }
+  .nav__logo {
+    flex: none;
+    display: flex;
+    align-items: center;
+    min-height: 44px;
+    line-height: 0;
+    border-radius: 6px;
+  }
+  .nav__logo :global(img) {
+    width: 216px;
+    height: auto;
+    transform-origin: left center;
+    transition: transform 0.3s var(--ease-out);
+  }
+  :global(html[data-scrolled]) .nav__logo :global(img) {
+    transform: scale(0.85);
+  }
+
+  .nav__menu {
+    flex: 1;
+    min-width: 0;
+  }
+  .nav__list {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+  }
+  .nav__trigger,
+  .nav__link {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 44px;
+    padding: 0 14px;
+    border: 0;
+    border-radius: var(--radius-ctl);
+    background: none;
+    color: var(--ink);
+    font-family: var(--font-body);
+    font-size: 17px;
+    font-weight: 400;
+    text-decoration: none;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .nav__trigger:hover,
+  .nav__link:hover {
+    background: var(--surface);
+  }
+  .nav__trigger::after,
+  .nav__link[aria-current='page']::after {
+    content: '';
+    position: absolute;
+    left: 14px;
+    right: 14px;
+    bottom: 2px;
+    height: var(--lane);
+    background: var(--cyan);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.25s var(--ease-out);
+  }
+  .nav__trigger[aria-expanded='true']::after,
+  .nav__link[aria-current='page']::after {
+    transform: scaleX(1);
+  }
+  .pm {
+    position: relative;
+    display: inline-block;
+    width: 11px;
+    height: 11px;
+    color: var(--ink-2);
+  }
+  .pm::before,
+  .pm::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    width: 100%;
+    height: 1.5px;
+    margin-top: -0.75px;
+    background: currentColor;
+    transition: transform 0.2s var(--ease-out);
+  }
+  .pm::after {
+    transform: rotate(90deg);
+  }
+  [aria-expanded='true'] > .pm::after {
+    transform: rotate(0deg);
+  }
+
+  .nav__actions {
+    flex: none;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .nav__signin {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    padding: 0 10px;
+    color: var(--ink);
+    text-decoration: none;
+    font-size: 17px;
+  }
+  .nav__signin:hover {
+    text-decoration: underline;
+    text-decoration-color: var(--cyan);
+    text-decoration-thickness: 2px;
+    text-underline-offset: 6px;
+  }
+  .nav__bar-only {
+    display: contents;
+  }
+  .nav__burger {
+    display: none;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    border: 1px solid var(--line);
+    border-radius: 50%;
+    background: var(--bg);
+    cursor: pointer;
+  }
+  .nav__burger :global(.nav__burger-close) {
+    display: none;
+  }
+  .nav__burger[aria-expanded='true'] :global(.nav__burger-open) {
+    display: none;
+  }
+  .nav__burger[aria-expanded='true'] :global(.nav__burger-close) {
+    display: block;
+  }
+  .nav__drawer-extras {
+    display: none;
+  }
+
+  /* Mega panels (desktop) */
+  .mega {
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 50%;
+    width: min(1200px, calc(100vw - 2 * var(--gutter)));
+    padding: 28px 32px 0;
+    border: 1px solid var(--pop-border);
+    border-radius: var(--radius-card);
+    background: var(--bg);
+    box-shadow: var(--shadow-pop);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transform: translate(-50%, -8px);
+    transition:
+      opacity 0.2s ease,
+      transform 0.2s var(--ease-out),
+      visibility 0s linear 0.2s;
+  }
+  .mega::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: -16px;
+    height: 16px;
+  }
+  .mega[data-open] {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transform: translate(-50%, 0);
+    transition:
+      opacity 0.2s ease,
+      transform 0.2s var(--ease-out),
+      visibility 0s;
+  }
+  .mega--solutions {
+    width: min(760px, calc(100vw - 2 * var(--gutter)));
+  }
+  .mega--resources {
+    width: 400px;
+  }
+  .mega__cols {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 32px;
+  }
+  .mega__cols--2 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .mega__cols--1 {
+    grid-template-columns: 1fr;
+  }
+  .mega__photo {
+    overflow: hidden;
+    border-radius: 10px;
+    margin-bottom: 16px;
+    opacity: 0;
+    transition: opacity 0.25s ease calc(var(--i, 0) * 40ms);
+  }
+  .mega[data-open] .mega__photo {
+    opacity: 1;
+  }
+  .mega__label {
+    margin-bottom: 8px;
+    color: var(--ink-3);
+    font-size: 12px;
+    line-height: 16px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+  .mega__link,
+  .mega__app {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 9px 10px;
+    margin-inline: -10px;
+    border-radius: var(--radius-ctl);
+    text-decoration: none;
+    color: var(--ink);
+  }
+  .mega__link {
+    min-height: 44px;
+  }
+  .mega__link:hover {
+    background: var(--surface);
+  }
+  .mega__name {
+    font-size: 16px;
+    line-height: 22px;
+    font-weight: 500;
+    color: var(--ink);
+  }
+  .mega__desc {
+    font-size: 14px;
+    line-height: 20px;
+    color: var(--ink-2);
+  }
+  .mega__stores {
+    display: flex;
+    gap: 16px;
+    margin-top: 4px;
+  }
+  .mega__stores :global(.link) {
+    display: inline-flex;
+    align-items: center;
+    min-height: 32px;
+    font-size: 14px;
+  }
+  .mega__foot {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 20px -32px 0;
+    padding: 14px 32px;
+    border-top: 1px solid var(--line);
+    border-radius: 0 0 var(--radius-card) var(--radius-card);
+    background: var(--surface);
+    color: var(--ink-2);
+    font-size: 15px;
+  }
+  .mega__foot :global(.link) {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+  }
+
+  @media (max-width: 1180px) {
+    .nav__logo :global(img) {
+      width: 176px;
+    }
+    .nav__list {
+      gap: 0;
+    }
+    .nav__trigger,
+    .nav__link {
+      padding: 0 10px;
+      font-size: 16px;
+    }
+    .nav__bar {
+      gap: 12px;
+    }
+    .nav__actions {
+      gap: 8px;
+    }
+  }
+
+  /* Mobile: the same markup becomes a full-height drawer with accordion groups. */
+  @media (max-width: 1024px) {
+    .nav__burger {
+      display: grid;
+    }
+    .nav__bar {
+      justify-content: space-between;
+    }
+    .nav__signin,
+    .nav__bar-only {
+      display: none;
+    }
+    .nav__cta {
+      min-height: 44px;
+      padding: 0 16px;
+      font-size: 15px;
+    }
+    .nav__logo :global(img) {
+      width: 168px;
+    }
+    .nav__menu {
+      position: fixed;
+      inset: var(--nav-cur) 0 0 0;
+      z-index: 99;
+      display: none;
+      flex: none;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      padding: 8px var(--gutter) 32px;
+      background: var(--bg);
+    }
+    .nav[data-menu-open] .nav__menu {
+      display: block;
+    }
+    .nav__list {
+      display: block;
+    }
+    .nav__item {
+      border-bottom: 1px solid var(--line);
+    }
+    .nav__trigger,
+    .nav__link {
+      width: 100%;
+      justify-content: space-between;
+      min-height: 56px;
+      padding: 0 4px;
+      font-size: 19px;
+      font-weight: 500;
+      border-radius: 0;
+    }
+    .nav__trigger:hover,
+    .nav__link:hover {
+      background: none;
+    }
+    .nav__trigger::after {
+      left: 0;
+      right: auto;
+      top: 8px;
+      bottom: 8px;
+      width: var(--lane);
+      height: auto;
+      transform: scaleY(0);
+      transform-origin: top;
+    }
+    .nav__trigger[aria-expanded='true']::after {
+      transform: scaleY(1);
+    }
+    .mega,
+    .mega--solutions,
+    .mega--resources {
+      position: static;
+      display: none;
+      width: auto;
+      padding: 0 0 12px;
+      border: 0;
+      border-radius: 0;
+      background: none;
+      box-shadow: none;
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+      transform: none;
+      transition: none;
+    }
+    .mega[data-open] {
+      display: block;
+      transform: none;
+    }
+    .mega::before,
+    .mega__photo {
+      display: none;
+    }
+    .mega__cols,
+    .mega__cols--2 {
+      grid-template-columns: 1fr;
+      gap: 8px;
+    }
+    .mega__col {
+      padding-top: 8px;
+    }
+    .mega__foot {
+      margin: 8px 0 0;
+      padding: 8px 12px;
+      border: 0;
+      border-radius: var(--radius-ctl);
+    }
+    .nav__drawer-extras {
+      display: grid;
+      gap: 16px;
+      padding-top: 24px;
+    }
+    .nav__drawer-signin {
+      width: 100%;
+    }
+    .nav__drawer-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+  }
+  @media (max-width: 420px) {
+    .nav__logo :global(img) {
+      width: 146px;
+    }
+    .nav__actions {
+      gap: 4px;
+    }
+    .nav__cta {
+      padding: 0 12px;
+      font-size: 14px;
+    }
+  }
+  @media (max-width: 380px) {
+    .nav__logo :global(img) {
+      width: 132px;
+    }
+  }
+</style>
+
+<script>
+  import '../../scripts/nav';
+</script>

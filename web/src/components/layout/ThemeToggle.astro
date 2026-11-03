@@ -1,0 +1,65 @@
+---
+import { useDict, type Locale } from '../../i18n';
+import Icon from '../ui/Icon.astro';
+
+interface Props {
+  locale: Locale;
+  onBand?: boolean;
+}
+const { locale, onBand = false } = Astro.props;
+const t = useDict(locale);
+---
+
+<button
+  type="button"
+  class:list={['theme-toggle', { 'theme-toggle--band': onBand }]}
+  data-theme-toggle
+  data-label-light={t.a11y.themeToLight}
+  data-label-dark={t.a11y.themeToDark}
+  aria-label={t.a11y.themeToDark}
+>
+  <Icon name="sun" size={20} class="theme-toggle__sun" />
+  <Icon name="moon" size={20} class="theme-toggle__moon" />
+</button>
+
+<style>
+  .theme-toggle {
+    display: inline-grid;
+    place-items: center;
+    flex: none;
+    width: 44px;
+    height: 44px;
+    border: 1px solid var(--line);
+    border-radius: 50%;
+    background: var(--bg);
+    color: var(--ink);
+    cursor: pointer;
+    transition:
+      background-color 0.2s,
+      border-color 0.2s;
+  }
+  .theme-toggle:hover {
+    background: var(--surface);
+  }
+  /* The icon shows the current theme; the label names the action. */
+  .theme-toggle :global(.theme-toggle__moon) {
+    display: none;
+  }
+  :global(html[data-theme='dark']) .theme-toggle :global(.theme-toggle__sun) {
+    display: none;
+  }
+  :global(html[data-theme='dark']) .theme-toggle :global(.theme-toggle__moon) {
+    display: block;
+  }
+  :global(html:not(.js)) .theme-toggle {
+    display: none;
+  }
+  .theme-toggle--band {
+    background: transparent;
+    border-color: var(--band-line);
+    color: #fff;
+  }
+  .theme-toggle--band:hover {
+    background: rgb(255 255 255 / 0.1);
+  }
+</style>
