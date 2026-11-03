@@ -192,7 +192,7 @@ await homeChecks({ open, check, sleep, settle, metrics });
   const ptabs = pillarRoot.locator('[role="tab"]');
   const shown = () =>
     page.evaluate(() => ({
-      panels: [...document.querySelectorAll('#pillars .pil-panel')].map((p) => getComputedStyle(p).display !== 'none'),
+      panels: [...document.querySelectorAll('#pillars .pil-panel')].map((p) => p.classList.contains('on') && getComputedStyle(p).visibility === 'visible'),
       clips: [...document.querySelectorAll('#pillars .pil-clip')].map((c) => c.classList.contains('on')),
     }));
   check('pillars', 'four tabs, first selected', (await ptabs.count()) === 4 && (await ptabs.nth(0).getAttribute('aria-selected')) === 'true');
@@ -211,6 +211,7 @@ await homeChecks({ open, check, sleep, settle, metrics });
   check('pillars', 'End moves to the last tab', (await ptabs.nth(3).getAttribute('aria-selected')) === 'true');
   await page.keyboard.press('Home');
   check('pillars', 'Home moves to the first tab', (await ptabs.nth(0).getAttribute('aria-selected')) === 'true');
+  await sleep(700);
   const open1 = (await shown()).panels.filter(Boolean).length;
   check('pillars', 'only the active panel is shown', open1 === 1, `${open1} panels shown`);
 
@@ -366,8 +367,18 @@ for (const [label, width, height, mobile] of [
     await context.addInitScript(perfInit);
     const page = await context.newPage();
     const client = await context.newCDPSession(page);
+    await client.send('Network.enable');
+    // Playwright cannot read a streamed media body, so count the video bytes from the protocol instead.
+    const videos = new Map();
+    client.on('Network.responseReceived', (e) => {
+      if ((e.response.mimeType ?? '').startsWith('video/')) videos.set(e.requestId, { url: e.response.url, size: 0 });
+    });
+    client.on('Network.dataReceived', (e) => {
+      const v = videos.get(e.requestId);
+      if (v) v.size += e.dataLength;
+    });
+    const videoBytes = () => [...videos.values()].reduce((n, v) => n + v.size, 0);
     if (mobile) {
-      await client.send('Network.enable');
       await client.send('Network.emulateNetworkConditions', { offline: false, latency: 150, downloadThroughput: (1.6 * 1024 * 1024) / 8, uploadThroughput: (750 * 1024) / 8 });
       await client.send('Emulation.setCPUThrottlingRate', { rate: 4 });
     }
@@ -383,6 +394,7 @@ for (const [label, width, height, mobile] of [
     await page.evaluate(() => document.fonts.ready);
     await sleep(2500);
     const firstScreen = loaded.slice();
+    const videoAtFirstScreen = videoBytes();
     await page.evaluate(async () => {
       for (let y = 0; y < document.body.scrollHeight; y += 500) {
         window.scrollTo(0, y);
@@ -395,9 +407,9 @@ for (const [label, width, height, mobile] of [
     if (run === 0) {
       bytes = firstScreen.reduce((n, r) => n + r.size, 0);
       heroImages = loaded.filter((r) => /\/home\/img\/hero\d-.*\.(avif|webp)$/.test(r.url));
-      videoFirst = firstScreen.filter((r) => r.type.startsWith('video/')).reduce((n, r) => n + r.size, 0);
-      videoScrolled = loaded.filter((r) => r.type.startsWith('video/')).reduce((n, r) => n + r.size, 0);
-      clipsRequested = new Set(loaded.filter((r) => r.type.startsWith('video/')).map((r) => r.url)).size;
+      videoFirst = videoAtFirstScreen;
+      videoScrolled = videoBytes();
+      clipsRequested = new Set([...videos.values()].map((v) => v.url)).size;
       metrics[`js-${label}`] = firstScreen.filter((r) => r.type.includes('javascript')).reduce((n, r) => n + r.size, 0);
     }
     await context.close();
@@ -410,7 +422,7 @@ for (const [label, width, height, mobile] of [
   check('perf', `${label}: every hero photo delivered <= 180 KB`, maxHero <= 180 * 1024, `${heroImages.length} hero files, largest ${(maxHero / 1024).toFixed(0)} KB`);
   // DESIGN-4 section 5: preload="none", clips start on visibility. Measured after a fast scroll, so partial range requests count as bytes.
   check('perf', `${label}: clips stay off the first view (<= 512 KB of video before any scroll)`, videoFirst <= 512 * 1024, `${(videoFirst / 1024).toFixed(0)} KB`);
-  check('perf', `${label}: a full fast scroll loads <= 6 MB of video`, videoScrolled <= 6 * 1024 * 1024, `${(videoScrolled / 1024 / 1024).toFixed(2)} MB over ${clipsRequested} clips`);
+  check('perf', `${label}: a full fast scroll loads <= 6 MB of video, and does load some`, clipsRequested > 0 && videoScrolled <= 6 * 1024 * 1024, `${(videoScrolled / 1024 / 1024).toFixed(2)} MB over ${clipsRequested} clips`);
   metrics[`perf-${label}`] = { lcpMs: Math.round(lcp), cls: Number(cls.toFixed(4)), firstScreenKB: Math.round(bytes / 1024), jsKB: Math.round(metrics[`js-${label}`] / 1024), largestHeroKB: Math.round(maxHero / 1024), heroFiles: heroImages.length, videoFirstScreenKB: Math.round(videoFirst / 1024), videoFullScrollKB: Math.round(videoScrolled / 1024), clipsRequested };
 }
 const homeHtml = await readFile(`${root}dist/index.html`, 'utf8');

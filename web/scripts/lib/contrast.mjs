@@ -1,6 +1,7 @@
 // In-page WCAG AA text-contrast probe, run with page.evaluate(contrastProbe, opts). It must stay self-contained.
 // includeAriaHidden: also measure decorative (aria-hidden) demo text, which sighted users still read.
 // scope: a selector; only text inside it is measured (its backdrop is still resolved through the page).
+// [data-decorative] marks purely decorative display type (WCAG 1.4.3 exempts it); it is skipped.
 export const contrastProbe = ({ includeAriaHidden = false, scope = null } = {}) => {
   const canvas = document.createElement('canvas');
   canvas.width = canvas.height = 1;
@@ -34,7 +35,7 @@ export const contrastProbe = ({ includeAriaHidden = false, scope = null } = {}) 
     for (let n = e; n && n !== document.documentElement; n = n.parentElement) {
       const cs = getComputedStyle(n);
       if (cs.display === 'none' || cs.visibility === 'hidden' || parseFloat(cs.opacity) === 0) return true;
-      if ((!includeAriaHidden && n.getAttribute('aria-hidden') === 'true') || n.hasAttribute('inert') || n.tagName === 'TEMPLATE') return true;
+      if ((!includeAriaHidden && n.getAttribute('aria-hidden') === 'true') || n.hasAttribute('inert') || n.hasAttribute('data-decorative') || n.tagName === 'TEMPLATE') return true;
     }
     return false;
   };
@@ -45,6 +46,13 @@ export const contrastProbe = ({ includeAriaHidden = false, scope = null } = {}) 
   };
   const bgOf = (e) => {
     const stack = [];
+    const box = e.getBoundingClientRect();
+    // A glass fill only counts as the backdrop when it spans the whole text box (a 3px lane line does not).
+    const covers = (pseudo) => {
+      const w = parseFloat(pseudo.width);
+      const h = parseFloat(pseudo.height);
+      return w >= box.width - 1 && h >= box.height - 1;
+    };
     let imageBg = false;
     let opaque = false;
     let fixedRoot = null;
@@ -53,7 +61,7 @@ export const contrastProbe = ({ includeAriaHidden = false, scope = null } = {}) 
       if (fillOf(cs)) imageBg = true;
       // A glass bar paints its fill on an absolutely positioned ::before; count it unless it is faded out.
       const pseudo = getComputedStyle(n, '::before');
-      if (pseudo.content !== 'none' && pseudo.position === 'absolute' && !fillOf(pseudo)) {
+      if (pseudo.content !== 'none' && pseudo.position === 'absolute' && !fillOf(pseudo) && covers(pseudo)) {
         const [r, g, b, a] = rgba(pseudo.backgroundColor);
         const alpha = a * parseFloat(pseudo.opacity);
         if (alpha > 0) stack.push([r, g, b, alpha]);

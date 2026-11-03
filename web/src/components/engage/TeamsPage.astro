@@ -186,6 +186,9 @@ const schoolValues: Record<string, string> = { price: usd(highSchool.monthly), a
     color: var(--ink-2);
     font-size: 15px;
   }
+  .side li :global(svg) {
+    flex: none;
+  }
   .side li.is-on {
     background: var(--cyan-tint);
     color: var(--cyan-ink);
@@ -441,6 +444,19 @@ const schoolValues: Record<string, string> = { price: usd(highSchool.monthly), a
   @media (max-width: 1180px) {
     .stats {
       grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  /* The wider page gutter leaves the panel about 490px here; let the table shrink to it rather than scroll. */
+  @media (max-width: 1180px) and (min-width: 1025px) {
+    .tp {
+      grid-template-columns: minmax(0, 1fr) 224px;
+      gap: 0 20px;
+    }
+    .tp__panel {
+      grid-template-columns: 152px minmax(0, 1fr);
+    }
+    table {
+      min-width: 0;
     }
   }
   @media (max-width: 1024px) {

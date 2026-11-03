@@ -54,6 +54,10 @@ if (wantStills) {
         for (const [i, id] of homeSections.entries()) {
           await page.locator(`main > section#${id}`).screenshot({ path: `${dir}/${String(i + 1).padStart(2, '0')}-${id}.png` });
         }
+        // The showcase is six stacked blocks; each gets its own frame next to the (very tall) whole section.
+        for (const [j, [name, sel]] of [['head', '#showcase .show-head'], ['mosaic', '#showcase .mosaic'], ['plan', '#plan'], ['measure', '#measure'], ['engage', '#engage'], ['scale', '#scale'], ['apps', '#apps']].entries()) {
+          await page.locator(sel).first().screenshot({ path: `${dir}/05${'abcdefg'[j]}-showcase-${name}.png` });
+        }
         await page.locator('footer').screenshot({ path: `${dir}/08-footer.png` });
         await context.close();
         console.log(`stills ${locale} ${scheme} ${width}`);

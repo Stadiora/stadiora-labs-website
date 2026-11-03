@@ -217,10 +217,17 @@ const readContrast = () => {
   const bgOf = (e) => {
     const stack = [];
     let imageBg = false;
+    const box = e.getBoundingClientRect();
     for (let n = e; n; n = n.parentElement) {
       const cs = getComputedStyle(n);
       const fill = cs.backgroundImage;
       if (fill !== 'none' && (/url\(/.test(fill) || !/^0(px|%) /.test(cs.backgroundSize))) imageBg = true;
+      // The nav's glass is an absolutely positioned ::before; count it when it spans the whole text box.
+      const pseudo = getComputedStyle(n, '::before');
+      if (pseudo.content !== 'none' && pseudo.position === 'absolute' && pseudo.backgroundImage === 'none' && parseFloat(pseudo.width) >= box.width - 1 && parseFloat(pseudo.height) >= box.height - 1) {
+        const [r, g, b, a] = rgba(pseudo.backgroundColor);
+        stack.push([r, g, b, a * parseFloat(pseudo.opacity)]);
+      }
       stack.push(rgba(cs.backgroundColor));
       if (rgba(cs.backgroundColor)[3] >= 0.99) break;
     }
@@ -316,7 +323,8 @@ const describeFocus = () => {
     tag: e.tagName.toLowerCase(),
     inMain: Boolean(e.closest('main')),
     visible: r.width > 0 && r.height > 0 && cs.visibility === 'visible' && (wrapper ? true : parseFloat(cs.opacity) > 0),
-    inViewport: r.top >= -1 && r.bottom <= innerHeight + 1,
+    // Chrome snaps a focus scroll to whole device pixels; with fractional layout it can leave about a pixel of a control past the edge.
+    inViewport: r.top >= -2 && r.bottom <= innerHeight + 2,
     obscured: !(top && (target.contains(top) || top.contains(target))),
     ariaHidden: Boolean(e.closest('[aria-hidden="true"], [inert]')),
     ring: ring(cs) || ring(csFocus),

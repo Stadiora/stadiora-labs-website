@@ -103,8 +103,12 @@ export async function homeChecks({ open, check, sleep, settle, metrics }) {
     return { ok: false, s };
   };
 
+  // HOME_ONLY=autoplay,marquee runs just those groups (used to mutation-prove one guard quickly); unset runs all.
+  const only = process.env.HOME_ONLY?.split(',');
+  const on = (group) => !only || only.includes(group);
+
   // ------------------------------------------------------------ 1. structure of the page
-  for (const locale of ['en', 'es']) {
+  if (on('structure')) for (const locale of ['en', 'es']) {
     const page = await open({ width: 1440, height: 900, reduced: true }, pathFor(locale));
     const ids = await page.evaluate(() => [...document.querySelectorAll('main > section')].map((s) => s.id));
     check('home', `${locale}: main holds the seven sections in order`, JSON.stringify(ids) === JSON.stringify(homeSections), ids.join(' > '));
@@ -121,7 +125,7 @@ export async function homeChecks({ open, check, sleep, settle, metrics }) {
   }
 
   // ------------------------------------------------------------ 2. every autoplayer: starts visible, pauses on hover, focus, offscreen
-  {
+  if (on('autoplay')) {
     const page = await open({ width: 1440, height: 900 }, '/');
     await page.mouse.move(2, 2);
     await settle(page);
@@ -202,7 +206,7 @@ export async function homeChecks({ open, check, sleep, settle, metrics }) {
   }
 
   // ------------------------------------------------------------ 3. reduced motion: no autoplay, no loops, posters shown
-  for (const locale of ['en', 'es']) {
+  if (on('reduced')) for (const locale of ['en', 'es']) {
     const page = await open({ width: 1440, height: 900, reduced: true }, pathFor(locale));
     await settle(page);
     await sleep(1500);
@@ -239,7 +243,7 @@ export async function homeChecks({ open, check, sleep, settle, metrics }) {
   }
 
   // ------------------------------------------------------------ 4. marquees move, and stop under the pointer or reduced motion
-  {
+  if (on('marquee')) {
     const page = await open({ width: 1440, height: 900 }, '/');
     await page.mouse.move(2, 2);
     const count = await page.evaluate(() => document.querySelectorAll('.marquee').length);
@@ -292,7 +296,7 @@ export async function homeChecks({ open, check, sleep, settle, metrics }) {
   }
 
   // ------------------------------------------------------------ 5. hero: seven words, in order, and the conveyor follows
-  for (const [path, words] of Object.entries(heroWords)) {
+  if (on('hero')) for (const [path, words] of Object.entries(heroWords)) {
     const page = await open({ width: 1440, height: 900 }, path);
     await page.mouse.move(2, 2);
     const initial = {
@@ -312,7 +316,7 @@ export async function homeChecks({ open, check, sleep, settle, metrics }) {
     check('hero', `${path} the words cycle ${words.join(' > ')} and back to the first`, JSON.stringify(seen.slice(0, words.length + 1)) === JSON.stringify([...words, words[0]]), seen.join(' > '));
     await page.context().close();
   }
-  {
+  if (on('hero')) {
     const page = await open({ width: 1440, height: 900 }, '/');
     await page.mouse.move(2, 2);
     const word = () => page.evaluate(activeWord);
@@ -328,7 +332,7 @@ export async function homeChecks({ open, check, sleep, settle, metrics }) {
     await page.mouse.move(2, 2);
     await page.context().close();
   }
-  {
+  if (on('hero')) {
     const page = await open({ width: 1440, height: 900, reduced: true }, '/');
     const w0 = await page.evaluate(activeWord);
     await sleep(4500);
@@ -338,7 +342,7 @@ export async function homeChecks({ open, check, sleep, settle, metrics }) {
   }
 
   // ------------------------------------------------------------ 6. no clipped text, EN and ES, both themes, six widths
-  for (const locale of ['en', 'es']) {
+  if (on('clipping')) for (const locale of ['en', 'es']) {
     for (const scheme of ['light', 'dark']) {
       const bad = [];
       let checked = 0;
@@ -355,7 +359,7 @@ export async function homeChecks({ open, check, sleep, settle, metrics }) {
   }
 
   // ------------------------------------------------------------ 7. AA contrast on the phone layout (the 1440 pass is in "measured budgets")
-  for (const locale of ['en', 'es']) {
+  if (on('contrast')) for (const locale of ['en', 'es']) {
     for (const scheme of ['light', 'dark']) {
       const page = await open({ width: 390, height: 844, scheme, reduced: true, mobile: true }, pathFor(locale));
       await settle(page);
@@ -367,7 +371,7 @@ export async function homeChecks({ open, check, sleep, settle, metrics }) {
 
   // The bar is transparent over the dark hero (the page probe skips what sits on a gradient), so judge its glass state
   // separately: scrolled onto the page, against a white worst case.
-  for (const locale of ['en', 'es']) {
+  if (on('contrast')) for (const locale of ['en', 'es']) {
     for (const scheme of ['light', 'dark']) {
       const page = await open({ width: 1440, height: 900, scheme, reduced: true }, pathFor(locale));
       await settle(page);
