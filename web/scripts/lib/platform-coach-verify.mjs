@@ -43,8 +43,10 @@ const competitors = /everfit|trainerize|trainheroic|teambuildr|truecoach|sportse
 const integrationBrands = /garmin|strava|polar/i;
 
 // What each page must keep saying: estimates are labelled as estimates, readiness is a guide, journals stay private.
+// The meal-photo result card (MealPopCard) must carry a visible, locale-correct estimate pill in its header.
+const mealCardLabel = { en: 'Estimate', es: 'Estimado' };
+
 const mustSay = {
-  nutrition: [/estimated|estimates|estimado/i, 'an "estimated" label on the meal photo result'],
   'power-lab': [/estimates from video, not a force plate|estimados a partir de video, no de una plataforma de fuerza/i, 'the "estimates from video" footnote'],
   readiness: [/not a medical check|no un chequeo m[eé]dico/i, 'the "not a medical check" footnote'],
 };
@@ -108,6 +110,14 @@ export function verifyCoachPages({ dist, fail }) {
 
     const [re, what] = mustSay[page.slug] ?? [];
     if (re && !re.test(copy)) failHere(`${page.file}: is missing ${what}`);
+
+    if (page.slug === 'nutrition') {
+      const head = html.match(/<div class="mp__head[^"]*"[^>]*>([\s\S]*?)<\/div>/);
+      const pill = head && [...head[1].matchAll(/<span\b[^>]*class="[^"]*\bco-pill\b[^"]*"[^>]*>([^<]*)<\/span>/g)].map((m) => m[1].trim());
+      if (!pill?.includes(mealCardLabel[page.lang])) {
+        failHere(`${page.file}: the meal photo result card (.mp__head) is missing its visible "${mealCardLabel[page.lang]}" label`);
+      }
+    }
 
     for (const m of html.matchAll(/<img\b[^>]*>/g)) {
       if (!/\salt(=|\s|\/?>)/.test(m[0])) failHere(`${page.file}: img without alt: ${m[0].slice(0, 80)}`);
