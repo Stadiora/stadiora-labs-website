@@ -11,6 +11,21 @@ const pages = [
 
 const count = (html, re) => (html.match(re) ?? []).length;
 
+// The page text with every <script> body cut out. A scan helper for our own build output, not an HTML sanitizer.
+function withoutScripts(html) {
+  const lower = html.toLowerCase();
+  let out = '';
+  let at = 0;
+  for (;;) {
+    const open = lower.indexOf('<script', at);
+    if (open < 0) return out + html.slice(at);
+    out += html.slice(at, open);
+    const close = lower.indexOf('</script>', open);
+    if (close < 0) return out;
+    at = close + '</script>'.length;
+  }
+}
+
 // Dollar amounts that exist only in the LatAm table. They must never be in the HTML: LatAm numbers ship in the
 // script bundle and reach the DOM only for a visitor whose time zone is in the LatAm list.
 function latamOnlyAmounts() {
@@ -68,7 +83,7 @@ export function verifyPricing(dist, report) {
     // Prices: the server HTML is the no-JS state (US, monthly, 100 athletes) and carries no other region's number.
     tag(/data-amount="core"[^>]*>\$199</, 'Core $199 in the no-JS state');
     tag(/data-amount="performance"[^>]*>\$299</, 'Performance $299 in the no-JS state');
-    const text = html.replace(/<script\b[\s\S]*?<\/script>/g, '');
+    const text = withoutScripts(html);
     for (const amount of latamOnly) {
       const re = new RegExp(`\\$${amount.toLocaleString('en-US').replace(',', '\\,')}(?![\\d,])`);
       if (re.test(text)) fail(`${page.file}: LatAm-only amount $${amount} is in the HTML`);
