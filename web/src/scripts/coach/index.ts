@@ -5,3 +5,8 @@ import { initAi } from '../home/ai';
 
 initAi();
 startKit();
+
+// The kit pauses CSS loops that are off screen; a hidden tab pauses them too, through one class on the root.
+const syncHidden = () => document.documentElement.classList.toggle('cf-tab-hidden', document.hidden);
+document.addEventListener('visibilitychange', syncHidden);
+syncHidden();

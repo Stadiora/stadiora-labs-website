@@ -313,3 +313,10 @@ html:not(.js) .cf-page .rv-mask {
     counter-reset: n var(--to);
   }
 }
+
+/* A hidden tab stops every loop on the page (set by scripts/coach/index.ts). */
+.cf-tab-hidden main *,
+.cf-tab-hidden main *::before,
+.cf-tab-hidden main *::after {
+  animation-play-state: paused !important;
+}

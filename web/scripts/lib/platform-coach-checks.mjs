@@ -367,6 +367,41 @@ export async function platformCoachChecks({ open, check, shot, el, sleep, settle
       await still.context().close();
     }
 
+    // Motion contract: endless CSS loops run only for blocks on screen, stop in a hidden tab, and do not exist under reduced motion.
+    for (const slug of coachSlugs) {
+      const loops = () =>
+        document
+          .getAnimations()
+          .filter((a) => a.playState === 'running' && a.effect?.getComputedTiming().iterations === Infinity && a.effect.target?.closest?.('main'))
+          .map((a) => {
+            const t = a.effect.target;
+            const host = t.closest('section, footer');
+            const r = host?.getBoundingClientRect();
+            const near = !r || (r.bottom > -600 && r.top < innerHeight + 600);
+            return { name: a.animationName, near, el: `${t.tagName.toLowerCase()}.${String(t.className).split(/\s+/)[0]}` };
+          });
+      const page = await open({ width: 1440, height: 900 }, pathOf(slug, locale));
+      await settle(page);
+      await sleep(400);
+      const onScreen = await page.evaluate(loops);
+      const far = onScreen.filter((l) => !l.near);
+      check('coach-motion', `${locale}/${slug}: no endless CSS loop runs in a block that is far off screen`, far.length === 0, `${onScreen.length} running, off screen: ${far.slice(0, 4).map((l) => `${l.name} on ${l.el}`).join(', ')}`);
+      await page.evaluate(() => {
+        Object.defineProperty(document, 'hidden', { configurable: true, get: () => true });
+        document.dispatchEvent(new Event('visibilitychange'));
+      });
+      await sleep(300);
+      const hidden = await page.evaluate(loops);
+      check('coach-motion', `${locale}/${slug}: a hidden tab stops every endless CSS loop`, hidden.length === 0, `${hidden.length} still running: ${hidden.slice(0, 4).map((l) => `${l.name} on ${l.el}`).join(', ')}`);
+      await page.context().close();
+      const still = await open({ width: 1440, height: 900, reduced: true }, pathOf(slug, locale));
+      await settle(still);
+      await sleep(300);
+      const rm = await still.evaluate(() => ({ loops: document.getAnimations().filter((a) => a.playState === 'running' && a.effect?.getComputedTiming().iterations === Infinity && a.effect.target?.closest?.('main')).length, playing: [...document.querySelectorAll('video')].filter((v) => !v.paused).length }));
+      check('coach-motion', `${locale}/${slug} reduced motion: no endless CSS loop and no playing video`, rm.loops === 0 && rm.playing === 0, JSON.stringify(rm));
+      await still.context().close();
+    }
+
     // Power lab count-up: the HTML already holds the final value, every frame of the motion stays between 0 and
     // that value (a first frame stamped before the start time once ran negative), and it lands on the value.
     {

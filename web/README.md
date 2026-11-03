@@ -66,7 +66,7 @@ node scripts/evidence.mjs --engage-only # just the Platform page checks, EN and 
   `HoverRevealRow`, `ChartBaseline`, the phone and browser frames) are unchanged in content; `Accordion` has an `overlay` slot for live
   cards over its stage. Styles: the Floodlight layer is `src/styles/coach/cf.css` (every selector starts `cf-` or `.cf-page`), the
   product-screen styles stay in `src/styles/coach.css`. Scripts: `src/scripts/coach/index.ts` (imported by `CoachHero`) starts the AI
-  demo and the motion kit. Add new coach motion as CSS keyframes that stop under `.is-off`, or through the kit's `.rv`, `.lines`,
+  demo and the motion kit, and pauses every CSS loop in a hidden tab (`.cf-tab-hidden`). Add new coach motion as CSS keyframes that stop under `.is-off`, or through the kit's `.rv`, `.lines`,
   `.count` and `[data-depth]`/`[data-tilt]`.
 - Coach clips are `public/home/media/coach-{programs,nutrition,readiness,powerlab}.{webm,mp4,webp}`: text-free, rendered by
   `node scripts/clips/render.mjs` from `scripts/clips/stages/*.html` (stage HTML over the photos in `scripts/clips/src/`; needs
@@ -77,7 +77,8 @@ node scripts/evidence.mjs --engage-only # just the Platform page checks, EN and 
   `night-stadium` closing band, its own moving hero clip, or on a baked-text clip or an opening ¿ or ¡ in Spanish, and on a coach
   stylesheet without its no-JS and reduced-motion rules. `scripts/lib/platform-coach-checks.mjs` (run by `evidence`) covers overflow,
   sideways clipping and overlapping text at 390/1024/1280/1440, WCAG AA in both themes (the shared `contrast.mjs` probe), alt text,
-  heading order, the keyboard walk, the accordion and hover-reveal behaviour, the count-up and a no-JavaScript render.
+  heading order, the keyboard walk, the accordion and hover-reveal behaviour, the count-up, the motion contract (no endless CSS loop far off screen, none in a hidden tab,
+  none under reduced motion) and a no-JavaScript render.
 - Motion library: `src/scripts/motion/kit.ts` (small TypeScript, no dependencies). Anything that moves on its own is an `autoplayer()`
   (or a `group()`, `autotabs()` or a `video[data-clip]`, which use it): it runs only while on screen, with the tab visible, with no
   pointer hovering and no focus inside its scope, and never under `prefers-reduced-motion`. It mirrors its state to `data-ap`
