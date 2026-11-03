@@ -1,5 +1,6 @@
 // Slow-scroll motion recordings of the four coach pages (EN, light, live motion), Playwright recordVideo -> MP4.
 //   node record.mjs <outDir> [desktop|phone]
+// Each moving stage (`[data-cf-stage]`) is also hovered for ~2.5 s: the loops and the clip freeze under the pointer and run again after.
 import { spawnSync } from 'node:child_process';
 import { mkdir, rename, rm } from 'node:fs/promises';
 import { chromium } from '/data/ianrowe/worktrees/coach/web/node_modules/playwright/index.mjs';
@@ -44,11 +45,25 @@ for (const [slug, width, height, mobile] of jobs) {
   await page.goto(`${server.url}/platform/${slug}/`, { waitUntil: 'load' });
   await page.evaluate(() => document.fonts.ready);
   await sleep(4000); // hero first: the clip, the chips and the headline run
+  if (!mobile) {
+    await page.locator('main [data-cf-stage="hero"]').first().hover({ timeout: 2000 }).catch(() => {});
+    await sleep(2500);
+    await page.mouse.move(4, 4);
+    await sleep(1200);
+  }
   const count = await page.evaluate(() => document.querySelectorAll('main > div > section, main > section, main section.cf-stage, main section.cf-sec, main section.final').length);
   const ids = await page.evaluate(() => [...document.querySelectorAll('main section')].map((s, i) => (s.id ? `#${s.id}` : null) ?? (s.setAttribute('data-rec', String(i)), `[data-rec="${i}"]`)));
   for (const sel of ids.slice(1)) {
     if (!(await ease(page, sel, mobile ? 70 : 70))) continue;
     await sleep(2500);
+    const stages = page.locator(`${sel} [data-cf-stage]:not([data-cf-stage="hero"]):not([data-cf-stage="accordion"])`);
+    const st = mobile ? 0 : await stages.count();
+    for (let i = 0; i < st; i++) {
+      await stages.nth(i).hover({ timeout: 2000 }).catch(() => {});
+      await sleep(2500);
+      await page.mouse.move(4, 4);
+      await sleep(1000);
+    }
     const acc = page.locator(`${sel} [data-accordion] .acc__btn`);
     const n = await acc.count();
     for (let i = 0; i < n; i++) {
