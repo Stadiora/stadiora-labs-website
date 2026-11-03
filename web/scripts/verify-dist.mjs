@@ -2,6 +2,7 @@
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { parse } from 'yaml';
 
 const dist = fileURLToPath(new URL('../dist/', import.meta.url));
 const errors = [];
@@ -84,9 +85,27 @@ if (existsSync(assets)) {
 }
 
 // Cutover guard: Pages still runs Jekyll over the repo root, and web/*.astro files are invalid front matter.
+// Parse _config.yml and assert the real `exclude` setting: a top-level `exclude` list that contains web, and no
+// `include` entry that would bring it back (Jekyll lets `include` win over `exclude`).
 const jekyllConfig = join(fileURLToPath(new URL('../../', import.meta.url)), '_config.yml');
-if (!existsSync(jekyllConfig) || !/^\s*-\s*web\s*$/m.test(readFileSync(jekyllConfig, 'utf8'))) {
-  fail('_config.yml at the repo root must exclude web/ or the Pages Jekyll build fails');
+const jekyllNames = (list) => (Array.isArray(list) ? list.filter((v) => typeof v === 'string').map((v) => v.replace(/\/+$/, '')) : []);
+if (!existsSync(jekyllConfig)) {
+  fail('_config.yml is missing at the repo root: Jekyll would build web/ and fail the Pages deploy');
+} else {
+  let config;
+  try {
+    config = parse(readFileSync(jekyllConfig, 'utf8')) ?? {};
+  } catch (error) {
+    fail(`_config.yml is not valid YAML (duplicate keys included): ${error.message.split('\n')[0]}`);
+  }
+  if (config) {
+    if (!Array.isArray(config.exclude) || !jekyllNames(config.exclude).includes('web')) {
+      fail('_config.yml: `exclude` must be a list that contains `web`, or the Pages Jekyll build fails on web/**/*.astro');
+    }
+    if (jekyllNames(config.include).includes('web')) {
+      fail('_config.yml: `include` lists `web`, which overrides `exclude` and puts web/ back into the Jekyll build');
+    }
+  }
 }
 
 if (errors.length) {
