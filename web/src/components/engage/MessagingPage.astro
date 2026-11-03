@@ -1,13 +1,14 @@
 ---
+import '../../styles/engage/home-phone.css';
+import '../../styles/engage/home-showcase.css';
+import '../../styles/engage/messaging.css';
 import type { Locale } from '../../i18n';
 import { useEngage } from '../../i18n/pages/engage';
 import { hrefFor } from '../../data/nav';
 import { site } from '../../data/site';
 import { contactHref } from './links';
-import Photo from '../ui/Photo.astro';
-import Phone from '../ui/Phone.astro';
-import FinalCta from '../home/FinalCta.astro';
-import FeatureHero from './FeatureHero.astro';
+import EngageHero from './EngageHero.astro';
+import EngageFinal from './EngageFinal.astro';
 import AlsoInAria from './AlsoInAria.astro';
 import EIcon from './EIcon.astro';
 
@@ -18,653 +19,189 @@ const { locale } = Astro.props;
 const e = useEngage(locale);
 const m = e.messaging;
 const c = e.common;
+
+const scenes = ['chat', 'feed', 'bc', 'ann'] as const;
+const tabs = [m.chat.title, m.feed.title, m.broadcast.title, m.announcements.title];
+const bubblePos = { chat: 'a', feed: 'b', bc: 'c', ann: 'd' } as const;
+const bubbleDepth = { chat: 24, feed: 30, bc: 20, ann: 26 } as const;
+// The bubbles outside the phone repeat strings the phone already shows.
+const bubbles = {
+  chat: [m.chat.name, m.chat.m3],
+  feed: [m.feed.author, m.feed.post],
+  bc: [m.broadcast.group, m.broadcast.message],
+  ann: [m.announcements.label, m.announcements.progress],
+} as const;
+// "18 of 24 read": the number counts up, the rest stays put.
+const [, readNum, readRest] = m.announcements.progress.match(/^(\d+)(.*)$/) ?? ['', '0', m.announcements.progress];
+const initials = (name: string) => name.split(' ').map((w) => w[0]).join('').slice(0, 2);
 ---
 
-<FeatureHero
+<EngageHero
   eyebrow={m.eyebrow}
   title={m.title}
   sub={m.sub}
   ctas={[
     { label: c.startFree, href: site.signUp },
-    { label: c.bookDemo, href: contactHref(locale, 'demo'), kind: 'secondary' },
+    { label: c.bookDemo, href: contactHref(locale, 'demo') },
   ]}
 >
-  <div slot="media" class="fh__fill">
-    <Photo
-      slot="m2-engage"
-      ratio="3/2"
-      sizes="(max-width: 1024px) 94vw, 720px"
-      widths={[480, 800, 1200]}
-      alt={m.photoAlt}
-      eager
-      priority="high"
-      locale={locale}
-    />
-  </div>
-</FeatureHero>
-
-<section class="section section--surface bento" aria-labelledby="bento-title">
-  <div class="container">
-    <h2 id="bento-title" class="sr-only">{m.gridLabel}</h2>
-    <div class="bento__grid">
-      <article class="bt" data-reveal style="--reveal-i:0">
-        <h3 class="bt__title">{m.chat.title}</h3>
-        <p class="bt__sub">{m.chat.sub}</p>
-        <div class="bt__demo" aria-hidden="true">
-          <Phone class="bt__phone">
-            <div class="chat chat--seq" data-chat>
-              <div class="chat__head">
-                <EIcon name="chevron-left" size={16} />
-                <span class="avatar">D</span>
-                <div>
-                  <p class="chat__name">{m.chat.name}</p>
-                  <p class="chat__status">{m.chat.status}</p>
+  <div slot="media" class="eg-live" data-autotabs data-at="7600">
+    <div class="media-frame eg-live__frame">
+      <video muted playsinline loop preload="none" data-clip data-poster="/home/media/engage-bg.webp" aria-hidden="true" tabindex="-1">
+        <source src="/home/media/engage-bg.webm" type="video/webm" />
+        <source src="/home/media/engage-bg.mp4" type="video/mp4" />
+      </video>
+      <div class="vid-shade"></div>
+      <div class="dphone" aria-hidden="true">
+        <div class="scr">
+          <i class="island"></i>
+          <div class="sb"><span>9:41</span><span>●●● ▮</span></div>
+          <div class="ph-scn on" data-panel data-scn="chat" role="tabpanel" id="eg-p0" aria-labelledby="eg-t0">
+            <div class="ph-top"><span class="av av-violet">{initials(m.chat.name)}</span><div><b>{m.chat.name}</b><small>{m.chat.status}</small></div></div>
+            <div class="ph-body">
+              <div class="dmsg in" data-el="m1">{m.chat.m1}</div>
+              <div class="typing" data-el="t1"><i></i><i></i><i></i></div>
+              <div class="dmsg me" data-el="m2">{m.chat.m2}</div>
+              <div class="typing" data-el="t2"><i></i><i></i><i></i></div>
+              <div class="dmsg in" data-el="m3">{m.chat.m3}</div>
+            </div>
+            <div class="ph-input">{m.chat.placeholder}</div>
+          </div>
+          <div class="ph-scn" data-panel data-scn="feed" role="tabpanel" id="eg-p1" aria-labelledby="eg-t1">
+            <div class="ph-top"><span class="av av-cyan">{initials(m.feed.group)}</span><div><b>{m.feed.screenTitle}</b><small>{m.feed.group}</small></div></div>
+            <div class="ph-body">
+              <div class="post" data-el="p1">
+                <div class="ph" style="--img:url(/home/img/night-huddle-800.webp)"></div>
+                <div class="pb">
+                  <b>{m.feed.author} · {m.feed.time}</b>{m.feed.post}
+                  <div class="reacts">
+                    <span data-el="rc1"><EIcon name="heart" size={12} /> <b class="tn fnum" style={`--to:${m.feed.likes}`}></b></span>
+                    <span><EIcon name="chat" size={12} /> {m.feed.comments}</span>
+                  </div>
                 </div>
               </div>
-              <div class="chat__body">
-                <div class="bubble bubble--in"><p>{m.chat.m1}</p><span>{m.chat.times[0]}</span></div>
-                <div class="bubble bubble--out"><p>{m.chat.m2}</p><span>{m.chat.times[1]}</span></div>
-                <div class="bubble bubble--in"><p>{m.chat.m3}</p><span>{m.chat.times[2]}</span></div>
-              </div>
-              <div class="chat__input">
-                <span class="chat__plus"><EIcon name="plus" size={14} /></span>
-                <span class="chat__field">{m.chat.placeholder}</span>
-                <EIcon name="send" size={16} />
+            </div>
+          </div>
+          <div class="ph-scn" data-panel data-scn="bc" role="tabpanel" id="eg-p2" aria-labelledby="eg-t2">
+            <div class="ph-top"><span class="av av-mint">{initials(m.broadcast.group)}</span><div><b>{m.broadcast.window}</b><small>{m.broadcast.to} {m.broadcast.group}</small></div></div>
+            <div class="ph-body">
+              <div class="bc-card" data-el="b1">
+                <div class="to">{m.broadcast.to} {m.broadcast.group}</div>
+                <p class="bc-text">{m.broadcast.message}</p>
+                <div class="bc-prog"><i data-el="bp"></i></div>
               </div>
             </div>
-          </Phone>
-        </div>
-      </article>
-
-      <article class="bt" data-reveal style="--reveal-i:1">
-        <h3 class="bt__title">{m.feed.title}</h3>
-        <p class="bt__sub">{m.feed.sub}</p>
-        <div class="bt__demo" aria-hidden="true">
-          <Phone class="bt__phone">
-            <div class="chat">
-              <p class="feed__title">{m.feed.screenTitle}</p>
-              <article class="post">
-                <header class="post__head">
-                  <span class="avatar">D</span>
-                  <div>
-                    <p class="chat__name">{m.feed.group}</p>
-                    <p class="chat__status">{m.feed.author} · {m.feed.time}</p>
-                  </div>
-                </header>
-                <p class="post__text">{m.feed.post}</p>
-                <div class="post__photo"><i></i><i></i><i></i><i></i><b></b></div>
-                <p class="post__react">
-                  <span><EIcon name="heart" size={16} /><span class="num">{m.feed.likes}</span></span>
-                  <span><EIcon name="chat" size={16} />{m.feed.comments}</span>
-                </p>
-              </article>
-            </div>
-          </Phone>
-        </div>
-      </article>
-
-      <article class="bt" data-reveal style="--reveal-i:2">
-        <h3 class="bt__title">{m.broadcast.title}</h3>
-        <p class="bt__sub">{m.broadcast.sub}</p>
-        <div class="bt__demo bt__demo--flat" aria-hidden="true">
-          <div class="win">
-            <div class="win__bar"><i></i><i></i><i></i></div>
-            <div class="win__body">
-              <p class="win__title">{m.broadcast.window}</p>
-              <p class="win__to">
-                <span class="win__label">{m.broadcast.to}</span>
-                <span class="win__select">{m.broadcast.group}<EIcon name="chevron-down" size={16} /></span>
-              </p>
-              <p class="win__text">{m.broadcast.message}</p>
-              <p class="win__foot"><span class="win__send">{m.broadcast.send}</span></p>
+            <div class="ph-input ph-input-c eg-send">{m.broadcast.send}</div>
+          </div>
+          <div class="ph-scn" data-panel data-scn="ann" role="tabpanel" id="eg-p3" aria-labelledby="eg-t3">
+            <div class="ph-top"><span class="av av-red">{initials(m.announcements.title)}</span><div><b>{m.announcements.title}</b><small>{m.announcements.label}</small></div></div>
+            <div class="ph-body">
+              <div class="ann" data-el="a1">
+                <small>{m.announcements.label}</small>
+                <p class="ann-text">{m.announcements.headline}</p>
+                <div class="bc-prog eg-prog"><i data-el="ap"></i></div>
+                <small data-el="a2"><b class="tn fnum" style={`--to:${readNum}`}></b>{readRest}</small>
+              </div>
+              <ul class="eg-readers">
+                {m.announcements.readers.map((r, i) => (<li data-el={`r${i + 1}`}><span class="eg-av">{r.name[0]}</span><b>{r.name}</b><small>{r.when}</small></li>))}
+              </ul>
             </div>
           </div>
         </div>
-      </article>
-
-      <article class="bt" data-reveal style="--reveal-i:3">
-        <h3 class="bt__title">{m.announcements.title}</h3>
-        <p class="bt__sub">{m.announcements.sub}</p>
-        <div class="bt__demo bt__demo--flat" aria-hidden="true">
-          <div class="ann">
-            <p class="ann__label"><EIcon name="mail" size={16} />{m.announcements.label}</p>
-            <h4 class="ann__title">{m.announcements.headline}</h4>
-            <p class="ann__body">{m.announcements.body}</p>
-            <div class="ann__bar"><span style="width:75%"></span></div>
-            <p class="ann__count">{m.announcements.progress}</p>
-            <ul class="ann__list">
-              {
-                m.announcements.readers.map((r) => (
-                  <li>
-                    <span class="avatar">{r.name[0]}</span>
-                    <span class="ann__name">{r.name}</span>
-                    <span class="ann__when"><i></i>{r.when}</span>
-                  </li>
-                ))
-              }
-            </ul>
+      </div>
+      {
+        scenes.map((k, i) => (
+          <div class:list={['bubble-out', 'pop', `bo-${bubblePos[k]}`, { on: i === 0 }]} data-bubble={k} data-depth={bubbleDepth[k]} aria-hidden="true">
+            <b>{bubbles[k][0]}</b>
+            <div>{bubbles[k][1]}</div>
           </div>
-        </div>
-      </article>
+        ))
+      }
+      <span class="badge-demo">{c.demoNote}</span>
+    </div>
+    <div class="eg-tabs" role="tablist" aria-label={m.gridLabel}>
+      {
+        tabs.map((label, i) => (
+          <button class="eg-tab" type="button" role="tab" id={`eg-t${i}`} aria-controls={`eg-p${i}`} aria-selected={i === 0 ? 'true' : 'false'} tabindex={i === 0 ? 0 : -1}>
+            <span class="hd">
+              <strong>{label}</strong>
+              <em>{`0${i + 1}`}</em>
+            </span>
+            <span class="at-bar"><i /></span>
+          </button>
+        ))
+      }
+    </div>
+  </div>
+</EngageHero>
+
+<section class="show impact eg-stage" id="ways" data-section aria-labelledby="ways-title">
+  <div class="wrap">
+    <div class="panel reading rv">
+      <h2 class="t-title" id="ways-title">{m.gridLabel}</h2>
+      <div class="bento eg-bento" data-tilt>
+        <article class="bt eg-a rv" style="--i:0">
+          <h3>{m.chat.title}</h3>
+          <p>{m.chat.sub}</p>
+          <div class="shot" aria-hidden="true">
+            <div class="org-rows">
+              <div class="org-hd"><b>{m.chat.name}</b><span>{m.chat.status}</span></div>
+              <div class="eg-bub in">{m.chat.m1}<span>{m.chat.times[0]}</span></div>
+              <div class="eg-bub me">{m.chat.m2}<span>{m.chat.times[1]}</span></div>
+              <div class="eg-bub in">{m.chat.m3}<span>{m.chat.times[2]}</span></div>
+            </div>
+          </div>
+        </article>
+        <article class="bt eg-b rv" style="--i:1">
+          <h3>{m.feed.title}</h3>
+          <p>{m.feed.sub}</p>
+          <div class="shot" aria-hidden="true">
+            <div class="org-rows">
+              <div class="org-hd"><b>{m.feed.group}</b><span>{m.feed.time}</span></div>
+              <div class="eg-photo" style="--img:url(/home/img/night-huddle-800.webp)"></div>
+              <p class="eg-line"><b>{m.feed.author}</b> {m.feed.post}</p>
+              <p class="eg-react"><span><EIcon name="heart" size={14} /> {m.feed.likes}</span><span><EIcon name="chat" size={14} /> {m.feed.comments}</span></p>
+            </div>
+          </div>
+        </article>
+        <article class="bt eg-c rv" style="--i:2">
+          <h3>{m.broadcast.title}</h3>
+          <p>{m.broadcast.sub}</p>
+          <div class="shot" aria-hidden="true">
+            <div class="org-rows">
+              <div class="org-hd"><b>{m.broadcast.window}</b><span>{m.broadcast.to} {m.broadcast.group}</span></div>
+              <p class="eg-line">{m.broadcast.message}</p>
+              <p class="eg-foot"><span class="eg-pill">{m.broadcast.send}</span></p>
+            </div>
+          </div>
+        </article>
+        <article class="bt eg-d rv" style="--i:3">
+          <h3>{m.announcements.title}</h3>
+          <p>{m.announcements.sub}</p>
+          <div class="shot" aria-hidden="true">
+            <div class="org-rows">
+              <div class="org-hd"><b>{m.announcements.label}</b><span>{m.announcements.progress}</span></div>
+              <p class="eg-line"><b>{m.announcements.headline}</b></p>
+              <div class="bc-prog"><i style="transform:scaleX(.75)"></i></div>
+              {m.announcements.readers.map((r, k) => (<div class="org-row org-row-2" style={`--k:${k}`}><b>{r.name}</b><span>{r.when}</span></div>))}
+            </div>
+          </div>
+        </article>
+      </div>
+      <p class="dnote">{m.privacy}</p>
+      <p class="dnote">{c.demoNote}</p>
     </div>
 
-    <p class="demo-note bento__note">{m.privacy}</p>
-    <p class="demo-note bento__note bento__note--tight">{c.demoNote}</p>
-  </div>
-</section>
-
-<section class="fam" aria-label={m.families.link}>
-  <div class="container fam__row">
-    <p class="fam__text">{m.families.text}</p>
-    <a class="link link-arrow" href={hrefFor('guardian', locale)}>
-      {m.families.link}
-      <EIcon name="arrow-right" size={18} />
-    </a>
+    <div class="eg-fam glass rv">
+      <p>{m.families.text}</p>
+      <a class="eg-link" href={hrefFor('guardian', locale)}>{m.families.link}<EIcon name="arrow-right" size={18} /></a>
+    </div>
   </div>
 </section>
 
 <AlsoInAria locale={locale} items={m.also} />
-<FinalCta locale={locale} demoHref={contactHref(locale, 'demo')} />
-
-<style>
-  .bento {
-    padding-block: clamp(40px, 5vw, 64px);
-  }
-  .bento__grid {
-    display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 24px;
-  }
-  .bt {
-    display: flex;
-    flex-direction: column;
-    min-width: 0;
-    padding: 24px 24px 0;
-    overflow: hidden;
-    border-radius: var(--radius-card);
-    background: var(--bg);
-    box-shadow: 0 1px 2px rgb(8 19 43 / 0.04);
-    transition:
-      transform 0.2s var(--ease-out),
-      box-shadow 0.2s var(--ease-out);
-  }
-  .bt:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-pop);
-  }
-  .bt__title {
-    font-size: 22px;
-    line-height: 28px;
-  }
-  .bt__sub {
-    margin-top: 2px;
-    color: var(--ink-2);
-    font-size: 17px;
-    line-height: 24px;
-  }
-  .bt__demo {
-    container-type: inline-size;
-    flex: 1;
-    min-height: 372px;
-    margin-top: 20px;
-    overflow: hidden;
-  }
-  .bt__demo--flat {
-    padding-bottom: 24px;
-  }
-  .bt :global(.bt__phone) {
-    --phone-w: min(100cqw, 262px);
-    margin-inline: auto;
-  }
-  .bt :global(.phone__bezel) {
-    box-shadow: 0 0 0 1px rgb(255 255 255 / 0.12) inset;
-  }
-  .bt :global(.phone__screen) {
-    aspect-ratio: auto;
-    height: 408px;
-    background: var(--bg);
-  }
-
-  .chat {
-    display: flex;
-    flex: 1;
-    flex-direction: column;
-    min-height: 0;
-    padding: 0 0.9em 0.9em;
-  }
-  .chat__head {
-    display: flex;
-    align-items: center;
-    gap: 0.6em;
-    padding: 0.7em 0;
-    border-bottom: 1px solid var(--line);
-    font-size: 0.9em;
-  }
-  .chat__name {
-    font-weight: 600;
-    font-size: 0.95em;
-    line-height: 1.2;
-  }
-  .chat__status {
-    color: var(--ink-2);
-    font-size: 0.8em;
-  }
-  .avatar {
-    display: grid;
-    place-items: center;
-    flex: none;
-    width: 2.2em;
-    height: 2.2em;
-    border-radius: 50%;
-    background: var(--cyan-tint);
-    color: var(--cyan-ink);
-    font-size: 0.85em;
-    font-weight: 700;
-  }
-  .chat__body {
-    display: flex;
-    flex: 1;
-    flex-direction: column;
-    gap: 0.7em;
-    padding-top: 0.9em;
-    min-height: 0;
-  }
-  .bubble {
-    max-width: 84%;
-    font-size: 0.86em;
-  }
-  .bubble p {
-    padding: 0.6em 0.8em;
-    border-radius: 0.9em;
-  }
-  .bubble span {
-    display: block;
-    margin-top: 0.2em;
-    color: var(--ink-3);
-    font-size: 0.8em;
-  }
-  .bubble--in {
-    align-self: flex-start;
-  }
-  .bubble--in p {
-    background: var(--surface);
-  }
-  .bubble--out {
-    align-self: flex-end;
-    text-align: right;
-  }
-  .bubble--out p {
-    background: var(--cyan-tint);
-    text-align: left;
-  }
-  html.js .chat--seq .bubble {
-    transition:
-      opacity 0.3s var(--ease-out),
-      transform 0.3s var(--ease-out);
-  }
-  html.js .chat--seq:not(.is-playing):not(.is-done) .bubble {
-    opacity: 0;
-    transform: translateY(8px);
-  }
-  html.js .chat--seq.is-playing .bubble:not(.is-in) {
-    opacity: 0;
-    transform: translateY(8px);
-  }
-  @media (prefers-reduced-motion: reduce) {
-    html.js .chat--seq .bubble,
-    html.js .chat--seq:not(.is-playing):not(.is-done) .bubble,
-    html.js .chat--seq.is-playing .bubble:not(.is-in) {
-      opacity: 1;
-      transform: none;
-      transition: none;
-    }
-    .bt {
-      transition: none;
-    }
-    .bt:hover {
-      transform: none;
-    }
-  }
-  .chat__input {
-    display: flex;
-    align-items: center;
-    gap: 0.6em;
-    color: var(--ink-3);
-    font-size: 0.78em;
-  }
-  .chat__plus {
-    display: grid;
-    place-items: center;
-    flex: none;
-    width: 2.2em;
-    height: 2.2em;
-    border: 1px solid var(--line);
-    border-radius: 50%;
-  }
-  .chat__field {
-    flex: 1;
-    padding: 0.7em 1em;
-    border: 1px solid var(--line);
-    border-radius: 2em;
-    background: var(--surface);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  .feed__title {
-    padding: 0.7em 0;
-    border-bottom: 1px solid var(--line);
-    font-size: 0.9em;
-    font-weight: 600;
-    text-align: center;
-  }
-  .post {
-    display: grid;
-    gap: 0.7em;
-    margin-top: 0.8em;
-    font-size: 0.9em;
-  }
-  .post__head {
-    display: flex;
-    align-items: center;
-    gap: 0.6em;
-  }
-  .post__text {
-    line-height: 1.35;
-  }
-  .post__photo {
-    position: relative;
-    height: 13.5em;
-    overflow: hidden;
-    border-radius: 0.7em;
-    background: linear-gradient(160deg, #c9794e, #a95a36);
-  }
-  /* Track lanes and a baton drawn in CSS: a stand-in for the team photo. */
-  .post__photo i {
-    position: absolute;
-    left: -10%;
-    right: -10%;
-    height: 2px;
-    background: rgb(255 255 255 / 0.7);
-    transform: rotate(-12deg);
-  }
-  .post__photo i:nth-child(1) {
-    top: 20%;
-  }
-  .post__photo i:nth-child(2) {
-    top: 42%;
-  }
-  .post__photo i:nth-child(3) {
-    top: 64%;
-  }
-  .post__photo i:nth-child(4) {
-    top: 86%;
-  }
-  .post__photo b {
-    position: absolute;
-    left: 34%;
-    top: 46%;
-    width: 34%;
-    height: 0.55em;
-    border-radius: 1em;
-    background: #00bef3;
-    transform: rotate(-24deg);
-  }
-  .post__react {
-    display: flex;
-    align-items: center;
-    gap: 1.2em;
-    color: var(--ink-2);
-    font-size: 0.85em;
-  }
-  .post__react > span {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.4em;
-  }
-  .post__react :global(svg) {
-    flex: none;
-  }
-  .post__react > span:first-child :global(svg) {
-    color: #e0457b;
-  }
-
-  .win {
-    overflow: hidden;
-    border: 1px solid var(--line);
-    border-radius: 12px;
-    background: var(--bg);
-    font-size: 15px;
-  }
-  .win__bar {
-    display: flex;
-    gap: 6px;
-    padding: 10px 12px;
-    border-bottom: 1px solid var(--line);
-    background: var(--surface);
-  }
-  .win__bar i {
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-  }
-  .win__bar i:nth-child(1) {
-    background: #ff6159;
-  }
-  .win__bar i:nth-child(2) {
-    background: #ffbd2e;
-  }
-  .win__bar i:nth-child(3) {
-    background: #28c840;
-  }
-  .win__body {
-    display: grid;
-    gap: 14px;
-    padding: 16px;
-  }
-  .win__title {
-    font-family: var(--font-display);
-    font-size: 18px;
-    font-weight: 600;
-  }
-  .win__to {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-  .win__label {
-    color: var(--ink-2);
-  }
-  .win__select {
-    display: flex;
-    flex: 1;
-    align-items: center;
-    justify-content: space-between;
-    padding: 8px 10px;
-    border: 1px solid var(--line);
-    border-radius: 8px;
-    background: var(--surface);
-  }
-  .win__text {
-    min-height: 112px;
-    padding: 12px;
-    border: 1px solid var(--line);
-    border-radius: 8px;
-  }
-  .win__foot {
-    display: flex;
-    justify-content: flex-end;
-  }
-  .win__send {
-    padding: 10px 28px;
-    border-radius: var(--radius-ctl);
-    background: var(--btn-bg);
-    color: var(--btn-ink);
-    font-weight: 600;
-  }
-
-  .ann {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr);
-    gap: 10px;
-    padding: 16px;
-    border: 1px solid var(--line);
-    border-radius: 12px;
-    background: var(--bg);
-    font-size: 15px;
-    line-height: 22px;
-  }
-  .ann__label {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    color: var(--cyan-ink);
-    font-size: 14px;
-    font-weight: 600;
-  }
-  .ann__title {
-    margin: 2px 0 0;
-    font-family: var(--font-display);
-    font-size: 17px;
-    line-height: 23px;
-    font-weight: 600;
-    color: var(--ink);
-  }
-  .ann__body {
-    color: var(--ink-2);
-  }
-  .ann__bar {
-    height: 8px;
-    margin-top: 4px;
-    overflow: hidden;
-    border-radius: 4px;
-    background: var(--surface-2);
-  }
-  .ann__bar span {
-    display: block;
-    height: 100%;
-    border-radius: 4px;
-    background: var(--cyan);
-  }
-  .ann__count {
-    color: var(--ink-2);
-    font-size: 14px;
-  }
-  .ann__list {
-    display: grid;
-    gap: 10px;
-    margin-top: 4px;
-  }
-  .ann__list li {
-    display: grid;
-    grid-template-columns: 30px minmax(0, 1fr) auto;
-    align-items: center;
-    gap: 10px;
-  }
-  .ann__list .avatar {
-    width: 30px;
-    height: 30px;
-    font-size: 13px;
-  }
-  .ann__name {
-    min-width: 0;
-    font-weight: 500;
-  }
-  .ann__when {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    color: var(--ink-2);
-    font-size: 13px;
-    white-space: nowrap;
-  }
-  .ann__when i {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: var(--mint);
-  }
-
-  /* Four columns leave the card about 190 to 280px wide: the read time moves under the name instead of being cut off. */
-  @container (max-width: 260px) {
-    .ann__list li {
-      grid-template-columns: 30px minmax(0, 1fr);
-      row-gap: 0;
-    }
-    .ann__list .avatar {
-      grid-row: span 2;
-    }
-    .ann__when {
-      grid-column: 2;
-    }
-  }
-
-  .bento__note {
-    margin-top: 28px;
-    text-align: center;
-  }
-  .bento__note--tight {
-    margin-top: 4px;
-  }
-
-  .fam {
-    padding-block: 36px 0;
-  }
-  .fam__row {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: space-between;
-    gap: 12px 32px;
-    padding: 20px 28px;
-    border: 1px solid var(--line);
-    border-radius: var(--radius-card);
-  }
-  .fam__text {
-    font-size: 19px;
-    line-height: 28px;
-  }
-
-  @media (max-width: 1180px) {
-    .bento__grid {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-  }
-  @media (max-width: 640px) {
-    .bento__grid {
-      grid-template-columns: minmax(0, 1fr);
-    }
-    .bt {
-      padding-inline: 18px;
-    }
-  }
-</style>
+<EngageFinal locale={locale} demoHref={contactHref(locale, 'demo')} />
 
 <script>
-  // Chat bubbles arrive one after another, 300 ms apart, the first time the tile scrolls into view.
-  const chat = document.querySelector<HTMLElement>('[data-chat]');
-  if (chat) {
-    const bubbles = Array.from(chat.querySelectorAll<HTMLElement>('.bubble'));
-    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const showAll = () => {
-      bubbles.forEach((b) => b.classList.add('is-in'));
-      chat.classList.add('is-done');
-    };
-    if (reduced || !('IntersectionObserver' in window)) {
-      showAll();
-    } else {
-      const io = new IntersectionObserver(
-        (entries) => {
-          if (!entries.some((en) => en.isIntersecting)) return;
-          io.disconnect();
-          chat.classList.add('is-playing');
-          bubbles.forEach((b, i) => window.setTimeout(() => b.classList.add('is-in'), 300 * (i + 1)));
-          window.setTimeout(showAll, 300 * (bubbles.length + 1));
-        },
-        { threshold: 0.4 },
-      );
-      io.observe(chat);
-    }
-  }
+  import '../../scripts/engage/messaging';
 </script>

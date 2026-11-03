@@ -1,0 +1,3 @@
+/* The home phone kit, pulled in with a CSS @import on purpose. Importing styles/home/phone.css from a component
+   would make the bundler split it out of Home.css into a shared stylesheet, which changes how the home loads. */
+@import '../home/phone.css';

@@ -14,7 +14,8 @@ npm run evidence   # needs a build; Playwright screenshots, interaction checks a
 node scripts/evidence.mjs --coach-only   # just the Platform Coach pages, EN and ES (see below); add --checks-only to skip screenshots
 node scripts/evidence.mjs --nav-only   # just the header checks: geometry 1025 to 1440, panel height, drawer and panel focus
 node scripts/evidence.mjs --pricing-only   # just /pricing/ and /es/pricing/: prices, region, dialogs, fallback, layout, contrast, tab walk; add --checks-only to skip the screenshots, and --pricing-group=dialogs (data, region, prices, behaviour, dialogs, fallback, layout, contrast, links) to run one group, e.g. in a loop to look for flakes
-node scripts/evidence.mjs --engage-only # just the Platform page checks, EN and ES (see below); add --checks-only to skip screenshots
+node scripts/evidence.mjs --engage-only # just the Platform page checks and motion guards, EN and ES (see below); add --checks-only to skip screenshots
+node scripts/evidence.mjs --engage-motion-only --checks-only # just the Platform motion guards; ENGAGE_ONLY=teams,integrations narrows the pages
 ```
 
 - Pages: `/` and `/pricing/` (EN), `/es/` and `/es/pricing/` (ES). Copy lives in `src/i18n/{en,es}.ts`; `es.ts` is typed against `en.ts`, so `astro check` flags a missing key. Page copy lives in `src/i18n/pages/` (`pricing.ts`: EN and ES typed together).
@@ -46,8 +47,20 @@ node scripts/evidence.mjs --engage-only # just the Platform page checks, EN and 
   the repo root and the element ids it points at. Routes that other open PRs own (`pendingRoutes`: the coach pages, help) are an explicit list and are printed as `pending` by `npm run verify`, never passed
   silently; a typo of one of them fails. Delete an entry when its PR has merged. A `/contact/` link in the page body must carry `?topic=demo` or `?topic=question`; the footer and nav link to the plain page. `scripts/lib/engage-checks.mjs` (run by
   `evidence`) covers overflow and clipped text (`clip-probe.mjs`) at 390/1024/1280/1440, WCAG AA in both themes, alt text,
-  heading order, the Guardian child switcher and that Teams and `/pricing/` show the same schools price for the same visitor
-  (`?region=us|latam`, ten time zones, a missing one).
+  heading order, the live Messaging phone and the Guardian child switcher (tab ARIA, click and arrow keys) and that Teams and
+  `/pricing/` show the same schools price for the same visitor (`?region=us|latam`, ten time zones, a missing one). The clip
+  check also sweeps 16 widths from 360 to 1600 px on all five pages.
+- Platform page look (Floodlight, R57 VB-3): every page is an `.impact` hero (`EngageHero`, split, overlap or orbit variant) with a
+  live HTML stage on the right, at least one dark `.show.impact` stage, the shared `AlsoInAria` links and the `EngageFinal` call to
+  action on the `night-stadium` clip. Styles are `src/styles/engage/{base,messaging,guardian,teams,branded,integrations}.css`
+  (`eg-` prefixed classes; the foundation and home CSS stay untouched) and scripts `src/scripts/engage/*.ts`. Everything that moves
+  goes through the motion kit (`src/scripts/motion/kit.ts`: `autoplayer`, `autotabs`, `group`, `tl`), so it starts on screen, pauses
+  on hover, focus, off screen and in a hidden tab, and is a finished still under reduced motion. No clip with words baked into the
+  picture is used (`pillar-*` and `planner-demo` stay on the home); the demo UIs are HTML. `scripts/lib/engage-motion-checks.mjs`
+  guards all of that: the Floodlight frame, text-free clips, every autoplayer (start, off screen, hover, focus, resume), a hidden tab,
+  the live reduced-motion flip, finished stills, the tab sets rotating, the Teams rail and the planner, the Branded morph and the
+  Integrations chips. `.rv-mask` elements never get `.in` (an IntersectionObserver ignores an element whose own clip-path hides it),
+  so a reveal that clips an element observes a wrapper `.rv` and clips its child.
   Prices on these pages are not typed into the copy: the Teams schools teaser and the Branded add-on line are rendered from
   `src/data/prices.ts` (`education`, `addOns`) with `{tokens}` in `engage.ts`, and the Teams script picks the region with
   `detectRegion` from `src/lib/region.ts`, the same two modules `/pricing/` uses. `npm run verify` fails on a dollar amount in
