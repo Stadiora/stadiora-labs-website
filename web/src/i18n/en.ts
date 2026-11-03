@@ -170,7 +170,7 @@ export const en = {
     load: {
       label: 'Training load · this week',
       days: ['M', 'T', 'W', 'T', 'F', 'S', 'S'],
-      status: 'RPE × minutes',
+      status: 'Effort × minutes',
     },
     goal: { label: 'Goal', value: '72%', text: 'Run 400 m under 58 s' },
     checkin: {

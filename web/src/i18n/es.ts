@@ -172,7 +172,7 @@ export const es: Dict = {
     load: {
       label: 'Carga de entrenamiento · esta semana',
       days: ['L', 'M', 'M', 'J', 'V', 'S', 'D'],
-      status: 'RPE × minutos',
+      status: 'Esfuerzo × minutos',
     },
     goal: { label: 'Meta', value: '72%', text: 'Correr 400 m en menos de 58 s' },
     checkin: {
