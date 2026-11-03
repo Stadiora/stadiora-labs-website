@@ -1,0 +1,874 @@
+{
+  "results": [
+    {
+      "group": "engage",
+      "name": "en/messaging: no horizontal overflow at 390px",
+      "pass": true,
+      "detail": "scrollWidth 390 vs 390"
+    },
+    {
+      "group": "engage",
+      "name": "en/messaging: no horizontal overflow at 1024px",
+      "pass": true,
+      "detail": "scrollWidth 1024 vs 1024"
+    },
+    {
+      "group": "engage",
+      "name": "en/messaging: no horizontal overflow at 1280px",
+      "pass": true,
+      "detail": "scrollWidth 1280 vs 1280"
+    },
+    {
+      "group": "engage",
+      "name": "en/messaging: no horizontal overflow at 1440px",
+      "pass": true,
+      "detail": "scrollWidth 1440 vs 1440"
+    },
+    {
+      "group": "engage",
+      "name": "en/messaging: every image has an alt attribute",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "engage",
+      "name": "en/messaging: nothing focusable sits inside aria-hidden",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "engage",
+      "name": "en/messaging: one h1 and no skipped heading level",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "engage",
+      "name": "en/messaging: page problems (console errors, 4xx, failed requests)",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "engage",
+      "name": "en/messaging/light: text meets WCAG AA (4.5:1, 3:1 large)",
+      "pass": true,
+      "detail": "103 text nodes, lowest 4.57:1; 0 over images skipped"
+    },
+    {
+      "group": "engage",
+      "name": "en/messaging/dark: text meets WCAG AA (4.5:1, 3:1 large)",
+      "pass": true,
+      "detail": "103 text nodes, lowest 7.32:1; 0 over images skipped"
+    },
+    {
+      "group": "engage",
+      "name": "es/messaging: no horizontal overflow at 390px",
+      "pass": true,
+      "detail": "scrollWidth 390 vs 390"
+    },
+    {
+      "group": "engage",
+      "name": "es/messaging: no horizontal overflow at 1024px",
+      "pass": true,
+      "detail": "scrollWidth 1024 vs 1024"
+    },
+    {
+      "group": "engage",
+      "name": "es/messaging: no horizontal overflow at 1280px",
+      "pass": true,
+      "detail": "scrollWidth 1280 vs 1280"
+    },
+    {
+      "group": "engage",
+      "name": "es/messaging: no horizontal overflow at 1440px",
+      "pass": true,
+      "detail": "scrollWidth 1440 vs 1440"
+    },
+    {
+      "group": "engage",
+      "name": "es/messaging: every image has an alt attribute",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "engage",
+      "name": "es/messaging: nothing focusable sits inside aria-hidden",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "engage",
+      "name": "es/messaging: one h1 and no skipped heading level",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "engage",
+      "name": "es/messaging: page problems (console errors, 4xx, failed requests)",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "engage",
+      "name": "es/messaging/light: text meets WCAG AA (4.5:1, 3:1 large)",
+      "pass": true,
+      "detail": "103 text nodes, lowest 4.57:1; 0 over images skipped"
+    },
+    {
+      "group": "engage",
+      "name": "es/messaging/dark: text meets WCAG AA (4.5:1, 3:1 large)",
+      "pass": true,
+      "detail": "103 text nodes, lowest 7.32:1; 0 over images skipped"
+    },
+    {
+      "group": "engage",
+      "name": "en/guardian: no horizontal overflow at 390px",
+      "pass": true,
+      "detail": "scrollWidth 390 vs 390"
+    },
+    {
+      "group": "engage",
+      "name": "en/guardian: no horizontal overflow at 1024px",
+      "pass": true,
+      "detail": "scrollWidth 1024 vs 1024"
+    },
+    {
+      "group": "engage",
+      "name": "en/guardian: no horizontal overflow at 1280px",
+      "pass": true,
+      "detail": "scrollWidth 1280 vs 1280"
+    },
+    {
+      "group": "engage",
+      "name": "en/guardian: no horizontal overflow at 1440px",
+      "pass": true,
+      "detail": "scrollWidth 1440 vs 1440"
+    },
+    {
+      "group": "engage",
+      "name": "en/guardian: every image has an alt attribute",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "engage",
+      "name": "en/guardian: nothing focusable sits inside aria-hidden",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "engage",
+      "name": "en/guardian: one h1 and no skipped heading level",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "engage",
+      "name": "en/guardian: page problems (console errors, 4xx, failed requests)",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "engage",
+      "name": "en/guardian/light: text meets WCAG AA (4.5:1, 3:1 large)",
+      "pass": true,
+      "detail": "88 text nodes, lowest 4.57:1; 0 over images skipped"
+    },
+    {
+      "group": "engage",
+      "name": "en/guardian/dark: text meets WCAG AA (4.5:1, 3:1 large)",
+      "pass": true,
+      "detail": "88 text nodes, lowest 7.91:1; 0 over images skipped"
+    },
+    {
+      "group": "engage",
+      "name": "es/guardian: no horizontal overflow at 390px",
+      "pass": true,
+      "detail": "scrollWidth 390 vs 390"
+    },
+    {
+      "group": "engage",
+      "name": "es/guardian: no horizontal overflow at 1024px",
+      "pass": true,
+      "detail": "scrollWidth 1024 vs 1024"
+    },
+    {
+      "group": "engage",
+      "name": "es/guardian: no horizontal overflow at 1280px",
+      "pass": true,
+      "detail": "scrollWidth 1280 vs 1280"
+    },
+    {
+      "group": "engage",
+      "name": "es/guardian: no horizontal overflow at 1440px",
+      "pass": true,
+      "detail": "scrollWidth 1440 vs 1440"
+    },
+    {
+      "group": "engage",
+      "name": "es/guardian: every image has an alt attribute",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "engage",
+      "name": "es/guardian: nothing focusable sits inside aria-hidden",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "engage",
+      "name": "es/guardian: one h1 and no skipped heading level",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "engage",
+      "name": "es/guardian: page problems (console errors, 4xx, failed requests)",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "engage",
+      "name": "es/guardian/light: text meets WCAG AA (4.5:1, 3:1 large)",
+      "pass": true,
+      "detail": "88 text nodes, lowest 4.57:1; 0 over images skipped"
+    },
+    {
+      "group": "engage",
+      "name": "es/guardian/dark: text meets WCAG AA (4.5:1, 3:1 large)",
+      "pass": true,
+      "detail": "88 text nodes, lowest 7.91:1; 0 over images skipped"
+    },
+    {
+      "group": "engage",
+      "name": "en/teams: no horizontal overflow at 390px",
+      "pass": true,
+      "detail": "scrollWidth 390 vs 390"
+    },
+    {
+      "group": "engage",
+      "name": "en/teams: no horizontal overflow at 1024px",
+      "pass": true,
+      "detail": "scrollWidth 1024 vs 1024"
+    },
+    {
+      "group": "engage",
+      "name": "en/teams: no horizontal overflow at 1280px",
+      "pass": true,
+      "detail": "scrollWidth 1280 vs 1280"
+    },
+    {
+      "group": "engage",
+      "name": "en/teams: no horizontal overflow at 1440px",
+      "pass": true,
+      "detail": "scrollWidth 1440 vs 1440"
+    },
+    {
+      "group": "engage",
+      "name": "en/teams: every image has an alt attribute",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "engage",
+      "name": "en/teams: nothing focusable sits inside aria-hidden",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "engage",
+      "name": "en/teams: one h1 and no skipped heading level",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "engage",
+      "name": "en/teams: page problems (console errors, 4xx, failed requests)",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "engage",
+      "name": "en/teams/light: text meets WCAG AA (4.5:1, 3:1 large)",
+      "pass": true,
+      "detail": "123 text nodes, lowest 4.57:1; 0 over images skipped"
+    },
+    {
+      "group": "engage",
+      "name": "en/teams/dark: text meets WCAG AA (4.5:1, 3:1 large)",
+      "pass": true,
+      "detail": "123 text nodes, lowest 7.91:1; 0 over images skipped"
+    },
+    {
+      "group": "engage",
+      "name": "es/teams: no horizontal overflow at 390px",
+      "pass": true,
+      "detail": "scrollWidth 390 vs 390"
+    },
+    {
+      "group": "engage",
+      "name": "es/teams: no horizontal overflow at 1024px",
+      "pass": true,
+      "detail": "scrollWidth 1024 vs 1024"
+    },
+    {
+      "group": "engage",
+      "name": "es/teams: no horizontal overflow at 1280px",
+      "pass": true,
+      "detail": "scrollWidth 1280 vs 1280"
+    },
+    {
+      "group": "engage",
+      "name": "es/teams: no horizontal overflow at 1440px",
+      "pass": true,
+      "detail": "scrollWidth 1440 vs 1440"
+    },
+    {
+      "group": "engage",
+      "name": "es/teams: every image has an alt attribute",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "engage",
+      "name": "es/teams: nothing focusable sits inside aria-hidden",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "engage",
+      "name": "es/teams: one h1 and no skipped heading level",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "engage",
+      "name": "es/teams: page problems (console errors, 4xx, failed requests)",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "engage",
+      "name": "es/teams/light: text meets WCAG AA (4.5:1, 3:1 large)",
+      "pass": true,
+      "detail": "123 text nodes, lowest 4.57:1; 0 over images skipped"
+    },
+    {
+      "group": "engage",
+      "name": "es/teams/dark: text meets WCAG AA (4.5:1, 3:1 large)",
+      "pass": true,
+      "detail": "123 text nodes, lowest 7.91:1; 0 over images skipped"
+    },
+    {
+      "group": "engage",
+      "name": "en/branded: no horizontal overflow at 390px",
+      "pass": true,
+      "detail": "scrollWidth 390 vs 390"
+    },
+    {
+      "group": "engage",
+      "name": "en/branded: no horizontal overflow at 1024px",
+      "pass": true,
+      "detail": "scrollWidth 1024 vs 1024"
+    },
+    {
+      "group": "engage",
+      "name": "en/branded: no horizontal overflow at 1280px",
+      "pass": true,
+      "detail": "scrollWidth 1280 vs 1280"
+    },
+    {
+      "group": "engage",
+      "name": "en/branded: no horizontal overflow at 1440px",
+      "pass": true,
+      "detail": "scrollWidth 1440 vs 1440"
+    },
+    {
+      "group": "engage",
+      "name": "en/branded: every image has an alt attribute",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "engage",
+      "name": "en/branded: nothing focusable sits inside aria-hidden",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "engage",
+      "name": "en/branded: one h1 and no skipped heading level",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "engage",
+      "name": "en/branded: page problems (console errors, 4xx, failed requests)",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "engage",
+      "name": "en/branded/light: text meets WCAG AA (4.5:1, 3:1 large)",
+      "pass": true,
+      "detail": "122 text nodes, lowest 4.67:1; 3 over images skipped"
+    },
+    {
+      "group": "engage",
+      "name": "en/branded/dark: text meets WCAG AA (4.5:1, 3:1 large)",
+      "pass": true,
+      "detail": "122 text nodes, lowest 4.67:1; 3 over images skipped"
+    },
+    {
+      "group": "engage",
+      "name": "es/branded: no horizontal overflow at 390px",
+      "pass": true,
+      "detail": "scrollWidth 390 vs 390"
+    },
+    {
+      "group": "engage",
+      "name": "es/branded: no horizontal overflow at 1024px",
+      "pass": true,
+      "detail": "scrollWidth 1024 vs 1024"
+    },
+    {
+      "group": "engage",
+      "name": "es/branded: no horizontal overflow at 1280px",
+      "pass": true,
+      "detail": "scrollWidth 1280 vs 1280"
+    },
+    {
+      "group": "engage",
+      "name": "es/branded: no horizontal overflow at 1440px",
+      "pass": true,
+      "detail": "scrollWidth 1440 vs 1440"
+    },
+    {
+      "group": "engage",
+      "name": "es/branded: every image has an alt attribute",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "engage",
+      "name": "es/branded: nothing focusable sits inside aria-hidden",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "engage",
+      "name": "es/branded: one h1 and no skipped heading level",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "engage",
+      "name": "es/branded: page problems (console errors, 4xx, failed requests)",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "engage",
+      "name": "es/branded/light: text meets WCAG AA (4.5:1, 3:1 large)",
+      "pass": true,
+      "detail": "122 text nodes, lowest 4.67:1; 3 over images skipped"
+    },
+    {
+      "group": "engage",
+      "name": "es/branded/dark: text meets WCAG AA (4.5:1, 3:1 large)",
+      "pass": true,
+      "detail": "122 text nodes, lowest 4.67:1; 3 over images skipped"
+    },
+    {
+      "group": "engage",
+      "name": "en/integrations: no horizontal overflow at 390px",
+      "pass": true,
+      "detail": "scrollWidth 390 vs 390"
+    },
+    {
+      "group": "engage",
+      "name": "en/integrations: no horizontal overflow at 1024px",
+      "pass": true,
+      "detail": "scrollWidth 1024 vs 1024"
+    },
+    {
+      "group": "engage",
+      "name": "en/integrations: no horizontal overflow at 1280px",
+      "pass": true,
+      "detail": "scrollWidth 1280 vs 1280"
+    },
+    {
+      "group": "engage",
+      "name": "en/integrations: no horizontal overflow at 1440px",
+      "pass": true,
+      "detail": "scrollWidth 1440 vs 1440"
+    },
+    {
+      "group": "engage",
+      "name": "en/integrations: every image has an alt attribute",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "engage",
+      "name": "en/integrations: nothing focusable sits inside aria-hidden",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "engage",
+      "name": "en/integrations: one h1 and no skipped heading level",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "engage",
+      "name": "en/integrations: page problems (console errors, 4xx, failed requests)",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "engage",
+      "name": "en/integrations/light: text meets WCAG AA (4.5:1, 3:1 large)",
+      "pass": true,
+      "detail": "74 text nodes, lowest 4.84:1; 0 over images skipped"
+    },
+    {
+      "group": "engage",
+      "name": "en/integrations/dark: text meets WCAG AA (4.5:1, 3:1 large)",
+      "pass": true,
+      "detail": "74 text nodes, lowest 7.18:1; 0 over images skipped"
+    },
+    {
+      "group": "engage",
+      "name": "es/integrations: no horizontal overflow at 390px",
+      "pass": true,
+      "detail": "scrollWidth 390 vs 390"
+    },
+    {
+      "group": "engage",
+      "name": "es/integrations: no horizontal overflow at 1024px",
+      "pass": true,
+      "detail": "scrollWidth 1024 vs 1024"
+    },
+    {
+      "group": "engage",
+      "name": "es/integrations: no horizontal overflow at 1280px",
+      "pass": true,
+      "detail": "scrollWidth 1280 vs 1280"
+    },
+    {
+      "group": "engage",
+      "name": "es/integrations: no horizontal overflow at 1440px",
+      "pass": true,
+      "detail": "scrollWidth 1440 vs 1440"
+    },
+    {
+      "group": "engage",
+      "name": "es/integrations: every image has an alt attribute",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "engage",
+      "name": "es/integrations: nothing focusable sits inside aria-hidden",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "engage",
+      "name": "es/integrations: one h1 and no skipped heading level",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "engage",
+      "name": "es/integrations: page problems (console errors, 4xx, failed requests)",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "engage",
+      "name": "es/integrations/light: text meets WCAG AA (4.5:1, 3:1 large)",
+      "pass": true,
+      "detail": "74 text nodes, lowest 4.84:1; 0 over images skipped"
+    },
+    {
+      "group": "engage",
+      "name": "es/integrations/dark: text meets WCAG AA (4.5:1, 3:1 large)",
+      "pass": true,
+      "detail": "74 text nodes, lowest 7.18:1; 0 over images skipped"
+    },
+    {
+      "group": "engage",
+      "name": "en/messaging: chat bubbles play in and all 3 end visible",
+      "pass": true,
+      "detail": "3/3"
+    },
+    {
+      "group": "engage",
+      "name": "en/messaging: with reduced motion every bubble is visible at once",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "engage",
+      "name": "en/guardian: two child tabs",
+      "pass": true,
+      "detail": "2"
+    },
+    {
+      "group": "engage",
+      "name": "en/guardian: first child is selected, second panel is inert",
+      "pass": true,
+      "detail": "[{\"sel\":\"true\",\"tab\":0,\"panelInert\":false},{\"sel\":\"false\",\"tab\":-1,\"panelInert\":true}]"
+    },
+    {
+      "group": "engage",
+      "name": "en/guardian: click on the second child swaps the panel",
+      "pass": true,
+      "detail": "[{\"sel\":\"false\",\"tab\":-1,\"panelInert\":true},{\"sel\":\"true\",\"tab\":0,\"panelInert\":false}]"
+    },
+    {
+      "group": "engage",
+      "name": "en/guardian: ArrowLeft returns to the first child",
+      "pass": true,
+      "detail": "[{\"sel\":\"true\",\"tab\":0,\"panelInert\":false},{\"sel\":\"false\",\"tab\":-1,\"panelInert\":true}]"
+    },
+    {
+      "group": "engage",
+      "name": "en/guardian: the active panel has content",
+      "pass": true,
+      "detail": "SSofia (Demo)This week: 4 sessions2 prac"
+    },
+    {
+      "group": "engage",
+      "name": "en/teams: school price defaults to the US price",
+      "pass": true,
+      "detail": "{\"price\":\"$99\",\"us\":\"$99\",\"latam\":\"$69\"}"
+    },
+    {
+      "group": "engage",
+      "name": "en/teams: ?region=latam shows the LatAm price",
+      "pass": true,
+      "detail": "{\"price\":\"$69\",\"us\":\"$99\",\"latam\":\"$69\"}"
+    },
+    {
+      "group": "engage",
+      "name": "en/teams: ?region=us forces the US price",
+      "pass": true,
+      "detail": "{\"price\":\"$99\",\"us\":\"$99\",\"latam\":\"$69\"}"
+    },
+    {
+      "group": "engage",
+      "name": "en/teams: a Bogota time zone shows the LatAm price",
+      "pass": true,
+      "detail": "{\"price\":\"$69\",\"us\":\"$99\",\"latam\":\"$69\"}"
+    },
+    {
+      "group": "engage",
+      "name": "en/teams: #reports anchor exists",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "engage",
+      "name": "en/integrations: Garmin, Strava and Polar are plain text, no links or logos",
+      "pass": true,
+      "detail": "{\"text\":\"Coming: Garmin, Strava, Polar\",\"links\":0}"
+    },
+    {
+      "group": "engage",
+      "name": "en/branded: four named example apps in the fan",
+      "pass": true,
+      "detail": "Run with Aria | Aria 12 | Lift with Aria | FitMG"
+    },
+    {
+      "group": "engage",
+      "name": "es/messaging: chat bubbles play in and all 3 end visible",
+      "pass": true,
+      "detail": "3/3"
+    },
+    {
+      "group": "engage",
+      "name": "es/messaging: with reduced motion every bubble is visible at once",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "engage",
+      "name": "es/guardian: two child tabs",
+      "pass": true,
+      "detail": "2"
+    },
+    {
+      "group": "engage",
+      "name": "es/guardian: first child is selected, second panel is inert",
+      "pass": true,
+      "detail": "[{\"sel\":\"true\",\"tab\":0,\"panelInert\":false},{\"sel\":\"false\",\"tab\":-1,\"panelInert\":true}]"
+    },
+    {
+      "group": "engage",
+      "name": "es/guardian: click on the second child swaps the panel",
+      "pass": true,
+      "detail": "[{\"sel\":\"false\",\"tab\":-1,\"panelInert\":true},{\"sel\":\"true\",\"tab\":0,\"panelInert\":false}]"
+    },
+    {
+      "group": "engage",
+      "name": "es/guardian: ArrowLeft returns to the first child",
+      "pass": true,
+      "detail": "[{\"sel\":\"true\",\"tab\":0,\"panelInert\":false},{\"sel\":\"false\",\"tab\":-1,\"panelInert\":true}]"
+    },
+    {
+      "group": "engage",
+      "name": "es/guardian: the active panel has content",
+      "pass": true,
+      "detail": "SSofía (Demo)Esta semana: 4 sesiones2 pr"
+    },
+    {
+      "group": "engage",
+      "name": "es/teams: school price defaults to the US price",
+      "pass": true,
+      "detail": "{\"price\":\"$99\",\"us\":\"$99\",\"latam\":\"$69\"}"
+    },
+    {
+      "group": "engage",
+      "name": "es/teams: ?region=latam shows the LatAm price",
+      "pass": true,
+      "detail": "{\"price\":\"$69\",\"us\":\"$99\",\"latam\":\"$69\"}"
+    },
+    {
+      "group": "engage",
+      "name": "es/teams: ?region=us forces the US price",
+      "pass": true,
+      "detail": "{\"price\":\"$99\",\"us\":\"$99\",\"latam\":\"$69\"}"
+    },
+    {
+      "group": "engage",
+      "name": "es/teams: a Bogota time zone shows the LatAm price",
+      "pass": true,
+      "detail": "{\"price\":\"$69\",\"us\":\"$99\",\"latam\":\"$69\"}"
+    },
+    {
+      "group": "engage",
+      "name": "es/teams: #reports anchor exists",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "engage",
+      "name": "es/integrations: Garmin, Strava and Polar are plain text, no links or logos",
+      "pass": true,
+      "detail": "{\"text\":\"Próximamente: Garmin, Strava, Polar\",\"links\":0}"
+    },
+    {
+      "group": "engage",
+      "name": "es/branded: four named example apps in the fan",
+      "pass": true,
+      "detail": "Run with Aria | Aria 12 | Lift with Aria | FitMG"
+    }
+  ],
+  "metrics": {
+    "contrast-en/messaging-light": {
+      "checked": 103,
+      "lowest": 4.57,
+      "overImagesSkipped": 0
+    },
+    "contrast-en/messaging-dark": {
+      "checked": 103,
+      "lowest": 7.32,
+      "overImagesSkipped": 0
+    },
+    "contrast-es/messaging-light": {
+      "checked": 103,
+      "lowest": 4.57,
+      "overImagesSkipped": 0
+    },
+    "contrast-es/messaging-dark": {
+      "checked": 103,
+      "lowest": 7.32,
+      "overImagesSkipped": 0
+    },
+    "contrast-en/guardian-light": {
+      "checked": 88,
+      "lowest": 4.57,
+      "overImagesSkipped": 0
+    },
+    "contrast-en/guardian-dark": {
+      "checked": 88,
+      "lowest": 7.91,
+      "overImagesSkipped": 0
+    },
+    "contrast-es/guardian-light": {
+      "checked": 88,
+      "lowest": 4.57,
+      "overImagesSkipped": 0
+    },
+    "contrast-es/guardian-dark": {
+      "checked": 88,
+      "lowest": 7.91,
+      "overImagesSkipped": 0
+    },
+    "contrast-en/teams-light": {
+      "checked": 123,
+      "lowest": 4.57,
+      "overImagesSkipped": 0
+    },
+    "contrast-en/teams-dark": {
+      "checked": 123,
+      "lowest": 7.91,
+      "overImagesSkipped": 0
+    },
+    "contrast-es/teams-light": {
+      "checked": 123,
+      "lowest": 4.57,
+      "overImagesSkipped": 0
+    },
+    "contrast-es/teams-dark": {
+      "checked": 123,
+      "lowest": 7.91,
+      "overImagesSkipped": 0
+    },
+    "contrast-en/branded-light": {
+      "checked": 122,
+      "lowest": 4.67,
+      "overImagesSkipped": 3
+    },
+    "contrast-en/branded-dark": {
+      "checked": 122,
+      "lowest": 4.67,
+      "overImagesSkipped": 3
+    },
+    "contrast-es/branded-light": {
+      "checked": 122,
+      "lowest": 4.67,
+      "overImagesSkipped": 3
+    },
+    "contrast-es/branded-dark": {
+      "checked": 122,
+      "lowest": 4.67,
+      "overImagesSkipped": 3
+    },
+    "contrast-en/integrations-light": {
+      "checked": 74,
+      "lowest": 4.84,
+      "overImagesSkipped": 0
+    },
+    "contrast-en/integrations-dark": {
+      "checked": 74,
+      "lowest": 7.18,
+      "overImagesSkipped": 0
+    },
+    "contrast-es/integrations-light": {
+      "checked": 74,
+      "lowest": 4.84,
+      "overImagesSkipped": 0
+    },
+    "contrast-es/integrations-dark": {
+      "checked": 74,
+      "lowest": 7.18,
+      "overImagesSkipped": 0
+    }
+  }
+}
