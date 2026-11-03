@@ -1,7 +1,7 @@
 // Post-build checks for the Floodlight home page (DESIGN-4 sections 5 and 7): clip budgets, the clip trio
 // (WebM + MP4 + poster), the video markup contract and broken media references. Called from verify-dist.mjs.
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
-import { join } from 'node:path';
+import { join, relative } from 'node:path';
 
 export const CLIP_BUDGET_BYTES = 1.6 * 1024 * 1024; // DESIGN-4 M17: "<=1.6 MB each"
 export const POSTER_BUDGET_BYTES = 120 * 1024;
@@ -72,4 +72,32 @@ export function verifyHomeClaims({ html, file, fail }) {
 
 export function homeHtml(dist, file) {
   return readFileSync(join(dist, file), 'utf8');
+}
+
+// Class names are global. A selector declared in two of the home stylesheets lets the later one silently rewrite the
+// first (`.cal-grid` once did, and the planner calendar lost its week-label column). Scope the rule under its section.
+export function verifyHomeSelectors({ root, fail }) {
+  const files = [join(root, 'src/styles/floodlight.css'), ...readdirSync(join(root, 'src/styles/home')).filter((f) => f.endsWith('.css')).map((f) => join(root, 'src/styles/home', f))];
+  const owners = new Map();
+  for (const file of files) {
+    const css = readFileSync(file, 'utf8').replace(/\/\*[\s\S]*?\*\//g, '');
+    let depth = 0;
+    let head = '';
+    for (const ch of css) {
+      if (ch === '{') {
+        if (depth === 0 && !head.trim().startsWith('@')) {
+          for (const sel of head.split(',')) {
+            const s = sel.replace(/\s+/g, ' ').trim();
+            if (s) owners.set(s, new Set([...(owners.get(s) ?? []), relative(root, file)]));
+          }
+        }
+        depth++;
+        head = '';
+      } else if (ch === '}') {
+        depth--;
+        head = '';
+      } else if (depth === 0) head += ch;
+    }
+  }
+  for (const [sel, set] of owners) if (set.size > 1) fail(`${sel} is declared in ${[...set].join(' and ')}: scope one under its section so the two cannot collide`);
 }

@@ -121,6 +121,21 @@ export async function homeChecks({ open, check, sleep, settle, metrics }) {
       videos: [...document.querySelectorAll('video')].filter((v) => !v.hasAttribute('data-clip') || !v.muted || v.getAttribute('preload') !== 'none').length,
     }));
     check('home', `${locale}: one h1, every image has alt, no autoplay attribute, every video is a muted preload=none clip`, markup.h1 === 1 && markup.noAlt === 0 && markup.autoplay === 0 && markup.videos === 0, JSON.stringify(markup));
+    // Class names are global: the planner calendar and the Scale rail's mini calendar once collided on `.cal-grid`, so the planner lost its week-label column.
+    const cal = await page.evaluate(() => {
+      const mid = (e) => Math.round(e.getBoundingClientRect().left + e.getBoundingClientRect().width / 2);
+      const g = document.querySelector('.ai-cal .cal-grid');
+      const cells = [...g.querySelectorAll('.cal-cell')].slice(0, 7);
+      const heads = [...g.querySelectorAll('.dh')];
+      return {
+        tracks: getComputedStyle(g).gridTemplateColumns.split(' ').length,
+        heads: heads.map((h) => h.textContent.trim()),
+        aligned: heads.length === 7 && cells.length === 7 && heads.every((h, i) => Math.abs(mid(h) - mid(cells[i])) <= 2),
+        labelLeft: g.querySelector('.wk').getBoundingClientRect().right <= cells[0].getBoundingClientRect().left + 1,
+        mini: getComputedStyle(document.querySelector('.rail .cal-grid')).gridTemplateColumns.split(' ').length,
+      };
+    });
+    check('home', `${locale}: the planner calendar is a week-label column plus seven day columns, each day header over its cells; the mini calendar has seven`, cal.tracks === 8 && cal.aligned && cal.labelLeft && cal.mini === 7, JSON.stringify(cal));
     await page.context().close();
   }
 
@@ -339,6 +354,26 @@ export async function homeChecks({ open, check, sleep, settle, metrics }) {
     const w1 = await page.evaluate(activeWord);
     check('reduced-motion', 'the hero stays on its first word', w0 === heroWords['/'][0] && w1 === w0, `"${w0}" -> "${w1}"`);
     await page.context().close();
+  }
+  // The customers band is pinned to the hero's bottom edge: the copy above it (headline, lead, buttons, note) must never run under it,
+  // in either motion mode (reduced motion swaps the marquee for a taller wrapped row).
+  if (on('hero')) for (const locale of ['en', 'es']) {
+    for (const reduced of [false, true]) {
+      const page = await open({ width: 1440, height: 900, reduced }, pathFor(locale));
+      const bad = [];
+      for (const [width, height] of [[1920, 1080], [1440, 900], [1366, 768], [1280, 720], [1180, 800], [1100, 800], [1024, 768], [768, 1024], [390, 844], [360, 740]]) {
+        await page.setViewportSize({ width, height });
+        await sleep(150);
+        const gap = await page.evaluate(() => {
+          const band = document.querySelector('.hero-band').getBoundingClientRect();
+          const bottoms = ['.hero-copy h1', '.hero-copy .lead', '.hero-copy .hero-ctas', '.hero-copy .hero-note'].map((s) => document.querySelector(s)?.getBoundingClientRect().bottom ?? 0);
+          return Math.round(band.top - Math.max(...bottoms));
+        });
+        if (gap < 8) bad.push(`${width}x${height}: ${gap}px`);
+      }
+      await page.context().close();
+      check('hero', `${locale} ${reduced ? 'reduced motion' : 'motion'}: the hero copy stays clear of the customers band at 10 viewports`, bad.length === 0, bad.length ? `overlap/gap under 8px at ${bad.join(', ')}` : 'at least 8px clear everywhere');
+    }
   }
 
   // ------------------------------------------------------------ 6. no clipped text, EN and ES, both themes, six widths

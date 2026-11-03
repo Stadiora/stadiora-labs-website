@@ -26,7 +26,7 @@
   min-height: inherit;
   align-items: center;
   padding-top: 118px;
-  padding-bottom: 190px;
+  padding-bottom: calc(var(--band-h) + 58px);
 }
 .hero-copy {
   position: relative;
@@ -592,8 +592,11 @@
   .hero-col .hero-tile.big::after {
     transition: none;
   }
-  .hero {
-    --band-h: 210px;
+  /* the band is as tall as its wrapped logos need: one row wide, two or three rows once the row no longer fits */
+  @media (max-width: 1279px) {
+    .hero {
+      --band-h: 210px;
+    }
   }
   .hero-logos-set {
     flex-wrap: wrap;

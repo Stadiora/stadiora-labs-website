@@ -51,7 +51,11 @@ if (wantStills) {
         await page.evaluate(() => document.fonts.ready);
         await settle(page);
         await page.screenshot({ path: `${dir}/00-full.png`, fullPage: true });
+        await page.locator('main > section#hero').screenshot({ path: `${dir}/01-hero.png` });
+        // The nav is fixed, so it would float over the heading of every later section frame: hide it (and the skip link) for those.
+        await page.addStyleTag({ content: '.nav, .skip-link { visibility: hidden !important; }' });
         for (const [i, id] of homeSections.entries()) {
+          if (id === 'hero') continue;
           await page.locator(`main > section#${id}`).screenshot({ path: `${dir}/${String(i + 1).padStart(2, '0')}-${id}.png` });
         }
         // The showcase is six stacked blocks; each gets its own frame next to the (very tall) whole section.

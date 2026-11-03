@@ -40,9 +40,9 @@
 .ai-cal{position:absolute;left:54px;top:44px;width:892px;height:474px;border-radius:24px;background:#fff;box-shadow:0 40px 90px -30px rgba(2,6,15,.7);padding:22px 24px}
 .ai-stage .avs i{background:var(--c)}
 .ai-stage .cal-hd{color:#08132B}
-.cal-grid{display:grid;grid-template-columns:70px repeat(7,1fr);gap:8px;margin-top:18px}
-.cal-grid .dh{font:600 11px/1 var(--f-mono);letter-spacing:.1em;color:#5B6678;text-align:center;padding-bottom:4px}
-.cal-grid .wk{font:600 11px/1.2 var(--f-mono);color:#5B6678;display:flex;align-items:center}
+.ai-cal .cal-grid{display:grid;grid-template-columns:70px repeat(7,1fr);gap:8px;margin-top:18px}
+.ai-cal .cal-grid .dh{font:600 11px/1 var(--f-mono);letter-spacing:.1em;color:#5B6678;text-align:center;padding-bottom:4px}
+.ai-cal .cal-grid .wk{font:600 11px/1.2 var(--f-mono);color:#5B6678;display:flex;align-items:center}
 .cal-cell{height:150px;border-radius:12px;background:#F6F8FB;border:1px dashed #E1E7EF;padding:6px;position:relative}
 .sess{border-radius:10px;padding:8px 8px 9px;background:#fff;box-shadow:0 6px 16px -8px rgba(8,19,43,.35);border-left:3px solid var(--sc,#00BEF3);font-size:11.5px;line-height:1.25}
 .sess b{display:block;font-weight:700;font-size:11.5px}

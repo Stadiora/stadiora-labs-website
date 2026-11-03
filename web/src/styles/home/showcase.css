@@ -232,12 +232,12 @@
 .rl-row span{font:500 11px/1 var(--f-mono);color:var(--ink3)}
 .rl-row span.ok{color:var(--mint-ink)}
 .rl-row span.warn{color:var(--amber-ink)}
-.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
-.cal-grid i{height:28px;border-radius:6px;background:var(--surface2)}
-.cal-grid i.c0{background:#00BEF3}
-.cal-grid i.c1{background:#34D399}
-.cal-grid i.c2{background:#8B5CF6}
-.cal-grid i.c3{background:#FF4D5E}
+.rail .cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.rail .cal-grid i{height:28px;border-radius:6px;background:var(--surface2)}
+.rail .cal-grid i.c0{background:#00BEF3}
+.rail .cal-grid i.c1{background:#34D399}
+.rail .cal-grid i.c2{background:#8B5CF6}
+.rail .cal-grid i.c3{background:#FF4D5E}
 .trend{width:100%}
 .trend .base{fill:none;stroke:var(--line)}
 .mini-bars{display:flex;align-items:flex-end;gap:6px;height:90px}
