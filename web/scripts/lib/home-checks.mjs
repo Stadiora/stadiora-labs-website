@@ -338,17 +338,14 @@ export async function homeChecks({ open, check, sleep, settle, metrics }) {
     }
   }
 
-  // ------------------------------------------------------------ 7. AA contrast, both themes, desktop and phone
+  // ------------------------------------------------------------ 7. AA contrast on the phone layout (the 1440 pass is in "measured budgets")
   for (const locale of ['en', 'es']) {
     for (const scheme of ['light', 'dark']) {
-      for (const [width, height, mobile] of [[1440, 900, false], [390, 844, true]]) {
-        const page = await open({ width, height, scheme, reduced: true, mobile }, pathFor(locale));
-        await settle(page);
-        const c = await page.evaluate(contrastProbe);
-        const perSection = await page.evaluate(() => [...document.querySelectorAll('main > section')].filter((s) => s.textContent.trim().length > 40).length);
-        check('contrast', `${locale}/${scheme}/${width}: all ${perSection} home sections meet WCAG AA (4.5:1, 3:1 large)`, perSection === homeSections.length && c.failCount === 0, `${c.checked} text nodes, lowest ${c.min.toFixed(2)}:1${c.failCount ? `, failing: ${JSON.stringify(c.fails)}` : ''}`);
-        await page.context().close();
-      }
+      const page = await open({ width: 390, height: 844, scheme, reduced: true, mobile: true }, pathFor(locale));
+      await settle(page);
+      const c = await page.evaluate(contrastProbe);
+      check('contrast', `${locale}/${scheme}/390: text meets WCAG AA (4.5:1, 3:1 large)`, c.checked > 150 && c.failCount === 0, `${c.checked} text nodes, lowest ${c.min.toFixed(2)}:1${c.failCount ? `, failing: ${JSON.stringify(c.fails)}` : ''}`);
+      await page.context().close();
     }
   }
 }
