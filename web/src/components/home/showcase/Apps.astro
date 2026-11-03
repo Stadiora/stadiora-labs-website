@@ -1,0 +1,86 @@
+---
+import type { ShowcaseCopy } from '../../../i18n/pages/home-showcase';
+import Icon from '../../ui/Icon.astro';
+interface Props {
+  t: ShowcaseCopy['apps'];
+  note: string;
+  contact: string;
+}
+const { t, note, contact } = Astro.props;
+const img = (id: string) => `url(/home/img/${id}.webp)`;
+const brands = t.brands.map((b) => ({ n: b.n, m: b.m, c: b.c, i: img(b.i) }));
+const labelled = t.brands.filter((b) => b.status);
+const first = brands[0];
+const left = brands[brands.length - 1];
+const right = brands[1];
+---
+
+<article class="panel reading rv" id="apps" aria-labelledby="pe-h">
+  <div class="ap-grid">
+    <div>
+      <span class="chip-label c-cyan">
+        <i><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><rect x="6" y="2" width="12" height="20" rx="3"></rect><path d="M11 18h2"></path></svg></i>
+        {t.label}
+      </span>
+      <h3 class="t-title" id="pe-h">{t.title}</h3>
+      <p class="lead ap-lead">{t.lead}</p>
+      <ul class="ap-labels" data-ap-labels>
+        {
+          labelled.map((b, i) => (
+            <li class:list={['ap-lab', { on: i === 0 }]} style={`--bc:${b.c}`}>
+              <b><i></i>{b.n}</b>
+              <span>{b.status}</span>
+            </li>
+          ))
+        }
+      </ul>
+      <a class="link link-arrow ap-link" href={contact}>
+        {t.link}
+        <Icon name="arrow-right" size={18} />
+      </a>
+    </div>
+    <div class="ap-stage" data-ap-stage data-brands={JSON.stringify(brands)}>
+      <div class="ap-side l1" aria-hidden="true">
+        <div class="s">
+          <div class="app-scr" style={`--bc:${left.c}`}>
+            <div class="mk">{left.m}</div>
+            <div class="an">{left.n}</div>
+            <div class="hl" style={`--img:${left.i}`}></div>
+          </div>
+        </div>
+      </div>
+      <div class="ap-side r1" aria-hidden="true">
+        <div class="s">
+          <div class="app-scr" style={`--bc:${right.c}`}>
+            <div class="mk">{right.m}</div>
+            <div class="an">{right.n}</div>
+            <div class="hl" style={`--img:${right.i}`}></div>
+          </div>
+        </div>
+      </div>
+      <div class="dphone" data-morph aria-hidden="true">
+        <div class="scr">
+          <i class="island"></i>
+          <div class="app-scr" data-app style={`--bc:${first.c}`}>
+            <div class="mk" data-app-mk>{first.m}</div>
+            <div class="an" data-app-name>{first.n}</div>
+            <div class="hl" data-app-img style={`--img:${first.i}`}></div>
+            <div class="tc">
+              <span class="tc-k">{t.today}</span>
+              <b>{t.session}</b>
+              <span class="tc-s">{t.coach}</span>
+            </div>
+            <div class="tc tc-ready">
+              <div class="dring" style="--v:82;--rs:40px"></div>
+              <div><b>{t.readiness}</b><span class="tc-ok">{t.ready}</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="flychip fc1" data-depth="20"><i></i>{t.chips[0]}</div>
+      <div class="flychip fc2" data-depth="34"><i></i>{t.chips[1]}</div>
+      <div class="flychip fc3" data-depth="26"><i></i>{t.chips[2]}</div>
+    </div>
+  </div>
+  <p class="dnote">{note}</p>
+</article>

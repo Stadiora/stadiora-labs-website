@@ -1,0 +1,56 @@
+/* Phone kit: the demo handset used by the engage and custom-apps blocks. Always-light product UI mock-ups, so
+   the colours here are literal on purpose (they do not follow the page theme). The finished still frame is
+   the base state; the timelines in scripts/home/showcase/engage.ts animate away from it. */
+.dphone{position:relative;width:300px;height:620px;border-radius:48px;background:#0A0F1C;padding:11px;box-shadow:0 0 0 2px #2A3550,0 50px 100px -30px rgba(0,0,0,.8);z-index:3}
+.dphone .scr{position:relative;width:100%;height:100%;border-radius:38px;overflow:hidden;background:#F3F6FA;color:#08132B;font-family:var(--f-text)}
+.dphone .island{position:absolute;left:50%;top:10px;width:92px;height:26px;margin-left:-46px;border-radius:20px;background:#000;z-index:9}
+.dphone .sb{display:flex;justify-content:space-between;padding:14px 26px 0;font:600 12px/1 var(--f-text);height:44px}
+.ph-scn{position:absolute;inset:44px 0 0;opacity:0;visibility:hidden;transition:opacity 300ms,transform 400ms var(--e-out),visibility 0s 400ms;transform:translateX(16px);display:flex;flex-direction:column}
+.ph-scn.on{opacity:1;visibility:visible;transform:none;transition:opacity 300ms,transform 400ms var(--e-out)}
+.ph-top{display:flex;align-items:center;gap:10px;padding:10px 16px 12px;border-bottom:1px solid #E3E9F1;background:#fff}
+.ph-top .av{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;font-weight:700;font-size:12px;color:#fff;flex:none}
+.ph-top .av-violet{background:#7C4DE8}
+.ph-top .av-cyan{background:#0077A8}
+.ph-top .av-mint{background:#34D399;color:#04101F}
+.ph-top .av-red{background:#D6263A}
+.ph-top b{font-size:14px;display:block}
+.ph-top small{font-size:11px;color:#5B6678}
+.ph-body{flex:1;padding:14px 12px;display:flex;flex-direction:column;gap:8px;overflow:hidden}
+.dmsg{max-width:78%;padding:10px 12px;border-radius:18px;font-size:13px;line-height:1.35}
+.dmsg.in{background:#fff;align-self:flex-start;border-bottom-left-radius:6px;box-shadow:0 2px 6px rgba(8,19,43,.06)}
+.dmsg.me{background:#08132B;color:#fff;align-self:flex-end;border-bottom-right-radius:6px}
+.dmsg .who{display:block;font-size:10.5px;font-weight:700;color:#0077A8;margin-bottom:3px}
+.typing{align-self:flex-start;display:flex;gap:4px;padding:0 14px;max-height:0;margin-top:-8px;opacity:0;overflow:hidden;border-radius:18px;background:#fff}
+.typing i{width:6px;height:6px;border-radius:50%;background:#7A869B;animation:tdot 1s infinite}
+.typing i:nth-child(2){animation-delay:.15s}
+.typing i:nth-child(3){animation-delay:.3s}
+@keyframes tdot{0%,60%,100%{transform:none;opacity:.5}30%{transform:translateY(-4px);opacity:1}}
+.ph-input{margin:8px 12px 18px;height:40px;border-radius:20px;background:#fff;border:1px solid #E3E9F1;display:flex;align-items:center;padding:0 14px;font-size:12.5px;color:#66728A}
+.ph-input-c{justify-content:center}
+.dphone .post{background:#fff;border-radius:18px;overflow:hidden;box-shadow:0 2px 8px rgba(8,19,43,.06)}
+.post .ph{height:150px;background-color:#C9D6E6;background-image:var(--img);background-size:cover;background-position:center}
+.post .pb{padding:10px 12px;font-size:12.5px}
+.post .pb > b{display:block;font-size:13px}
+.reacts{display:flex;gap:6px;margin-top:8px}
+.reacts span{font-size:12px;padding:4px 8px;border-radius:999px;background:#F3F6FA;font-variant-numeric:tabular-nums}
+.tn{--n:var(--to);counter-reset:tn var(--n);font-weight:inherit}
+.tn::after{content:counter(tn)}
+.bc-card{background:#fff;border-radius:18px;padding:14px;box-shadow:0 2px 8px rgba(8,19,43,.06)}
+.bc-card .to{font:600 10.5px/1 var(--f-mono);letter-spacing:.1em;color:#5B6678;text-transform:uppercase}
+.bc-text{font-size:14px;margin-top:8px;font-weight:600}
+.bc-earlier{font-size:13px;margin-top:6px}
+.bc-prog{height:6px;border-radius:6px;background:#E8EDF4;overflow:hidden;margin-top:10px}
+.bc-prog i{display:block;height:100%;background:linear-gradient(90deg,#00BEF3,#34D399);transform-origin:0 50%}
+.bc-meta{display:flex;justify-content:space-between;font-size:11.5px;color:#5B6678;margin-top:8px}
+.bc-status{display:grid}
+.bc-status > span{grid-area:1/1}
+.bc-status > span:first-child{opacity:0}
+.dphone .ann{background:#08132B;color:#fff;border-radius:18px;padding:14px;position:relative}
+.ann .pin{position:absolute;right:12px;top:-10px;font-size:20px}
+.ann small{color:#A9B4C6;font-size:11px}
+.ann-text{font-weight:700;font-size:15px;margin-top:6px}
+
+@media (prefers-reduced-motion:reduce){
+  .typing i{animation:none}
+  .ph-scn,.ph-scn.on{transition:none}
+}

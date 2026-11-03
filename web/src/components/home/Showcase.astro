@@ -1,8 +1,31 @@
 ---
 import type { Locale } from '../../i18n';
+import { homeShowcase } from '../../i18n/pages/home-showcase';
+import { contactHref } from '../../lib/links';
+import Mosaic from './showcase/Mosaic.astro';
+import Planner from './showcase/Planner.astro';
+import Measure from './showcase/Measure.astro';
+import Engage from './showcase/Engage.astro';
+import Scale from './showcase/Scale.astro';
+import Apps from './showcase/Apps.astro';
+import '../../styles/home/stage.css';
+import '../../styles/home/phone.css';
+import '../../styles/home/showcase.css';
+
 interface Props {
   locale: Locale;
 }
+const { locale } = Astro.props;
+const t = homeShowcase[locale];
 ---
 
-<section class="show impact" id="showcase" data-section aria-label="Stub"></section>
+<section class="show impact" id="showcase" data-section aria-labelledby="sh-h">
+  <div class="wrap">
+    <Mosaic t={t.head} />
+    <Planner t={t.plan} demo={t.demoData} />
+    <Measure t={t.measure} note={t.demoNoteMeasure} />
+    <Engage t={t.engage} demo={t.demoData} />
+    <Scale t={t.scale} note={t.demoNoteScale} />
+    <Apps t={t.apps} note={t.demoNoteApps} contact={contactHref(locale, 'question')} />
+  </div>
+</section>
