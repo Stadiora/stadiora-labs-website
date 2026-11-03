@@ -1,0 +1,622 @@
+{
+  "results": [
+    {
+      "group": "nav-layout",
+      "name": "en @1025: logo, menu items and right-side controls do not overlap",
+      "pass": true,
+      "detail": "bar: logo to Platform 9.0px, Resources to sign in 9.0px"
+    },
+    {
+      "group": "nav-layout",
+      "name": "en @1100: logo, menu items and right-side controls do not overlap",
+      "pass": true,
+      "detail": "bar: logo to Platform 46.5px, Resources to sign in 46.5px"
+    },
+    {
+      "group": "nav-layout",
+      "name": "en @1180: logo, menu items and right-side controls do not overlap",
+      "pass": true,
+      "detail": "bar: logo to Platform 46.5px, Resources to sign in 46.5px"
+    },
+    {
+      "group": "nav-layout",
+      "name": "en @1280: logo, menu items and right-side controls do not overlap",
+      "pass": true,
+      "detail": "bar: logo to Platform 36.0px, Resources to sign in 36.0px"
+    },
+    {
+      "group": "nav-layout",
+      "name": "en @1440: logo, menu items and right-side controls do not overlap",
+      "pass": true,
+      "detail": "bar: logo to Platform 116.0px, Resources to sign in 116.0px"
+    },
+    {
+      "group": "nav-layout",
+      "name": "en: no overlap at any width 1025 to 1440 (every 5px)",
+      "pass": false,
+      "detail": "1185px: logo and Platform overlap by 11.50px; Resources and sign in overlap by 11.50px; logo to Platform is -11.50px; Resources to sign in is -11.50px | 1190px: logo and Platform overlap by 9.00px; Resources and sign in overlap by 9.00px; logo to Platform is -9.00px; Resources to sign in is -9.00px | 1195px: logo and Platform overlap by 6.50px; Resources and sign in overlap by 6.50px; logo to Platform is -6.50px; Resources to sign in is -6.50px | 1200px: logo and Platform overlap by 4.00px; Resources and sign in overlap by 4.00px; logo to Platform is -4.00px; Resources to sign in is -4.00px"
+    },
+    {
+      "group": "nav-layout",
+      "name": "en (compact header, scrolled): no overlap at any width 1025 to 1440 (every 5px)",
+      "pass": false,
+      "detail": "1185px: logo and Platform overlap by 11.50px; Resources and sign in overlap by 11.50px; logo to Platform is -11.50px; Resources to sign in is -11.50px | 1190px: logo and Platform overlap by 9.00px; Resources and sign in overlap by 9.00px; logo to Platform is -9.00px; Resources to sign in is -9.00px | 1195px: logo and Platform overlap by 6.50px; Resources and sign in overlap by 6.50px; logo to Platform is -6.50px; Resources to sign in is -6.50px | 1200px: logo and Platform overlap by 4.00px; Resources and sign in overlap by 4.00px; logo to Platform is -4.00px; Resources to sign in is -4.00px"
+    },
+    {
+      "group": "nav-layout",
+      "name": "es @1025: logo, menu items and right-side controls do not overlap",
+      "pass": false,
+      "detail": "bar: logo to Plataforma -51.5px, Recursos to sign in -51.5px | logo and Plataforma overlap by 51.50px; Recursos and sign in overlap by 51.50px; logo to Plataforma is -51.50px; Recursos to sign in is -51.50px"
+    },
+    {
+      "group": "nav-layout",
+      "name": "es @1100: logo, menu items and right-side controls do not overlap",
+      "pass": false,
+      "detail": "bar: logo to Plataforma -14.0px, Recursos to sign in -14.0px | logo and Plataforma overlap by 14.00px; Recursos and sign in overlap by 14.00px; logo to Plataforma is -14.00px; Recursos to sign in is -14.00px"
+    },
+    {
+      "group": "nav-layout",
+      "name": "es @1180: logo, menu items and right-side controls do not overlap",
+      "pass": false,
+      "detail": "bar: logo to Plataforma -14.0px, Recursos to sign in -14.0px | logo and Plataforma overlap by 14.00px; Recursos and sign in overlap by 14.00px; logo to Plataforma is -14.00px; Recursos to sign in is -14.00px"
+    },
+    {
+      "group": "nav-layout",
+      "name": "es @1280: logo, menu items and right-side controls do not overlap",
+      "pass": false,
+      "detail": "bar: logo to Plataforma -26.0px, Recursos to sign in -26.0px | logo and Plataforma overlap by 26.00px; Recursos and sign in overlap by 26.00px; logo to Plataforma is -26.00px; Recursos to sign in is -26.00px"
+    },
+    {
+      "group": "nav-layout",
+      "name": "es @1440: logo, menu items and right-side controls do not overlap",
+      "pass": true,
+      "detail": "bar: logo to Plataforma 54.0px, Recursos to sign in 54.0px"
+    },
+    {
+      "group": "nav-layout",
+      "name": "es: no overlap at any width 1025 to 1440 (every 5px)",
+      "pass": false,
+      "detail": "1025px: logo and Plataforma overlap by 51.50px; Recursos and sign in overlap by 51.50px; logo to Plataforma is -51.50px; Recursos to sign in is -51.50px | 1030px: logo and Plataforma overlap by 49.00px; Recursos and sign in overlap by 49.00px; logo to Plataforma is -49.00px; Recursos to sign in is -49.00px | 1035px: logo and Plataforma overlap by 46.50px; Recursos and sign in overlap by 46.50px; logo to Plataforma is -46.50px; Recursos to sign in is -46.50px | 1040px: logo and Plataforma overlap by 44.00px; Recursos and sign in overlap by 44.00px; logo to Plataforma is -44.00px; Recursos to sign in is -44.00px"
+    },
+    {
+      "group": "nav-layout",
+      "name": "es (compact header, scrolled): no overlap at any width 1025 to 1440 (every 5px)",
+      "pass": false,
+      "detail": "1025px: logo and Plataforma overlap by 51.50px; Recursos and sign in overlap by 51.50px; logo to Plataforma is -51.50px; Recursos to sign in is -51.50px | 1030px: logo and Plataforma overlap by 49.00px; Recursos and sign in overlap by 49.00px; logo to Plataforma is -49.00px; Recursos to sign in is -49.00px | 1035px: logo and Plataforma overlap by 46.50px; Recursos and sign in overlap by 46.50px; logo to Plataforma is -46.50px; Recursos to sign in is -46.50px | 1040px: logo and Plataforma overlap by 44.00px; Recursos and sign in overlap by 44.00px; logo to Plataforma is -44.00px; Recursos to sign in is -44.00px"
+    },
+    {
+      "group": "mega-fit",
+      "name": "en @1280x700 platform: panel sits between the header and the bottom of the viewport",
+      "pass": true,
+      "detail": "y 85-668 of 700, header ends 80"
+    },
+    {
+      "group": "mega-fit",
+      "name": "en @1280x700 platform: all 11 links reachable, last link and footer CTA in view",
+      "pass": true,
+      "detail": "height 583, overflow 0px"
+    },
+    {
+      "group": "mega-fit",
+      "name": "en @1280x700 solutions: panel sits between the header and the bottom of the viewport",
+      "pass": true,
+      "detail": "y 85-556 of 700, header ends 80"
+    },
+    {
+      "group": "mega-fit",
+      "name": "en @1280x700 solutions: all 9 links reachable, last link and footer CTA in view",
+      "pass": true,
+      "detail": "height 471, overflow 0px"
+    },
+    {
+      "group": "mega-fit",
+      "name": "en @1280x700 resources: panel sits between the header and the bottom of the viewport",
+      "pass": true,
+      "detail": "y 85-418 of 700, header ends 80"
+    },
+    {
+      "group": "mega-fit",
+      "name": "en @1280x700 resources: all 4 links reachable, last link and footer CTA in view",
+      "pass": true,
+      "detail": "height 333, overflow 0px"
+    },
+    {
+      "group": "mega-fit",
+      "name": "en @1280x600 platform: panel sits between the header and the bottom of the viewport",
+      "pass": false,
+      "detail": "y 85-668 of 600, header ends 80"
+    },
+    {
+      "group": "mega-fit",
+      "name": "en @1280x600 platform: all 11 links reachable, last link and footer CTA in view",
+      "pass": false,
+      "detail": "unreachable: Start free"
+    },
+    {
+      "group": "mega-fit",
+      "name": "en @1280x600 solutions: panel sits between the header and the bottom of the viewport",
+      "pass": true,
+      "detail": "y 85-556 of 600, header ends 80"
+    },
+    {
+      "group": "mega-fit",
+      "name": "en @1280x600 solutions: all 9 links reachable, last link and footer CTA in view",
+      "pass": true,
+      "detail": "height 471, overflow 0px"
+    },
+    {
+      "group": "mega-fit",
+      "name": "en @1280x600 resources: panel sits between the header and the bottom of the viewport",
+      "pass": true,
+      "detail": "y 85-418 of 600, header ends 80"
+    },
+    {
+      "group": "mega-fit",
+      "name": "en @1280x600 resources: all 4 links reachable, last link and footer CTA in view",
+      "pass": true,
+      "detail": "height 333, overflow 0px"
+    },
+    {
+      "group": "mega-fit",
+      "name": "en @1440x500 platform: panel sits between the header and the bottom of the viewport",
+      "pass": false,
+      "detail": "y 85-658 of 500, header ends 80"
+    },
+    {
+      "group": "mega-fit",
+      "name": "en @1440x500 platform: all 11 links reachable, last link and footer CTA in view",
+      "pass": false,
+      "detail": "unreachable: Readiness and wellbeingS, Power Lab and testingJum, Start free"
+    },
+    {
+      "group": "mega-fit",
+      "name": "en @1440x500 solutions: panel sits between the header and the bottom of the viewport",
+      "pass": false,
+      "detail": "y 85-556 of 500, header ends 80"
+    },
+    {
+      "group": "mega-fit",
+      "name": "en @1440x500 solutions: all 9 links reachable, last link and footer CTA in view",
+      "pass": false,
+      "detail": "unreachable: Start free"
+    },
+    {
+      "group": "mega-fit",
+      "name": "en @1440x500 resources: panel sits between the header and the bottom of the viewport",
+      "pass": true,
+      "detail": "y 85-418 of 500, header ends 80"
+    },
+    {
+      "group": "mega-fit",
+      "name": "en @1440x500 resources: all 4 links reachable, last link and footer CTA in view",
+      "pass": true,
+      "detail": "height 333, overflow 0px"
+    },
+    {
+      "group": "mega-fit",
+      "name": "es @1280x700 platform: panel sits between the header and the bottom of the viewport",
+      "pass": true,
+      "detail": "y 85-668 of 700, header ends 80"
+    },
+    {
+      "group": "mega-fit",
+      "name": "es @1280x700 platform: all 11 links reachable, last link and footer CTA in view",
+      "pass": true,
+      "detail": "height 583, overflow 0px"
+    },
+    {
+      "group": "mega-fit",
+      "name": "es @1280x700 solutions: panel sits between the header and the bottom of the viewport",
+      "pass": true,
+      "detail": "y 85-556 of 700, header ends 80"
+    },
+    {
+      "group": "mega-fit",
+      "name": "es @1280x700 solutions: all 9 links reachable, last link and footer CTA in view",
+      "pass": true,
+      "detail": "height 471, overflow 0px"
+    },
+    {
+      "group": "mega-fit",
+      "name": "es @1280x700 resources: panel sits between the header and the bottom of the viewport",
+      "pass": true,
+      "detail": "y 85-418 of 700, header ends 80"
+    },
+    {
+      "group": "mega-fit",
+      "name": "es @1280x700 resources: all 4 links reachable, last link and footer CTA in view",
+      "pass": true,
+      "detail": "height 333, overflow 0px"
+    },
+    {
+      "group": "mega-fit",
+      "name": "es @1280x600 platform: panel sits between the header and the bottom of the viewport",
+      "pass": false,
+      "detail": "y 85-668 of 600, header ends 80"
+    },
+    {
+      "group": "mega-fit",
+      "name": "es @1280x600 platform: all 11 links reachable, last link and footer CTA in view",
+      "pass": false,
+      "detail": "unreachable: Empieza gratis"
+    },
+    {
+      "group": "mega-fit",
+      "name": "es @1280x600 solutions: panel sits between the header and the bottom of the viewport",
+      "pass": true,
+      "detail": "y 85-556 of 600, header ends 80"
+    },
+    {
+      "group": "mega-fit",
+      "name": "es @1280x600 solutions: all 9 links reachable, last link and footer CTA in view",
+      "pass": true,
+      "detail": "height 471, overflow 0px"
+    },
+    {
+      "group": "mega-fit",
+      "name": "es @1280x600 resources: panel sits between the header and the bottom of the viewport",
+      "pass": true,
+      "detail": "y 85-418 of 600, header ends 80"
+    },
+    {
+      "group": "mega-fit",
+      "name": "es @1280x600 resources: all 4 links reachable, last link and footer CTA in view",
+      "pass": true,
+      "detail": "height 333, overflow 0px"
+    },
+    {
+      "group": "mega-fit",
+      "name": "es @1440x500 platform: panel sits between the header and the bottom of the viewport",
+      "pass": false,
+      "detail": "y 85-680 of 500, header ends 80"
+    },
+    {
+      "group": "mega-fit",
+      "name": "es @1440x500 platform: all 11 links reachable, last link and footer CTA in view",
+      "pass": false,
+      "detail": "unreachable: Preparación y bienestarS, Power Lab y pruebasPrueb, Empieza gratis"
+    },
+    {
+      "group": "mega-fit",
+      "name": "es @1440x500 solutions: panel sits between the header and the bottom of the viewport",
+      "pass": false,
+      "detail": "y 85-556 of 500, header ends 80"
+    },
+    {
+      "group": "mega-fit",
+      "name": "es @1440x500 solutions: all 9 links reachable, last link and footer CTA in view",
+      "pass": false,
+      "detail": "unreachable: Empieza gratis"
+    },
+    {
+      "group": "mega-fit",
+      "name": "es @1440x500 resources: panel sits between the header and the bottom of the viewport",
+      "pass": true,
+      "detail": "y 85-418 of 500, header ends 80"
+    },
+    {
+      "group": "mega-fit",
+      "name": "es @1440x500 resources: all 4 links reachable, last link and footer CTA in view",
+      "pass": true,
+      "detail": "height 333, overflow 0px"
+    },
+    {
+      "group": "mega-fit",
+      "name": "en @1100x600 (drawer): ran to completion",
+      "pass": false,
+      "detail": "locator.click: Timeout 30000ms exceeded."
+    },
+    {
+      "group": "mega-fit",
+      "name": "es @1100x600 (drawer): ran to completion",
+      "pass": false,
+      "detail": "locator.click: Timeout 30000ms exceeded."
+    },
+    {
+      "group": "nav-drawer",
+      "name": "390x844 touch: opening the drawer moves focus into it",
+      "pass": false,
+      "detail": "focus on item BUTTON, inside the menu: false"
+    },
+    {
+      "group": "nav-drawer",
+      "name": "390x844 touch: page behind the drawer is inert (main, footer, skip link) and the header is not",
+      "pass": false,
+      "detail": "[false,false,false]"
+    },
+    {
+      "group": "nav-drawer",
+      "name": "390x844 touch: Tab stays inside the header and drawer and wraps (11 stops)",
+      "pass": false,
+      "detail": "2 distinct stops over 24 presses, 24 escaped"
+    },
+    {
+      "group": "nav-drawer",
+      "name": "390x844 touch: Shift+Tab stays inside and wraps",
+      "pass": false,
+      "detail": "1 distinct stops, 12 escaped"
+    },
+    {
+      "group": "nav-drawer",
+      "name": "390x844 touch: the page behind does not scroll while the drawer is open",
+      "pass": false,
+      "detail": "scrollY 6094, html overflow hidden"
+    },
+    {
+      "group": "nav-drawer",
+      "name": "390x844 touch: Escape closes the drawer and returns focus to the burger",
+      "pass": true,
+      "detail": "burger focused: true"
+    },
+    {
+      "group": "nav-drawer",
+      "name": "390x844 touch: closing restores the page (nothing inert, scrolling works)",
+      "pass": true,
+      "detail": "html overflow visible"
+    },
+    {
+      "group": "nav-drawer",
+      "name": "390x844 touch: the page scrolls again after the drawer closes",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "nav-drawer",
+      "name": "390x844 touch: the burger closes the drawer and keeps focus",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "nav-drawer",
+      "name": "390x844 touch: Escape from inside an open group closes the drawer and focuses the burger",
+      "pass": false,
+      "detail": ""
+    },
+    {
+      "group": "nav-drawer",
+      "name": "1100x700: opening the drawer moves focus into it",
+      "pass": false,
+      "detail": "focus on item BODY, inside the menu: false"
+    },
+    {
+      "group": "nav-drawer",
+      "name": "1100x700: page behind the drawer is inert (main, footer, skip link) and the header is not",
+      "pass": false,
+      "detail": "[false,false,false]"
+    },
+    {
+      "group": "nav-drawer",
+      "name": "1100x700: Tab stays inside the header and drawer and wraps (10 stops)",
+      "pass": false,
+      "detail": "12 distinct stops over 22 presses, 12 escaped"
+    },
+    {
+      "group": "nav-drawer",
+      "name": "1100x700: Shift+Tab stays inside and wraps",
+      "pass": false,
+      "detail": "3 distinct stops, 10 escaped"
+    },
+    {
+      "group": "nav-drawer",
+      "name": "1100x700: the page behind does not scroll while the drawer is open",
+      "pass": false,
+      "detail": "scrollY 631, html overflow visible"
+    },
+    {
+      "group": "nav-drawer",
+      "name": "1100x700: Escape closes the drawer and returns focus to the burger",
+      "pass": false,
+      "detail": "burger focused: false"
+    },
+    {
+      "group": "nav-drawer",
+      "name": "1100x700: closing restores the page (nothing inert, scrolling works)",
+      "pass": true,
+      "detail": "html overflow visible"
+    },
+    {
+      "group": "nav-drawer",
+      "name": "1100x700: the page scrolls again after the drawer closes",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "nav-drawer",
+      "name": "1100x700: ran to completion",
+      "pass": false,
+      "detail": "locator.click: Timeout 30000ms exceeded."
+    },
+    {
+      "group": "nav-drawer",
+      "name": "1279x720: opening the drawer moves focus into it",
+      "pass": false,
+      "detail": "focus on item BODY, inside the menu: false"
+    },
+    {
+      "group": "nav-drawer",
+      "name": "1279x720: page behind the drawer is inert (main, footer, skip link) and the header is not",
+      "pass": false,
+      "detail": "[false,false,false]"
+    },
+    {
+      "group": "nav-drawer",
+      "name": "1279x720: Tab stays inside the header and drawer and wraps (10 stops)",
+      "pass": false,
+      "detail": "12 distinct stops over 22 presses, 12 escaped"
+    },
+    {
+      "group": "nav-drawer",
+      "name": "1279x720: Shift+Tab stays inside and wraps",
+      "pass": false,
+      "detail": "3 distinct stops, 10 escaped"
+    },
+    {
+      "group": "nav-drawer",
+      "name": "1279x720: the page behind does not scroll while the drawer is open",
+      "pass": false,
+      "detail": "scrollY 1479, html overflow visible"
+    },
+    {
+      "group": "nav-drawer",
+      "name": "1279x720: Escape closes the drawer and returns focus to the burger",
+      "pass": false,
+      "detail": "burger focused: false"
+    },
+    {
+      "group": "nav-drawer",
+      "name": "1279x720: closing restores the page (nothing inert, scrolling works)",
+      "pass": true,
+      "detail": "html overflow visible"
+    },
+    {
+      "group": "nav-drawer",
+      "name": "1279x720: the page scrolls again after the drawer closes",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "nav-drawer",
+      "name": "1279x720: ran to completion",
+      "pass": false,
+      "detail": "locator.click: Timeout 30000ms exceeded."
+    },
+    {
+      "group": "mega-focus",
+      "name": "1440x900 en, opened by keyboard: Tab stays inside the open panel and wraps (12 stops)",
+      "pass": true,
+      "detail": "12 distinct stops over 26 presses, 0 escaped"
+    },
+    {
+      "group": "mega-focus",
+      "name": "1440x900 en, opened by keyboard: Shift+Tab stays inside and wraps",
+      "pass": true,
+      "detail": "12 distinct stops, 0 escaped"
+    },
+    {
+      "group": "mega-focus",
+      "name": "1440x900 en, opened by keyboard: Escape closes the panel and returns focus to its trigger",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "mega-focus",
+      "name": "1440x900 en, opened by pointer: Tab stays inside the open panel and wraps (12 stops)",
+      "pass": false,
+      "detail": "13 distinct stops over 26 presses, 15 escaped"
+    },
+    {
+      "group": "mega-focus",
+      "name": "1440x900 en, opened by pointer: Shift+Tab stays inside and wraps",
+      "pass": false,
+      "detail": "2 distinct stops, 13 escaped"
+    },
+    {
+      "group": "mega-focus",
+      "name": "1440x900 en, opened by pointer: Escape closes the panel and returns focus to its trigger",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "mega-focus",
+      "name": "1440x900 en, opened by hover: Tab stays inside the open panel and wraps (12 stops)",
+      "pass": false,
+      "detail": "14 distinct stops over 26 presses, 14 escaped"
+    },
+    {
+      "group": "mega-focus",
+      "name": "1440x900 en, opened by hover: Shift+Tab stays inside and wraps",
+      "pass": false,
+      "detail": "4 distinct stops, 11 escaped"
+    },
+    {
+      "group": "mega-focus",
+      "name": "1440x900 en, opened by hover: Escape closes the panel and returns focus to its trigger",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "mega-focus",
+      "name": "1280x700 es, opened by keyboard: Tab stays inside the open panel and wraps (12 stops)",
+      "pass": true,
+      "detail": "12 distinct stops over 26 presses, 0 escaped"
+    },
+    {
+      "group": "mega-focus",
+      "name": "1280x700 es, opened by keyboard: Shift+Tab stays inside and wraps",
+      "pass": true,
+      "detail": "12 distinct stops, 0 escaped"
+    },
+    {
+      "group": "mega-focus",
+      "name": "1280x700 es, opened by keyboard: Escape closes the panel and returns focus to its trigger",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "mega-focus",
+      "name": "1280x700 es, opened by pointer: Tab stays inside the open panel and wraps (12 stops)",
+      "pass": false,
+      "detail": "13 distinct stops over 26 presses, 15 escaped"
+    },
+    {
+      "group": "mega-focus",
+      "name": "1280x700 es, opened by pointer: Shift+Tab stays inside and wraps",
+      "pass": false,
+      "detail": "2 distinct stops, 13 escaped"
+    },
+    {
+      "group": "mega-focus",
+      "name": "1280x700 es, opened by pointer: Escape closes the panel and returns focus to its trigger",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "mega-focus",
+      "name": "1280x700 es, opened by hover: Tab stays inside the open panel and wraps (12 stops)",
+      "pass": false,
+      "detail": "14 distinct stops over 26 presses, 14 escaped"
+    },
+    {
+      "group": "mega-focus",
+      "name": "1280x700 es, opened by hover: Shift+Tab stays inside and wraps",
+      "pass": false,
+      "detail": "4 distinct stops, 11 escaped"
+    },
+    {
+      "group": "mega-focus",
+      "name": "1280x700 es, opened by hover: Escape closes the panel and returns focus to its trigger",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "retro-motion",
+      "name": "normal motion: the stack advances on its own",
+      "pass": true,
+      "detail": "0,1,2,3,4,5,6,7 -> 7,0,1,2,3,4,5,6"
+    },
+    {
+      "group": "retro-motion",
+      "name": "switching to reduced motion stops the stack (no card moves in 6 s)",
+      "pass": false,
+      "detail": "7,0,1,2,3,4,5,6 -> 4,5,6,7,0,1,2,3"
+    },
+    {
+      "group": "retro-motion",
+      "name": "switching back to normal motion restarts the stack",
+      "pass": true,
+      "detail": "4,5,6,7,0,1,2,3 -> 3,4,5,6,7,0,1,2"
+    },
+    {
+      "group": "i18n",
+      "name": "/es/ retro images carry Spanish alt text (all 8 differ from the English text)",
+      "pass": false,
+      "detail": "e.g. \"Retro poster photo of a worn starting block with the Stadiora mark painted on the footplate.\""
+    }
+  ],
+  "metrics": {
+    "nav-min-gap-en": -11.5,
+    "nav-min-gap-en-scrolled": -11.5,
+    "nav-min-gap-es": -73.5,
+    "nav-min-gap-es-scrolled": -73.5
+  }
+}

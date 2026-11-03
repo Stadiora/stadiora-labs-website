@@ -1,0 +1,635 @@
+{
+  "results": [
+    {
+      "group": "capture",
+      "name": "en/light/1440: main has 9 sections",
+      "pass": true,
+      "detail": "found 9"
+    },
+    {
+      "group": "capture",
+      "name": "en/light/390: main has 9 sections",
+      "pass": true,
+      "detail": "found 9"
+    },
+    {
+      "group": "capture",
+      "name": "en/dark/1440: main has 9 sections",
+      "pass": true,
+      "detail": "found 9"
+    },
+    {
+      "group": "capture",
+      "name": "es/light/1440: main has 9 sections",
+      "pass": true,
+      "detail": "found 9"
+    },
+    {
+      "group": "capture",
+      "name": "es/light/390: main has 9 sections",
+      "pass": true,
+      "detail": "found 9"
+    },
+    {
+      "group": "capture",
+      "name": "es/dark/1440: main has 9 sections",
+      "pass": true,
+      "detail": "found 9"
+    },
+    {
+      "group": "hero",
+      "name": "/ first painted word (HTML, no JS) is \"coaches\"",
+      "pass": true,
+      "detail": "static word \"coaches\""
+    },
+    {
+      "group": "hero",
+      "name": "/ rotation order is 7 words, coaches first",
+      "pass": true,
+      "detail": "coaches | high school teams | soccer academies | track and field | gyms and studios | nutrition coaches | universities"
+    },
+    {
+      "group": "hero",
+      "name": "/es/ first painted word (HTML, no JS) is \"entrenadores\"",
+      "pass": true,
+      "detail": "static word \"entrenadores\""
+    },
+    {
+      "group": "hero",
+      "name": "/es/ rotation order is 7 words, coaches first",
+      "pass": true,
+      "detail": "entrenadores | equipos escolares | academias de fútbol | equipos de atletismo | gimnasios y estudios | coaches de nutrición | universidades"
+    },
+    {
+      "group": "hero",
+      "name": "rotation cycles coaches -> ... -> universities -> coaches in order",
+      "pass": true,
+      "detail": "coaches > high school teams > soccer academies > track and field > gyms and studios > nutrition coaches > universities > coaches > high school teams"
+    },
+    {
+      "group": "hero",
+      "name": "photo sets stay in sync with the word through the whole cycle",
+      "pass": true,
+      "detail": "0 samples out of step (a crossfade frame can lag)"
+    },
+    {
+      "group": "hero",
+      "name": "headline word rotates",
+      "pass": true,
+      "detail": "\"coaches\" -> \"high school teams\""
+    },
+    {
+      "group": "hero",
+      "name": "three photo tiles follow the word",
+      "pass": true,
+      "detail": "3 active tiles"
+    },
+    {
+      "group": "hero",
+      "name": "pause button stops the rotation (WCAG 2.2.2)",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "nav",
+      "name": "Platform mega menu opens",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "nav",
+      "name": "Escape closes the menu and returns focus to its trigger",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "nav",
+      "name": "Solutions mega menu opens",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "a11y",
+      "name": "first Tab stop is the skip link",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "a11y",
+      "name": "focused control shows a focus ring (>= 2px outline)",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "ai-demo",
+      "name": "loop runs prompt -> review -> calendar",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "ai-demo",
+      "name": "pause control is pressed after click",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "pillars",
+      "name": "four tabs, first selected",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "pillars",
+      "name": "click selects the second tab",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "pillars",
+      "name": "ArrowRight moves to the third tab",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "pillars",
+      "name": "End moves to the last tab",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "pillars",
+      "name": "Home moves to the first tab",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "pillars",
+      "name": "only the active panel is interactive",
+      "pass": true,
+      "detail": "1 non-inert panels"
+    },
+    {
+      "group": "messaging",
+      "name": "phone screen slides to the broadcast screen",
+      "pass": true,
+      "detail": "translateX -50.0% of track"
+    },
+    {
+      "group": "brand",
+      "name": "retro stack advances on its own",
+      "pass": true,
+      "detail": "0,1,2,3,4,5,6,7 -> 7,0,1,2,3,4,5,6"
+    },
+    {
+      "group": "brand",
+      "name": "stack cycles through all 8 retro images",
+      "pass": true,
+      "detail": "8 distinct front cards"
+    },
+    {
+      "group": "brand",
+      "name": "pause control stops the stack",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "brand",
+      "name": "five overlapping cards are visible as a fan",
+      "pass": true,
+      "detail": "5 visible, positions 0,1,2,3,4"
+    },
+    {
+      "group": "dialog",
+      "name": "store chooser opens as a modal dialog",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "dialog",
+      "name": "chooser links to both Run with Aria stores",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "dialog",
+      "name": "Escape closes it",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "theme",
+      "name": "toggle switches the page to dark",
+      "pass": true,
+      "detail": "rgb(255, 255, 255) -> rgb(6, 14, 32)"
+    },
+    {
+      "group": "theme",
+      "name": "choice persists after reload",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "runtime",
+      "name": "no console errors, page errors or failed requests (desktop run)",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "nav",
+      "name": "mobile drawer opens",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "nav",
+      "name": "drawer group expands as an accordion",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "nav",
+      "name": "Escape closes the drawer",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "reduced-motion",
+      "name": "hero shows the static word \"coaches\", no rotation",
+      "pass": true,
+      "detail": "\"coaches\"; active word stays \"coaches\""
+    },
+    {
+      "group": "reduced-motion",
+      "name": "no infinite animation is running",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "reduced-motion",
+      "name": "retro stack is a static fan of five cards, no cycling",
+      "pass": true,
+      "detail": "5 cards visible, order 0,1,2,3,4,5,6,7 -> 0,1,2,3,4,5,6,7"
+    },
+    {
+      "group": "responsive",
+      "name": "/ @1920: no horizontal scroll",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "responsive",
+      "name": "/ @1440: no horizontal scroll",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "responsive",
+      "name": "/ @1280: no horizontal scroll",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "responsive",
+      "name": "/ @1100: no horizontal scroll",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "responsive",
+      "name": "/ @1024: no horizontal scroll",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "responsive",
+      "name": "/ @768: no horizontal scroll",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "responsive",
+      "name": "/ @600: no horizontal scroll",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "responsive",
+      "name": "/ @390: no horizontal scroll",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "responsive",
+      "name": "/ @360: no horizontal scroll",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "responsive",
+      "name": "/es/ @1920: no horizontal scroll",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "responsive",
+      "name": "/es/ @1440: no horizontal scroll",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "responsive",
+      "name": "/es/ @1280: no horizontal scroll",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "responsive",
+      "name": "/es/ @1100: no horizontal scroll",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "responsive",
+      "name": "/es/ @1024: no horizontal scroll",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "responsive",
+      "name": "/es/ @768: no horizontal scroll",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "responsive",
+      "name": "/es/ @600: no horizontal scroll",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "responsive",
+      "name": "/es/ @390: no horizontal scroll",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "responsive",
+      "name": "/es/ @360: no horizontal scroll",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "ai-layout",
+      "name": "en @1440: the prompt reads in 2 to 3 lines",
+      "pass": true,
+      "detail": "3 lines in a 359px card"
+    },
+    {
+      "group": "ai-layout",
+      "name": "en @1440: ask card is wider than the program card on the three-column row, no word breaks mid-word",
+      "pass": true,
+      "detail": "ask 359 / program 287 / calendar 546px, 0 clipped"
+    },
+    {
+      "group": "ai-layout",
+      "name": "en @1360: the prompt reads in 2 to 3 lines",
+      "pass": true,
+      "detail": "3 lines in a 335px card"
+    },
+    {
+      "group": "ai-layout",
+      "name": "en @1360: ask card is wider than the program card on the three-column row, no word breaks mid-word",
+      "pass": true,
+      "detail": "ask 335 / program 268 / calendar 509px, 0 clipped"
+    },
+    {
+      "group": "ai-layout",
+      "name": "en @1280: the prompt reads in 2 to 3 lines",
+      "pass": true,
+      "detail": "2 lines in a 522px card"
+    },
+    {
+      "group": "ai-layout",
+      "name": "en @1280: ask card is wider than the program card on the three-column row, no word breaks mid-word",
+      "pass": true,
+      "detail": "ask 522 / program 522 / calendar 1080px, 0 clipped"
+    },
+    {
+      "group": "ai-layout",
+      "name": "en @1024: the prompt reads in 2 to 3 lines",
+      "pass": true,
+      "detail": "2 lines in a 434px card"
+    },
+    {
+      "group": "ai-layout",
+      "name": "en @1024: ask card is wider than the program card on the three-column row, no word breaks mid-word",
+      "pass": true,
+      "detail": "ask 434 / program 434 / calendar 904px, 0 clipped"
+    },
+    {
+      "group": "ai-layout",
+      "name": "es @1440: the prompt reads in 2 to 3 lines",
+      "pass": true,
+      "detail": "3 lines in a 359px card"
+    },
+    {
+      "group": "ai-layout",
+      "name": "es @1440: ask card is wider than the program card on the three-column row, no word breaks mid-word",
+      "pass": true,
+      "detail": "ask 359 / program 287 / calendar 546px, 0 clipped"
+    },
+    {
+      "group": "ai-layout",
+      "name": "es @1360: the prompt reads in 2 to 3 lines",
+      "pass": true,
+      "detail": "3 lines in a 335px card"
+    },
+    {
+      "group": "ai-layout",
+      "name": "es @1360: ask card is wider than the program card on the three-column row, no word breaks mid-word",
+      "pass": true,
+      "detail": "ask 335 / program 268 / calendar 509px, 0 clipped"
+    },
+    {
+      "group": "ai-layout",
+      "name": "es @1280: the prompt reads in 2 to 3 lines",
+      "pass": true,
+      "detail": "2 lines in a 522px card"
+    },
+    {
+      "group": "ai-layout",
+      "name": "es @1280: ask card is wider than the program card on the three-column row, no word breaks mid-word",
+      "pass": true,
+      "detail": "ask 522 / program 522 / calendar 1080px, 0 clipped"
+    },
+    {
+      "group": "ai-layout",
+      "name": "es @1024: the prompt reads in 2 to 3 lines",
+      "pass": true,
+      "detail": "3 lines in a 434px card"
+    },
+    {
+      "group": "ai-layout",
+      "name": "es @1024: ask card is wider than the program card on the three-column row, no word breaks mid-word",
+      "pass": true,
+      "detail": "ask 434 / program 434 / calendar 904px, 0 clipped"
+    },
+    {
+      "group": "apps",
+      "name": "three phone screens carry real photos, FitMG rows carry thumbnails",
+      "pass": true,
+      "detail": "3/3 hero photos, 4/4 thumbnails loaded, 7 distinct files"
+    },
+    {
+      "group": "logos",
+      "name": "logos are sized by optical area, not one shared height",
+      "pass": true,
+      "detail": "heights 62/64/64/52/39/64, widths 62/137/81/139/144/55"
+    },
+    {
+      "group": "logos",
+      "name": "mono-dark (#0B1220) at 70-80% opacity keeps AA contrast on white",
+      "pass": true,
+      "detail": "opacity 0.76, 8.8:1"
+    },
+    {
+      "group": "claims",
+      "name": "training load card carries no unbacked \"In range\" verdict",
+      "pass": true,
+      "detail": "Training load · this weekMTWTFSSRPE × minutes"
+    },
+    {
+      "group": "contrast",
+      "name": "en/light: text meets WCAG AA (4.5:1, 3:1 large)",
+      "pass": true,
+      "detail": "148 text nodes, lowest 4.57:1; 0 over images skipped, 82 decorative demo nodes excluded"
+    },
+    {
+      "group": "hit-targets",
+      "name": "en: every button, tab and block link is >= 44px",
+      "pass": true,
+      "detail": "48 controls, smallest 44x44; 4 inline text links exempt"
+    },
+    {
+      "group": "contrast",
+      "name": "en/dark: text meets WCAG AA (4.5:1, 3:1 large)",
+      "pass": true,
+      "detail": "148 text nodes, lowest 7.32:1; 0 over images skipped, 82 decorative demo nodes excluded"
+    },
+    {
+      "group": "contrast",
+      "name": "es/light: text meets WCAG AA (4.5:1, 3:1 large)",
+      "pass": true,
+      "detail": "148 text nodes, lowest 4.57:1; 0 over images skipped, 82 decorative demo nodes excluded"
+    },
+    {
+      "group": "hit-targets",
+      "name": "es: every button, tab and block link is >= 44px",
+      "pass": true,
+      "detail": "48 controls, smallest 44x44; 4 inline text links exempt"
+    },
+    {
+      "group": "contrast",
+      "name": "es/dark: text meets WCAG AA (4.5:1, 3:1 large)",
+      "pass": true,
+      "detail": "148 text nodes, lowest 7.32:1; 0 over images skipped, 82 decorative demo nodes excluded"
+    },
+    {
+      "group": "perf",
+      "name": "desktop: LCP <= 2500 ms (local, unthrottled)",
+      "pass": true,
+      "detail": "104 ms (runs 116, 104, 104)"
+    },
+    {
+      "group": "perf",
+      "name": "desktop: CLS <= 0.1 including a full scroll-through",
+      "pass": true,
+      "detail": "0.0000"
+    },
+    {
+      "group": "perf",
+      "name": "desktop: every hero photo delivered <= 180 KB",
+      "pass": true,
+      "detail": "15 hero files, largest 42 KB"
+    },
+    {
+      "group": "perf",
+      "name": "mobile: LCP <= 2500 ms (throttled: 1.6 Mbps, 150 ms RTT, 4x CPU)",
+      "pass": true,
+      "detail": "1860 ms (runs 1852, 1884, 1860)"
+    },
+    {
+      "group": "perf",
+      "name": "mobile: CLS <= 0.1 including a full scroll-through",
+      "pass": true,
+      "detail": "0.0000"
+    },
+    {
+      "group": "perf",
+      "name": "mobile: every hero photo delivered <= 180 KB",
+      "pass": true,
+      "detail": "9 hero files, largest 19 KB"
+    },
+    {
+      "group": "perf",
+      "name": "no video files shipped (budget 1.5 MB each)",
+      "pass": true,
+      "detail": ""
+    }
+  ],
+  "metrics": {
+    "contrast-en-light": {
+      "checked": 148,
+      "lowest": 4.57,
+      "decorativeExcluded": 82,
+      "overImagesSkipped": 0
+    },
+    "targets-en": {
+      "controls": 48,
+      "smallest": "44x44",
+      "inlineLinksExempt": 4
+    },
+    "contrast-en-dark": {
+      "checked": 148,
+      "lowest": 7.32,
+      "decorativeExcluded": 82,
+      "overImagesSkipped": 0
+    },
+    "contrast-es-light": {
+      "checked": 148,
+      "lowest": 4.57,
+      "decorativeExcluded": 82,
+      "overImagesSkipped": 0
+    },
+    "targets-es": {
+      "controls": 48,
+      "smallest": "44x44",
+      "inlineLinksExempt": 4
+    },
+    "contrast-es-dark": {
+      "checked": 148,
+      "lowest": 7.32,
+      "decorativeExcluded": 82,
+      "overImagesSkipped": 0
+    },
+    "js-desktop": 2239,
+    "perf-desktop": {
+      "lcpMs": 104,
+      "cls": 0,
+      "firstScreenKB": 920,
+      "jsKB": 2,
+      "largestHeroKB": 42,
+      "heroFiles": 15
+    },
+    "js-mobile": 2239,
+    "perf-mobile": {
+      "lcpMs": 1860,
+      "cls": 0,
+      "firstScreenKB": 589,
+      "jsKB": 2,
+      "largestHeroKB": 19,
+      "heroFiles": 9
+    },
+    "js-inline-bytes-home": 12471
+  }
+}
