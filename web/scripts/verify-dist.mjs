@@ -93,12 +93,17 @@ if (!existsSync(jekyllConfig)) {
   fail('_config.yml is missing at the repo root: Jekyll would build web/ and fail the Pages deploy');
 } else {
   let config;
+  let parsed = false;
   try {
-    config = parse(readFileSync(jekyllConfig, 'utf8')) ?? {};
+    config = parse(readFileSync(jekyllConfig, 'utf8'));
+    parsed = true;
   } catch (error) {
     fail(`_config.yml is not valid YAML (duplicate keys included): ${error.message.split('\n')[0]}`);
   }
-  if (config) {
+  // Every successful parse is checked: a scalar, list or empty root (e.g. `false`) is not a Jekyll config mapping.
+  if (parsed && (config === null || typeof config !== 'object' || Array.isArray(config))) {
+    fail('_config.yml: the root must be a mapping with an `exclude` list that contains `web`');
+  } else if (parsed) {
     if (!Array.isArray(config.exclude) || !jekyllNames(config.exclude).includes('web')) {
       fail('_config.yml: `exclude` must be a list that contains `web`, or the Pages Jekyll build fails on web/**/*.astro');
     }
