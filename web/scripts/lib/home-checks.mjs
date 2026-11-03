@@ -14,13 +14,17 @@ const heroWords = {
 
 const pathFor = (locale) => (locale === 'en' ? '/' : '/es/');
 
+// The hero word on screen (the per-letter markup uses no-break spaces) and the full list the markup carries.
+const activeWord = () => document.querySelector('[data-hero-word][data-active]')?.textContent?.replace(/[\u00a0\u200b]/g, ' ').replace(/\s+/g, ' ').trim();
+const wordList = () => JSON.parse(document.querySelector('[data-hero-words]')?.getAttribute('data-words') ?? '[]');
+
 // ---- in-page helpers (serialised into the page, so they must stay self-contained)
 
 // Tag every autoplayer host with an index and describe it.
 const tagHosts = () =>
   [...document.querySelectorAll('[data-ap]')].map((h, i) => {
     h.setAttribute('data-ap-i', String(i));
-    const scope = h.closest('[data-ap-scope]') ?? h.querySelector('[data-ap-scope]') ?? h;
+    const scope = (h.dataset.apWithin && document.querySelector(h.dataset.apWithin)) || h.closest('[data-ap-scope]') || h.querySelector('[data-ap-scope]') || h;
     const section = h.closest('main > section')?.id ?? '';
     const label = `${section ? `#${section} ` : ''}${h.tagName.toLowerCase()}${h.id ? `#${h.id}` : ''}${typeof h.className === 'string' && h.className ? `.${h.className.trim().split(/\s+/)[0]}` : ''}${h.tagName === 'VIDEO' ? ` ${h.dataset.clip || h.querySelector('source')?.getAttribute('src') || ''}` : ''}`;
     return { i, label: label.trim(), isVideo: h.tagName === 'VIDEO', scopeIsHost: scope === h };
@@ -34,7 +38,7 @@ const hostState = (i) => {
 // A point inside the host's scope that is visible and really belongs to it (not covered by something else).
 const scopePoint = (i) => {
   const h = document.querySelector(`[data-ap-i="${i}"]`);
-  const scope = h.closest('[data-ap-scope]') ?? h.querySelector('[data-ap-scope]') ?? h;
+  const scope = (h.dataset.apWithin && document.querySelector(h.dataset.apWithin)) || h.closest('[data-ap-scope]') || h.querySelector('[data-ap-scope]') || h;
   const r = scope.getBoundingClientRect();
   const x0 = Math.max(r.left, 0);
   const x1 = Math.min(r.right, innerWidth);
@@ -55,7 +59,7 @@ const scopePoint = (i) => {
 // A point outside the scope for the mouse to rest on.
 const restPoint = (i) => {
   const h = document.querySelector(`[data-ap-i="${i}"]`);
-  const scope = h.closest('[data-ap-scope]') ?? h.querySelector('[data-ap-scope]') ?? h;
+  const scope = (h.dataset.apWithin && document.querySelector(h.dataset.apWithin)) || h.closest('[data-ap-scope]') || h.querySelector('[data-ap-scope]') || h;
   const corners = [[2, 2], [innerWidth - 2, 2], [2, innerHeight - 2], [innerWidth - 2, innerHeight - 2]];
   for (const [x, y] of corners) {
     const hit = document.elementFromPoint(x, y);
@@ -66,7 +70,7 @@ const restPoint = (i) => {
 
 const focusIn = (i) => {
   const h = document.querySelector(`[data-ap-i="${i}"]`);
-  const scope = h.closest('[data-ap-scope]') ?? h.querySelector('[data-ap-scope]') ?? h;
+  const scope = (h.dataset.apWithin && document.querySelector(h.dataset.apWithin)) || h.closest('[data-ap-scope]') || h.querySelector('[data-ap-scope]') || h;
   const target = [...scope.querySelectorAll('a[href], button, [tabindex]:not([tabindex="-1"]), input, select, textarea')].find((e) => {
     const r = e.getBoundingClientRect();
     return r.width > 0 && r.height > 0 && getComputedStyle(e).visibility !== 'hidden' && !e.closest('[inert]');
@@ -244,7 +248,13 @@ export async function homeChecks({ open, check, sleep, settle, metrics }) {
       const name = await page.evaluate((k) => {
         const m = document.querySelectorAll('.marquee')[k];
         m.scrollIntoView({ block: 'center', behavior: 'instant' });
-        return `${m.closest('main > section')?.id ?? '?'} marquee`;
+        const sec = m.closest('main > section');
+        // A decorative marquee cannot be hovered itself, so it pauses with its section: park the pointer off that section.
+        const r = m.getBoundingClientRect();
+        const hit = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2);
+        const decorative = !(hit && m.contains(hit));
+        if (decorative && sec && document.elementFromPoint(2, 2)?.closest('main > section') === sec) window.scrollBy(0, sec.getBoundingClientRect().top - 120);
+        return `${sec?.id ?? '?'} marquee`;
       }, n);
       await sleep(900);
       const x = () => page.evaluate((k) => document.querySelectorAll('.marquee')[k].querySelector('.marquee-track').getBoundingClientRect().left, n);
@@ -252,9 +262,15 @@ export async function homeChecks({ open, check, sleep, settle, metrics }) {
       await sleep(1200);
       const b = await x();
       check('marquee', `${name} ${n + 1} moves on its own`, Math.abs(b - a) >= 4, `${(b - a).toFixed(1)}px in 1.2 s`);
+      // A decorative marquee behind content cannot be hovered itself: the section it decorates is the hover target.
       const box = await page.evaluate((k) => {
-        const r = document.querySelectorAll('.marquee')[k].getBoundingClientRect();
-        return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
+        const m = document.querySelectorAll('.marquee')[k];
+        const r = m.getBoundingClientRect();
+        const pt = { x: r.left + r.width / 2, y: r.top + r.height / 2 };
+        const hit = document.elementFromPoint(pt.x, pt.y);
+        if (hit && m.contains(hit)) return pt;
+        const s = m.closest('main > section').getBoundingClientRect();
+        return { x: s.left + s.width / 2, y: Math.min(Math.max(s.top, 0) + innerHeight * 0.6, s.bottom - 20, innerHeight - 40) };
       }, n);
       await page.mouse.move(box.x, box.y);
       await sleep(300);
@@ -279,16 +295,16 @@ export async function homeChecks({ open, check, sleep, settle, metrics }) {
   for (const [path, words] of Object.entries(heroWords)) {
     const page = await open({ width: 1440, height: 900 }, path);
     await page.mouse.move(2, 2);
-    const initial = await page.evaluate(() => ({
-      count: document.querySelector('[data-hero-words]')?.getAttribute('data-hero-count'),
-      first: document.querySelector('[data-hero-word][data-active]')?.textContent?.trim(),
-      all: [...document.querySelectorAll('[data-hero-word]')].map((e) => e.textContent.trim()),
-    }));
+    const initial = {
+      count: await page.evaluate(() => document.querySelector('[data-hero-words]')?.getAttribute('data-hero-count')),
+      first: await page.evaluate(activeWord),
+      all: await page.evaluate(wordList),
+    };
     check('hero', `${path} the h1 starts on "${words[0]}" and lists ${words.length} words in order`, initial.count === String(words.length) && initial.first === words[0] && JSON.stringify(initial.all) === JSON.stringify(words), JSON.stringify(initial));
     const seen = [];
     const t0 = Date.now();
     while (Date.now() - t0 < 26000) {
-      const w = await page.evaluate(() => document.querySelector('[data-hero-word][data-active]')?.textContent?.trim());
+      const w = await page.evaluate(activeWord);
       if (seen[seen.length - 1] !== w) seen.push(w);
       if (seen.length > words.length) break;
       await sleep(200);
@@ -299,7 +315,7 @@ export async function homeChecks({ open, check, sleep, settle, metrics }) {
   {
     const page = await open({ width: 1440, height: 900 }, '/');
     await page.mouse.move(2, 2);
-    const word = () => page.evaluate(() => document.querySelector('[data-hero-word][data-active]')?.textContent?.trim());
+    const word = () => page.evaluate(activeWord);
     const w0 = await word();
     const pt = await page.evaluate(() => {
       const h1 = document.querySelector('h1');
@@ -314,9 +330,9 @@ export async function homeChecks({ open, check, sleep, settle, metrics }) {
   }
   {
     const page = await open({ width: 1440, height: 900, reduced: true }, '/');
-    const w0 = await page.evaluate(() => document.querySelector('[data-hero-word][data-active]')?.textContent?.trim());
+    const w0 = await page.evaluate(activeWord);
     await sleep(4500);
-    const w1 = await page.evaluate(() => document.querySelector('[data-hero-word][data-active]')?.textContent?.trim());
+    const w1 = await page.evaluate(activeWord);
     check('reduced-motion', 'the hero stays on its first word', w0 === heroWords['/'][0] && w1 === w0, `"${w0}" -> "${w1}"`);
     await page.context().close();
   }
@@ -345,6 +361,20 @@ export async function homeChecks({ open, check, sleep, settle, metrics }) {
       await settle(page);
       const c = await page.evaluate(contrastProbe);
       check('contrast', `${locale}/${scheme}/390: text meets WCAG AA (4.5:1, 3:1 large)`, c.checked > 150 && c.failCount === 0, `${c.checked} text nodes, lowest ${c.min.toFixed(2)}:1${c.failCount ? `, failing: ${JSON.stringify(c.fails)}` : ''}`);
+      await page.context().close();
+    }
+  }
+
+  // The bar is transparent over the dark hero (the page probe skips what sits on a gradient), so judge its glass state
+  // separately: scrolled onto the page, against a white worst case.
+  for (const locale of ['en', 'es']) {
+    for (const scheme of ['light', 'dark']) {
+      const page = await open({ width: 1440, height: 900, scheme, reduced: true }, pathFor(locale));
+      await settle(page);
+      await page.evaluate(() => window.scrollTo(0, 2400));
+      await page.waitForFunction(() => document.documentElement.hasAttribute('data-scrolled'), null, { timeout: 5000 });
+      const c = await page.evaluate(contrastProbe, { scope: '.nav' });
+      check('contrast', `${locale}/${scheme}: the scrolled nav bar meets WCAG AA`, c.checked >= 5 && c.failCount === 0 && c.skippedImage === 0, `${c.checked} text nodes, lowest ${c.min.toFixed(2)}:1${c.failCount ? `, failing: ${JSON.stringify(c.fails)}` : ''}`);
       await page.context().close();
     }
   }

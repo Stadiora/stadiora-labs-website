@@ -26,6 +26,11 @@
   padding-right: 60px;
   white-space: nowrap;
 }
+/* the drifting outline text cannot be hovered (it sits behind the card), so the whole section pauses it */
+.proof:hover .proof-bg .marquee-track,
+.proof:focus-within .proof-bg .marquee-track {
+  animation-play-state: paused;
+}
 .proof-wrap {
   position: relative;
 }
@@ -194,6 +199,7 @@ html:not(.js) .proof .lines > span > span {
   .proof-photo img {
     object-position: 50% 14%;
   }
+}
 @media (max-width: 640px) {
   .proof-photo {
     min-height: 300px;

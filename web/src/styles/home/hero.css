@@ -221,6 +221,15 @@
   -webkit-backdrop-filter: blur(6px);
   backdrop-filter: blur(6px);
 }
+@media (max-width: 400px) {
+  .hero-tag {
+    left: 6px;
+    top: 6px;
+    font-size: 9px;
+    letter-spacing: 0.06em;
+    padding: 5px 6px;
+  }
+}
 .hero-mid {
   container-type: size;
 }

@@ -65,3 +65,7 @@
 @media (prefers-reduced-motion:reduce){
   .ai-input .caret{animation:none}
 }
+/* Nothing pans under reduced motion, so the whole stage is fitted to the width and the frame hugs it. */
+@media (max-width:640px) and (prefers-reduced-motion:reduce){
+  .ai-frame{aspect-ratio:16/9}
+}

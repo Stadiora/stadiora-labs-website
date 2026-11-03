@@ -164,7 +164,7 @@
 .show .en-tab{display:block;width:100%;text-align:left;padding:14px 0 12px;color:var(--ink);background:transparent}
 .en-tab .hd{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:12px}
 .en-tab strong{font:800 24px/1 var(--f-display);font-variation-settings:"wdth" 80;transition:color 300ms}
-.en-tab[aria-selected="false"] strong{color:color-mix(in srgb,var(--ink) 42%,transparent)}
+.en-tab[aria-selected="false"] strong{color:color-mix(in srgb,var(--ink) 58%,transparent)}
 .en-tab em{font:500 12px/1 var(--f-mono);font-style:normal;color:var(--ink3)}
 .en-tab .at-bar{display:block}
 .en-media{position:relative;min-height:660px}
@@ -322,4 +322,8 @@
   .ms-slide,.ms-slide.on,.ms-slide > img,.ms-slide .pop,.ms-slide.on .pop{transition:none}
   .acc-row .bd,.app-scr,.pl-step,.bubble-out,.show .bt{transition:none}
   .rail .set{flex-wrap:wrap;justify-content:center;padding-right:0;max-width:100%}
+}
+/* Nothing pans under reduced motion, so the whole stage is fitted to the width and the frame hugs it. */
+@media (max-width:640px) and (prefers-reduced-motion:reduce){
+  .pl-frame{aspect-ratio:1100/560}
 }

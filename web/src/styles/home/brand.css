@@ -41,4 +41,6 @@
 @media (prefers-reduced-motion:reduce){
   .owin .th,.owin .px{display:none}
   .giant .gl{transition:none}
+  /* The ticker is a static, wrapping line when it does not scroll. */
+  .bs-ticker .marquee-track span{white-space:normal;padding:0 16px;text-align:center;line-height:1.8}
 }

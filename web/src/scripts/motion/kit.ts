@@ -110,8 +110,15 @@ function initVideos() {
     // A clip inside a tab panel only plays while its panel is the active one.
     const panel = v.closest<HTMLElement>('[data-panel]');
     const active = () => !panel || panel.classList.contains('on') || panel.hasAttribute('data-active');
+    // Hover and focus pause the clip through the surface the user can actually reach: an explicit
+    // `data-ap-within` selector (decorative clips that cannot be hovered themselves), else the tab group or frame around it.
+    const within =
+      (v.dataset.apWithin ? document.querySelector<HTMLElement>(v.dataset.apWithin) : null) ??
+      v.closest<HTMLElement>('[data-autotabs]') ??
+      v.closest<HTMLElement>('.media-frame') ??
+      v;
     autoplayer(v, {
-      within: v.closest<HTMLElement>('.media-frame') ?? v,
+      within,
       threshold: 0.2,
       play: () => {
         if (active()) playVideo(v);
@@ -433,9 +440,15 @@ function initFit() {
   const ro = new ResizeObserver((entries) => {
     for (const e of entries) {
       const host = e.target as HTMLElement;
+      const stage = host.firstElementChild as HTMLElement | null;
       const fitH = Number(host.dataset.fitH);
-      const k = fitH && narrow.matches ? host.clientHeight / fitH : host.clientWidth / Number(host.dataset.fit);
-      (host.firstElementChild as HTMLElement | null)?.style.setProperty('--k', k.toFixed(4));
+      // Narrow screens scale a stage to the frame height and pan across it; with reduced motion nothing pans, so the
+      // whole stage is fitted to the width instead and centred in the frame.
+      const panned = Boolean(fitH) && narrow.matches && !RMQ.matches;
+      const k = panned ? host.clientHeight / fitH : host.clientWidth / Number(host.dataset.fit);
+      stage?.style.setProperty('--k', k.toFixed(4));
+      if (stage && fitH && narrow.matches && RMQ.matches) stage.style.translate = `0px ${Math.max(0, (host.clientHeight - fitH * k) / 2).toFixed(1)}px`;
+      else stage?.style.removeProperty('translate');
     }
   });
   $$('[data-fit]').forEach((h) => ro.observe(h));

@@ -70,14 +70,14 @@ const first = split(t.words[0]);
   </div>
 
   <div class="hero-cv" aria-hidden="true" data-hero-cv>
-    <div class="hero-lane">
+    <div class="hero-lane" data-clip-window="y">
       <div class="hero-run">
         {
           copies.map((c) =>
             laneA.map((tile, i) => (
               <div class={`hero-tile ${tile.shape}`}>
                 {tile.clip && c === 0 ? (
-                  <video muted playsinline loop preload="none" data-clip poster={tile.src} width={tile.w} height={tile.h}>
+                  <video muted playsinline loop preload="none" data-clip data-ap-within="#hero .hero-copy" poster={tile.src} width={tile.w} height={tile.h}>
                     <source src={`${MEDIA}${tile.clip}.webm`} type="video/webm" />
                     <source src={`${MEDIA}${tile.clip}.mp4`} type="video/mp4" />
                   </video>
@@ -91,7 +91,7 @@ const first = split(t.words[0]);
         }
       </div>
     </div>
-    <div class="hero-lane hero-mid">
+    <div class="hero-lane hero-mid" data-clip-window="y">
       <div class="hero-col" data-hero-col>
         {
           blocks.map((j, bi) => (
@@ -119,7 +119,7 @@ const first = split(t.words[0]);
         }
       </div>
     </div>
-    <div class="hero-lane">
+    <div class="hero-lane" data-clip-window="y">
       <div class="hero-run down">
         {
           copies.map((c) =>
