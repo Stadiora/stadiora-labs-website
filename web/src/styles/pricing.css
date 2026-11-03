@@ -1,0 +1,1176 @@
+/* Pricing page (Floodlight, owner item 14): hero with controls, five plan cards, add-ons with a live estimate, FAQ.
+   Ported from design/round4/proto/css/pricing.css. The look follows the page theme; the hero, the Performance card, the
+   estimate and the final CTA are dark stages in both themes (the `.impact` and `color-scheme: dark` rules do that).
+   Everything below that needs JavaScript has a still state: no-JS and the failsafe (`data-fallback`) show every
+   reveal open, hide the controls, switches and estimate, and keep the US monthly prices for 100 athletes. */
+
+.pricing [hidden] {
+  display: none !important;
+}
+:where(.pricing) button {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  color: inherit;
+  text-align: inherit;
+  cursor: pointer;
+}
+
+/* ---------- Hero ---------- */
+.p-hero {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  padding: 150px 0 230px;
+  text-align: center;
+}
+.p-hero .mesh .b {
+  opacity: 0.55;
+}
+.p-hero .orbits .fdot {
+  offset-path: path('M40,400 a760,250 0 1,0 1520,0 a760,250 0 1,0 -1520,0');
+  --d: 20s;
+}
+.p-hero__in {
+  position: relative;
+  z-index: 2;
+}
+.p-hero .eyebrow {
+  color: #eef3fb;
+}
+.p-hero h1 {
+  font-size: clamp(52px, 7.4vw, 124px);
+  color: #fff;
+  max-width: 12em;
+  margin: 20px auto 0;
+}
+.p-hero .lead {
+  margin: 22px auto 0;
+  text-align: center;
+  color: #d3dbe8;
+}
+.p-hero__controls {
+  position: relative;
+  z-index: 2;
+}
+
+/* ---------- Controls ---------- */
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 22px 44px;
+  margin-top: 44px;
+}
+.controls__bill {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+.seg {
+  position: relative;
+  display: inline-grid;
+  grid-template-columns: 1fr 1fr;
+  margin: 0;
+  min-width: 0;
+  padding: 5px;
+  border: 0;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 0.08);
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.16);
+}
+.seg__thumb {
+  position: absolute;
+  top: 5px;
+  bottom: 5px;
+  left: 5px;
+  width: calc(50% - 5px);
+  border-radius: 999px;
+  background: #fff;
+  transition: transform 450ms var(--e-spring);
+}
+.seg:has(input[value='annual']:checked) .seg__thumb {
+  transform: translateX(100%);
+}
+.seg__opt {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  border-radius: 999px;
+  cursor: pointer;
+}
+.seg__opt input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+.seg__opt span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 46px;
+  padding: 0 26px;
+  font-size: 15px;
+  font-weight: 600;
+  color: #d3dbe8;
+  transition: color 300ms;
+}
+.seg__opt:has(input:checked) span {
+  color: #04101f;
+}
+.seg__opt:has(input:focus-visible) {
+  outline: 3px solid var(--cyan);
+  outline-offset: 2px;
+}
+.saves {
+  margin: 0;
+  padding: 6px 10px;
+  border-radius: 8px;
+  background: rgb(52 211 153 / 0.14);
+  font: 600 13px/1 var(--f-mono);
+  letter-spacing: 0.06em;
+  color: #34d399;
+}
+.roster {
+  width: min(520px, 90vw);
+  text-align: left;
+}
+.roster__label {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 8px;
+  padding-top: 4px;
+  font-size: 14px;
+  color: #d3dbe8;
+}
+.roster__label b {
+  font: 900 30px/1 var(--f-display);
+  font-variation-settings: 'wdth' 70;
+  color: #fff;
+}
+.roster__label small {
+  margin-left: 6px;
+  font: 500 14px/1 var(--f-text);
+  color: #c4cedd;
+}
+.range {
+  position: relative;
+  height: 44px;
+}
+.range input {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  opacity: 0;
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+}
+.range input::-webkit-slider-runnable-track {
+  height: 44px;
+  background: transparent;
+}
+.range input::-moz-range-track {
+  height: 44px;
+  background: transparent;
+}
+.range input::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 24px;
+  height: 24px;
+  margin-top: 10px;
+  border: 0;
+  border-radius: 50%;
+}
+.range input::-moz-range-thumb {
+  width: 24px;
+  height: 24px;
+  border: 0;
+  border-radius: 50%;
+}
+.range__trk,
+.range__fil {
+  position: absolute;
+  top: 20px;
+  left: 0;
+  height: 4px;
+  border-radius: 4px;
+}
+.range__trk {
+  right: 0;
+  background: rgb(255 255 255 / 0.18);
+}
+.range__fil {
+  width: calc(12px + (100% - 24px) * var(--f, 0));
+  background: var(--grad-brand);
+  transition: width 350ms var(--e-out);
+}
+.range__knob {
+  position: absolute;
+  top: 10px;
+  left: calc(12px + (100% - 24px) * var(--f, 0));
+  width: 24px;
+  height: 24px;
+  margin-left: -12px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow:
+    0 0 0 6px rgb(0 190 243 / 0.25),
+    0 6px 16px rgb(0 0 0 / 0.4);
+  transition:
+    left 350ms var(--e-out),
+    box-shadow 200ms;
+}
+.range input:focus-visible ~ .range__knob {
+  box-shadow:
+    0 0 0 4px #00bef3,
+    0 6px 16px rgb(0 0 0 / 0.4);
+}
+.range:has(input:focus-visible) {
+  border-radius: 22px;
+  outline: 3px solid var(--cyan);
+  outline-offset: 4px;
+}
+.ticks {
+  position: relative;
+  height: 26px;
+}
+.tk {
+  position: absolute;
+  top: 0;
+  left: calc(12px + (100% - 24px) * var(--f, 0));
+  transform: translateX(-50%);
+  padding: 4px 5px;
+  font: 500 11px/1 var(--f-mono);
+  color: #a9b4c6;
+  cursor: pointer;
+  transition: color 200ms;
+}
+.tk.on {
+  color: #fff;
+}
+/* The end labels sit inside the track instead of hanging past it. */
+.tk:first-child {
+  transform: translateX(-12px);
+}
+.tk:last-child {
+  transform: translateX(calc(-100% + 12px));
+}
+.currency {
+  flex: 1 0 100%;
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: #c4cedd;
+  text-align: center;
+}
+.controls-note {
+  display: none;
+  max-width: 56ch;
+  margin: 34px auto 0;
+  font-size: 14px;
+  color: #d3dbe8;
+  text-align: center;
+}
+
+/* ---------- Plan cards ---------- */
+.plans-section {
+  position: relative;
+  z-index: 3;
+  margin-top: -170px;
+}
+.plans {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 0 14px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.pricing .pcard {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  grid-row: span 8;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: subgrid;
+  row-gap: 0;
+  min-width: 0;
+  padding: 26px 22px 22px;
+  border-radius: 26px;
+  background: var(--panel);
+  color: var(--ink);
+  box-shadow:
+    0 0 0 1px var(--panel-line),
+    0 40px 80px -40px rgb(8 19 43 / 0.35);
+  transition:
+    opacity 700ms var(--e-out) calc(var(--i, 0) * 70ms),
+    transform 900ms var(--e-out) calc(var(--i, 0) * 70ms),
+    translate 350ms var(--e-out),
+    box-shadow 350ms;
+}
+.pricing .pcard:hover {
+  translate: 0 -8px;
+}
+.pcard::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background: radial-gradient(320px circle at var(--sx, 50%) var(--sy, 0%), rgb(0 190 243 / 0.12), transparent 60%);
+  opacity: 0;
+  transition: opacity 300ms;
+  pointer-events: none;
+}
+.pcard:hover::after {
+  opacity: 1;
+}
+.pricing .pcard--performance {
+  color-scheme: dark;
+  background: #06102a;
+  box-shadow: 0 50px 100px -40px rgb(0 190 243 / 0.5);
+}
+.pcard--performance::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  border-radius: inherit;
+  padding: 2px;
+  /* The angle is read here, on the element that animates it. --grad-iris resolves var(--a) where it is declared (:root),
+     so an animated --a on this pseudo-element never reached it and the border stood still. */
+  background: conic-gradient(from var(--a), #00bef3, #8b5cf6, #ff4d5e, #34d399, #00bef3);
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  animation: spinA 5s linear infinite;
+  pointer-events: none;
+}
+.pcard__badge {
+  position: absolute;
+  top: -14px;
+  left: 22px;
+  z-index: 2;
+  margin: 0;
+  padding: 7px 9px;
+  border-radius: 8px;
+  background: var(--grad-brand);
+  font: 600 10.5px/1 var(--f-mono);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #04101f;
+}
+.pcard__name {
+  grid-row: 1;
+  margin: 0;
+  font: 800 24px/1 var(--f-display);
+  font-variation-settings: 'wdth' 80;
+  letter-spacing: -0.01em;
+}
+.pcard__price {
+  grid-row: 2;
+  display: flex;
+  align-items: flex-end;
+  gap: 6px;
+  min-height: 66px;
+  margin: 22px 0 0;
+}
+.pcard__amount {
+  display: inline-flex;
+  align-items: flex-start;
+  font: 900 clamp(40px, 3.6vw, 60px) / 1 var(--f-display);
+  font-variation-settings: 'wdth' 62;
+  font-variant-numeric: tabular-nums;
+}
+.pcard__price--text .pcard__amount {
+  font-size: clamp(30px, 2.8vw, 44px);
+}
+.pcard__unit,
+.pcard__from {
+  padding-bottom: 6px;
+  font-size: 13px;
+  line-height: 1.3;
+  color: var(--ink2);
+}
+.pcard__lines {
+  grid-row: 3;
+  margin-top: 12px;
+}
+.pcard__lines p {
+  margin: 0 0 2px;
+  font-size: 14px;
+  color: var(--ink2);
+}
+.pcard__cta {
+  grid-row: 4;
+  display: flex;
+  margin-top: 18px;
+}
+.pcard__cta .btn {
+  width: 100%;
+  height: auto;
+  min-height: 48px;
+  padding: 8px 10px;
+  line-height: 1.2;
+  white-space: normal;
+  text-align: center;
+  text-wrap: balance;
+}
+.pcard__checks {
+  grid-row: 5;
+  display: grid;
+  align-content: start;
+  gap: 10px;
+  margin: 20px 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: 14px;
+}
+.pcard__checks li {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+.pcard__checks span {
+  min-width: 0;
+}
+.pcard__tick {
+  flex: none;
+  box-sizing: border-box;
+  width: 18px;
+  height: 18px;
+  margin-top: 1px;
+  padding: 3px;
+  border-radius: 6px;
+  background: var(--mint);
+  color: #04101f;
+}
+.pcard__foot {
+  grid-row: 6;
+  margin-top: 18px;
+  padding-top: 14px;
+  border-top: 1px solid var(--panel-line);
+  font-size: 13px;
+  color: var(--ink2);
+}
+.pcard__foot p {
+  margin: 0;
+}
+.pcard__more,
+.addon__more {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--link);
+  text-align: left;
+}
+.pcard__more {
+  margin-top: 4px;
+}
+.pcard__reveal {
+  grid-row: 7;
+}
+.pcard__reveal > div {
+  font-size: 13px;
+  color: var(--ink2);
+}
+.pricing .pcard__reveal .reveal__text {
+  margin: 8px 0 0;
+  padding: 0;
+  font-size: 13px;
+}
+.edu {
+  width: 100%;
+  margin-top: 10px;
+  border-collapse: collapse;
+}
+.edu th,
+.edu td {
+  padding: 6px 0;
+  border-top: 1px solid var(--panel-line);
+  font-weight: 500;
+  text-align: left;
+}
+.edu thead th {
+  border-top: 0;
+  font: 500 11px/1.2 var(--f-mono);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.edu .edu__n {
+  padding-left: 8px;
+  text-align: right;
+}
+.edu td.edu__n {
+  font-weight: 600;
+  color: var(--ink);
+}
+.pcard__use {
+  grid-row: 8;
+  align-self: end;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  margin-top: 14px;
+  padding: 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink2);
+  text-align: left;
+}
+.pcard__use i {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 2px currentColor;
+  transition: background-color 200ms;
+}
+.pcard__use[aria-pressed='true'] {
+  color: var(--ink);
+}
+.pcard__use[aria-pressed='true'] i {
+  background: var(--cyan);
+  box-shadow: inset 0 0 0 2px var(--cyan);
+}
+.pcard__use[aria-pressed='true'] i::after {
+  content: '';
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #04101f;
+}
+.pricing .pcard :focus-visible {
+  border-radius: 12px;
+}
+.pricing .pcard .btn:focus-visible {
+  border-radius: 999px;
+}
+
+/* The "+" that turns into a cross when its panel is open. */
+.pm {
+  display: inline-block;
+  font-style: normal;
+  line-height: 1;
+  transition: transform 400ms var(--e-spring);
+}
+[aria-expanded='true'] .pm {
+  transform: rotate(45deg);
+}
+
+/* Height reveal: the row animates 0fr to 1fr, so the panel can be any height. Closed panels are not focusable. */
+.reveal {
+  display: grid;
+  grid-template-rows: 0fr;
+  visibility: hidden;
+  transition:
+    grid-template-rows 450ms var(--e-out),
+    visibility 0s linear 450ms;
+}
+.reveal.open {
+  grid-template-rows: 1fr;
+  visibility: visible;
+  transition:
+    grid-template-rows 450ms var(--e-out),
+    visibility 0s;
+}
+.reveal > div {
+  min-height: 0;
+  overflow: hidden;
+}
+.reveal__text {
+  margin: 0;
+  padding: 14px 0 4px 68px;
+  max-width: 62ch;
+  font-size: 14.5px;
+  color: var(--ink2);
+}
+.reveal__action {
+  margin: 0;
+  padding: 10px 0 4px 68px;
+}
+
+/* ---------- Odometer ---------- */
+/* While a price rolls, the element holds its real value in a visually hidden span and the wheels are an aria-hidden
+   picture of it (.odo). Every character is generated from data-ch, so no text node or accessible name ever shows a
+   0 to 9 strip. */
+.odo-on {
+  position: relative;
+}
+.odo {
+  display: inline-flex;
+  align-items: flex-start;
+}
+.odo-ch::before {
+  content: attr(data-ch);
+}
+.odo-on .dg {
+  position: relative;
+  display: inline-block;
+  height: 1em;
+  overflow: hidden;
+  line-height: 1;
+}
+.odo-on .dg::after {
+  content: attr(data-ch);
+  visibility: hidden;
+}
+.odo-on .dg::before {
+  content: '0\A 1\A 2\A 3\A 4\A 5\A 6\A 7\A 8\A 9';
+  position: absolute;
+  left: 0;
+  top: 0;
+  white-space: pre;
+  line-height: 1;
+  transform: translateY(calc(var(--d, 0) * -1em));
+  transition: transform 700ms var(--e-spring);
+  transition-delay: calc(var(--k, 0) * 45ms);
+}
+
+/* ---------- Add-ons ---------- */
+.addons {
+  background: var(--bg);
+}
+.addons__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 380px;
+  gap: 32px;
+  align-items: start;
+}
+.addons__list {
+  display: grid;
+  gap: 14px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.pricing .addon {
+  padding: 22px 24px;
+  border-radius: 24px;
+  background: var(--surface);
+  transition:
+    opacity 700ms var(--e-out) calc(var(--i, 0) * 70ms),
+    transform 900ms var(--e-out) calc(var(--i, 0) * 70ms),
+    background-color 300ms,
+    box-shadow 300ms;
+}
+.pricing .addon[data-on='true'] {
+  background: var(--panel);
+  box-shadow:
+    0 0 0 2px var(--cyan),
+    0 30px 60px -30px rgb(0 190 243 / 0.5);
+}
+.addon__top {
+  display: grid;
+  grid-template-columns: 52px minmax(0, 1fr) auto;
+  gap: 16px;
+  align-items: center;
+}
+.addon__icon {
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  border-radius: 16px;
+  color: #04101f;
+}
+.addon__icon--cyan {
+  background: var(--cyan);
+}
+.addon__icon--violet {
+  background: #b69cff;
+}
+.addon__icon--mint {
+  background: var(--mint);
+}
+.addon__name {
+  margin: 0;
+  font: 700 18px/1.2 var(--f-text);
+}
+.addon__price {
+  margin: 4px 0 0;
+  font: 600 14px/1.4 var(--f-mono);
+  color: var(--ink2);
+}
+.addon__price--text {
+  font-family: var(--f-text);
+}
+.addon__unit {
+  margin-left: 2px;
+}
+.sw {
+  position: relative;
+  flex: none;
+  width: 58px;
+  height: 44px;
+  padding: 0;
+  border-radius: 999px;
+  cursor: pointer;
+}
+.sw::before {
+  content: '';
+  position: absolute;
+  inset: 5px 0;
+  border-radius: 999px;
+  background: var(--surface2);
+  box-shadow: inset 0 0 0 1.5px var(--ink-3);
+  transition: background-color 300ms;
+}
+.sw i {
+  position: absolute;
+  left: 4px;
+  top: 9px;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 2px 6px rgb(8 19 43 / 0.35);
+  transition: transform 450ms var(--e-spring);
+}
+.sw[aria-checked='true']::before {
+  background: var(--cyan);
+  box-shadow: inset 0 0 0 1.5px var(--cyan-ink);
+}
+.sw[aria-checked='true'] i {
+  transform: translateX(24px);
+}
+.sw:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.pricing .sw:focus-visible {
+  border-radius: 999px;
+}
+.addon__sub {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 16px;
+  margin: 6px 0 0 68px;
+}
+.step {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px;
+  border-radius: 999px;
+  background: var(--surface2);
+  visibility: hidden;
+  opacity: 0;
+  transform: scale(0.9);
+  transition:
+    opacity 300ms,
+    transform 400ms var(--e-spring),
+    visibility 0s linear 400ms;
+}
+.addon[data-on='true'] .step {
+  visibility: visible;
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity 300ms,
+    transform 400ms var(--e-spring),
+    visibility 0s;
+}
+.step button {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--ink);
+}
+.step button:hover {
+  background: var(--panel);
+}
+.step button[aria-disabled='true'] {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.step output {
+  min-width: 40px;
+  font: 700 16px/1 var(--f-mono);
+  text-align: center;
+  color: var(--ink);
+}
+.addon__fact {
+  margin: 0;
+  padding: 10px 0 0 68px;
+  font: 600 14px/1.4 var(--f-mono);
+  color: var(--ink);
+}
+.addon__na {
+  margin: 8px 0 0 68px;
+  font-size: 12.5px;
+  color: var(--amber-ink);
+}
+
+/* ---------- Estimate ---------- */
+.pricing .est {
+  position: sticky;
+  top: 96px;
+  padding: 26px;
+  border-radius: 28px;
+  background: #06102a;
+  color: #fff;
+  box-shadow: 0 50px 100px -40px rgb(8 19 43 / 0.6);
+  overflow: hidden;
+  isolation: isolate;
+}
+.est::before {
+  content: '';
+  position: absolute;
+  inset: -40%;
+  z-index: -1;
+  background:
+    radial-gradient(circle at 80% 0%, rgb(0 190 243 / 0.35), transparent 40%),
+    radial-gradient(circle at 0% 100%, rgb(139 92 246 / 0.35), transparent 45%);
+  animation: drift1 18s ease-in-out infinite alternate;
+  /* Runs only while the shared autoplayer (pricing.ts) marks the panel on: visible, tab shown, no hover or focus inside. */
+  animation-play-state: paused;
+}
+.est[data-ap='on']::before {
+  animation-play-state: running;
+}
+.est__title {
+  margin: 0;
+  font: 600 12px/1 var(--f-mono);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #a9b4c6;
+}
+.est__lines {
+  margin-top: 16px;
+}
+.el {
+  display: grid;
+  grid-template-rows: 1fr;
+  transition:
+    grid-template-rows 400ms var(--e-out),
+    opacity 300ms;
+}
+.el.out {
+  grid-template-rows: 0fr;
+  opacity: 0;
+}
+.el > div {
+  min-height: 0;
+  overflow: hidden;
+}
+.el .r {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 11px 0;
+  border-bottom: 1px solid rgb(255 255 255 / 0.1);
+  font-size: 14.5px;
+}
+.el .r span:last-child {
+  font: 600 14px/1.3 var(--f-mono);
+  text-align: right;
+}
+.est__total {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 18px;
+}
+.est__total small {
+  padding-bottom: 6px;
+  font-size: 13px;
+  color: #a9b4c6;
+}
+.est__total .amt {
+  display: inline-flex;
+  align-items: flex-start;
+  font: 900 64px/1 var(--f-display);
+  font-variation-settings: 'wdth' 62;
+  font-variant-numeric: tabular-nums;
+}
+.est__setup {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 10px;
+  font-size: 13.5px;
+  color: #d3dbe8;
+}
+.est .btn {
+  width: 100%;
+  margin-top: 20px;
+}
+.est__fine {
+  margin: 12px 0 0;
+  font-size: 12px;
+  color: #a9b4c6;
+}
+.est.bump .est__total .amt {
+  animation: bump 500ms var(--e-spring);
+}
+@keyframes bump {
+  40% {
+    transform: scale(1.08);
+  }
+}
+
+/* ---------- FAQ ---------- */
+.faq {
+  background: var(--bg);
+  padding-top: 0;
+}
+.faq__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+  gap: 48px;
+}
+.faq__item {
+  border-bottom: 1px solid var(--line);
+}
+.faq__h {
+  margin: 0;
+  font: inherit;
+}
+.faq__q {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  width: 100%;
+  min-height: 44px;
+  padding: 24px 0;
+  font: 700 clamp(18px, 1.6vw, 22px) / 1.3 var(--f-text);
+  color: var(--ink);
+  text-align: left;
+}
+/* Plain question text for the no-JS and failsafe states, where the button would do nothing. */
+.faq__static {
+  display: none;
+  padding: 24px 0 16px;
+  font: 700 clamp(18px, 1.6vw, 22px) / 1.3 var(--f-text);
+  color: var(--ink);
+}
+.faq__q .pm {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--surface);
+  font-size: 20px;
+  transition:
+    transform 400ms var(--e-spring),
+    background-color 300ms;
+}
+.faq__q[aria-expanded='true'] .pm {
+  background: var(--cyan);
+  color: #04101f;
+}
+.faq__a p {
+  margin: 0;
+  padding: 0 60px 24px 0;
+  font-size: 16px;
+  color: var(--ink2);
+}
+
+/* ---------- Final CTA: the shared reel look comes from home/final.css ---------- */
+
+/* ---------- Responsive ---------- */
+@media (max-width: 1199px) {
+  .plans {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+  .pricing .pcard {
+    grid-column: span 2;
+  }
+  .pricing .pcard--schools,
+  .pricing .pcard--federations {
+    grid-column: span 3;
+    margin-top: 14px;
+  }
+}
+@media (max-width: 1180px) {
+  .addons__grid {
+    grid-template-columns: 1fr;
+  }
+  .pricing .est {
+    position: relative;
+    top: 0;
+  }
+}
+@media (max-width: 720px) {
+  .plans {
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+  }
+  .pricing .pcard {
+    display: flex;
+    flex-direction: column;
+    grid-row: auto;
+  }
+  .pricing .pcard--schools,
+  .pricing .pcard--federations {
+    margin-top: 0;
+  }
+  .pcard__use {
+    margin-top: auto;
+    padding-top: 6px;
+  }
+  .pcard__price {
+    margin-top: 18px;
+  }
+}
+@media (max-width: 640px) {
+  .p-hero {
+    padding: 116px 0 190px;
+  }
+  .plans-section {
+    margin-top: -150px;
+  }
+  .seg__opt span {
+    padding: 0 18px;
+  }
+  .reveal__text,
+  .reveal__action,
+  .addon__fact {
+    padding-left: 0;
+  }
+  .addon__sub,
+  .addon__na {
+    margin-left: 0;
+  }
+  .addon__top {
+    grid-template-columns: 44px minmax(0, 1fr) auto;
+    gap: 12px;
+  }
+  .addon__icon {
+    width: 44px;
+    height: 44px;
+  }
+  .pricing .addon {
+    padding: 20px 18px;
+  }
+  .faq__grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+  .faq__a p {
+    padding-right: 0;
+  }
+  .pricing .est {
+    padding: 22px 20px;
+  }
+  .est__total .amt {
+    font-size: 56px;
+  }
+}
+
+/* Browsers without subgrid: cards stack their rows and the button sits at the bottom. */
+@supports not (grid-template-rows: subgrid) {
+  .pricing .pcard {
+    display: flex;
+    flex-direction: column;
+    grid-row: auto;
+  }
+  .pcard__use {
+    margin-top: auto;
+  }
+}
+
+/* ---------- Without JavaScript, or when the script fails to start (data-fallback) ---------- */
+html:not(.js) .pricing .rv,
+html:not(.js) .pricing .lines > span > span,
+.pricing[data-fallback] .rv,
+.pricing[data-fallback] .lines > span > span {
+  opacity: 1;
+  transform: none;
+}
+html:not(.js) .controls,
+.pricing[data-fallback] .controls {
+  display: none;
+}
+html:not(.js) .controls-note,
+.pricing[data-fallback] .controls-note {
+  display: block;
+}
+html:not(.js) .reveal,
+.pricing[data-fallback] .reveal {
+  grid-template-rows: 1fr;
+  visibility: visible;
+}
+html:not(.js) [data-reveal-btn],
+html:not(.js) .sw,
+html:not(.js) .step,
+html:not(.js) .pcard__use,
+html:not(.js) .est,
+.pricing[data-fallback] [data-reveal-btn],
+.pricing[data-fallback] .sw,
+.pricing[data-fallback] .step,
+.pricing[data-fallback] .pcard__use,
+.pricing[data-fallback] .est {
+  display: none;
+}
+html:not(.js) .faq__static,
+.pricing[data-fallback] .faq__static {
+  display: block;
+}
+html:not(.js) .addons__grid,
+.pricing[data-fallback] .addons__grid {
+  grid-template-columns: minmax(0, 1fr);
+}
+html:not(.js) .addon__top,
+.pricing[data-fallback] .addon__top {
+  grid-template-columns: 52px minmax(0, 1fr);
+}
+/* Prices are filled in by the script; until it is ready the server-rendered ones stay hidden instead of flashing. */
+html.js .pricing:not([data-ready]):not([data-fallback]) [data-amount],
+html.js .pricing:not([data-ready]):not([data-fallback]) [data-schools-from],
+html.js .pricing:not([data-ready]):not([data-fallback]) [data-meta],
+html.js .pricing:not([data-ready]):not([data-fallback]) [data-billed] {
+  visibility: hidden;
+}
+
+/* ---------- Reduced motion: every effect has a still state ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .pcard--performance::before,
+  .est::before,
+  .est.bump .est__total .amt {
+    animation: none !important;
+  }
+  .pricing .pcard:hover {
+    translate: none;
+  }
+  .pcard::after {
+    display: none;
+  }
+  .odo-on .dg::before {
+    transition: none;
+  }
+}

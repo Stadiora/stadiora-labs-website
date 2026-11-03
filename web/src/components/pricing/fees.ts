@@ -1,6 +1,6 @@
 import { addOns, usd } from '../../data/prices';
 
-/** The custom-branded app fee, formatted from the price table. Shown in the add-ons strip and in its dialog. */
+/** The custom-branded app fee, formatted from the price table. Shown in the add-ons strip and in its More info panel. */
 export const brandedFee = {
   values: { monthly: usd(addOns.brandedApp.monthly), setup: usd(addOns.brandedApp.setup) },
   // Each amount gets a marker so the evidence checks can read it where it shows.

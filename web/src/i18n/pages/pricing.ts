@@ -9,7 +9,10 @@ export const en = {
     description:
       'Simple pricing that grows with your roster. Start free, then pick Core or Performance by athlete count. Education rates for schools and institutions.',
   },
-  h1: 'Simple pricing that grows with your roster.',
+  eyebrow: 'Pricing',
+  /** Three display lines; the last one carries the gradient. */
+  h1: ['Simple pricing', 'that grows with', 'your roster.'],
+  lead: 'Start free. Pay for the athletes you coach, not every member of your club.',
   plansTitle: 'Plans',
   controls: {
     label: 'Pricing options',
@@ -17,7 +20,9 @@ export const en = {
     monthly: 'Monthly',
     annual: 'Annual',
     annualSaves: 'Annual saves {percent}%',
-    athletes: 'Athletes:',
+    athletes: 'Athletes',
+    coaches: '· {coaches} coaches',
+    valueText: '{athletes} athletes, {coaches} coaches',
     currency: 'Prices in USD',
     noScript:
       'Showing prices for {athletes} athletes, billed monthly. To see other sizes or annual billing, turn on JavaScript or talk to us.',
@@ -31,7 +36,9 @@ export const en = {
     live: '{plan}, {amount} dollars per month',
     liveYearly: '{plan}, {amount} dollars per month, billed yearly',
   },
+  reveal: { more: 'More info' },
   plans: {
+    use: 'Use in my estimate',
     free: {
       name: 'Free',
       line: '{coaches} coach · up to {athletes} athletes',
@@ -54,7 +61,6 @@ export const en = {
       name: 'Schools and institutions',
       line: 'Education pricing for high schools, departments and colleges',
       sub: 'All program coaches included.',
-      rates: 'See education rates',
       cta: 'Book a school demo',
       checks: ['Admin overview', 'Guardian portal', 'Consent for minors'],
     },
@@ -68,18 +74,27 @@ export const en = {
   },
   addons: {
     title: 'Add-ons',
-    more: 'More info',
+    /** Two display lines. */
+    heading: ['Add what you need.', 'Watch the total move.'],
     extraCoach: {
       name: 'Extra coach',
-      modalTitle: 'Extra coach',
+      switch: 'Add extra coaches',
+      stepper: 'Number of extra coaches',
+      fewer: 'One fewer coach',
+      more: 'One more coach',
       body: 'Add a coach to Core or Performance beyond the coaches included at your athlete size.',
       priceLine: '{amount} per month for each extra coach.',
       note: 'Schools and institutions plans include every coach in the program, so this does not apply to them.',
+      unavailable: {
+        free: 'Free includes one coach. Choose Core or Performance to add coaches.',
+        schools: 'Schools and institutions plans include every coach in the program.',
+        federations: 'Federation and enterprise plans are sized with you.',
+      },
     },
     brandedApp: {
       name: 'Custom-branded app',
       price: '{monthly}/mo + {setup} setup',
-      modalTitle: 'Custom-branded app',
+      switch: 'Add a custom-branded app',
       body: "Your logo, colors and name on the athlete app, built on the same platform. We'll confirm timing and store setup with you.",
       priceLine: '{monthly} per month, plus a one-time {setup} setup.',
       cta: 'Talk to us',
@@ -87,13 +102,30 @@ export const en = {
     credits: {
       name: 'AI and video credits',
       price: 'Talk to us',
-      modalTitle: 'AI and video credits',
+      switch: 'Ask about AI and video credits',
       body: "Need more AI program generation or video analysis than your plan covers? Talk to us and we'll work out what fits.",
       cta: 'Talk to us',
     },
   },
+  estimate: {
+    title: 'Your estimate',
+    perMonth: 'per month',
+    fromPerMonth: 'from, per month',
+    custom: 'custom pricing',
+    plusCredits: '+ credits',
+    yearly: 'yearly',
+    setup: 'One-time setup',
+    schoolsRow: 'Schools and institutions, from',
+    planRow: '{plan} · {athletes} athletes',
+    coachRow: 'Extra coach × {qty}',
+    fine: 'An estimate, not a quote. There is no card form here: we confirm your plan with you.',
+    live: 'Estimate: {plan}, {amount} dollars per month',
+    liveFrom: 'Estimate: {plan}, from {amount} dollars per month',
+    liveCustom: 'Estimate: {plan}, custom pricing',
+    liveSetup: 'plus a one-time {setup} setup',
+    liveCredits: 'plus AI and video credits, talk to us',
+  },
   education: {
-    modalTitle: 'Education rates',
     intro: 'For schools and institutions. Every coach in the program is included.',
     caption: 'Education rates per month',
     colType: 'Program',
@@ -101,11 +133,11 @@ export const en = {
     colPrice: 'Per month',
     rows: { highSchool: 'High school', department: 'Department', college: 'College' },
     note: 'Education rates do not change with the annual toggle. Book a demo and we will fit them to your program.',
-    cta: 'Book a school demo',
   },
-  modal: { close: 'Close' },
   faq: {
-    title: 'Questions',
+    eyebrow: 'FAQ',
+    /** Two display lines. */
+    heading: ['Questions,', 'answered.'],
     items: [
       {
         q: 'What counts as an athlete?',
@@ -137,6 +169,13 @@ export const en = {
       },
     ],
   },
+  final: {
+    /** Two display lines; the second carries the gradient. */
+    title: ['Ready when', 'your season is.'],
+    lead: 'Start free with one coach and up to {athletes} athletes. No card needed.',
+    coach: 'Start as a coach',
+    demo: 'Book a school demo',
+  },
 };
 
 export type PricingCopy = typeof en;
@@ -147,7 +186,9 @@ export const es: PricingCopy = {
     description:
       'Precios simples que crecen con tu grupo. Empieza gratis y elige Core o Performance según el número de atletas. Tarifas educativas para escuelas e instituciones.',
   },
-  h1: 'Precios simples que crecen con tu grupo.',
+  eyebrow: 'Precios',
+  h1: ['Precios simples', 'que crecen con', 'tu grupo.'],
+  lead: 'Empieza gratis. Paga por los atletas que entrenas, no por cada miembro de tu club.',
   plansTitle: 'Planes',
   controls: {
     label: 'Opciones de precios',
@@ -155,7 +196,9 @@ export const es: PricingCopy = {
     monthly: 'Mensual',
     annual: 'Anual',
     annualSaves: 'Anual ahorra {percent} %',
-    athletes: 'Atletas:',
+    athletes: 'Atletas',
+    coaches: '· {coaches} entrenadores',
+    valueText: '{athletes} atletas, {coaches} entrenadores',
     currency: 'Precios en dólares (USD)',
     noScript:
       'Se muestran los precios para {athletes} atletas, con facturación mensual. Para ver otros tamaños o la facturación anual, activa JavaScript o habla con nosotros.',
@@ -169,7 +212,9 @@ export const es: PricingCopy = {
     live: '{plan}, {amount} dólares al mes',
     liveYearly: '{plan}, {amount} dólares al mes, facturación anual',
   },
+  reveal: { more: 'Más información' },
   plans: {
+    use: 'Usar en mi estimación',
     free: {
       name: 'Gratis',
       line: '{coaches} entrenador · hasta {athletes} atletas',
@@ -192,7 +237,6 @@ export const es: PricingCopy = {
       name: 'Escuelas e instituciones',
       line: 'Tarifas educativas para secundarias, departamentos y universidades',
       sub: 'Todos los entrenadores del programa incluidos.',
-      rates: 'Ver tarifas educativas',
       cta: 'Agenda una demo escolar',
       checks: ['Panel de administración', 'Portal de tutores', 'Consentimiento para menores'],
     },
@@ -206,18 +250,26 @@ export const es: PricingCopy = {
   },
   addons: {
     title: 'Complementos',
-    more: 'Más información',
+    heading: ['Suma lo que necesitas.', 'Mira cómo se mueve el total.'],
     extraCoach: {
       name: 'Entrenador adicional',
-      modalTitle: 'Entrenador adicional',
+      switch: 'Agregar entrenadores adicionales',
+      stepper: 'Número de entrenadores adicionales',
+      fewer: 'Un entrenador menos',
+      more: 'Un entrenador más',
       body: 'Suma un entrenador a Core o Performance más allá de los incluidos según el tamaño de tu grupo de atletas.',
       priceLine: '{amount} al mes por cada entrenador adicional.',
       note: 'Los planes para escuelas e instituciones incluyen a todos los entrenadores del programa, así que no aplica.',
+      unavailable: {
+        free: 'Gratis incluye un entrenador. Elige Core o Performance para sumar entrenadores.',
+        schools: 'Los planes para escuelas e instituciones incluyen a todos los entrenadores del programa.',
+        federations: 'Los planes para federaciones y empresas se dimensionan contigo.',
+      },
     },
     brandedApp: {
       name: 'App con tu marca',
       price: '{monthly}/mes + {setup} de configuración',
-      modalTitle: 'App con tu marca',
+      switch: 'Agregar una app con tu marca',
       body: 'Tu logo, tus colores y tu nombre en la app para atletas, construida sobre la misma plataforma. Confirmamos contigo los tiempos y la publicación en las tiendas.',
       priceLine: '{monthly} al mes, más {setup} de configuración única.',
       cta: 'Habla con nosotros',
@@ -225,13 +277,30 @@ export const es: PricingCopy = {
     credits: {
       name: 'Créditos de IA y video',
       price: 'Habla con nosotros',
-      modalTitle: 'Créditos de IA y video',
+      switch: 'Consultar por créditos de IA y video',
       body: 'Necesitas más generación de programas con IA o análisis de video de lo que cubre tu plan? Habla con nosotros y vemos qué te conviene.',
       cta: 'Habla con nosotros',
     },
   },
+  estimate: {
+    title: 'Tu estimación',
+    perMonth: 'al mes',
+    fromPerMonth: 'desde, al mes',
+    custom: 'precio a la medida',
+    plusCredits: '+ créditos',
+    yearly: 'anual',
+    setup: 'Configuración única',
+    schoolsRow: 'Escuelas e instituciones, desde',
+    planRow: '{plan} · {athletes} atletas',
+    coachRow: 'Entrenador adicional × {qty}',
+    fine: 'Es una estimación, no una cotización. Aquí no hay formulario de tarjeta: confirmamos tu plan contigo.',
+    live: 'Estimación: {plan}, {amount} dólares al mes',
+    liveFrom: 'Estimación: {plan}, desde {amount} dólares al mes',
+    liveCustom: 'Estimación: {plan}, precio a la medida',
+    liveSetup: 'más {setup} de configuración única',
+    liveCredits: 'más créditos de IA y video, habla con nosotros',
+  },
   education: {
-    modalTitle: 'Tarifas educativas',
     intro: 'Para escuelas e instituciones. Todos los entrenadores del programa están incluidos.',
     caption: 'Tarifas educativas por mes',
     colType: 'Programa',
@@ -239,11 +308,10 @@ export const es: PricingCopy = {
     colPrice: 'Por mes',
     rows: { highSchool: 'Secundaria', department: 'Departamento', college: 'Universidad' },
     note: 'Las tarifas educativas no cambian con la opción anual. Agenda una demo y las ajustamos a tu programa.',
-    cta: 'Agenda una demo escolar',
   },
-  modal: { close: 'Cerrar' },
   faq: {
-    title: 'Preguntas',
+    eyebrow: 'Preguntas frecuentes',
+    heading: ['Preguntas,', 'respondidas.'],
     items: [
       {
         q: 'Qué cuenta como un atleta?',
@@ -274,5 +342,11 @@ export const es: PricingCopy = {
         a: 'Los tutores dan el consentimiento por los menores. Los atletas eligen qué ve cada entrenador. Los administradores no pueden anular el consentimiento. Aria for Families, el portal de tutores, está incluido en los planes para escuelas. Para clubes y academias está disponible: habla con nosotros.',
       },
     ],
+  },
+  final: {
+    title: ['Listos cuando', 'empiece tu temporada.'],
+    lead: 'Empieza gratis con un entrenador y hasta {athletes} atletas. Sin tarjeta.',
+    coach: 'Empieza como entrenador',
+    demo: 'Agenda una demo escolar',
   },
 };
