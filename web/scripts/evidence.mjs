@@ -1,14 +1,17 @@
 // Evidence run for the home page: screenshots, interaction checks and measured budgets.
 //   npm run build && npm run evidence          (everything)
 //   node scripts/evidence.mjs --checks-only    (no screenshots)
+//   node scripts/evidence.mjs --nav-only       (header geometry, mega panel height, drawer and panel focus only)
 // Output goes to web/.evidence/ (git-ignored): PNGs plus summary.json. Exit code 1 when a check fails.
 import { mkdir, readdir, readFile, rm, writeFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import { chromium } from 'playwright';
+import { navChecks } from './lib/nav-checks.mjs';
 import { serve } from './lib/static-server.mjs';
 
 const root = fileURLToPath(new URL('..', import.meta.url));
 const outDir = `${root}.evidence/`;
+const navOnly = process.argv.includes('--nav-only');
 const checksOnly = process.argv.includes('--checks-only');
 
 await rm(outDir, { recursive: true, force: true });
@@ -70,8 +73,19 @@ async function settle(page) {
 const shot = (page, name, opts = {}) => page.screenshot({ path: `${outDir}${name}.png`, ...opts });
 const el = (page, selector, name) => page.locator(selector).first().screenshot({ path: `${outDir}${name}.png` });
 
+async function finish() {
+  await browser.close();
+  await server.close();
+
+  const failed = results.filter((r) => !r.pass);
+  await writeFile(`${outDir}summary.json`, JSON.stringify({ results, metrics }, null, 2));
+  console.log(`\n${results.length - failed.length}/${results.length} checks passed`);
+  console.log(JSON.stringify(metrics, null, 2));
+  process.exit(failed.length ? 1 : 0);
+}
+
 // ---------------------------------------------------------------- 1. static captures
-if (!checksOnly) {
+if (!checksOnly && !navOnly) {
   for (const locale of ['en', 'es']) {
     const path = locale === 'en' ? '/' : '/es/';
     for (const scheme of ['light', 'dark']) {
@@ -95,6 +109,10 @@ if (!checksOnly) {
     }
   }
 }
+
+// ---------------------------------------------------------------- 1b. header: geometry, mega panel height, drawer and panel focus (fix round B)
+await navChecks({ open, check, shot, sleep, checksOnly, metrics });
+if (navOnly) await finish();
 
 // ---------------------------------------------------------------- 2. interactions (motion on)
 // Hero cycle: the first painted word is "coaches" (also in the no-JS HTML) and the rotation visits all seven
@@ -628,11 +646,4 @@ metrics['js-inline-bytes-home'] = [...homeHtml.matchAll(/<script(?![^>]*ld\+json
 const dist = await readdir(`${root}dist/_astro`);
 check('perf', 'no video files shipped (budget 1.5 MB each)', !dist.some((f) => /\.(mp4|webm)$/.test(f)));
 
-await browser.close();
-await server.close();
-
-const failed = results.filter((r) => !r.pass);
-await writeFile(`${outDir}summary.json`, JSON.stringify({ results, metrics }, null, 2));
-console.log(`\n${results.length - failed.length}/${results.length} checks passed`);
-console.log(JSON.stringify(metrics, null, 2));
-process.exit(failed.length ? 1 : 0);
+await finish();
