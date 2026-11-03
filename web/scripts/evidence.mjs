@@ -346,7 +346,9 @@ const measure = {
       let imageBg = false;
       for (let n = e; n; n = n.parentElement) {
         const cs = getComputedStyle(n);
-        if (cs.backgroundImage !== 'none') imageBg = true;
+        // Link underlines are a zero-width gradient until hover; only real image or gradient fills defeat the check.
+        const fill = cs.backgroundImage;
+        if (fill !== 'none' && (/url\(/.test(fill) || !/^0(px|%) /.test(cs.backgroundSize))) imageBg = true;
         stack.push(rgba(cs.backgroundColor));
         if (rgba(cs.backgroundColor)[3] >= 0.99) break;
       }
