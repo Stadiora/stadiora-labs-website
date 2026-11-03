@@ -1,7 +1,6 @@
 ---
 import { Image } from 'astro:assets';
-import logoLight from '../../assets/brand/logo-light.png';
-import logoWhite from '../../assets/brand/logo-white.png';
+import wordmark from '../../assets/brand/wordmark-white.png';
 import { localePath, useDict, type Locale } from '../../i18n';
 import { site } from '../../data/site';
 import { appLinks, hrefFor, platformColumns, resourceItems, solutionItems } from '../../data/nav';
@@ -31,10 +30,18 @@ const appStores: Record<string, { label: string; href: string }[]> = {
 
 <div class="nav-scrim" data-nav-scrim></div>
 <header class="nav" data-nav>
-  <div class="nav__bar container">
+  <div class="nav__bar">
     <a class="nav__logo" href={home} aria-label={t.a11y.homeLink}>
-      <Image src={logoLight} alt="" width={216} densities={[1, 2]} format="webp" class="only-light" loading="eager" />
-      <Image src={logoWhite} alt="" width={216} densities={[1, 2]} format="webp" class="only-dark" loading="eager" />
+      <svg class="nav__mark" viewBox="0 0 48 48" fill="none" aria-hidden="true" focusable="false">
+        <g class="nav__orbit">
+          <ellipse cx="24" cy="24" rx="20" ry="10.5" transform="rotate(-24 24 24)" stroke="#00BEF3" stroke-width="2.4"></ellipse>
+          <circle cx="40" cy="9.5" r="3.6" fill="#00BEF3"></circle>
+          <circle cx="7.5" cy="31" r="3.6" fill="#8B5CF6"></circle>
+          <circle cx="31" cy="37.2" r="3.1" fill="#00BEF3"></circle>
+        </g>
+        <ellipse cx="24" cy="23" rx="9" ry="5.6" stroke="#fff" stroke-width="4"></ellipse>
+      </svg>
+      <Image src={wordmark} alt="" width={74} height={22} densities={[1, 2]} format="webp" class="nav__word" loading="eager" />
     </a>
 
     <nav class="nav__menu" id="nav-menu" aria-label={t.a11y.mainNav} data-nav-menu>
@@ -212,56 +219,125 @@ const appStores: Record<string, { label: string; href: string }[]> = {
     pointer-events: auto;
   }
 
+  /* The Floodlight bar: a floating glass pill that is dark in both themes. color-scheme: dark makes every
+     light-dark() token below resolve to its dark value, so the mega panels and controls follow without overrides. */
   .nav {
     --nav-cur: var(--nav-h);
     position: fixed;
     inset: 0 0 auto 0;
     z-index: 100;
-    height: var(--nav-cur);
-    border-bottom: 1px solid var(--line);
-    transition: height 0.3s var(--ease-out);
+    display: flex;
+    justify-content: center;
+    padding: 18px var(--gutter) 0;
+    color: #fff;
+    color-scheme: dark;
+    pointer-events: none;
+    transition: padding 0.45s var(--e-out);
   }
-  /* The translucent blurred background lives on a pseudo-element so backdrop-filter does not
-     become the containing block of the fixed mobile drawer. */
-  .nav::before {
+  :global(html[data-scrolled]) .nav {
+    --nav-cur: var(--nav-h-compact);
+    padding-top: 12px;
+  }
+  .nav__bar {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 28px;
+    width: 100%;
+    max-width: var(--maxw);
+    height: 64px;
+    padding: 0 10px 0 18px;
+    pointer-events: auto;
+    transition:
+      max-width 0.6s var(--e-inout),
+      height 0.45s var(--e-out);
+  }
+  /* The glass lives on a pseudo-element so backdrop-filter does not become the containing block of the
+     fixed mobile drawer. Over the home hero it is invisible until the page scrolls. */
+  .nav__bar::before {
     content: '';
     position: absolute;
     inset: 0;
     z-index: -1;
-    background: var(--bg);
-    transition: background-color 0.3s var(--ease-out);
-  }
-  :global(html[data-scrolled]) .nav {
-    --nav-cur: var(--nav-h-compact);
-  }
-  :global(html[data-scrolled]) .nav::before {
+    border-radius: 22px;
     background: var(--nav-bg);
-    -webkit-backdrop-filter: blur(12px);
-    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(18px) saturate(1.6);
+    backdrop-filter: blur(18px) saturate(1.6);
+    box-shadow:
+      0 0 0 1px rgb(255 255 255 / 0.08),
+      0 20px 50px -18px rgb(0 0 0 / 0.6);
+    transition:
+      opacity 0.45s,
+      border-radius 0.45s var(--e-out);
   }
-  .nav__bar {
-    display: flex;
-    align-items: center;
-    height: 100%;
-    gap: 24px;
-    width: min(100% - 2 * var(--gutter), 1440px);
+  :global(html:not([data-scrolled]) body[data-hero]) .nav__bar::before {
+    opacity: 0;
+  }
+  :global(html[data-scrolled]) .nav__bar {
+    max-width: 1120px;
+    height: 56px;
+  }
+  :global(html[data-scrolled]) .nav__bar::before {
+    border-radius: var(--r-pill);
+  }
+  /* Scroll progress: a gradient line along the bottom of the compact pill; nav.ts sets --progress. */
+  .nav__bar::after {
+    content: '';
+    position: absolute;
+    left: 24px;
+    right: 24px;
+    bottom: 0;
+    height: 2px;
+    border-radius: 2px;
+    background: var(--grad-brand);
+    transform-origin: 0 50%;
+    transform: scaleX(var(--progress, 0));
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+  :global(html[data-scrolled]) .nav__bar::after {
+    opacity: 1;
   }
   .nav__logo {
     flex: none;
     display: flex;
     align-items: center;
+    gap: 10px;
     min-height: 44px;
     line-height: 0;
-    border-radius: 6px;
+    border-radius: 12px;
   }
-  .nav__logo :global(img) {
-    width: 216px;
+  .nav__mark {
+    width: 40px;
+    height: 40px;
+    flex: none;
+    transition: transform 0.6s var(--e-spring);
+  }
+  .nav__orbit {
+    transform-origin: 24px 24px;
+    animation: nav-orbit 16s linear infinite;
+  }
+  @keyframes nav-orbit {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+  .nav__logo :global(.nav__word) {
+    width: 74px;
     height: auto;
-    transform-origin: left center;
-    transition: transform 0.3s var(--ease-out);
+    transform-origin: 0 50%;
+    transition:
+      opacity 0.3s,
+      transform 0.45s var(--e-out),
+      width 0.45s var(--e-out);
   }
-  :global(html[data-scrolled]) .nav__logo :global(img) {
-    transform: scale(0.85);
+  :global(html[data-scrolled]) .nav__mark {
+    transform: rotate(-360deg) scale(0.9);
+  }
+  :global(html[data-scrolled]) .nav__logo :global(.nav__word) {
+    width: 0;
+    opacity: 0;
+    transform: translateX(-12px) scale(0.9);
   }
 
   /* While the mobile drawer is open the page behind it does not scroll (nav.ts also marks it inert). */
@@ -277,8 +353,8 @@ const appStores: Record<string, { label: string; href: string }[]> = {
   .nav__list {
     display: flex;
     align-items: center;
-    justify-content: center;
-    gap: 6px;
+    justify-content: flex-start;
+    gap: 4px;
   }
   .nav__trigger,
   .nav__link {
@@ -289,36 +365,34 @@ const appStores: Record<string, { label: string; href: string }[]> = {
     min-height: 44px;
     padding: 0 14px;
     border: 0;
-    border-radius: var(--radius-ctl);
+    border-radius: var(--r-pill);
     background: none;
-    color: var(--ink);
+    color: rgb(255 255 255 / 0.86);
     font-family: var(--font-body);
-    font-size: 17px;
-    font-weight: 400;
+    font-size: 14px;
+    font-weight: 500;
     text-decoration: none;
     cursor: pointer;
     white-space: nowrap;
+    transition:
+      background-color 0.2s,
+      color 0.2s;
   }
   .nav__trigger:hover,
-  .nav__link:hover {
-    background: var(--surface);
+  .nav__link:hover,
+  .nav__trigger[aria-expanded='true'] {
+    background: rgb(255 255 255 / 0.1);
+    color: #fff;
   }
-  .nav__trigger::after,
   .nav__link[aria-current='page']::after {
     content: '';
     position: absolute;
     left: 14px;
     right: 14px;
-    bottom: 2px;
+    bottom: 5px;
     height: var(--lane);
-    background: var(--cyan);
-    transform: scaleX(0);
-    transform-origin: left;
-    transition: transform 0.25s var(--ease-out);
-  }
-  .nav__trigger[aria-expanded='true']::after,
-  .nav__link[aria-current='page']::after {
-    transform: scaleX(1);
+    border-radius: 3px;
+    background: var(--grad-brand);
   }
   .pm {
     position: relative;
@@ -350,22 +424,30 @@ const appStores: Record<string, { label: string; href: string }[]> = {
     flex: none;
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 6px;
   }
   .nav__signin {
     display: inline-flex;
     align-items: center;
     min-height: 44px;
-    padding: 0 10px;
-    color: var(--ink);
+    padding: 0 12px;
+    border-radius: var(--r-pill);
+    color: rgb(255 255 255 / 0.86);
     text-decoration: none;
-    font-size: 17px;
+    font-size: 14px;
+    font-weight: 500;
+    transition:
+      background-color 0.2s,
+      color 0.2s;
   }
   .nav__signin:hover {
-    text-decoration: underline;
-    text-decoration-color: var(--cyan);
-    text-decoration-thickness: 2px;
-    text-underline-offset: 6px;
+    background: rgb(255 255 255 / 0.1);
+    color: #fff;
+  }
+  .nav__cta {
+    min-height: 44px;
+    padding: 0 20px;
+    font-size: 14px;
   }
   .nav__bar-only {
     display: contents;
@@ -375,9 +457,10 @@ const appStores: Record<string, { label: string; href: string }[]> = {
     place-items: center;
     width: 44px;
     height: 44px;
-    border: 1px solid var(--line);
+    border: 0;
     border-radius: 50%;
-    background: var(--bg);
+    background: rgb(255 255 255 / 0.1);
+    color: #fff;
     cursor: pointer;
   }
   .nav__burger :global(.nav__burger-close) {
@@ -393,10 +476,10 @@ const appStores: Record<string, { label: string; href: string }[]> = {
     display: none;
   }
 
-  /* Mega panels (desktop) */
+  /* Mega panels (desktop): dark glass, 28px radius. They sit under the bar, which is their positioning context. */
   .mega {
     position: absolute;
-    top: calc(100% + 6px);
+    top: calc(100% + 10px);
     left: 50%;
     width: min(1200px, calc(100vw - 2 * var(--gutter)));
     display: flex;
@@ -404,18 +487,23 @@ const appStores: Record<string, { label: string; href: string }[]> = {
     /* Fits the space under the fixed header: the columns scroll, the footer CTA stays in view. */
     max-height: calc(100vh - var(--nav-cur) - 22px);
     max-height: calc(100dvh - var(--nav-cur) - 22px);
-    border: 1px solid var(--pop-border);
-    border-radius: var(--radius-card);
-    background: var(--bg);
-    box-shadow: var(--shadow-pop);
+    border: 0;
+    border-radius: 28px;
+    background: rgb(5 11 26 / 0.94);
+    -webkit-backdrop-filter: blur(24px);
+    backdrop-filter: blur(24px);
+    box-shadow:
+      0 0 0 1px rgb(255 255 255 / 0.08),
+      0 40px 100px -20px rgb(0 0 0 / 0.7);
     opacity: 0;
     visibility: hidden;
     pointer-events: none;
-    transform: translate(-50%, -8px);
+    transform: translate(-50%, -10px) scale(0.985);
+    transform-origin: 50% 0;
     transition:
-      opacity 0.2s ease,
-      transform 0.2s var(--ease-out),
-      visibility 0s linear 0.2s;
+      opacity 0.22s var(--e-out),
+      transform 0.32s var(--e-out),
+      visibility 0s linear 0.32s;
   }
   .mega::before {
     content: '';
@@ -431,8 +519,8 @@ const appStores: Record<string, { label: string; href: string }[]> = {
     pointer-events: auto;
     transform: translate(-50%, 0);
     transition:
-      opacity 0.2s ease,
-      transform 0.2s var(--ease-out),
+      opacity 0.22s var(--e-out),
+      transform 0.32s var(--e-out),
       visibility 0s;
   }
   .mega--solutions {
@@ -447,13 +535,13 @@ const appStores: Record<string, { label: string; href: string }[]> = {
     overflow-y: auto;
     overscroll-behavior: contain;
     scrollbar-width: thin;
-    padding: 28px 32px 20px;
-    border-radius: var(--radius-card) var(--radius-card) 0 0;
+    padding: 22px 22px 14px;
+    border-radius: 28px 28px 0 0;
   }
   .mega__cols {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 32px;
+    gap: 14px;
   }
   .mega__cols--2 {
     grid-template-columns: repeat(2, 1fr);
@@ -461,10 +549,19 @@ const appStores: Record<string, { label: string; href: string }[]> = {
   .mega__cols--1 {
     grid-template-columns: 1fr;
   }
+  .mega__col {
+    padding: 12px;
+    border-radius: 20px;
+    background: rgb(255 255 255 / 0.03);
+    transition: background-color 0.2s;
+  }
+  .mega__col:hover {
+    background: rgb(255 255 255 / 0.07);
+  }
   .mega__photo {
     overflow: hidden;
-    border-radius: 10px;
-    margin-bottom: 16px;
+    border-radius: 14px;
+    margin-bottom: 14px;
     opacity: 0;
     transition: opacity 0.25s ease calc(var(--i, 0) * 40ms);
   }
@@ -494,19 +591,20 @@ const appStores: Record<string, { label: string; href: string }[]> = {
   .mega__link {
     min-height: 44px;
   }
-  .mega__link:hover {
-    background: var(--surface);
+  .mega__link:hover,
+  .mega__link:focus-visible {
+    background: rgb(255 255 255 / 0.08);
   }
   .mega__name {
-    font-size: 16px;
-    line-height: 22px;
-    font-weight: 500;
+    font-size: 14px;
+    line-height: 20px;
+    font-weight: 600;
     color: var(--ink);
   }
   .mega__desc {
-    font-size: 14px;
-    line-height: 20px;
-    color: var(--ink-2);
+    font-size: 13px;
+    line-height: 18px;
+    color: #a9b4c6;
   }
   .mega__stores {
     display: flex;
@@ -524,45 +622,36 @@ const appStores: Record<string, { label: string; href: string }[]> = {
     display: flex;
     align-items: center;
     gap: 12px;
-    padding: 14px 32px;
-    border-top: 1px solid var(--line);
-    border-radius: 0 0 var(--radius-card) var(--radius-card);
-    background: var(--surface);
-    color: var(--ink-2);
-    font-size: 15px;
+    margin: 0 22px 22px;
+    padding: 6px 16px;
+    border-radius: 16px;
+    background: linear-gradient(90deg, rgb(0 190 243 / 0.14), rgb(139 92 246 / 0.14));
+    color: #fff;
+    font-size: 14px;
   }
   .mega__foot :global(.link) {
     display: inline-flex;
     align-items: center;
     min-height: 44px;
+    font-weight: 600;
   }
 
-  /* Desktop bar tiers (the longest labels are Spanish: Plataforma, Soluciones, Iniciar sesión, Empieza gratis).
-     From 1440px the full-size bar fits with room to spare; from 1280px a compact bar does; below 1280px the
-     drawer takes over. nav.ts matches the same 1280px edge. evidence.mjs measures the bar every 5px from 1025
-     to 1440 in EN and ES, so a longer label that no longer fits fails the check. */
+  /* Desktop bar (the longest labels are Spanish: Plataforma, Soluciones, Iniciar sesión, Empieza gratis).
+     From 1280px the bar fits with room to spare, so the wordmark stays; below 1280px the drawer takes over.
+     nav.ts matches the same 1280px edge. evidence.mjs measures the bar every 5px from 1025 to 1440 in EN and ES,
+     so a longer label that no longer fits fails the check. */
   @media (min-width: 1280px) {
     .nav__menu {
       min-width: max-content;
     }
   }
   @media (min-width: 1280px) and (max-width: 1439.98px) {
-    .nav__logo :global(img) {
-      width: 176px;
-    }
-    .nav__list {
-      gap: 0;
+    .nav__bar {
+      gap: 16px;
     }
     .nav__trigger,
     .nav__link {
-      padding: 0 10px;
-      font-size: 16px;
-    }
-    .nav__bar {
-      gap: 12px;
-    }
-    .nav__actions {
-      gap: 8px;
+      padding: 0 12px;
     }
   }
 
@@ -581,21 +670,27 @@ const appStores: Record<string, { label: string; href: string }[]> = {
     .nav__cta {
       min-height: 44px;
       padding: 0 16px;
-      font-size: 15px;
+      font-size: 14px;
     }
-    .nav__logo :global(img) {
-      width: 168px;
+    /* The bar's own controls stay above the full-screen drawer. */
+    .nav__logo,
+    .nav__actions {
+      position: relative;
+      z-index: 100;
+    }
+    .nav[data-menu-open] .nav__bar::before {
+      opacity: 0;
     }
     .nav__menu {
       position: fixed;
-      inset: var(--nav-cur) 0 0 0;
+      inset: 0;
       z-index: 99;
       display: none;
       flex: none;
       overflow-y: auto;
       overscroll-behavior: contain;
-      padding: 8px max(var(--gutter), calc((100vw - 640px) / 2)) 32px;
-      background: var(--bg);
+      padding: calc(var(--nav-cur) + 8px) max(var(--gutter), calc((100vw - 640px) / 2)) 32px;
+      background: var(--night);
     }
     .nav[data-menu-open] .nav__menu {
       display: block;
@@ -612,26 +707,24 @@ const appStores: Record<string, { label: string; href: string }[]> = {
       justify-content: space-between;
       min-height: 56px;
       padding: 0 4px;
-      font-size: 19px;
-      font-weight: 500;
+      font-family: var(--f-display);
+      font-size: 30px;
+      font-weight: 900;
+      font-stretch: 62%;
+      text-transform: uppercase;
+      letter-spacing: 0;
       border-radius: 0;
     }
     .nav__trigger:hover,
-    .nav__link:hover {
+    .nav__link:hover,
+    .nav__trigger[aria-expanded='true'] {
       background: none;
     }
-    .nav__trigger::after {
-      left: 0;
+    .nav__link[aria-current='page']::after {
+      left: 4px;
       right: auto;
-      top: 8px;
-      bottom: 8px;
-      width: var(--lane);
-      height: auto;
-      transform: scaleY(0);
-      transform-origin: top;
-    }
-    .nav__trigger[aria-expanded='true']::after {
-      transform: scaleY(1);
+      width: 40px;
+      bottom: 6px;
     }
     .mega,
     .mega--solutions,
@@ -644,6 +737,8 @@ const appStores: Record<string, { label: string; href: string }[]> = {
       border: 0;
       border-radius: 0;
       background: none;
+      -webkit-backdrop-filter: none;
+      backdrop-filter: none;
       box-shadow: none;
       opacity: 1;
       visibility: visible;
@@ -669,13 +764,22 @@ const appStores: Record<string, { label: string; href: string }[]> = {
       grid-template-columns: 1fr;
       gap: 8px;
     }
-    .mega__col {
-      padding-top: 8px;
+    .mega__col,
+    .mega__col:hover {
+      padding: 8px 0 0;
+      background: none;
+    }
+    .mega__name {
+      font-size: 16px;
+      line-height: 22px;
+    }
+    .mega__desc {
+      font-size: 14px;
+      line-height: 20px;
     }
     .mega__foot {
       margin: 8px 0 0;
       padding: 8px 12px;
-      border: 0;
       border-radius: var(--radius-ctl);
     }
     .nav__drawer-extras {
@@ -692,21 +796,37 @@ const appStores: Record<string, { label: string; href: string }[]> = {
       justify-content: space-between;
     }
   }
-  @media (max-width: 420px) {
-    .nav__logo :global(img) {
-      width: 146px;
+  @media (max-width: 640px) {
+    .nav {
+      padding: 10px 12px 0;
     }
+    .nav__bar {
+      height: 56px;
+      gap: 10px;
+      padding: 0 6px 0 12px;
+    }
+    .nav__logo :global(.nav__word) {
+      height: 18px;
+      width: 60px;
+    }
+  }
+  @media (max-width: 420px) {
     .nav__actions {
       gap: 4px;
     }
     .nav__cta {
       padding: 0 12px;
-      font-size: 14px;
+      font-size: 13px;
     }
   }
-  @media (max-width: 380px) {
-    .nav__logo :global(img) {
-      width: 132px;
+  @media (max-width: 360px) {
+    .nav__logo :global(.nav__word) {
+      display: none;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .nav__orbit {
+      animation: none;
     }
   }
 </style>

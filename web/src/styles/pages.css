@@ -1,12 +1,6 @@
 /* Styles shared by the solutions, resources and company pages. Tokens come from tokens.css; nothing here
    hard-codes a colour, so light and dark both follow the theme. */
 
-.eyebrow {
-  color: var(--ink-2);
-  font-size: 18px;
-  line-height: 26px;
-}
-
 /* A flat card: 1px line, 14px radius, no shadow. */
 .pcard {
   min-width: 0;
@@ -92,9 +86,5 @@
   }
   .strip__actions .btn {
     width: 100%;
-  }
-  .eyebrow {
-    font-size: 16px;
-    line-height: 24px;
   }
 }
