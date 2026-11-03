@@ -1,0 +1,68 @@
+---
+interface Action {
+  label: string;
+  href: string;
+  tone?: 'white' | 'outline';
+}
+interface Props {
+  title: string;
+  actions: Action[];
+  id?: string;
+}
+const { title, actions, id = 'cta-band-title' } = Astro.props;
+---
+
+<section class="band cband" aria-labelledby={id}>
+  <div class="container cband__row">
+    <h2 {id} class="cband__title h-lane">{title}</h2>
+    <div class="cband__actions">
+      {
+        actions.map((action, i) => (
+          <a class:list={['btn', 'btn--lg', i === 0 && action.tone !== 'outline' ? 'btn--white' : 'btn--on-band']} href={action.href}>
+            {action.label}
+          </a>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<style>
+  .cband {
+    padding-block: 72px 64px;
+    background: var(--band);
+    color: var(--band-ink);
+  }
+  .cband__row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 32px 48px;
+  }
+  .cband__title {
+    flex: 1 1 380px;
+    color: var(--band-ink);
+    font-size: clamp(32px, 3.6vw, 52px);
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    text-wrap: balance;
+  }
+  .cband__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+  @media (max-width: 720px) {
+    .cband {
+      padding-block: 56px 48px;
+    }
+    .cband__actions {
+      width: 100%;
+      flex-direction: column;
+    }
+    .cband__actions .btn {
+      width: 100%;
+    }
+  }
+</style>

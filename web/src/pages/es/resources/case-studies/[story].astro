@@ -1,0 +1,10 @@
+---
+import CaseStoryPage from '../../../../components/pages/CaseStoryPage.astro';
+
+// Placeholder story template: dev only. The production build has no story pages until a real story is approved.
+export function getStaticPaths() {
+  return import.meta.env.DEV ? [{ params: { story: 'sample-story' } }] : [];
+}
+---
+
+<CaseStoryPage locale="es" />

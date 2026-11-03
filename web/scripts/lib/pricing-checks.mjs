@@ -855,7 +855,7 @@ export async function pricingChecks({ browser, server, outDir, check, metrics, s
     }
     for (const locale of ['en', 'es']) {
       const l = links[locale];
-      check('pricing/links', `${locale}: Free, Core and Performance go to sign-up; Schools to the booking page; Federations to contact`, l.plan.free === SIGN_UP && l.plan.core === SIGN_UP && l.plan.performance === SIGN_UP && /^https:\/\/bookings\.cloud\.microsoft\//.test(l.plan.schools) && /connect/.test(l.plan.federations), JSON.stringify(l.plan));
+      check('pricing/links', `${locale}: Free, Core and Performance go to sign-up; Schools to the booking page; Federations to contact`, l.plan.free === SIGN_UP && l.plan.core === SIGN_UP && l.plan.performance === SIGN_UP && /^https:\/\/bookings\.cloud\.microsoft\//.test(l.plan.schools) && (l.plan.federations === (locale === 'es' ? '/es/contact/' : '/contact/') || l.plan.federations === '/connect.html'), JSON.stringify(l.plan));
     }
     check('pricing/links', 'the language switch keeps you on pricing in the other language', links.en.lang.includes('es=/es/pricing/') && links.es.lang.includes('en=/pricing/'), `${links.en.lang} | ${links.es.lang}`);
 

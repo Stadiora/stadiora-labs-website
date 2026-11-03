@@ -12,18 +12,10 @@ import { fileURLToPath } from 'node:url';
 
 const repoRoot = fileURLToPath(new URL('../../../', import.meta.url));
 
-const pr30 = 'PR #30 (solutions, about, contact, case studies)';
 const pr31 = 'PR #31 (platform coach pages)';
 const unowned = 'no open PR (linked by the foundation nav and footer, status "planned" in data/site.ts)';
 
 export const pendingRoutes = new Map([
-  ['/solutions/coaches/', pr30],
-  ['/solutions/teams-and-clubs/', pr30],
-  ['/solutions/schools/', pr30],
-  ['/solutions/athletes/', pr30],
-  ['/about/', pr30],
-  ['/contact/', pr30],
-  ['/resources/case-studies/', pr30],
   ['/platform/programs/', pr31],
   ['/platform/nutrition/', pr31],
   ['/platform/readiness/', pr31],
@@ -44,6 +36,9 @@ const builtPage = (dist, path) => {
 export function checkLinks({ dist, page, html, fail, pending }) {
   const hrefs = [...html.matchAll(/<a\b[^>]*?\shref="([^"]*)"/g)].map((m) => unescape(m[1]));
   const ids = new Set([...html.matchAll(/\sid="([^"]+)"/g)].map((m) => m[1]));
+  // The footer and the nav link to the plain contact page; the ?topic rule is for calls to action in the page body.
+  const chrome = /<footer\b[\s\S]*?<\/footer>|<header class="nav"[\s\S]*?<\/header>/g;
+  const bodyHrefs = new Set([...html.replace(chrome, '').matchAll(/<a\b[^>]*?\shref="([^"]*)"/g)].map((m) => unescape(m[1])));
 
   for (const href of new Set(hrefs)) {
     if (/^(https?:|mailto:|tel:)/i.test(href)) continue;
@@ -69,7 +64,7 @@ export function checkLinks({ dist, page, html, fail, pending }) {
     }
 
     const route = withoutLocale(path);
-    if (route === '/contact/' && !contactTopics.has(url.searchParams.get('topic') ?? '')) {
+    if (route === '/contact/' && bodyHrefs.has(href) && !contactTopics.has(url.searchParams.get('topic') ?? '')) {
       fail(`${page.file}: link ${href} goes to the contact page without ?topic=demo or ?topic=question`);
     }
 

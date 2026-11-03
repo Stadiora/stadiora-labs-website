@@ -1,0 +1,155 @@
+---
+import Page from '../../layouts/Page.astro';
+import AppTile from '../solutions/AppTile.astro';
+import CtaBand from '../ui/CtaBand.astro';
+import { athletes } from '../../i18n/pages/athletes';
+import { site } from '../../data/site';
+import type { Locale } from '../../i18n';
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const c = athletes[locale];
+
+const glyphs = [
+  '<path d="M4.5 6h15v14h-15zM4.5 10.5h15M8.5 3.5v4M15.5 3.5v4"/>',
+  '<path d="M7 3.5v7a2.5 2.5 0 0 0 5 0v-7M9.5 3.5v17M17 3.5c-2 1.5-3 4-3 7h3v10"/>',
+  '<path d="M6 19.5v-8M12 19.5v-15M18 19.5v-11"/>',
+  '<path d="M4 5.5h16v10H12l-4.5 3.5V15.5H4z"/>',
+];
+---
+
+<Page locale={locale} path="/solutions/athletes/" title={c.meta.title} description={c.meta.description}>
+  <section class="ahero">
+    <div class="container ahero__inner">
+      <p class="eyebrow">{c.eyebrow}</p>
+      <h1 class="ahero__title">{c.titleBefore}<span class="lane-under">{c.titleUnder}</span></h1>
+      <p class="ahero__sub">{c.sub}</p>
+    </div>
+  </section>
+
+  <section id="apps" class="apps" aria-label={c.appsLabel}>
+    <div class="container">
+      <div class="apps__grid">
+        {c.apps.map((app) => <AppTile app={app} copy={c} {locale} />)}
+      </div>
+      <p class="demo-note">{c.screenNote}</p>
+
+      <div class="every strip" data-reveal>
+        <h2 class="every__title">{c.every.title}</h2>
+        <ul class="every__list">
+          {
+            c.every.items.map((label, i) => (
+              <li class="every__item">
+                <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" set:html={glyphs[i]} />
+                <span>{label}</span>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+
+      <div class="strip coach-strip">
+        <p class="strip__text"><strong>{c.coach.title}</strong> {c.coach.text}</p>
+      </div>
+    </div>
+  </section>
+
+  <CtaBand title={c.ctaTitle} actions={[{ label: c.cta.download, href: '#apps' }, { label: c.cta.coach, href: site.signUp }]} />
+</Page>
+
+<style>
+  .ahero {
+    padding-block: 56px 40px;
+    text-align: center;
+  }
+  .ahero__inner {
+    display: grid;
+    justify-items: center;
+  }
+  .ahero__title {
+    margin-top: 12px;
+    font-size: clamp(36px, 4.8vw, 64px);
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    text-wrap: balance;
+  }
+  .ahero__sub {
+    margin-top: 20px;
+    max-width: 36em;
+    color: var(--ink-2);
+    font-size: clamp(18px, 1.7vw, 24px);
+    line-height: 1.4;
+  }
+  .apps {
+    padding-bottom: 72px;
+  }
+  .apps__grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 20px;
+  }
+  .every {
+    margin-top: 32px;
+    justify-content: flex-start;
+    gap: 16px 40px;
+  }
+  .every__title {
+    font-size: 24px;
+    line-height: 30px;
+  }
+  .every__list {
+    display: flex;
+    flex: 1;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 16px 32px;
+  }
+  .every__item {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 18px;
+  }
+  .every__item {
+    min-width: 0;
+  }
+  .every__item svg {
+    flex: none;
+    color: var(--cyan-ink);
+  }
+  .coach-strip {
+    margin-top: 16px;
+  }
+  @media (max-width: 1100px) {
+    .apps__grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  @media (max-width: 720px) {
+    .ahero {
+      padding-block: 36px 24px;
+    }
+    .apps {
+      padding-bottom: 48px;
+    }
+    .apps__grid {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .every {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    .every__list {
+      display: grid;
+      width: 100%;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  @media (max-width: 480px) {
+    .every__list {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+</style>

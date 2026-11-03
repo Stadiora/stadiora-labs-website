@@ -7,6 +7,7 @@ import { parse } from 'yaml';
 import { verifyPricing } from './lib/pricing-verify.mjs';
 import { pendingReport } from './lib/engage-links.mjs';
 import { engagePages, verifyEngagePages } from './lib/engage-verify.mjs';
+import { verifySolutions } from './lib/verify-solutions.mjs';
 
 const dist = fileURLToPath(new URL('../dist/', import.meta.url));
 const errors = [];
@@ -76,6 +77,7 @@ for (const page of pages) {
 }
 
 verifyPricing(dist, fail);
+verifySolutions({ dist, fail });
 const pendingLinks = new Map();
 verifyEngagePages({ dist, fail, pending: pendingLinks });
 
@@ -128,4 +130,4 @@ if (errors.length) {
   for (const e of errors) console.error(`  - ${e}`);
   process.exit(1);
 }
-console.log(`verify-dist: ok (${pages.length} home pages + ${engagePages.length} platform pages, hreflang, OG, sitemap, no placeholders)`);
+console.log(`verify-dist: ok (${pages.length} home pages + ${engagePages.length} platform pages + 14 solutions, resources and company pages, hreflang, OG, sitemap, no placeholders)`);

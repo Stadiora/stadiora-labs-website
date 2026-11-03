@@ -27,15 +27,24 @@ node scripts/evidence.mjs --engage-only # just the Platform page checks, EN and 
   ```
 
   `prices.coreFrom` and `prices.highSchool` are derived from the table, so they cannot drift. `src/components/pricing/` is for the pricing page only.
+- Solutions (schools, coaches, teams-and-clubs, athletes), Resources (case studies), About and Contact exist in EN and ES.
+  Copy is in `src/i18n/pages/*.ts`, page bodies in `src/components/pages/`, and `src/pages/**` are thin route files.
+  `npm run verify` and `npm run evidence` cover them (`scripts/lib/verify-solutions.mjs`, `scripts/lib/solutions-checks.mjs`).
+  Their price teasers come from `src/data/prices.ts` and `src/lib/region.ts` (the same table and detector as `/pricing/`, nothing is copied). The HTML ships the US price, so no-JS visitors see it; the script swaps in the LatAm price. The evidence run checks each teaser against `/pricing/` for `?region=us`, `?region=latam` and the time zones in between.
+- Case studies: the production page is an honest "coming soon" state, noindex and out of the sitemap. Placeholder cards and a
+  sample story page render only under `npm run dev`, and the build never emits them.
+- Contact has no form endpoint yet: a valid submit opens the visitor's email app (mailto) and never claims a message was sent.
+  The approved post-submit status (EN and ES) is written out in `scripts/lib/contact-contract.mjs`, independent of
+  `src/i18n/pages/contact.ts`; verify and evidence compare the page with it word for word, so editing that copy means
+  editing the contract too.
 - Platform pages (`src/pages/{,es/}platform/{messaging,guardian-portal,teams,custom-branded-apps,integrations}/`): thin
   wrappers around `src/components/engage/*Page.astro`; all copy is in `src/i18n/pages/engage.ts` (EN and ES, ES typed against EN).
   Every claim on them is backed by Aria code, see the PR's claims table. `scripts/lib/engage-verify.mjs` (run by `npm run verify`)
   fails the build on an unbacked claim, a user or customer count, a competitor name, "all wearables", a demo call to action that
   does not go to `/contact/?topic=demo` (or "Talk to us" to `?topic=question`), or an internal link that does not resolve.
   The link guard (`scripts/lib/engage-links.mjs`) checks every internal href on the ten pages against `dist/`, the legacy pages at
-  the repo root and the element ids it points at. Routes that other open PRs own (`pendingRoutes`: solutions, about,
-  contact, case studies, the coach pages) are an explicit list and are printed as `pending` by `npm run verify`, never passed
-  silently; a typo of one of them fails. Delete an entry when its PR has merged. `scripts/lib/engage-checks.mjs` (run by
+  the repo root and the element ids it points at. Routes that other open PRs own (`pendingRoutes`: the coach pages, help) are an explicit list and are printed as `pending` by `npm run verify`, never passed
+  silently; a typo of one of them fails. Delete an entry when its PR has merged. A `/contact/` link in the page body must carry `?topic=demo` or `?topic=question`; the footer and nav link to the plain page. `scripts/lib/engage-checks.mjs` (run by
   `evidence`) covers overflow and clipped text (`clip-probe.mjs`) at 390/1024/1280/1440, WCAG AA in both themes, alt text,
   heading order, the Guardian child switcher and that Teams and `/pricing/` show the same schools price for the same visitor
   (`?region=us|latam`, ten time zones, a missing one).

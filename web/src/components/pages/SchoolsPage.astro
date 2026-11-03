@@ -1,0 +1,61 @@
+---
+import Page from '../../layouts/Page.astro';
+import FeatureHero from '../solutions/FeatureHero.astro';
+import SchoolCards from '../solutions/SchoolCards.astro';
+import RegionPrice from '../ui/RegionPrice.astro';
+import Icon from '../ui/Icon.astro';
+import Photo from '../ui/Photo.astro';
+import { common, altFor } from '../../i18n/pages/common';
+import { schools } from '../../i18n/pages/schools';
+import { contactHref } from '../../lib/links';
+import { hrefFor } from '../../data/nav';
+import type { Locale } from '../../i18n';
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const c = schools[locale];
+const k = common[locale];
+---
+
+<Page locale={locale} path="/solutions/schools/" title={c.meta.title} description={c.meta.description}>
+  <FeatureHero
+    eyebrow={c.eyebrow}
+    title={c.title}
+    sub={c.sub}
+    primary={{ label: k.bookSchoolDemo, href: contactHref(locale, 'demo') }}
+    secondary={{ label: k.seePricing, href: hrefFor('pricing', locale) }}
+  >
+    <div class="fhero__photo">
+      <Photo slot="s1-schools" ratio="4/3" sizes="(max-width: 1100px) 92vw, 680px" alt={altFor('s1-schools', locale)} eager />
+    </div>
+  </FeatureHero>
+
+  <SchoolCards copy={c} />
+
+  <section class="strip-section" aria-label={c.pricing.lead}>
+    <div class="container">
+      <div class="strip">
+        <p class="strip__text">
+          <strong>{c.pricing.lead}</strong><RegionPrice price="highSchool" text={c.pricing.text} />
+        </p>
+        <div class="strip__actions">
+          <a class="link link-arrow" href={hrefFor('pricing', locale)}>{c.pricing.link}<Icon name="arrow-right" /></a>
+          <a class="btn btn--primary btn--lg" href={contactHref(locale, 'demo')}>{c.pricing.cta}</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</Page>
+
+<style>
+  .strip-section {
+    padding-block: 0 80px;
+  }
+  @media (max-width: 720px) {
+    .strip-section {
+      padding-bottom: 56px;
+    }
+  }
+</style>

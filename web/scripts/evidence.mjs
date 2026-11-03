@@ -13,6 +13,7 @@ import { engageChecks } from './lib/engage-checks.mjs';
 import { navChecks } from './lib/nav-checks.mjs';
 import { pricingChecks } from './lib/pricing-checks.mjs';
 import { platformCoachChecks } from './lib/platform-coach-checks.mjs';
+import { solutionsChecks } from './lib/solutions-checks.mjs';
 import { serve } from './lib/static-server.mjs';
 
 const root = fileURLToPath(new URL('..', import.meta.url));
@@ -40,7 +41,7 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const sections = ['hero', 'logos', 'ai', 'pillars', 'engage', 'brand', 'apps', 'voices', 'cta'];
 
 async function open(opts, path = '/') {
-  const { width, height, scheme = 'light', reduced = false, init, mobile = false, timezoneId } = opts;
+  const { width, height, scheme = 'light', reduced = false, init, mobile = false, timezoneId, js = true } = opts;
   const context = await browser.newContext({
     viewport: { width, height },
     colorScheme: scheme,
@@ -48,6 +49,7 @@ async function open(opts, path = '/') {
     deviceScaleFactor: 1,
     hasTouch: mobile,
     isMobile: mobile,
+    javaScriptEnabled: js,
     ...(timezoneId ? { timezoneId } : {}),
   });
   if (init) await context.addInitScript(init);
@@ -62,7 +64,7 @@ async function open(opts, path = '/') {
     if (r.status() >= 400) page.problems.push(`${r.status()}: ${r.url()}`);
   });
   await page.goto(server.url + path, { waitUntil: 'load' });
-  await page.evaluate(() => document.fonts.ready);
+  if (js) await page.evaluate(() => document.fonts.ready);
   return page;
 }
 
@@ -581,5 +583,8 @@ const dist = await readdir(`${root}dist/_astro`);
 check('perf', 'no video files shipped (budget 1.5 MB each)', !dist.some((f) => /\.(mp4|webm)$/.test(f)));
 
 await pricingChecks({ browser, server, outDir, check, metrics, sleep, checksOnly });
+// ---------------------------------------------------------------- 6. solutions, resources and company pages
+await solutionsChecks({ open, settle, check, sleep, metrics, measure, outDir, checksOnly });
+
 await coachRun();
 await finish();
