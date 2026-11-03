@@ -16,8 +16,8 @@ const text = (html) =>
   html
     .replace(/<(script|style)[\s\S]*?<\/\1>/g, ' ')
     .replace(/<[^>]+>/g, ' ')
-    .replace(/&amp;/g, '&')
     .replace(/&#39;|&#x27;/g, "'")
+    .replace(/&amp;/g, '&')
     .replace(/\s+/g, ' ');
 
 // Claims that Aria does not back up. Each one needs code evidence before it may appear on a page.
