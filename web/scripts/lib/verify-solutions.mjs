@@ -124,6 +124,7 @@ export function verifySolutions({ dist, fail }) {
         }
         need(payload?.opening === approvedOpening[lang], `post-submit status must be exactly "${approvedOpening[lang]}", found ${JSON.stringify(payload?.opening)}`);
         need(payload?.to === CONTACT_EMAIL, `mail recipient must be exactly ${CONTACT_EMAIL}, found ${JSON.stringify(payload?.to)}`);
+        for (const what of findDeliveryClaims(String(payload?.opening ?? ''), lang)) need(false, `post-submit status claims receipt or delivery: ${what}`);
         const text = pageText(html);
         need(text.includes(approvedNote[lang]), `mailto note must read exactly "${approvedNote[lang]}"`);
         for (const what of findDeliveryClaims(text, lang)) need(false, `page text claims receipt or delivery: ${what}`);
