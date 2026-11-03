@@ -13,6 +13,8 @@ export default defineConfig({
   },
   integrations: [
     sitemap({
+      // The case-study index is noindex until there is a real story to show, so it stays out of the sitemap.
+      filter: (page) => !page.includes('/resources/case-studies/'),
       i18n: { defaultLocale: 'en', locales: { en: 'en', es: 'es' } },
     }),
   ],

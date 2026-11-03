@@ -1,0 +1,18 @@
+---
+import { prices, usd, type PriceKey } from '../../lib/region';
+
+interface Props {
+  price: PriceKey;
+  /** Copy with a `{price}` marker, e.g. `Core from {price}/mo for 25 athletes`. Omit to render only the price. */
+  text?: string;
+}
+const { price, text } = Astro.props;
+const value = prices[price];
+const [before, after] = (text ?? '{price}').split('{price}');
+---
+
+<Fragment>{before}</Fragment><span class="rprice" data-region-price data-us={usd(value.us)} data-latam={usd(value.latam)}>{usd(value.us)}</span><Fragment>{after}</Fragment>
+
+<script>
+  import '../../scripts/region';
+</script>

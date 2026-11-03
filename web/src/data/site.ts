@@ -69,7 +69,7 @@ export const routes: Record<ItemId | 'pricing' | 'solutions' | 'about' | 'contac
   pricing: { path: '/pricing/', status: 'planned' },
   solutions: { path: '/solutions/', status: 'planned' },
   about: { path: '/about/', status: 'planned' },
-  contact: { path: '/connect.html', status: 'legacy' },
+  contact: { path: '/contact/', status: 'planned' },
   privacy: { path: '/privacy.html', status: 'legacy' },
   terms: { path: '/terms.html', status: 'legacy' },
 };

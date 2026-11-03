@@ -14,9 +14,11 @@ interface Props {
   title?: string;
   description?: string;
   ogImage?: string;
+  /** Keeps the page out of search results. Case-study pages use it until a real story ships. */
+  noindex?: boolean;
 }
 
-const { locale, path, title, description, ogImage } = Astro.props;
+const { locale, path, title, description, ogImage, noindex = false } = Astro.props;
 const t = useDict(locale);
 const pageTitle = title ?? t.meta.title;
 const pageDescription = description ?? t.meta.description;
@@ -46,6 +48,7 @@ const jsonLd = {
     <title>{pageTitle}</title>
     <meta name="description" content={pageDescription} />
     <meta name="color-scheme" content="light dark" />
+    {noindex && <meta name="robots" content="noindex, follow" />}
     <link rel="canonical" href={canonical} />
     {alternates.map((a) => <link rel="alternate" hreflang={a.lang} href={a.href} />)}
     <link rel="alternate" hreflang="x-default" href={alternates[0].href} />
