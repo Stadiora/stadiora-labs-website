@@ -36,6 +36,13 @@
 .mega-cta:hover .ico svg,.mega-cta:focus-visible .ico svg{transform:rotate(-45deg) scale(1.1)}
 @keyframes spinA{to{--a:360deg}}
 
+/* Theme toggle: the new theme grows out of the button (theme.ts animates the clip-path). */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
 /* ---------- 6. Motion library ---------- */
 /* 6.1 scroll reveal */
 .rv{opacity:0;transform:translateY(28px);transition:opacity 700ms var(--e-out),transform 900ms var(--e-out);transition-delay:calc(var(--i,0) * 70ms)}
@@ -108,6 +115,9 @@
 .count::after{content:counter(n)}
 @keyframes countUp{from{--n:0}to{--n:var(--to)}}
 /* ---------- 7. Section chrome shared ---------- */
+.wrap{width:100%;max-width:calc(var(--maxw) + var(--gutter)*2);margin:0 auto;padding:0 var(--gutter)}
+.sec{padding:var(--sec) 0;position:relative}
+.sr{position:absolute!important;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 .sec-head{display:flex;align-items:flex-end;justify-content:space-between;gap:40px;margin-bottom:clamp(36px,5vw,64px)}
 .sec-head .lead{margin-top:18px}
 .media-frame{position:relative;border-radius:var(--r-xl);overflow:hidden;background:#040A1A;isolation:isolate}

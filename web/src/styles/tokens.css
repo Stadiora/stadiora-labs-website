@@ -1,7 +1,7 @@
 /* Design tokens: Floodlight (design/round4/DESIGN-4.md section 1). Light is the default reading theme; dark follows.
    Colour tokens use light-dark(); the active scheme comes from html[data-theme] (set by the inline script in <head>)
    and falls back to the OS preference when JavaScript is off. Because light-dark() resolves where a token is used,
-   `.impact` (always dark) and `.reading` (always light) only need to set color-scheme. */
+   `.impact` (always dark) and `.reading` (the page theme, inside an impact section) only need to set color-scheme. */
 
 @font-face {
   font-family: 'Archivo';
@@ -175,10 +175,21 @@
   background: var(--bg);
   color: var(--ink);
 }
-/* White panels sit inside dark stages and keep reading colours whatever the theme is. */
+/* A reading panel inside a dark stage follows the page theme: white in light, navy in dark. It also
+   undoes the two tokens `.impact` overrides. */
 .reading {
+  --bg: light-dark(#ffffff, #0b1730);
+  --ink-2: light-dark(#46536a, #a9b4c6);
   color-scheme: light;
   color: var(--ink);
+}
+:root[data-theme='dark'] .reading {
+  color-scheme: dark;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) .reading {
+    color-scheme: dark;
+  }
 }
 
 @media (max-width: 1100px) {

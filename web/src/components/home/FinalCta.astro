@@ -1,7 +1,7 @@
 ---
 import { useDict, type Locale } from '../../i18n';
 import { site } from '../../data/site';
-import Icon from '../ui/Icon.astro';
+import StoreSheet from './StoreSheet.astro';
 
 interface Props {
   locale: Locale;
@@ -25,19 +25,7 @@ const c = t.cta;
     </div>
   </div>
 
-  <dialog class="sheet" id="get-app" aria-labelledby="sheet-title">
-    <div class="sheet__card">
-      <button class="sheet__close" type="button" aria-label={t.a11y.close} data-close-sheet>
-        <Icon name="x" size={20} />
-      </button>
-      <h3 id="sheet-title" class="sheet__title">{c.sheetTitle}</h3>
-      <p class="sheet__body">{c.sheetBody}</p>
-      <div class="sheet__links">
-        <a class="btn btn--lg btn--primary" href={site.stores.runIos} rel="noopener">{c.sheetIos}</a>
-        <a class="btn btn--lg btn--secondary" href={site.stores.runAndroid} rel="noopener">{c.sheetAndroid}</a>
-      </div>
-    </div>
-  </dialog>
+  <StoreSheet locale={locale} />
 </section>
 
 <style>
@@ -66,70 +54,6 @@ const c = t.cta;
     gap: 16px;
   }
 
-  .sheet {
-    width: min(460px, calc(100% - 32px));
-    padding: 0;
-    border: 1px solid var(--line);
-    border-radius: 18px;
-    background: var(--bg);
-    color: var(--ink);
-    box-shadow: var(--shadow-lift);
-  }
-  .sheet::backdrop {
-    background: rgb(3 9 21 / 0.6);
-  }
-  .sheet__card {
-    position: relative;
-    padding: 36px 32px 32px;
-  }
-  .sheet__close {
-    position: absolute;
-    top: 8px;
-    right: 8px;
-    display: grid;
-    place-items: center;
-    width: 44px;
-    height: 44px;
-    border: 0;
-    border-radius: 50%;
-    background: none;
-    color: var(--ink-2);
-    cursor: pointer;
-  }
-  .sheet__close:hover {
-    background: var(--surface);
-    color: var(--ink);
-  }
-  .sheet__title {
-    font-size: 26px;
-    line-height: 1.2;
-  }
-  .sheet__body {
-    margin-top: 10px;
-    color: var(--ink-2);
-    font-size: 17px;
-    line-height: 26px;
-  }
-  .sheet__links {
-    display: grid;
-    gap: 12px;
-    margin-top: 24px;
-  }
-
-  /* Without JavaScript the chooser is shown inline, under the buttons. */
-  html:not(.js) .sheet {
-    display: block;
-    position: static;
-    margin: 28px auto 0 0;
-    background: var(--bg);
-  }
-  html:not(.js) .sheet__close {
-    display: none;
-  }
-  :global(html:has(dialog.sheet[open])) {
-    overflow: hidden;
-  }
-
   @media (max-width: 720px) {
     .cta {
       padding-block: 56px 48px;
@@ -143,20 +67,3 @@ const c = t.cta;
     }
   }
 </style>
-
-<script>
-  const sheet = document.querySelector<HTMLDialogElement>('dialog.sheet');
-  if (sheet && typeof sheet.showModal === 'function') {
-    document.querySelectorAll<HTMLElement>('[data-open-sheet]').forEach((opener) => {
-      opener.addEventListener('click', (event) => {
-        event.preventDefault();
-        sheet.showModal();
-      });
-    });
-    sheet.querySelector('[data-close-sheet]')?.addEventListener('click', () => sheet.close());
-    // A click on the backdrop lands on the dialog element itself, not its card.
-    sheet.addEventListener('click', (event) => {
-      if (event.target === sheet) sheet.close();
-    });
-  }
-</script>
