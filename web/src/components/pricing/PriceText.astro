@@ -1,0 +1,15 @@
+---
+import { segments } from '../../lib/template';
+
+interface Props {
+  /** Copy with {tokens}, for example `{monthly} per month, plus a one-time {setup} setup.` */
+  text: string;
+  /** Formatted value for each token. */
+  values: Record<string, string>;
+  /** Attributes for the element that wraps one token's value, so checks and scripts can find each amount. */
+  attrs?: Record<string, Record<string, string | boolean>>;
+}
+const { text, values, attrs = {} } = Astro.props;
+---
+
+{segments(text).map((s) => ('token' in s ? <span {...attrs[s.token]}>{values[s.token]}</span> : s.text))}

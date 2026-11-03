@@ -3,6 +3,7 @@ import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parse } from 'yaml';
+import { verifyPricing } from './lib/pricing-verify.mjs';
 
 const dist = fileURLToPath(new URL('../dist/', import.meta.url));
 const errors = [];
@@ -70,6 +71,8 @@ for (const page of pages) {
     if (!/\salt(=|\s|\/?>)/.test(m[0])) fail(`${page.file}: img without alt: ${m[0].slice(0, 80)}`);
   }
 }
+
+verifyPricing(dist, fail);
 
 if (!existsSync(join(dist, 'sitemap-index.xml'))) fail('sitemap-index.xml: missing');
 

@@ -1,0 +1,346 @@
+---
+import type { Locale } from '../../i18n';
+import { bandFor, defaultBand, education, free, usd } from '../../data/prices';
+import { fill } from '../../lib/template';
+import type { PricingCopy } from '../../i18n/pages/pricing';
+import Icon from '../ui/Icon.astro';
+import { pricingLinks } from './links';
+
+type PlanKey = 'free' | 'core' | 'performance' | 'schools' | 'federations';
+
+interface Props {
+  plan: PlanKey;
+  locale: Locale;
+  copy: PricingCopy;
+}
+const { plan, locale, copy } = Astro.props;
+const p = copy.plans[plan];
+const links = pricingLinks(locale);
+
+// Server-rendered state is always US, monthly, 100 athletes: the no-JS default. The client script
+// swaps in the visitor's region and selection; the other region's numbers never reach the HTML.
+const band = bandFor('us', defaultBand);
+const meta = fill(copy.price.meta, { athletes: band.athletes.toLocaleString('en-US'), coaches: String(band.coaches) });
+const amount = plan === 'core' ? usd(band.core.monthly) : plan === 'performance' ? usd(band.performance.monthly) : '';
+const schoolsFrom = usd(Math.min(...education.us.map((r) => r.monthly)));
+const freeLine = fill(copy.plans.free.line, { coaches: String(free.coaches), athletes: String(free.athletes) });
+
+const cta = {
+  free: { href: links.free, label: copy.plans.free.cta, variant: 'secondary' },
+  core: { href: links.core, label: copy.plans.core.cta, variant: 'primary' },
+  performance: { href: links.performance, label: copy.plans.performance.cta, variant: 'primary' },
+  schools: { href: links.schools, label: copy.plans.schools.cta, variant: 'secondary' },
+  federations: { href: links.talk, label: copy.plans.federations.cta, variant: 'secondary' },
+}[plan];
+const headingId = `plan-${plan}`;
+---
+
+<li class={`pcard pcard--${plan}`} data-plan={plan}>
+  {plan === 'performance' && <p class="pcard__badge">{copy.plans.performance.badge}</p>}
+  <h3 class="pcard__name" id={headingId}>{p.name}</h3>
+
+  <p class:list={['pcard__price num', (plan === 'free' || plan === 'federations') && 'pcard__price--text']}>
+    {plan === 'schools' && <span class="pcard__from">{copy.price.from}</span>}
+    {plan === 'free' && <span class="pcard__amount">{usd(free.monthly)}</span>}
+    {plan === 'federations' && <span class="pcard__amount">{copy.plans.federations.price}</span>}
+    {(plan === 'core' || plan === 'performance') && <span class="pcard__amount" data-amount={plan}>{amount}</span>}
+    {plan === 'schools' && <span class="pcard__amount" data-schools-from>{schoolsFrom}</span>}
+    {(plan === 'core' || plan === 'performance' || plan === 'schools') && <span class="pcard__unit">{copy.price.unit}</span>}
+  </p>
+
+  <div class="pcard__lines">
+    {
+      (plan === 'core' || plan === 'performance') && (
+        <>
+          <p data-meta>{meta}</p>
+          <p data-billed>{copy.price.billedMonthly}</p>
+        </>
+      )
+    }
+    {
+      plan === 'free' && (
+        <>
+          <p>{freeLine}</p>
+          <p>{copy.plans.free.sub}</p>
+        </>
+      )
+    }
+    {plan === 'schools' && <p>{copy.plans.schools.line}</p>}
+    {plan === 'federations' && <p>{copy.plans.federations.line}</p>}
+  </div>
+
+  <div class="pcard__cta">
+    <a
+      class={`btn btn--${cta.variant}`}
+      href={cta.href}
+      rel={plan === 'schools' ? 'noopener' : undefined}
+      aria-describedby={headingId}
+    >{cta.label}</a>
+  </div>
+
+  <ul class="pcard__checks">
+    {
+      p.checks.map((item) => (
+        <li>
+          <Icon name="check" size={20} class="pcard__tick" />
+          <span>{item}</span>
+        </li>
+      ))
+    }
+  </ul>
+
+  {
+    plan === 'schools' && (
+      <div class="pcard__foot">
+        <p>{copy.plans.schools.sub}</p>
+        <button class="pcard__more" type="button" data-open-modal="education-rates" aria-haspopup="dialog">
+          {copy.plans.schools.rates}
+          <Icon name="arrow-right" size={16} />
+        </button>
+      </div>
+    )
+  }
+</li>
+
+<style>
+  .pcard {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    min-width: 0;
+    padding: 26px 22px 24px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-card);
+    background: var(--bg);
+  }
+  .pcard__name {
+    font-size: 19px;
+    line-height: 26px;
+    letter-spacing: -0.01em;
+  }
+  .pcard__price {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0 8px;
+    min-height: 56px;
+    color: var(--ink);
+    font-weight: 600;
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+  }
+  .pcard__amount {
+    display: inline-block;
+    font-size: clamp(36px, 2.75vw, 46px);
+  }
+  .pcard__price--text .pcard__amount {
+    font-size: clamp(30px, 2.3vw, 38px);
+  }
+  /* Five across the 1280px container leaves about 196px inside a card: 36px keeps "$1,079" and its unit on one line. */
+  @media (min-width: 1400px) {
+    .pcard__amount {
+      font-size: 36px;
+    }
+    .pcard__price--text .pcard__amount {
+      font-size: 33px;
+    }
+  }
+  .pcard__from {
+    color: var(--ink-2);
+    font-size: 20px;
+    font-weight: 400;
+  }
+  .pcard__unit {
+    color: var(--ink-2);
+    font-size: 18px;
+    font-weight: 400;
+    letter-spacing: 0;
+  }
+  .pcard__lines {
+    color: var(--ink-2);
+    font-size: 15px;
+    line-height: 22px;
+  }
+  .pcard__lines p + p {
+    margin-top: 2px;
+  }
+  .pcard__cta .btn {
+    width: 100%;
+    min-height: 48px;
+    padding: 8px 10px;
+    font-size: 15px;
+    line-height: 1.25;
+    white-space: normal;
+    text-align: center;
+  }
+  .pcard__checks {
+    display: grid;
+    align-content: start;
+    gap: 10px;
+    margin-top: 4px;
+    font-size: 15px;
+    line-height: 22px;
+  }
+  .pcard__checks li {
+    display: grid;
+    grid-template-columns: 20px minmax(0, 1fr);
+    gap: 10px;
+    align-items: start;
+  }
+  .pcard__checks :global(.pcard__tick) {
+    margin-top: 1px;
+    color: var(--cyan-ink);
+  }
+  .pcard__foot {
+    display: grid;
+    gap: 10px;
+    padding-top: 14px;
+    border-top: 1px solid var(--line);
+    color: var(--ink-2);
+    font-size: 15px;
+    line-height: 22px;
+  }
+  .pcard__more {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    justify-self: start;
+    min-height: 44px;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: var(--cyan-ink);
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+  }
+  .pcard__more:hover {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  /* The rates dialog opens from JavaScript, so without it the button has nothing to open. */
+  :global(html:not(.js)) .pcard__more,
+  :global(.pricing[data-fallback]) .pcard__more {
+    display: none;
+  }
+
+  /* Most complete: a tab above the card, so the rows inside every card stay aligned. */
+  .pcard--performance {
+    border-top: 0;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+    box-shadow: var(--shadow-pop);
+  }
+  .pcard__badge {
+    position: absolute;
+    left: -1px;
+    right: -1px;
+    bottom: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 34px;
+    border: 1px solid var(--line);
+    border-bottom: 0;
+    border-top: 3px solid var(--cyan);
+    border-radius: var(--radius-card) var(--radius-card) 0 0;
+    background: var(--cyan-tint);
+    color: var(--cyan-ink);
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1;
+  }
+
+  /* Price roll when the toggle or selector changes. Reduced motion zeroes the duration globally. */
+  .pcard__amount:global(.is-rolling) {
+    animation: price-roll 250ms var(--ease-out);
+  }
+  @keyframes price-roll {
+    from {
+      opacity: 0;
+      transform: translateY(40%);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  /* Hold prices until the client script has chosen a region, so a LatAm visitor never sees US numbers.
+     If the script never starts (data-fallback), the server-rendered US prices are shown with a note. */
+  :global(html.js .pricing:not([data-ready]):not([data-fallback])) .pcard__amount[data-amount],
+  :global(html.js .pricing:not([data-ready]):not([data-fallback])) .pcard__amount[data-schools-from],
+  :global(html.js .pricing:not([data-ready]):not([data-fallback])) [data-meta],
+  :global(html.js .pricing:not([data-ready]):not([data-fallback])) [data-billed] {
+    visibility: hidden;
+  }
+
+  /* Wide: five columns with every row aligned across the cards. */
+  @media (min-width: 721px) {
+    .pcard {
+      display: grid;
+      grid-row: span 6;
+      grid-template-rows: subgrid;
+      row-gap: 0;
+    }
+    .pcard__price,
+    .pcard__lines,
+    .pcard__cta,
+    .pcard__checks {
+      margin-top: 14px;
+    }
+    .pcard__foot {
+      margin-top: 16px;
+    }
+  }
+
+  /* Phone: stacked. Free is compact (CTA beside the price) and Core is tinted. */
+  @media (max-width: 720px) {
+    .pcard {
+      padding: 22px 20px 20px;
+    }
+    .pcard__price {
+      min-height: 0;
+    }
+    .pcard__amount {
+      font-size: 44px;
+    }
+    .pcard--free {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      column-gap: 16px;
+      align-items: start;
+    }
+    .pcard--free > .pcard__name,
+    .pcard--free > .pcard__price,
+    .pcard--free > .pcard__lines,
+    .pcard--free > .pcard__checks {
+      grid-column: 1 / -1;
+    }
+    .pcard--free > .pcard__price {
+      grid-column: 1;
+      grid-row: 2;
+    }
+    .pcard--free > .pcard__cta {
+      grid-column: 2;
+      grid-row: 2;
+      align-self: center;
+    }
+    .pcard--free > .pcard__lines {
+      grid-row: 3;
+    }
+    .pcard--free > .pcard__checks {
+      grid-row: 4;
+    }
+    .pcard--free .pcard__cta .btn {
+      width: auto;
+      min-width: 140px;
+    }
+    .pcard--core {
+      background: var(--surface);
+    }
+    .pcard--performance {
+      margin-top: 34px;
+    }
+  }
+</style>

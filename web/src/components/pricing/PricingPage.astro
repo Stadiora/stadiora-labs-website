@@ -1,0 +1,135 @@
+---
+import type { Locale } from '../../i18n';
+import { defaultBand } from '../../data/prices';
+import { en, es, type PricingCopy } from '../../i18n/pages/pricing';
+import Controls from './Controls.astro';
+import PlanCard from './PlanCard.astro';
+import AddOns from './AddOns.astro';
+import Faq from './Faq.astro';
+import Modals from './Modals.astro';
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const copy: PricingCopy = locale === 'es' ? es : en;
+
+// Text the client script needs to re-render prices. No numbers: those live in its own bundle.
+const strings = JSON.stringify({
+  billedMonthly: copy.price.billedMonthly,
+  billedYearly: copy.price.billedYearly,
+  meta: copy.price.meta,
+  live: copy.price.live,
+  liveYearly: copy.price.liveYearly,
+  core: copy.plans.core.name,
+  performance: copy.plans.performance.name,
+});
+const plans = ['free', 'core', 'performance', 'schools', 'federations'] as const;
+---
+
+<div class="pricing" data-pricing data-region="us" data-billing="monthly" data-athletes={defaultBand} data-strings={strings}>
+  <section class="top" aria-labelledby="pricing-title">
+    <div class="container">
+      <h1 class="top__title h-lane" id="pricing-title">{copy.h1}</h1>
+      <Controls locale={locale} copy={copy} />
+    </div>
+  </section>
+
+  <section class="plans-section" aria-labelledby="plans-title">
+    <h2 class="sr-only" id="plans-title">{copy.plansTitle}</h2>
+    <div class="container">
+      <ul class="plans">
+        {plans.map((plan) => <PlanCard plan={plan} locale={locale} copy={copy} />)}
+      </ul>
+    </div>
+  </section>
+
+  <AddOns locale={locale} copy={copy} />
+  <Modals locale={locale} copy={copy} />
+  <Faq locale={locale} copy={copy} />
+
+  <p class="sr-only" role="status" aria-live="polite" data-live></p>
+</div>
+
+<!-- Failsafe: if the module below has not started after a moment, switch to the fallback. That is not the
+     enhanced state: data-ready means the script runs, data-fallback means it does not. In the fallback the
+     controls and dialog triggers are hidden and the note explains that the prices shown are US, monthly, 100
+     athletes, so what is on screen always matches what is selected. -->
+<script is:inline>
+  setTimeout(function () {
+    var el = document.querySelector('[data-pricing]');
+    if (el && !el.hasAttribute('data-ready')) el.setAttribute('data-fallback', '');
+  }, 2500);
+</script>
+<script>
+  import '../../scripts/pricing';
+</script>
+
+<style>
+  .top {
+    padding-block: 56px 0;
+  }
+  .top__title {
+    margin-inline: auto;
+    margin-bottom: 36px;
+    font-size: clamp(40px, 3.9vw, 56px);
+    line-height: 1.08;
+    letter-spacing: -0.025em;
+    text-align: center;
+    text-wrap: balance;
+  }
+  .top__title::after {
+    margin-inline: auto;
+  }
+  .plans-section {
+    padding-top: 56px;
+  }
+  .plans {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    column-gap: 18px;
+    row-gap: 18px;
+    align-items: stretch;
+  }
+  .plans > :global(.pcard) {
+    grid-column: span 2;
+  }
+  .plans > :global(.pcard--schools),
+  .plans > :global(.pcard--federations) {
+    grid-column: span 3;
+  }
+
+  /* Five across on wide screens. */
+  @media (min-width: 1400px) {
+    .plans {
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+    }
+    .plans > :global(.pcard),
+    .plans > :global(.pcard--schools),
+    .plans > :global(.pcard--federations) {
+      grid-column: span 1;
+    }
+  }
+
+  @media (max-width: 720px) {
+    .top {
+      padding-block: 36px 0;
+    }
+    .top__title {
+      margin-inline: 0;
+      margin-bottom: 28px;
+      text-align: left;
+    }
+    .top__title::after {
+      margin-inline: 0;
+    }
+    .plans-section {
+      padding-top: 28px;
+    }
+    .plans {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+  }
+</style>
