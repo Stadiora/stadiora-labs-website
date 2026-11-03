@@ -12,5 +12,6 @@ This branch holds images only and is never merged.
   - `state-modal-education-rates-es-<width>.png`: the ES education-rates dialog, US region.
   - `state-faq-open-<width>.png`: the FAQ with two answers open.
   - `state-focus-{select,cta}-<width>.png`: the keyboard focus ring on the athlete select and on the first plan CTA.
+  - `state-fallback-{top,plans}-<width>.png`: JavaScript on but the pricing script blocked (route aborted), after the 2.5 s failsafe, `?region=latam` with a US time zone: the note, no controls or dialog triggers, US monthly prices for 100 athletes.
 - `compare/top-en-light-{1440,390}-us.png`: the top of the built page, cropped to the mock's proportions (1440x960 and 390x585).
-- `summary.json`: the 55 pricing check results and the measured numbers. The full run (home, nav and pricing) was 255/255.
+- `summary.json`: the 63 pricing check results and the measured numbers. The full run (home, nav and pricing) was 263/263. Round 1 fixes (head `2478158`) updated this branch; captures that did not change are byte-identical to round 0.

@@ -2,7 +2,13 @@
  "results": [
   {
    "group": "pricing/data",
-   "name": "price table matches the epic and DECISIONS oracle (both regions, annual, yearly, education, add-ons)",
+   "name": "price table matches the epic and DECISIONS oracle (both regions, annual, yearly, education, add-ons, Free, annual percentage)",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "group": "pricing/data",
+   "name": "copy holds words and {tokens}, never numbers or amounts; en and es use the same tokens",
    "pass": true,
    "detail": ""
   },
@@ -55,6 +61,24 @@
    "detail": ""
   },
   {
+   "group": "pricing/addons",
+   "name": "custom-branded app: $99 is the monthly fee and $499 the setup fee, each at its own place in the strip and the dialog (marker and wording; 48 states: en/es x us/latam x monthly/annual x 6 sizes)",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "group": "pricing/addons",
+   "name": "extra coach: the price in the strip and in the dialog is $20 (US) or $10 (LatAm), both places, every state",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "group": "pricing/prices",
+   "name": "Free card shows $0 with 1 coach and 10 athletes, and the annual saving reads 10%, from the table in every state",
+   "pass": true,
+   "detail": ""
+  },
+  {
    "group": "pricing/prices",
    "name": "no dollar amount outside the current state is anywhere in the DOM, dialogs included",
    "pass": true,
@@ -68,7 +92,7 @@
   },
   {
    "group": "pricing/prices",
-   "name": "annual is 10% off rounded down per month; the yearly total is that times 12",
+   "name": "annual is 10% off rounded down per month; the yearly total is that times 12 (every band in the table)",
    "pass": true,
    "detail": ""
   },
@@ -169,6 +193,30 @@
    "detail": ""
   },
   {
+   "group": "pricing/dialogs",
+   "name": "close then move to another trigger then Enter opens that dialog, never the previous one (48 rounds: every ordered pair of 4 triggers x Escape and close button x same-task and real-key variants)",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "group": "pricing/dialogs",
+   "name": "the race run stayed clean (no console errors)",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "group": "pricing/fallback",
+   "name": "1280px: script blocked -> after the failsafe the page shows one honest state (US, monthly, 100 athletes: $199 / $299), hides the controls and dialog triggers, shows the note and the dialog content inline, and the Tab walk reaches nothing hidden",
+   "pass": true,
+   "detail": ""
+  },
+  {
+   "group": "pricing/fallback",
+   "name": "390px: script blocked -> after the failsafe the page shows one honest state (US, monthly, 100 athletes: $199 / $299), hides the controls and dialog triggers, shows the note and the dialog content inline, and the Tab walk reaches nothing hidden",
+   "pass": true,
+   "detail": ""
+  },
+  {
    "group": "pricing/layout",
    "name": "390px: no overflow or overlap in cards, controls and add-ons, rows aligned (8 states, en/es x us/latam x default/annual-1000)",
    "pass": true,
@@ -194,25 +242,25 @@
   },
   {
    "group": "pricing/contrast",
-   "name": "light/en: text meets WCAG AA in 7 states (847 text runs, lowest 4.57:1)",
+   "name": "light/en: text meets WCAG AA in 7 states (863 text runs, lowest 4.57:1)",
    "pass": true,
    "detail": ""
   },
   {
    "group": "pricing/contrast",
-   "name": "light/es: text meets WCAG AA in 7 states (847 text runs, lowest 4.57:1)",
+   "name": "light/es: text meets WCAG AA in 7 states (863 text runs, lowest 4.57:1)",
    "pass": true,
    "detail": ""
   },
   {
    "group": "pricing/contrast",
-   "name": "dark/en: text meets WCAG AA in 7 states (847 text runs, lowest 7.91:1)",
+   "name": "dark/en: text meets WCAG AA in 7 states (863 text runs, lowest 7.91:1)",
    "pass": true,
    "detail": ""
   },
   {
    "group": "pricing/contrast",
-   "name": "dark/es: text meets WCAG AA in 7 states (847 text runs, lowest 7.91:1)",
+   "name": "dark/es: text meets WCAG AA in 7 states (863 text runs, lowest 7.91:1)",
    "pass": true,
    "detail": ""
   },
@@ -333,6 +381,7 @@
  ],
  "metrics": {
   "pricing": {
+   "dialogRounds": 48,
    "tallestCta": {
     "en-390": 48,
     "es-390": 48,
