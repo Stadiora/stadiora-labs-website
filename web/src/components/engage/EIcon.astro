@@ -1,0 +1,85 @@
+---
+import Icon from '../ui/Icon.astro';
+
+type Core = 'arrow-right' | 'check' | 'chat' | 'heart' | 'moon' | 'send' | 'chevron-right' | 'chevron-down' | 'plus' | 'smile' | 'mail';
+type Extra =
+  | 'calendar'
+  | 'file'
+  | 'plane'
+  | 'users'
+  | 'user'
+  | 'shield'
+  | 'download'
+  | 'chart'
+  | 'pencil'
+  | 'image'
+  | 'drop'
+  | 'ball'
+  | 'store'
+  | 'steps'
+  | 'dumbbell'
+  | 'home'
+  | 'search'
+  | 'link'
+  | 'phone'
+  | 'chevron-left'
+  | 'run';
+
+interface Props {
+  name: Core | Extra;
+  size?: number;
+  class?: string;
+}
+const { name, size = 24, class: cls } = Astro.props;
+
+// Extra line icons for the Platform pages, drawn on the same 24px grid and 1.75 stroke as ui/Icon.
+const paths: Record<Extra, string> = {
+  calendar: '<rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/>',
+  file: '<path d="M6.5 3h7.5l4.5 4.5V20a1 1 0 0 1-1 1h-11a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z"/><path d="M14 3v4.5h4.5M9 12.5h6M9 16h6"/>',
+  plane:
+    '<path d="M3 12.5l7.5-1.3L7 4.5l1.8-.8 6.4 6.2 4.6-1.1a1.7 1.7 0 0 1 .9 3.2l-4.700 1.800L15.400 20.500l-1.900.400-2.300-6.400-3.700 1.200-1.200 2-1.400-.5z"/>',
+  users:
+    '<circle cx="9" cy="8.5" r="3.2"/><path d="M3 19.5c0-3.300 2.700-5.500 6-5.500s6 2.200 6 5.500"/><circle cx="17" cy="9.5" r="2.400"/><path d="M17.500 14.200c2.300.2 3.900 1.900 3.900 4.300"/>',
+  user: '<circle cx="12" cy="8" r="3.600"/><path d="M4.500 20c0-4 3.400-6.500 7.500-6.500s7.500 2.500 7.500 6.500"/>',
+  shield: '<path d="M12 3l7.500 2.800v5.700c0 4.600-3.200 8-7.500 9.500-4.300-1.500-7.500-4.900-7.500-9.500V5.800z"/><path d="M8.700 12l2.400 2.400 4.300-4.600"/>',
+  download: '<path d="M12 4v11M7.500 10.500 12 15l4.500-4.500M5 19.500h14"/>',
+  chart: '<path d="M4 4v16h16"/><path d="M8.500 16v-4M12.500 16V8M16.500 16v-6"/>',
+  pencil: '<path d="M4 20l1-4.500L16.500 4a2.100 2.100 0 0 1 3 3L8 18.500z"/><path d="M14.500 6l3.500 3.500"/>',
+  image: '<rect x="3.500" y="4.500" width="17" height="15" rx="2.500"/><circle cx="9" cy="10" r="1.800"/><path d="M4 18l5-4.500 3.500 3 3-2.500 5 4"/>',
+  drop: '<path d="M12 3.500s6 6.300 6 10.700a6 6 0 0 1-12 0C6 9.800 12 3.500 12 3.500z"/>',
+  ball: '<circle cx="12" cy="12" r="8.500"/><path d="M12 3.500v17M3.500 12h17M5.500 6.500c3 2 4.500 4 4.500 5.500s-1.500 3.500-4.500 5.500M18.500 6.500c-3 2-4.500 4-4.500 5.500s1.500 3.500 4.500 5.500"/>',
+  store:
+    '<path d="M4 9.500 5.500 4h13L20 9.500"/><path d="M4 9.500V20h16V9.500"/><path d="M4 9.500c0 1.700 1.300 2.800 2.700 2.800s2.700-1.100 2.700-2.800c0 1.700 1.300 2.800 2.700 2.800s2.700-1.100 2.700-2.800c0 1.700 1.300 2.800 2.700 2.800S20 11.200 20 9.500"/><path d="M10 20v-4.500h4V20"/>',
+  steps:
+    '<path d="M8 4c1.600 0 2.500 1.800 2.500 3.800S9.500 11 8 11 5.500 9.800 5.500 7.800 6.400 4 8 4z"/><path d="M6 14h4v1.500a2 2 0 0 1-4 0z"/><path d="M16 9c1.600 0 2.500 1.800 2.500 3.800S17.500 16 16 16s-2.500-1.200-2.500-3.200S14.400 9 16 9z"/><path d="M14 19h4v.500a2 2 0 0 1-4 0z"/>',
+  dumbbell: '<path d="M6.500 7.500v9M3.500 10v4M17.500 7.500v9M20.500 10v4M6.500 12h11"/>',
+  home: '<path d="M4 11.500 12 4.500l8 7"/><path d="M6 10v9.500h12V10"/>',
+  search: '<circle cx="11" cy="11" r="6.500"/><path d="M16 16l4 4"/>',
+  phone: '<rect x="7" y="2.500" width="10" height="19" rx="2.500"/><path d="M10.500 18.500h3"/>',
+  'chevron-left': '<path d="M14.500 6 8.500 12l6 6"/>',
+  run: '<circle cx="14.500" cy="4.500" r="1.800"/><path d="M9 20l2.500-5 3 2.500V21M11.500 15l-.5-4.500 3-2 2.500 3 3 .5M11 10.500 7.500 11.500"/>',
+  link: '<path d="M10 14a4 4 0 0 0 5.700 0l3-3a4 4 0 0 0-5.700-5.700l-1 1M14 10a4 4 0 0 0-5.700 0l-3 3a4 4 0 0 0 5.700 5.700l1-1"/>',
+};
+const extra = name in paths;
+---
+
+{
+  extra ? (
+    <svg
+      viewBox="0 0 24 24"
+      width={size}
+      height={size}
+      fill="none"
+      stroke="currentColor"
+      stroke-width="1.75"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      aria-hidden="true"
+      focusable="false"
+      class={cls}
+      set:html={paths[name as Extra]}
+    />
+  ) : (
+    <Icon name={name as Core} size={size} class={cls} />
+  )
+}

@@ -56,7 +56,7 @@ export const routes: Record<ItemId | 'pricing' | 'solutions' | 'about' | 'contac
   messaging: { path: '/platform/messaging/', status: 'planned' },
   guardian: { path: '/platform/guardian-portal/', status: 'planned' },
   teams: { path: '/platform/teams/', status: 'planned' },
-  reports: { path: '/platform/reports/', status: 'planned' },
+  reports: { path: '/platform/teams/#reports', status: 'planned' },
   branded: { path: '/platform/custom-branded-apps/', status: 'planned' },
   integrations: { path: '/platform/integrations/', status: 'planned' },
   coaches: { path: '/solutions/coaches/', status: 'planned' },

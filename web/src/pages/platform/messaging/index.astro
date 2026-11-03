@@ -1,0 +1,10 @@
+---
+import Base from '../../../layouts/Base.astro';
+import MessagingPage from '../../../components/engage/MessagingPage.astro';
+import { engageEn } from '../../../i18n/pages/engage';
+const m = engageEn.messaging;
+---
+
+<Base locale="en" path="/platform/messaging/" title={m.meta.title} description={m.meta.description}>
+  <MessagingPage locale="en" />
+</Base>
