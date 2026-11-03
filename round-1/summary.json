@@ -1,0 +1,467 @@
+{
+  "results": [
+    {
+      "group": "capture",
+      "name": "en/light/1440: main has 9 sections",
+      "pass": true,
+      "detail": "found 9"
+    },
+    {
+      "group": "capture",
+      "name": "en/light/390: main has 9 sections",
+      "pass": true,
+      "detail": "found 9"
+    },
+    {
+      "group": "capture",
+      "name": "en/dark/1440: main has 9 sections",
+      "pass": true,
+      "detail": "found 9"
+    },
+    {
+      "group": "capture",
+      "name": "es/light/1440: main has 9 sections",
+      "pass": true,
+      "detail": "found 9"
+    },
+    {
+      "group": "capture",
+      "name": "es/light/390: main has 9 sections",
+      "pass": true,
+      "detail": "found 9"
+    },
+    {
+      "group": "capture",
+      "name": "es/dark/1440: main has 9 sections",
+      "pass": true,
+      "detail": "found 9"
+    },
+    {
+      "group": "hero",
+      "name": "headline word rotates",
+      "pass": true,
+      "detail": "\"coaches\" -> \"high school teams\""
+    },
+    {
+      "group": "hero",
+      "name": "three photo tiles follow the word",
+      "pass": true,
+      "detail": "3 active tiles"
+    },
+    {
+      "group": "hero",
+      "name": "pause button stops the rotation (WCAG 2.2.2)",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "nav",
+      "name": "Platform mega menu opens",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "nav",
+      "name": "Escape closes the menu and returns focus to its trigger",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "nav",
+      "name": "Solutions mega menu opens",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "a11y",
+      "name": "first Tab stop is the skip link",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "a11y",
+      "name": "focused control shows a focus ring (>= 2px outline)",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "ai-demo",
+      "name": "loop runs prompt -> review -> calendar",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "ai-demo",
+      "name": "pause control is pressed after click",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "pillars",
+      "name": "four tabs, first selected",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "pillars",
+      "name": "click selects the second tab",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "pillars",
+      "name": "ArrowRight moves to the third tab",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "pillars",
+      "name": "End moves to the last tab",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "pillars",
+      "name": "Home moves to the first tab",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "pillars",
+      "name": "only the active panel is interactive",
+      "pass": true,
+      "detail": "1 non-inert panels"
+    },
+    {
+      "group": "messaging",
+      "name": "phone screen slides to the broadcast screen",
+      "pass": true,
+      "detail": "translateX -50.0% of track"
+    },
+    {
+      "group": "brand",
+      "name": "retro stack advances on its own",
+      "pass": true,
+      "detail": "0,1,2,3,4,5,6,7 -> 7,0,1,2,3,4,5,6"
+    },
+    {
+      "group": "brand",
+      "name": "pause control stops the stack",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "dialog",
+      "name": "store chooser opens as a modal dialog",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "dialog",
+      "name": "chooser links to both Run with Aria stores",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "dialog",
+      "name": "Escape closes it",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "theme",
+      "name": "toggle switches the page to dark",
+      "pass": true,
+      "detail": "rgb(255, 255, 255) -> rgb(6, 14, 32)"
+    },
+    {
+      "group": "theme",
+      "name": "choice persists after reload",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "runtime",
+      "name": "no console errors, page errors or failed requests (desktop run)",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "nav",
+      "name": "mobile drawer opens",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "nav",
+      "name": "drawer group expands as an accordion",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "nav",
+      "name": "Escape closes the drawer",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "reduced-motion",
+      "name": "hero shows the static sentence, no rotation",
+      "pass": true,
+      "detail": "\"coaches and teams\"; active word stays \"coaches\""
+    },
+    {
+      "group": "reduced-motion",
+      "name": "no infinite animation is running",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "reduced-motion",
+      "name": "retro stack shows only its front card",
+      "pass": true,
+      "detail": "0 extra cards visible"
+    },
+    {
+      "group": "responsive",
+      "name": "/ @1920: no horizontal scroll",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "responsive",
+      "name": "/ @1440: no horizontal scroll",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "responsive",
+      "name": "/ @1280: no horizontal scroll",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "responsive",
+      "name": "/ @1100: no horizontal scroll",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "responsive",
+      "name": "/ @1024: no horizontal scroll",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "responsive",
+      "name": "/ @768: no horizontal scroll",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "responsive",
+      "name": "/ @600: no horizontal scroll",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "responsive",
+      "name": "/ @390: no horizontal scroll",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "responsive",
+      "name": "/ @360: no horizontal scroll",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "responsive",
+      "name": "/es/ @1920: no horizontal scroll",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "responsive",
+      "name": "/es/ @1440: no horizontal scroll",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "responsive",
+      "name": "/es/ @1280: no horizontal scroll",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "responsive",
+      "name": "/es/ @1100: no horizontal scroll",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "responsive",
+      "name": "/es/ @1024: no horizontal scroll",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "responsive",
+      "name": "/es/ @768: no horizontal scroll",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "responsive",
+      "name": "/es/ @600: no horizontal scroll",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "responsive",
+      "name": "/es/ @390: no horizontal scroll",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "responsive",
+      "name": "/es/ @360: no horizontal scroll",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "contrast",
+      "name": "en/light: text meets WCAG AA (4.5:1, 3:1 large)",
+      "pass": true,
+      "detail": "148 text nodes, lowest 4.57:1; 0 over images skipped, 82 decorative demo nodes excluded"
+    },
+    {
+      "group": "hit-targets",
+      "name": "en: every button, tab and block link is >= 44px",
+      "pass": true,
+      "detail": "48 controls, smallest 44x44; 4 inline text links exempt"
+    },
+    {
+      "group": "contrast",
+      "name": "en/dark: text meets WCAG AA (4.5:1, 3:1 large)",
+      "pass": true,
+      "detail": "148 text nodes, lowest 7.32:1; 0 over images skipped, 82 decorative demo nodes excluded"
+    },
+    {
+      "group": "contrast",
+      "name": "es/light: text meets WCAG AA (4.5:1, 3:1 large)",
+      "pass": true,
+      "detail": "148 text nodes, lowest 4.57:1; 0 over images skipped, 82 decorative demo nodes excluded"
+    },
+    {
+      "group": "hit-targets",
+      "name": "es: every button, tab and block link is >= 44px",
+      "pass": true,
+      "detail": "48 controls, smallest 44x44; 4 inline text links exempt"
+    },
+    {
+      "group": "contrast",
+      "name": "es/dark: text meets WCAG AA (4.5:1, 3:1 large)",
+      "pass": true,
+      "detail": "148 text nodes, lowest 7.32:1; 0 over images skipped, 82 decorative demo nodes excluded"
+    },
+    {
+      "group": "perf",
+      "name": "desktop: LCP <= 2500 ms (local, unthrottled)",
+      "pass": true,
+      "detail": "120 ms (runs 124, 120, 88)"
+    },
+    {
+      "group": "perf",
+      "name": "desktop: CLS <= 0.1 including a full scroll-through",
+      "pass": true,
+      "detail": "0.0000"
+    },
+    {
+      "group": "perf",
+      "name": "desktop: every hero photo delivered <= 180 KB",
+      "pass": true,
+      "detail": "9 hero files, largest 42 KB"
+    },
+    {
+      "group": "perf",
+      "name": "mobile: LCP <= 2500 ms (throttled: 1.6 Mbps, 150 ms RTT, 4x CPU)",
+      "pass": true,
+      "detail": "1848 ms (runs 1848, 1848, 1860)"
+    },
+    {
+      "group": "perf",
+      "name": "mobile: CLS <= 0.1 including a full scroll-through",
+      "pass": true,
+      "detail": "0.0001"
+    },
+    {
+      "group": "perf",
+      "name": "mobile: every hero photo delivered <= 180 KB",
+      "pass": true,
+      "detail": "9 hero files, largest 19 KB"
+    },
+    {
+      "group": "perf",
+      "name": "no video files shipped (budget 1.5 MB each)",
+      "pass": true,
+      "detail": ""
+    }
+  ],
+  "metrics": {
+    "contrast-en-light": {
+      "checked": 148,
+      "lowest": 4.57,
+      "decorativeExcluded": 82,
+      "overImagesSkipped": 0
+    },
+    "targets-en": {
+      "controls": 48,
+      "smallest": "44x44",
+      "inlineLinksExempt": 4
+    },
+    "contrast-en-dark": {
+      "checked": 148,
+      "lowest": 7.32,
+      "decorativeExcluded": 82,
+      "overImagesSkipped": 0
+    },
+    "contrast-es-light": {
+      "checked": 148,
+      "lowest": 4.57,
+      "decorativeExcluded": 82,
+      "overImagesSkipped": 0
+    },
+    "targets-es": {
+      "controls": 48,
+      "smallest": "44x44",
+      "inlineLinksExempt": 4
+    },
+    "contrast-es-dark": {
+      "checked": 148,
+      "lowest": 7.32,
+      "decorativeExcluded": 82,
+      "overImagesSkipped": 0
+    },
+    "js-desktop": 2239,
+    "perf-desktop": {
+      "lcpMs": 120,
+      "cls": 0,
+      "firstScreenKB": 1019,
+      "jsKB": 2,
+      "largestHeroKB": 42,
+      "heroFiles": 9
+    },
+    "js-mobile": 2239,
+    "perf-mobile": {
+      "lcpMs": 1848,
+      "cls": 0.0001,
+      "firstScreenKB": 581,
+      "jsKB": 2,
+      "largestHeroKB": 19,
+      "heroFiles": 9
+    },
+    "js-inline-bytes-home": 12471
+  }
+}
