@@ -1,0 +1,344 @@
+---
+import { heroSets } from '../../data/photos';
+import { site } from '../../data/site';
+import { useDict, type Locale } from '../../i18n';
+import Photo from '../ui/Photo.astro';
+import Icon from '../ui/Icon.astro';
+import ReadinessCard from '../ui/ReadinessCard.astro';
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const t = useDict(locale);
+
+const slots = [
+  { key: 'big', suffix: 'big', ratio: '4/5', sizes: '(max-width: 1100px) 86vw, 600px', widths: [480, 800, 1200], delay: 0 },
+  { key: 'sq', suffix: 'tile-sq', ratio: '1/1', sizes: '(max-width: 1100px) 40vw, 300px', widths: [320, 560], delay: 80 },
+  { key: 'tall', suffix: 'tile-45', ratio: '4/5', sizes: '(max-width: 1100px) 40vw, 300px', widths: [320, 560], delay: 160 },
+] as const;
+---
+
+<section class="hero" data-hero aria-labelledby="hero-title">
+  <div class="container hero__grid">
+    <div class="hero__copy">
+      <h1 id="hero-title" class="hero__title">
+        <span class="sr-only">{t.hero.sentence}</span>
+        <span class="hero__visual" aria-hidden="true">
+          <span class="hero__lead">{t.hero.lead}</span>
+          <span class="hero__words" data-hero-words>
+            <span class="hero__static">{t.hero.words[heroSets[0].word]}</span>
+            {
+              heroSets.map((set, i) => (
+                <span class="hero__word" data-active={i === 0 ? '' : undefined}>
+                  {t.hero.words[set.word]}
+                </span>
+              ))
+            }
+            <span class="hero__lane" data-hero-lane></span>
+          </span>
+        </span>
+      </h1>
+      <p class="hero__sub">{t.hero.sub}</p>
+      <div class="hero__cta">
+        <a class="btn btn--primary btn--lg" href={site.signUp}>{t.hero.ctaPrimary}</a>
+        <a class="btn btn--secondary btn--lg" href={site.booking}>{t.hero.ctaSecondary}</a>
+        <button
+          class="hero__pause"
+          type="button"
+          aria-pressed="false"
+          aria-label={t.a11y.pauseMotion}
+          data-label-pause={t.a11y.pauseMotion}
+          data-label-play={t.a11y.playMotion}
+          data-hero-pause
+        >
+          <Icon name="pause" size={20} class="hero__pause-pause" />
+          <Icon name="play" size={20} class="hero__pause-play" />
+        </button>
+      </div>
+    </div>
+
+    <div class="hero__collage">
+      {
+        slots.map((slot) => (
+          <div class={`hero__slot hero__slot--${slot.key} xf`} data-hero-slot style={`--xf-dur:${slot.key === 'big' ? 600 : 450}ms;--xf-delay:${slot.delay}ms`}>
+            {heroSets.map((set, i) =>
+              i === 0 ? (
+                <div class="hero__ph" data-set={i} data-active>
+                  <Photo
+                    slot={`${set.prefix}-${slot.suffix}`}
+                    ratio={slot.ratio}
+                    sizes={slot.sizes}
+                    widths={[...slot.widths]}
+                    locale={locale}
+                    eager
+                    priority={slot.key === 'big' ? 'high' : 'auto'}
+                  />
+                </div>
+              ) : (
+                <template data-set={i}>
+                  <div class="hero__ph" data-set={i}>
+                    <Photo
+                      slot={`${set.prefix}-${slot.suffix}`}
+                      ratio={slot.ratio}
+                      sizes={slot.sizes}
+                      widths={[...slot.widths]}
+                      locale={locale}
+                    />
+                  </div>
+                </template>
+              ),
+            )}
+          </div>
+        ))
+      }
+      <ReadinessCard class="hero__card" label={t.hero.readiness.label} value={t.hero.readiness.value} status={t.hero.readiness.status} />
+    </div>
+  </div>
+</section>
+
+<style>
+  .hero {
+    padding-block: 56px 72px;
+  }
+  .hero__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.22fr) minmax(0, 1fr);
+    gap: 56px;
+    align-items: center;
+  }
+  .hero__title {
+    font-size: clamp(34px, 3.45vw, 54px);
+    line-height: 1.1;
+  }
+  .hero__visual {
+    display: block;
+  }
+  .hero__lead {
+    display: block;
+    text-wrap: balance;
+  }
+  @media (max-width: 1100px) {
+    .hero__lead {
+      max-width: 11.5em;
+    }
+  }
+  .hero__words {
+    position: relative;
+    display: grid;
+    justify-items: start;
+    padding-bottom: 14px;
+    margin-top: 4px;
+  }
+  .hero__static,
+  .hero__word {
+    grid-area: 1 / 1;
+    white-space: nowrap;
+  }
+  .hero__static {
+    position: relative;
+  }
+  .hero__static::after,
+  .hero__lane {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -14px;
+    height: calc(var(--lane) + 1px);
+    background: var(--cyan);
+  }
+  .hero__static::after {
+    width: 100%;
+  }
+  .hero__word,
+  .hero__lane {
+    display: none;
+  }
+  .hero__sub {
+    max-width: 34em;
+    margin-top: 28px;
+    color: var(--ink-2);
+    font-size: 21px;
+    line-height: 32px;
+  }
+  .hero__cta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 16px;
+    margin-top: 36px;
+  }
+  .hero__pause {
+    display: none;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    border: 1px solid var(--line);
+    border-radius: 50%;
+    background: var(--bg);
+    color: var(--ink-2);
+    cursor: pointer;
+  }
+  .hero__pause:hover {
+    color: var(--ink);
+    background: var(--surface);
+  }
+  .hero__pause :global(.hero__pause-play),
+  .hero__pause[aria-pressed='true'] :global(.hero__pause-pause) {
+    display: none;
+  }
+  .hero__pause[aria-pressed='true'] :global(.hero__pause-play) {
+    display: block;
+  }
+
+  /* Rotation is an enhancement: only with JavaScript and without a reduced-motion request. */
+  @media (prefers-reduced-motion: no-preference) {
+    :global(html.js) .hero__static {
+      display: none;
+    }
+    :global(html.js) .hero__word {
+      display: block;
+      opacity: 0;
+      visibility: hidden;
+      filter: blur(8px);
+      transform: translateY(12px);
+      transition:
+        opacity 0.45s var(--ease-out),
+        filter 0.45s var(--ease-out),
+        transform 0.45s var(--ease-out),
+        visibility 0s linear 0.45s;
+    }
+    :global(html.js) .hero__word[data-active] {
+      opacity: 1;
+      visibility: visible;
+      filter: blur(0);
+      transform: none;
+      transition-delay: 0s;
+    }
+    :global(html.js) .hero__word[data-leaving] {
+      transform: translateY(-12px);
+    }
+    :global(html.js) .hero__lane {
+      display: block;
+      width: var(--lane-w, 0);
+    }
+    :global(html.js) .hero__words.is-ready .hero__lane {
+      transition: width 0.45s var(--ease-out);
+    }
+    :global(html.js) .hero__pause {
+      display: grid;
+    }
+  }
+
+  .hero__collage {
+    position: relative;
+    display: grid;
+    grid-template-columns: 1.8fr 1fr;
+    grid-template-rows: auto auto;
+    gap: 12px;
+  }
+  .hero__slot {
+    overflow: hidden;
+    border-radius: var(--radius-card);
+    background: var(--surface-2);
+  }
+  .hero__slot--big {
+    grid-row: 1 / span 2;
+    min-height: 100%;
+  }
+  .hero__ph {
+    height: 100%;
+  }
+  .hero__ph :global(.photo) {
+    height: 100%;
+  }
+  .hero__slot--big .hero__ph {
+    min-height: 100%;
+  }
+  .hero__collage :global(.hero__card) {
+    position: absolute;
+    left: -36px;
+    bottom: 12%;
+    z-index: 2;
+  }
+
+  @media (max-width: 1100px) {
+    .hero {
+      padding-block: 24px 56px;
+    }
+    .hero__grid {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 40px;
+    }
+    .hero__collage {
+      order: -1;
+      max-width: 640px;
+      width: 100%;
+      margin-inline: auto;
+    }
+    .hero__title {
+      font-size: clamp(34px, 7vw, 56px);
+    }
+    .hero__collage :global(.hero__card) {
+      left: -12px;
+    }
+  }
+  @media (max-width: 720px) {
+    .hero__title {
+      font-size: clamp(26px, 7.8vw, 44px);
+    }
+    .hero__sub {
+      font-size: 18px;
+      line-height: 28px;
+      margin-top: 20px;
+    }
+    .hero__cta {
+      flex-direction: column;
+      align-items: stretch;
+      margin-top: 28px;
+    }
+    .hero__cta .btn {
+      width: 100%;
+    }
+    .hero__pause {
+      align-self: flex-start;
+    }
+    /* Phone: one big photo plus one overlapping tile; the second tile is dropped. */
+    .hero__collage {
+      display: block;
+      aspect-ratio: 5 / 4.4;
+      max-width: none;
+    }
+    .hero__slot--big {
+      width: 74%;
+      aspect-ratio: 4 / 5;
+      min-height: 0;
+    }
+    .hero__slot--sq {
+      position: absolute;
+      right: 0;
+      top: 0;
+      width: 38%;
+      aspect-ratio: 1;
+      border: 3px solid var(--bg);
+    }
+    .hero__slot--tall {
+      display: none;
+    }
+    .hero__collage :global(.hero__card) {
+      left: auto;
+      right: 0;
+      bottom: -8px;
+      width: 200px;
+      padding: 12px 16px 14px;
+    }
+    .hero__collage :global(.hero__card .rcard__value) {
+      font-size: 44px;
+      line-height: 50px;
+    }
+  }
+</style>
+
+<script>
+  import '../../scripts/hero';
+</script>

@@ -1,0 +1,234 @@
+---
+import { Image } from 'astro:assets';
+import logoWhite from '../../assets/brand/logo-white.png';
+import { localePath, useDict, type Locale } from '../../i18n';
+import { hrefFor } from '../../data/nav';
+import { site, type ItemId } from '../../data/site';
+import LangSwitch from './LangSwitch.astro';
+import ThemeToggle from './ThemeToggle.astro';
+
+interface Props {
+  locale: Locale;
+  path?: string;
+}
+const { locale, path = '/' } = Astro.props;
+const t = useDict(locale);
+const f = t.footer;
+
+const columns: { title: string; links: { label: string; href: string }[] }[] = [
+  {
+    title: f.columns.platform,
+    links: (['programs', 'nutrition', 'readiness', 'messaging'] as ItemId[]).map((id) => ({
+      label: f.links[id as 'programs'],
+      href: hrefFor(id, locale),
+    })),
+  },
+  {
+    title: f.columns.solutions,
+    links: (['coaches', 'clubs', 'schools', 'athletes'] as ItemId[]).map((id) => ({
+      label: f.links[id as 'coaches'],
+      href: hrefFor(id, locale),
+    })),
+  },
+  {
+    title: f.columns.resources,
+    links: (['caseStudies', 'help', 'api'] as ItemId[]).map((id) => ({
+      label: f.links[id as 'api'],
+      href: hrefFor(id, locale),
+    })),
+  },
+  {
+    title: f.columns.company,
+    links: [
+      { label: f.links.about, href: hrefFor('about', locale) },
+      { label: f.links.contact, href: hrefFor('contact', locale) },
+    ],
+  },
+];
+---
+
+<footer class="band footer" aria-label={t.a11y.footerNav}>
+  <div class="footer__wordmark" aria-hidden="true">
+    <Image src={logoWhite} alt="" width={900} format="webp" loading="lazy" />
+  </div>
+  <div class="container footer__inner">
+    <div class="footer__top">
+      <a class="footer__logo" href={localePath('/', locale)} aria-label={t.a11y.homeLink}>
+        <Image src={logoWhite} alt="" width={196} densities={[1, 2]} format="webp" loading="lazy" />
+      </a>
+      <div class="footer__cols">
+        {
+          columns.map((col) => (
+            <nav class="footer__col" aria-label={col.title}>
+              <h2 class="footer__h">{col.title}</h2>
+              <ul>
+                {col.links.map((l) => (
+                  <li>
+                    <a href={l.href}>{l.label}</a>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+          ))
+        }
+        <div class="footer__col">
+          <h2 class="footer__h">{f.contactLabel}</h2>
+          <ul>
+            <li>
+              <a href={`mailto:${site.email}`}>{site.email}</a>
+            </li>
+            <li>
+              <a href={site.whatsappUrl} rel="noopener">{f.whatsapp} {site.whatsappLabel}</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="footer__bottom">
+      <div class="footer__tools">
+        <LangSwitch locale={locale} path={path} onBand />
+        <ThemeToggle locale={locale} onBand />
+      </div>
+      <ul class="footer__legal">
+        <li><a href={hrefFor('privacy', locale)}>{f.privacy}</a></li>
+        <li><a href={hrefFor('terms', locale)}>{f.terms}</a></li>
+        <li>{f.rights}</li>
+      </ul>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .footer {
+    position: relative;
+    overflow: hidden;
+    background: var(--band);
+    color: var(--band-ink);
+    border-top: 1px solid var(--band-line);
+  }
+  .footer__wordmark {
+    position: absolute;
+    right: -4%;
+    bottom: -9%;
+    width: min(900px, 70vw);
+    opacity: 0.06;
+    pointer-events: none;
+    user-select: none;
+  }
+  .footer__inner {
+    position: relative;
+    padding-block: 72px 32px;
+  }
+  .footer__top {
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    gap: 48px;
+  }
+  .footer__logo {
+    display: flex;
+    align-items: center;
+    min-height: 44px;
+    line-height: 0;
+    align-self: start;
+  }
+  .footer__logo :global(img) {
+    width: 196px;
+    height: auto;
+  }
+  .footer__cols {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 0.8fr)) minmax(0, 1.5fr);
+    gap: 32px;
+  }
+  .footer__h {
+    margin-bottom: 14px;
+    color: #fff;
+    font-family: var(--font-body);
+    font-size: 13px;
+    line-height: 18px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+  .footer__col ul {
+    display: grid;
+    gap: 2px;
+  }
+  .footer__col a {
+    display: inline-flex;
+    align-items: center;
+    min-width: 44px;
+    min-height: 44px;
+    color: var(--band-ink-2);
+    font-size: 16px;
+    text-decoration: none;
+    overflow-wrap: anywhere;
+  }
+  .footer__col a:hover {
+    color: #fff;
+    text-decoration: underline;
+    text-decoration-color: var(--cyan);
+    text-decoration-thickness: 2px;
+    text-underline-offset: 5px;
+  }
+  .footer__bottom {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px 32px;
+    margin-top: 56px;
+    padding-top: 20px;
+    border-top: 1px solid var(--band-line);
+  }
+  .footer__tools {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .footer__legal {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px 24px;
+    color: var(--band-ink-2);
+    font-size: 15px;
+  }
+  .footer__legal a {
+    display: inline-flex;
+    align-items: center;
+    min-width: 44px;
+    min-height: 44px;
+    color: var(--band-ink-2);
+    text-decoration: none;
+  }
+  .footer__legal a:hover {
+    color: #fff;
+    text-decoration: underline;
+  }
+
+  @media (max-width: 1100px) {
+    .footer__top {
+      grid-template-columns: 1fr;
+      gap: 32px;
+    }
+    .footer__cols {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+  @media (max-width: 720px) {
+    .footer__inner {
+      padding-block: 56px 24px;
+    }
+    .footer__cols {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 24px;
+    }
+    .footer__cols > :last-child {
+      grid-column: 1 / -1;
+    }
+    .footer__bottom {
+      margin-top: 40px;
+    }
+  }
+</style>

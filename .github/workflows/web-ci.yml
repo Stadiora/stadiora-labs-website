@@ -1,0 +1,41 @@
+name: web-ci
+
+# Checks the Astro project in web/ (R57 rebuild). It is not deployed anywhere: stadioralabs.com keeps
+# serving the root HTML from main until the cutover.
+on:
+  pull_request:
+    paths:
+      - 'web/**'
+      - '_config.yml'
+      - '.github/workflows/web-ci.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: web-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - name: Install
+        run: npm install --no-audit --no-fund
+      - name: Build
+        run: npx astro build
+      - name: Type and template check
+        run: npx astro check
+      - name: Verify built output
+        run: npm run verify

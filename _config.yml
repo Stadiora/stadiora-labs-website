@@ -1,0 +1,5 @@
+# GitHub Pages (legacy build) runs Jekyll over the repo root. The Astro project in web/ is not a site
+# source: its .astro files open with `---` code fences, which Jekyll treats as invalid YAML front matter
+# and fails the whole Pages build. Keep it out of the Jekyll run until the cutover replaces this setup.
+exclude:
+  - web

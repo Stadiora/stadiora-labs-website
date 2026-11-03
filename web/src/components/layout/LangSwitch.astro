@@ -1,0 +1,74 @@
+---
+import { locales, localePath, useDict, type Locale } from '../../i18n';
+
+interface Props {
+  locale: Locale;
+  path: string;
+  /** Use light-on-dark colours (footer band). */
+  onBand?: boolean;
+}
+const { locale, path, onBand = false } = Astro.props;
+const t = useDict(locale);
+---
+
+<div class:list={['langswitch', { 'langswitch--band': onBand }]} role="group" aria-label={t.a11y.langSwitch}>
+  {
+    locales.map((l, i) => (
+      <>
+        {i > 0 && <span class="langswitch__sep" aria-hidden="true">/</span>}
+        <a
+          href={localePath(path, l)}
+          lang={l}
+          hreflang={l}
+          aria-current={l === locale ? 'true' : undefined}
+          aria-label={useDict(l).lang.label}
+        >
+          {useDict(l).lang.short}
+        </a>
+      </>
+    ))
+  }
+</div>
+
+<style>
+  .langswitch {
+    display: inline-flex;
+    align-items: center;
+    font-size: 16px;
+    font-weight: 500;
+  }
+  .langswitch a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 44px;
+    min-height: 44px;
+    color: var(--ink-2);
+    text-decoration: none;
+    border-radius: var(--radius-ctl);
+  }
+  .langswitch a[aria-current='true'] {
+    color: var(--ink);
+    font-weight: 700;
+  }
+  .langswitch a:hover {
+    color: var(--ink);
+    text-decoration: underline;
+    text-decoration-color: var(--cyan);
+    text-decoration-thickness: 2px;
+    text-underline-offset: 6px;
+  }
+  .langswitch__sep {
+    color: var(--ink-3);
+  }
+  .langswitch--band a {
+    color: var(--band-ink-2);
+  }
+  .langswitch--band a[aria-current='true'],
+  .langswitch--band a:hover {
+    color: #fff;
+  }
+  .langswitch--band .langswitch__sep {
+    color: var(--band-ink-2);
+  }
+</style>

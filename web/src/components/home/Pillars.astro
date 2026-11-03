@@ -1,0 +1,464 @@
+---
+import { useDict, type Locale } from '../../i18n';
+import { hrefFor } from '../../data/nav';
+import Photo from '../ui/Photo.astro';
+import Phone from '../ui/Phone.astro';
+import Icon from '../ui/Icon.astro';
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const t = useDict(locale);
+const p = t.pillars;
+const s = p.screens;
+
+const items = [
+  { id: 'training', slot: 'p1-training', route: 'programs', tone: 'warm' },
+  { id: 'nutrition', slot: 'p2-nutrition', route: 'nutrition', tone: 'kitchen' },
+  { id: 'readiness', slot: 'p3-readiness', route: 'readiness', tone: 'morning' },
+  { id: 'sport', slot: 'p4-team-coaching', route: 'teams', tone: 'pitch' },
+] as const;
+const watch = [false, false, true, false];
+---
+
+<section class="section section--tight-top pillars" aria-labelledby="pillars-title">
+  <div class="container" data-tabs data-tabs-auto="6000">
+    <h2 id="pillars-title" class="sr-only">{p.label}</h2>
+
+    <div class="pillars__bar">
+      <div class="tabs pillars__tabs" role="tablist" aria-label={p.label}>
+        {
+          items.map((it, i) => (
+            <button
+              class="tab"
+              type="button"
+              role="tab"
+              id={`pillar-tab-${it.id}`}
+              aria-controls={`pillar-panel-${it.id}`}
+              aria-selected={i === 0 ? 'true' : 'false'}
+              tabindex={i === 0 ? 0 : -1}
+              data-text={p.items[it.id].tab}
+            >
+              {p.items[it.id].tab}
+            </button>
+          ))
+        }
+        <span class="tabs__lane" aria-hidden="true"></span>
+      </div>
+      <button
+        class="pillars__pause"
+        type="button"
+        aria-pressed="false"
+        aria-label={t.a11y.pauseTabs}
+        data-label-pause={t.a11y.pauseTabs}
+        data-label-play={t.a11y.playTabs}
+        data-tabs-pause
+      >
+        <Icon name="pause" size={18} class="pillars__pause-pause" />
+        <Icon name="play" size={18} class="pillars__pause-play" />
+      </button>
+    </div>
+
+    <div class="pillars__stack xf" style="--xf-dur: 300ms">
+      {
+        items.map((it, i) => (
+          <div
+            class="pillar"
+            role="tabpanel"
+            id={`pillar-panel-${it.id}`}
+            aria-labelledby={`pillar-tab-${it.id}`}
+            data-tone={it.tone}
+            data-active={i === 0 ? '' : undefined}
+            inert={i === 0 ? undefined : true}
+          >
+            <div class="pillar__copy">
+              <h3 class="pillar__title sr-only">{p.items[it.id].tab}</h3>
+              <p class="pillar__text">{p.items[it.id].copy}</p>
+              <a class="link link-arrow pillar__more" href={hrefFor(it.route, locale)}>
+                {p.learnMore}
+                <Icon name="arrow-right" size={18} />
+              </a>
+            </div>
+            <div class="pillar__media">
+              <Photo slot={it.slot} ratio="16/9" sizes="(max-width: 720px) 92vw, (max-width: 1100px) 60vw, 800px" widths={[480, 800, 1200]} alt={p.items[it.id].photoAlt} />
+              <Phone class="pillar__phone">
+                {
+                  it.id === 'training' && (
+                    <div class="ps">
+                      <p class="ps__nav"><Icon name="chevron-left" size={14} />{s.today}</p>
+                      <h4 class="ps__h">{s.sessionName}</h4>
+                      <p class="ps__sub num">{s.sessionMeta}</p>
+                      <ul class="ps__list">
+                        {s.steps.map((step, n) => (
+                          <li class:list={['ps__row', n === 1 && 'is-now']}>
+                            <span class:list={['ps__tick', n === 0 && 'is-done']}>{n === 0 && <Icon name="check" size={11} />}</span>
+                            <span class="num">{step}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )
+                }
+                {
+                  it.id === 'nutrition' && (
+                    <div class="ps">
+                      <p class="ps__nav"><Icon name="chevron-left" size={14} />{s.meal}</p>
+                      <div class="ps__plate"></div>
+                      <h4 class="ps__h num">{s.mealKcal}</h4>
+                      <p class="ps__sub">{s.mealItems}</p>
+                      <ul class="ps__chips">
+                        {s.macros.map((m) => (
+                          <li class="num">{m}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )
+                }
+                {
+                  it.id === 'readiness' && (
+                    <div class="ps">
+                      <p class="ps__nav"><Icon name="chevron-left" size={14} />{s.today}</p>
+                      <div class="ps__stats">
+                        <div>
+                          <p class="ps__sub">{s.sleep}</p>
+                          <p class="ps__big num">{s.sleepValue}</p>
+                        </div>
+                        <div>
+                          <p class="ps__sub">{s.steps2}</p>
+                          <p class="ps__big num">{s.stepsValue}</p>
+                        </div>
+                      </div>
+                      <div class="ps__check">
+                        <p class="ps__sub">{s.checkin}</p>
+                        <p class="ps__mood"><span class="ps__dot"></span>{s.mood}</p>
+                      </div>
+                    </div>
+                  )
+                }
+                {
+                  it.id === 'sport' && (
+                    <div class="ps">
+                      <p class="ps__nav"><Icon name="chevron-left" size={14} />{s.roster}</p>
+                      <p class="ps__sub">{s.rosterMeta}</p>
+                      <ul class="ps__list">
+                        {s.rosterRows.map((name, n) => (
+                          <li class="ps__row ps__row--roster">
+                            <span class="ps__avatar">{name[0]}</span>
+                            <span>{name}</span>
+                            <span class:list={['ps__pill', watch[n] && 'is-watch']}>{s.rosterStatus[n]}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )
+                }
+              </Phone>
+            </div>
+          </div>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<style>
+  .pillars__bar {
+    display: flex;
+    align-items: stretch;
+    gap: 12px;
+  }
+  .pillars__tabs {
+    flex: 1;
+    min-width: 0;
+    border-bottom-color: transparent;
+  }
+  .pillars__pause {
+    flex: none;
+    align-self: center;
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    border: 1px solid var(--line);
+    border-radius: 50%;
+    background: var(--bg);
+    color: var(--ink-2);
+    cursor: pointer;
+  }
+  .pillars__pause:hover {
+    color: var(--ink);
+    border-color: var(--ink-3);
+  }
+  .pillars__pause :global(.pillars__pause-play),
+  .pillars__pause[aria-pressed='true'] :global(.pillars__pause-pause) {
+    display: none;
+  }
+  .pillars__pause[aria-pressed='true'] :global(.pillars__pause-play) {
+    display: block;
+  }
+  html:not(.js) .pillars__pause,
+  .pillars__pause[hidden] {
+    display: none;
+  }
+
+  .pillars__stack {
+    border: 1px solid var(--line);
+    border-radius: var(--radius-card);
+    background: var(--bg);
+    overflow: hidden;
+  }
+  .pillar {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.75fr);
+    gap: 24px;
+    align-items: stretch;
+    padding: 14px;
+  }
+  .pillar__copy {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 22px;
+    padding: 24px 32px;
+  }
+  .pillar__text {
+    font-family: var(--font-display);
+    font-size: clamp(22px, 2.2vw, 32px);
+    line-height: 1.22;
+    font-weight: 600;
+    letter-spacing: -0.015em;
+    text-wrap: balance;
+  }
+  .pillar__more {
+    align-self: flex-start;
+    font-size: 20px;
+  }
+  .pillar__media {
+    position: relative;
+    overflow: hidden;
+    border-radius: 10px;
+    background: var(--surface-2);
+  }
+  .pillar__media :global(.photo) {
+    height: 100%;
+    min-height: 100%;
+  }
+  .pillar :global(.pillar__phone) {
+    --phone-w: clamp(176px, 17vw, 232px);
+    position: absolute;
+    right: 6%;
+    top: 9%;
+  }
+
+  /* Without JavaScript every pillar is shown in turn, so no copy is hidden. */
+  html:not(.js) .pillars__bar {
+    display: none;
+  }
+  html:not(.js) .pillars__stack {
+    display: block;
+    border: 0;
+  }
+  html:not(.js) .pillars__stack > .pillar {
+    opacity: 1;
+    visibility: visible;
+    margin-bottom: 16px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-card);
+  }
+  html:not(.js) .pillar__title {
+    position: static !important;
+    width: auto;
+    height: auto;
+    clip: auto;
+    margin: 0 0 4px;
+    font-size: 16px;
+    color: var(--ink-2);
+  }
+
+  /* Phone screens (em-based: they scale with --phone-w). */
+  .pillar :global(.ps) {
+    padding: 0.5em 1.2em 1.4em;
+  }
+  .pillar :global(.ps__nav) {
+    display: flex;
+    align-items: center;
+    gap: 0.4em;
+    margin-bottom: 0.9em;
+    font-size: 0.85em;
+    font-weight: 500;
+  }
+  .pillar :global(.ps__h) {
+    font-family: var(--font-display);
+    font-size: 1.35em;
+    line-height: 1.15;
+    font-weight: 600;
+  }
+  .pillar :global(.ps__sub) {
+    margin-top: 0.15em;
+    color: var(--ink-2);
+    font-size: 0.85em;
+  }
+  .pillar :global(.ps__list) {
+    display: grid;
+    gap: 0.5em;
+    margin-top: 1.1em;
+    list-style: none;
+  }
+  .pillar :global(.ps__row) {
+    display: flex;
+    align-items: center;
+    gap: 0.7em;
+    padding: 0.7em 0.8em;
+    border-radius: 0.6em;
+    background: var(--surface);
+    font-size: 0.85em;
+  }
+  .pillar :global(.ps__row.is-now) {
+    box-shadow: 0 0 0 1px var(--cyan) inset;
+    background: var(--cyan-tint);
+  }
+  .pillar :global(.ps__tick) {
+    display: grid;
+    place-items: center;
+    flex: none;
+    width: 1.5em;
+    height: 1.5em;
+    border: 1.5px solid var(--ink-3);
+    border-radius: 50%;
+  }
+  .pillar :global(.ps__tick.is-done) {
+    border-color: var(--cyan);
+    background: var(--cyan);
+    color: #08132b;
+  }
+  .pillar :global(.ps__plate) {
+    height: 7.4em;
+    margin-bottom: 0.9em;
+    border-radius: 0.8em;
+    background:
+      radial-gradient(circle at 34% 46%, #f6d28a 0 12%, transparent 13%),
+      radial-gradient(circle at 62% 40%, #7fb069 0 13%, transparent 14%),
+      radial-gradient(circle at 54% 66%, #c0573b 0 11%, transparent 12%),
+      radial-gradient(circle at 50% 52%, #fffaf0 0 38%, #e8dcc6 39% 41%, transparent 42%),
+      linear-gradient(135deg, #c9a37a, #9b7352);
+  }
+  .pillar :global(.ps__chips) {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4em;
+    margin-top: 0.8em;
+    list-style: none;
+  }
+  .pillar :global(.ps__chips li) {
+    padding: 0.35em 0.7em;
+    border-radius: 2em;
+    background: var(--cyan-tint);
+    font-size: 0.78em;
+    font-weight: 500;
+  }
+  .pillar :global(.ps__stats) {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.6em;
+    margin-bottom: 0.9em;
+  }
+  .pillar :global(.ps__stats > div),
+  .pillar :global(.ps__check) {
+    padding: 0.8em;
+    border-radius: 0.7em;
+    background: var(--surface);
+  }
+  .pillar :global(.ps__big) {
+    margin-top: 0.2em;
+    font-size: 1.25em;
+    font-weight: 600;
+    line-height: 1.1;
+  }
+  .pillar :global(.ps__mood) {
+    display: flex;
+    align-items: center;
+    gap: 0.5em;
+    margin-top: 0.4em;
+    font-size: 0.95em;
+  }
+  .pillar :global(.ps__dot) {
+    width: 0.7em;
+    height: 0.7em;
+    border-radius: 50%;
+    background: var(--mint);
+  }
+  .pillar :global(.ps__row--roster) {
+    justify-content: space-between;
+  }
+  .pillar :global(.ps__avatar) {
+    display: grid;
+    place-items: center;
+    flex: none;
+    width: 1.9em;
+    height: 1.9em;
+    border-radius: 50%;
+    background: var(--surface-2);
+    font-weight: 600;
+  }
+  .pillar :global(.ps__row--roster > span:nth-child(2)) {
+    flex: 1;
+  }
+  .pillar :global(.ps__pill) {
+    padding: 0.2em 0.65em;
+    border-radius: 2em;
+    background: color-mix(in srgb, var(--mint) 22%, transparent);
+    color: var(--mint-ink);
+    font-size: 0.85em;
+    font-weight: 600;
+  }
+  .pillar :global(.ps__pill.is-watch) {
+    background: color-mix(in srgb, var(--amber) 22%, transparent);
+    color: var(--amber-ink);
+  }
+
+  /* Per-pillar photo grade: a faint tone behind the photo while it loads and at the edges. */
+  .pillar[data-tone='warm'] .pillar__media {
+    background: #c9794e;
+  }
+  .pillar[data-tone='kitchen'] .pillar__media {
+    background: #e7d9c0;
+  }
+  .pillar[data-tone='morning'] .pillar__media {
+    background: #b9c7d8;
+  }
+  .pillar[data-tone='pitch'] .pillar__media {
+    background: #5f8f55;
+  }
+
+  @media (max-width: 1024px) {
+    .pillar {
+      grid-template-columns: 1fr;
+      gap: 8px;
+    }
+    .pillar__copy {
+      padding: 16px 14px 8px;
+      gap: 14px;
+    }
+    .pillar__media :global(.photo) {
+      aspect-ratio: 4 / 3 !important;
+    }
+  }
+  @media (max-width: 720px) {
+    .pillars__bar {
+      gap: 8px;
+    }
+    .pillar :global(.pillar__phone) {
+      --phone-w: 150px;
+      right: 5%;
+      top: 12%;
+    }
+    .pillar__more {
+      font-size: 18px;
+    }
+  }
+</style>
+
+<script>
+  import '../../scripts/tabs';
+</script>

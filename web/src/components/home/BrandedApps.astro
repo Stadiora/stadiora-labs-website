@@ -1,0 +1,400 @@
+---
+import { useDict, type Locale } from '../../i18n';
+import { hrefFor } from '../../data/nav';
+import { site } from '../../data/site';
+import Phone from '../ui/Phone.astro';
+import Photo from '../ui/Photo.astro';
+import Icon from '../ui/Icon.astro';
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const t = useDict(locale);
+const a = t.apps;
+const names = t.nav.apps;
+
+// Availability text is split so each store word becomes a link; "Coming soon" has none.
+const storeLinks: Record<string, string> = {
+  run: `${a.store.ios}|${site.stores.runIos};${a.store.android}|${site.stores.runAndroid}`,
+  fitmg: `${a.store.android}|${site.stores.fitmgAndroid};${a.store.iosBeta}|${site.stores.fitmgIosBeta}`,
+};
+function parts(key: 'run' | 'aria12' | 'lift' | 'fitmg') {
+  const status = names[key].status;
+  const map = new Map((storeLinks[key] ?? '').split(';').filter(Boolean).map((p) => p.split('|') as [string, string]));
+  return status.split(/(iOS beta|iOS|Android)/).map((text) => ({ text, href: map.get(text) }));
+}
+const apps = ['run', 'aria12', 'lift', 'fitmg'] as const;
+const nav = ['activity', 'run', 'chat', 'menu'] as const;
+
+// Real photos for the demo screens (decorative: the phones are aria-hidden). `pos` is the object-position crop.
+const heroPhotos = {
+  run: { slot: 'p1-training', pos: '18% 55%' },
+  aria12: { slot: 'h2-academies-tile-sq', pos: '50% 80%' },
+  lift: { slot: 'h5-gyms-big', pos: '50% 36%' },
+} as const;
+const thumbs = [
+  { slot: 'h5-gyms-tile-sq', pos: '60% 40%' },
+  { slot: 'h7-universities-tile-sq', pos: '50% 22%' },
+  { slot: 'h5-gyms-tile-45', pos: '50% 30%' },
+  { slot: 'h7-universities-tile-45', pos: '30% 28%' },
+] as const;
+---
+
+<section class="section apps" aria-labelledby="apps-title">
+  <div class="container apps__grid">
+    <div class="apps__copy" data-reveal>
+      <h2 id="apps-title" class="h-lane">{a.title}</h2>
+      <p class="apps__sub">{a.sub}</p>
+      <a class="link link-arrow apps__cta" href={hrefFor('contact', locale)}>
+        {a.cta}
+        <Icon name="arrow-right" size={18} />
+      </a>
+    </div>
+
+    <ul class="apps__phones">
+      {
+        apps.map((key, i) => (
+          <li class="apps__item" data-reveal style={`--reveal-i:${((i * 80) / 60).toFixed(3)}`}>
+            <Phone class="apps__phone" bg={key === 'lift' ? '#ffffff' : undefined} ink={key === 'lift' ? '#08132b' : '#ffffff'}>
+              <div class={`bp bp--${key}`}>
+                <div class="bp__bar">
+                  <span class="bp__logo" />
+                  <span class="bp__name">{names[key].name}</span>
+                </div>
+                <div class="bp__hero" style={key !== 'fitmg' ? `--pos:${heroPhotos[key].pos}` : undefined}>
+                  {key !== 'fitmg' && (
+                    <Photo slot={heroPhotos[key].slot} ratio="2/1" sizes="(max-width: 1024px) 200px, 220px" widths={[240, 480]} alt="" />
+                  )}
+                </div>
+                <div class="bp__body">
+                  {key === 'run' && (
+                    <>
+                      <p class="bp__tag">{a.screen.run.title}</p>
+                      <p class="bp__big num">{a.screen.run.session}</p>
+                      <p class="bp__tag num">{a.screen.run.note}</p>
+                      <span class="bp__cta">{a.screen.run.cta}</span>
+                    </>
+                  )}
+                  {key === 'aria12' && (
+                    <>
+                      <p class="bp__tag">{a.screen.aria12.title}</p>
+                      <div class="bp__card">
+                        <span class="bp__crest" />
+                        <div>
+                          <p class="bp__strong">{a.screen.aria12.session}</p>
+                          <p class="bp__tag">{a.screen.aria12.note}</p>
+                        </div>
+                      </div>
+                      <span class="bp__cta">{a.screen.aria12.cta}</span>
+                    </>
+                  )}
+                  {key === 'lift' && (
+                    <>
+                      <p class="bp__strong">{a.screen.lift.title}</p>
+                      <ul class="bp__list">
+                        {a.screen.lift.rows.map((row, n) => (
+                          <li>
+                            <span>{row}</span>
+                            <span class="num">{a.screen.lift.sets[n]}</span>
+                            <i />
+                          </li>
+                        ))}
+                      </ul>
+                    </>
+                  )}
+                  {key === 'fitmg' && (
+                    <>
+                      <p class="bp__tag">{a.screen.fitmg.title}</p>
+                      <ul class="bp__list bp__list--tiles">
+                        {a.screen.fitmg.rows.map((row, n) => (
+                          <li>
+                            <b style={`--pos:${thumbs[n % thumbs.length].pos}`}>
+                              <Photo slot={thumbs[n % thumbs.length].slot} ratio="1/1" sizes="64px" widths={[64, 128]} alt="" />
+                            </b>
+                            <span>
+                              {row}
+                              <small class="num">{a.screen.fitmg.sets[n]}</small>
+                            </span>
+                            <i />
+                          </li>
+                        ))}
+                      </ul>
+                    </>
+                  )}
+                </div>
+                <div class="bp__tabs">
+                  {nav.map((n) => (
+                    <Icon name={n} size={14} />
+                  ))}
+                </div>
+              </div>
+            </Phone>
+            <h3 class="apps__name">{names[key].name}</h3>
+            <p class="apps__status">
+              {parts(key).map((p) => (p.href ? <a class="apps__store" href={p.href} rel="noopener">{p.text}</a> : p.text))}
+            </p>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+  <p class="container demo-note apps__note">{a.demoNote}</p>
+</section>
+
+<style>
+  .apps__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 2.25fr);
+    gap: clamp(24px, 3vw, 56px);
+    align-items: center;
+  }
+  .apps__sub {
+    margin-top: 16px;
+    color: var(--ink-2);
+    font-size: 22px;
+    line-height: 32px;
+  }
+  .apps__cta {
+    margin-top: 24px;
+    font-size: 18px;
+  }
+  .apps__phones {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: clamp(12px, 2vw, 32px);
+    list-style: none;
+  }
+  .apps__item {
+    text-align: center;
+  }
+  .apps__item :global(.apps__phone) {
+    --phone-w: clamp(150px, 14.5vw, 236px);
+    margin-inline: auto;
+    transition: transform 0.25s var(--ease-out);
+  }
+  .apps__item:hover :global(.apps__phone) {
+    transform: translateY(-6px);
+  }
+  .apps__name {
+    margin-top: 18px;
+    font-family: var(--font-display);
+    font-size: 20px;
+    line-height: 1.2;
+    font-weight: 600;
+  }
+  .apps__status {
+    margin-top: 2px;
+    color: var(--ink-2);
+    font-size: 16px;
+    line-height: 24px;
+  }
+  .apps__store {
+    display: inline;
+    padding: 10px 4px;
+    margin: -10px -4px;
+    color: var(--cyan-ink);
+    font-weight: 500;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  .apps__note {
+    margin-top: 28px;
+  }
+
+  /* Four branded app screens, drawn in HTML. Each brand keeps its own palette in both themes. */
+  .bp {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+    height: 100%;
+    color: inherit;
+  }
+  .bp__bar {
+    display: flex;
+    align-items: center;
+    gap: 0.5em;
+    padding: 0.5em 1em 0.7em;
+    font-weight: 600;
+    font-size: 0.95em;
+  }
+  .bp__logo {
+    width: 1.2em;
+    height: 1.2em;
+    border-radius: 0.3em;
+    background: var(--brand-accent);
+  }
+  .bp__hero {
+    flex: none;
+    height: 7.8em;
+    overflow: hidden;
+    background: var(--brand-hero);
+  }
+  .bp__hero :global(.photo),
+  .bp__list--tiles b :global(.photo) {
+    height: 100%;
+    object-position: var(--pos, 50% 50%);
+  }
+  .bp__body {
+    flex: 1;
+    min-height: 0;
+    padding: 0.9em 1em 0;
+    font-size: 0.82em;
+  }
+  .bp__tag {
+    opacity: 0.8;
+    font-size: 0.92em;
+  }
+  .bp__strong {
+    font-weight: 600;
+  }
+  .bp__big {
+    margin: 0.15em 0;
+    font-size: 1.7em;
+    font-weight: 600;
+    line-height: 1.1;
+  }
+  .bp__cta {
+    display: block;
+    margin-top: 0.9em;
+    padding: 0.8em;
+    border-radius: 0.6em;
+    background: var(--brand-accent);
+    color: var(--brand-on);
+    text-align: center;
+    font-weight: 600;
+  }
+  .bp__card {
+    display: flex;
+    gap: 0.7em;
+    align-items: center;
+    margin-top: 0.6em;
+    padding: 0.7em;
+    border-radius: 0.7em;
+    background: rgb(255 255 255 / 0.1);
+  }
+  .bp__crest {
+    flex: none;
+    width: 2.2em;
+    height: 2.2em;
+    border-radius: 0.5em;
+    background: var(--brand-accent);
+  }
+  .bp__list {
+    display: grid;
+    gap: 0.5em;
+    margin-top: 0.8em;
+    list-style: none;
+  }
+  .bp__list li {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.6em;
+    padding: 0.6em 0.2em;
+    font-size: 0.95em;
+  }
+  .bp__list i {
+    flex: none;
+    width: 1.3em;
+    height: 1.3em;
+    border: 1.5px solid currentColor;
+    border-radius: 50%;
+    opacity: 0.5;
+  }
+  .bp__list--tiles li {
+    justify-content: flex-start;
+    padding: 0.5em;
+    border-radius: 0.6em;
+    background: rgb(255 255 255 / 0.08);
+  }
+  .bp__list--tiles b {
+    flex: none;
+    width: 2.6em;
+    height: 2.6em;
+    overflow: hidden;
+    border-radius: 0.4em;
+    background: linear-gradient(135deg, #3a3a3a, #1c1c1c);
+  }
+  .bp__list--tiles span {
+    flex: 1;
+    display: grid;
+    line-height: 1.2;
+  }
+  .bp__list--tiles small {
+    opacity: 0.7;
+    font-size: 0.85em;
+  }
+  .bp__tabs {
+    display: flex;
+    flex: none;
+    justify-content: space-around;
+    padding: 0.8em 0.6em 1em;
+    border-top: 1px solid rgb(128 128 128 / 0.25);
+    opacity: 0.75;
+  }
+
+  .bp--run {
+    --brand-accent: #1a9bff;
+    --brand-on: #ffffff;
+    --brand-hero: linear-gradient(180deg, #b6593a, #8c3f27 55%, #6a2e1e);
+  }
+  .bp--aria12 {
+    --brand-accent: #22c55e;
+    --brand-on: #04230f;
+    --brand-hero: linear-gradient(180deg, #4d8a3a, #2f6a2b);
+  }
+  .bp--lift {
+    --brand-accent: #ff6a55;
+    --brand-on: #ffffff;
+    --brand-hero: linear-gradient(135deg, #3c3c3c, #1f1f1f);
+  }
+  .bp--lift .bp__bar {
+    background: #ff6a55;
+    color: #ffffff;
+  }
+  .bp--lift .bp__logo {
+    background: #ffffff;
+  }
+  .bp--fitmg {
+    --brand-accent: #f0b429;
+    --brand-on: #000000;
+    --brand-hero: none;
+  }
+  .bp--fitmg .bp__hero {
+    display: none;
+  }
+  /* Phone backgrounds per brand. */
+  .apps__item:nth-child(1) :global(.phone) {
+    --ph-bg: #0a1a3a;
+  }
+  .apps__item:nth-child(2) :global(.phone) {
+    --ph-bg: #0e3b2b;
+  }
+  .apps__item:nth-child(4) :global(.phone) {
+    --ph-bg: #0a0a0a;
+  }
+
+  @media (max-width: 1024px) {
+    .apps__grid {
+      grid-template-columns: 1fr;
+    }
+    .apps__phones {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      row-gap: 40px;
+    }
+    .apps__item :global(.apps__phone) {
+      --phone-w: clamp(160px, 30vw, 236px);
+    }
+  }
+  @media (max-width: 720px) {
+    .apps__sub {
+      font-size: 18px;
+      line-height: 26px;
+    }
+    .apps__item :global(.apps__phone) {
+      --phone-w: min(40vw, 190px);
+    }
+  }
+</style>

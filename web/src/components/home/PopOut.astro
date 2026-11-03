@@ -1,0 +1,345 @@
+---
+import { useDict, type Locale } from '../../i18n';
+import Photo from '../ui/Photo.astro';
+import Ring from '../ui/Ring.astro';
+import ReadinessCard from '../ui/ReadinessCard.astro';
+import Icon from '../ui/Icon.astro';
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const t = useDict(locale);
+const e = t.engage;
+const bars = [36, 58, 78, 50, 68, 62, 92];
+---
+
+<div class="popout" data-popout data-reveal>
+  <div class="popout__photo">
+    <Photo slot="e1-engage" ratio="4/5" sizes="(max-width: 1024px) 92vw, 700px" widths={[480, 800, 1200]} alt={e.photoAlt} />
+  </div>
+
+  <div class="popout__card popout__card--ready" data-depth="14">
+    <ReadinessCard label={e.readiness.label} value={e.readiness.value} status={e.readiness.status} animate />
+  </div>
+
+  <div class="popout__card popout__card--load" data-depth="24">
+    <div class="pcard pcard--load">
+      <p class="pcard__label">{e.load.label}</p>
+      <div class="bars" aria-hidden="true">
+        {
+          bars.map((h, i) => (
+            <div class="bars__col">
+              <span class:list={['bars__bar', i === bars.length - 1 && 'is-last']} style={`--h:${h}%`} />
+              <span class="bars__day">{e.load.days[i]}</span>
+            </div>
+          ))
+        }
+      </div>
+      <p class="pcard__status">{e.load.status}</p>
+    </div>
+  </div>
+
+  <div class="popout__card popout__card--goal" data-depth="18">
+    <div class="pcard pcard--goal">
+      <p class="pcard__label">{e.goal.label}</p>
+      <div class="goal">
+        <Ring value={72} size={104} stroke={9} animate duration={900} />
+        <span class="goal__value num">{e.goal.value}</span>
+      </div>
+      <p class="pcard__status">{e.goal.text}</p>
+    </div>
+  </div>
+
+  <div class="popout__card popout__card--check" data-depth="12">
+    <div class="pcard pcard--check">
+      <p class="pcard__label">{e.checkin.label}</p>
+      <ul class="check">
+        <li><Icon name="bed" size={22} />{e.checkin.sleep}</li>
+        <li><Icon name="smile" size={22} />{e.checkin.mood}</li>
+        <li><Icon name="run" size={22} />{e.checkin.legs}</li>
+      </ul>
+    </div>
+  </div>
+
+  <p class="popout__sync">
+    <Icon name="heart" size={20} />
+    <Icon name="activity" size={20} />
+    <span>{e.sync}</span>
+  </p>
+</div>
+
+<style>
+  .popout {
+    position: relative;
+    padding-bottom: 56px;
+    --px: 0;
+  }
+  .popout__photo {
+    overflow: hidden;
+    border-radius: var(--radius-card);
+    background: var(--surface-2);
+  }
+  .popout__card {
+    position: absolute;
+    transform: translate3d(0, calc(var(--py, 0) * 1px), 0);
+    will-change: transform;
+  }
+  .popout__card--ready {
+    top: 7%;
+    left: -28px;
+  }
+  .popout__card--load {
+    top: 11%;
+    right: -28px;
+  }
+  .popout__card--goal {
+    top: 47%;
+    left: -28px;
+  }
+  .popout__card--check {
+    top: 61%;
+    right: -28px;
+  }
+
+  .pcard {
+    padding: 18px 22px 20px;
+    border: 1px solid var(--pop-border);
+    border-radius: var(--radius-card);
+    background: var(--bg);
+    box-shadow: var(--shadow-pop);
+  }
+  .pcard__label {
+    color: var(--ink-2);
+    font-size: 14px;
+    line-height: 20px;
+    font-weight: 500;
+  }
+  .pcard__status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 6px;
+    color: var(--ink-2);
+    font-size: 15px;
+    line-height: 20px;
+  }
+
+  .pcard--load {
+    width: 262px;
+  }
+  .bars {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    height: 84px;
+    margin-top: 12px;
+  }
+  .bars__col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+    height: 100%;
+  }
+  .bars__bar {
+    display: block;
+    width: 12px;
+    height: var(--h);
+    border-radius: 4px;
+    background: var(--ink);
+    transform-origin: bottom;
+  }
+  .bars__bar.is-last {
+    background: var(--cyan);
+  }
+  .bars__day {
+    color: var(--ink-3);
+    font-size: 12px;
+    line-height: 1;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    html.js .popout:not(.is-in) .bars__bar {
+      transform: scaleY(0.15);
+    }
+    html.js .popout.is-in .bars__bar {
+      transition: transform 0.6s var(--ease-out) calc(var(--i, 0) * 50ms);
+    }
+  }
+
+  .pcard--goal {
+    width: 204px;
+  }
+  .goal {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: 104px;
+    height: 104px;
+    margin: 8px auto 4px;
+  }
+  .goal :global(.ring) {
+    position: absolute;
+    inset: 0;
+  }
+  .goal__value {
+    position: relative;
+    font-size: 24px;
+    font-weight: 600;
+  }
+  .pcard--goal .pcard__status {
+    justify-content: center;
+    text-align: center;
+  }
+
+  .pcard--check {
+    width: 262px;
+  }
+  .check {
+    display: grid;
+    gap: 12px;
+    margin-top: 12px;
+    list-style: none;
+    font-size: 16px;
+  }
+  .check li {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .check :global(svg) {
+    flex: none;
+    color: var(--ink-2);
+  }
+
+  .popout__sync {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: var(--ink-2);
+    font-size: 16px;
+    line-height: 24px;
+  }
+  .popout__sync :global(svg) {
+    flex: none;
+  }
+
+  @media (max-width: 1100px) {
+    .popout__card--ready,
+    .popout__card--goal {
+      left: -10px;
+    }
+    .popout__card--load,
+    .popout__card--check {
+      right: -10px;
+    }
+  }
+  /* Phone: the four cards sit in a 2 by 2 grid, the top pair overlapping the photo. */
+  @media (max-width: 720px) {
+    .popout {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      padding-bottom: 0;
+    }
+    .popout__photo {
+      grid-column: 1 / -1;
+    }
+    .popout__card {
+      position: relative;
+      inset: auto;
+      transform: none;
+      will-change: auto;
+    }
+    .popout__card--ready,
+    .popout__card--load {
+      margin-top: -56px;
+    }
+    .popout__card--ready {
+      margin-left: 8px;
+    }
+    .popout__card--load {
+      margin-right: 8px;
+    }
+    .popout__card :global(.rcard),
+    .pcard {
+      width: 100%;
+      height: 100%;
+      padding: 14px 14px 16px;
+    }
+    .pcard--load,
+    .pcard--goal,
+    .pcard--check {
+      width: 100%;
+    }
+    .popout__card :global(.rcard__value) {
+      font-size: 44px;
+      line-height: 52px;
+    }
+    .popout__card :global(.rcard .ring) {
+      width: 56px;
+      height: 56px;
+    }
+    .pcard__label {
+      font-size: 13px;
+      line-height: 18px;
+    }
+    .bars {
+      gap: 2px;
+    }
+    .bars__bar {
+      width: 10px;
+    }
+    .check {
+      gap: 10px;
+      font-size: 14px;
+    }
+    .check li {
+      gap: 8px;
+    }
+    .check :global(svg) {
+      width: 18px;
+      height: 18px;
+    }
+    .popout__sync {
+      position: static;
+      grid-column: 1 / -1;
+      margin-top: 8px;
+      font-size: 15px;
+    }
+  }
+</style>
+
+<script>
+  // Cards drift against the photo while the block is in view: each at its own depth (12 to 24px).
+  const root = document.querySelector<HTMLElement>('[data-popout]');
+  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
+  if (root && !reduced.matches) {
+    const cards = Array.from(root.querySelectorAll<HTMLElement>('[data-depth]'));
+    root.querySelectorAll<HTMLElement>('.bars__bar').forEach((bar, i) => bar.style.setProperty('--i', String(i)));
+    let inView = false;
+    let frame = 0;
+    const update = () => {
+      frame = 0;
+      const r = root.getBoundingClientRect();
+      const progress = Math.max(-1, Math.min(1, (r.top + r.height / 2 - window.innerHeight / 2) / window.innerHeight));
+      for (const card of cards) card.style.setProperty('--py', String((-progress * Number(card.dataset.depth)).toFixed(2)));
+    };
+    const request = () => {
+      if (!frame && inView) frame = requestAnimationFrame(update);
+    };
+    new IntersectionObserver(
+      ([entry]) => {
+        inView = entry.isIntersecting;
+        request();
+      },
+      { rootMargin: '10% 0px' },
+    ).observe(root);
+    window.addEventListener('scroll', request, { passive: true });
+    window.addEventListener('resize', request, { passive: true });
+  }
+</script>

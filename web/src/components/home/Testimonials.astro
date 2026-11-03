@@ -1,0 +1,159 @@
+---
+import { useDict, type Locale } from '../../i18n';
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const t = useDict(locale);
+const m = t.testimonials.marco;
+---
+
+<section class="section section--surface voices" aria-labelledby="voices-title">
+  <div class="container">
+    <h2 id="voices-title" class="sr-only">{t.testimonials.title}</h2>
+    <div class="voices__grid">
+      <figure class="quote" data-reveal>
+        <!-- Initials stand in until Marco Saenz's approved portrait is supplied (never an AI face). -->
+        <div class="quote__avatar" aria-hidden="true"><span>{m.initials}</span></div>
+        <div class="quote__body">
+          <blockquote class="quote__text"><p>“{m.quote}”</p></blockquote>
+          <figcaption>
+            <span class="quote__name">{m.name} · {m.role}</span>
+            <span class="quote__disclosure">{m.disclosure}</span>
+          </figcaption>
+        </div>
+      </figure>
+      {
+        import.meta.env.DEV &&
+          [1, 2].map(() => (
+            <div class="quote quote--placeholder" data-placeholder>
+              <div class="quote__avatar" aria-hidden="true"></div>
+              <div class="quote__body">
+                <span class="bar" />
+                <span class="bar" />
+                <span class="bar bar--short" />
+                <p class="quote__ph-label">{t.testimonials.placeholder}</p>
+              </div>
+            </div>
+          ))
+      }
+    </div>
+  </div>
+</section>
+
+<style>
+  .voices {
+    padding-block: 56px;
+  }
+  .voices__grid {
+    display: grid;
+    grid-template-columns: 1.45fr 1fr 1fr;
+    gap: 24px;
+  }
+  .voices__grid > :only-child {
+    grid-column: 1 / -1;
+  }
+  .voices__grid > :only-child .quote__text {
+    font-size: clamp(22px, 2.4vw, 32px);
+  }
+  .voices__grid > :only-child .quote__avatar {
+    width: 240px;
+    min-height: 180px;
+  }
+  .quote {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    margin: 0;
+    padding: 12px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-card);
+    background: var(--bg);
+  }
+  .quote__avatar {
+    display: grid;
+    place-items: center;
+    flex: none;
+    width: 200px;
+    align-self: stretch;
+    min-height: 150px;
+    border-radius: 10px;
+    background: linear-gradient(150deg, #16233f, #08132b 70%);
+    color: #ffffff;
+    font-family: var(--font-display);
+    font-size: 44px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+  }
+  .quote__body {
+    min-width: 0;
+    padding: 8px 12px 8px 0;
+  }
+  .quote__text {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: 22px;
+    line-height: 1.28;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+  figcaption {
+    display: grid;
+    gap: 2px;
+    margin-top: 16px;
+    font-size: 16px;
+    line-height: 22px;
+  }
+  .quote__disclosure {
+    color: var(--ink-2);
+    font-size: 15px;
+  }
+  .quote--placeholder {
+    border-style: dashed;
+    background: transparent;
+  }
+  .quote--placeholder .quote__avatar {
+    width: 84px;
+    min-height: 84px;
+    align-self: flex-start;
+    border-radius: 50%;
+    background: var(--surface-2);
+  }
+  .bar {
+    display: block;
+    height: 12px;
+    margin-bottom: 10px;
+    border-radius: 4px;
+    background: var(--surface-2);
+  }
+  .bar--short {
+    width: 60%;
+  }
+  .quote__ph-label {
+    margin-top: 10px;
+    color: var(--ink-3);
+    font-size: 14px;
+  }
+  @media (max-width: 1100px) {
+    .voices__grid {
+      grid-template-columns: 1fr;
+    }
+  }
+  @media (max-width: 720px) {
+    .quote {
+      flex-direction: column;
+      align-items: stretch;
+    }
+    .quote__avatar {
+      width: auto;
+      min-height: 120px;
+    }
+    .quote__body {
+      padding: 0 8px 12px;
+    }
+    .quote__text {
+      font-size: 20px;
+    }
+  }
+</style>
