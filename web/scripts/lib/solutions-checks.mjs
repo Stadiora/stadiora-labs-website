@@ -103,7 +103,15 @@ async function focusProblems(page, stops = 220) {
   return { seen, missing, hidden };
 }
 
-export async function solutionsChecks({ open, settle, check, sleep, metrics, measure, outDir, checksOnly }) {
+export async function solutionsChecks({ open, settle: settleRaw, check, sleep, metrics, measure, outDir, checksOnly }) {
+  // settle() ends with scrollTo(0, 0), which global.css turns into a smooth scroll that is still running when a check
+  // starts measuring; a sticky header then reads as overlapping the first section. Finish at the top before measuring.
+  const settle = async (page) => {
+    await settleRaw(page);
+    await page.evaluate(() => window.scrollTo({ top: 0, left: 0, behavior: 'instant' }));
+    await page.waitForFunction(() => window.scrollY === 0);
+  };
+
   const shotsDir = `${outDir}solutions/`;
   await mkdir(shotsDir, { recursive: true });
 
