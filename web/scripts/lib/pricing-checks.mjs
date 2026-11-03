@@ -1,45 +1,31 @@
 // Evidence checks for /pricing/ and /es/pricing/. Called from evidence.mjs with its browser, server and recorders.
 //   node scripts/evidence.mjs --pricing-only            (checks plus screenshots)
 //   node scripts/evidence.mjs --pricing-only --checks-only
-// It opens its own Playwright contexts (it needs a time zone per context) and carries its own price oracle: the
-// numbers below are typed in from the epic (Stadiora/Aria#16544) and DECISIONS #3 to #5, not read back from
-// src/data/pricing.ts, so a wrong edit to the table fails here.
+//   node scripts/evidence.mjs --pricing-only --checks-only --pricing-group=dialogs   (one group: data, region, prices,
+//     behaviour, dialogs, fallback, layout, contrast, links; repeat it to look for flakes)
+// It opens its own Playwright contexts (it needs a time zone per context) and carries its own price oracle
+// (pricing-oracle.mjs): the numbers there are typed in from the epic (Stadiora/Aria#16544) and DECISIONS #3 to #5, not
+// read back from src/data/prices.ts, so a wrong edit to the table fails here.
 import { mkdir } from 'node:fs/promises';
 import { existsSync, readFileSync } from 'node:fs';
-import { addOns, bands, education, athleteBands } from '../../src/data/pricing.ts';
-import { regionFromTimeZone } from '../../src/data/region.ts';
+import * as table from '../../src/data/prices.ts';
+import { regionFromTimeZone } from '../../src/lib/region.ts';
+import { fill } from '../../src/lib/template.ts';
 import { en, es } from '../../src/i18n/pages/pricing.ts';
+import { ANNUAL_PERCENT, BRANDED, DEFAULT_BAND, EDU, EXTRA_COACH, FREE, ORACLE, annual, brandedFromText, copyProblems, everyAmount, fmt, sharedAmounts, sizes, tableProblems } from './pricing-oracle.mjs';
 
+const { athleteBands } = table;
 const copyFor = { en, es };
 const paths = { en: '/pricing/', es: '/es/pricing/' };
 const SIGN_UP = 'https://app.ariaforcoaches.com/signup';
-
-// athletes -> [coaches, Core monthly, Performance monthly]
-const ORACLE = {
-  us: { 25: [2, 79, 119], 50: [3, 129, 199], 100: [5, 199, 299], 250: [8, 349, 529], 500: [10, 499, 749], 1000: [15, 799, 1199] },
-  latam: { 25: [2, 49, 79], 50: [3, 79, 119], 100: [5, 129, 199], 250: [8, 229, 349], 500: [10, 350, 529], 1000: [15, 550, 829] },
-};
-// high school (100), college department (250), college / university (500)
-const EDU = { us: [99, 149, 299], latam: [69, 99, 199] };
-const EXTRA_COACH = { us: 20, latam: 10 };
-const BRANDED = { monthly: 99, setup: 499 };
-const annual = (monthly) => Math.floor((monthly * 9) / 10);
-const fmt = (n) => `$${n.toLocaleString('en-US')}`;
-const sizes = Object.keys(ORACLE.us).map(Number);
-
-const everyAmount = (region) => {
-  const out = new Set([EXTRA_COACH[region], ...EDU[region]]);
-  for (const [, core, perf] of Object.values(ORACLE[region])) for (const m of [core, perf]) out.add(m).add(annual(m)).add(annual(m) * 12);
-  return out;
-};
-const sharedAmounts = new Set([0, BRANDED.monthly, BRANDED.setup]);
+const onlyGroup = process.argv.find((a) => a.startsWith('--pricing-group='))?.slice('--pricing-group='.length) ?? null;
 
 function expectedState(region, billing, n, locale) {
   const copy = copyFor[locale];
   const [coaches, core, perf] = ORACLE[region][n];
   const per = (m) => (billing === 'annual' ? annual(m) : m);
-  const billed = (m) => (billing === 'annual' ? copy.price.billedYearly.replace('{total}', fmt(annual(m) * 12)) : copy.price.billedMonthly);
-  const meta = copy.price.meta.replace('{athletes}', n.toLocaleString('en-US')).replace('{coaches}', String(coaches));
+  const billed = (m) => (billing === 'annual' ? fill(copy.price.billedYearly, { total: fmt(annual(m) * 12) }) : copy.price.billedMonthly);
+  const meta = fill(copy.price.meta, { athletes: n.toLocaleString('en-US'), coaches: String(coaches) });
   const allowed = new Set([...sharedAmounts, per(core), per(perf), ...EDU[region], EXTRA_COACH[region]]);
   if (billing === 'annual') allowed.add(annual(core) * 12).add(annual(perf) * 12);
   return {
@@ -83,6 +69,15 @@ const readState = () => {
     edu: ['highSchool', 'department', 'college'].map((k) => text(`[data-edu-rate="${k}"]`)),
     extra: [...document.querySelectorAll('[data-extra-coach]')].map((e) => e.textContent.trim()),
     live: text('[data-live]'),
+    fallback: root.hasAttribute('data-fallback'),
+    // Each branded-app amount read where it shows: the marked span and the whole line it sits in.
+    brandedStrip: { monthly: text('[data-addon="branded-app"] [data-price="branded-monthly"]'), setup: text('[data-addon="branded-app"] [data-price="branded-setup"]'), line: text('[data-addon="branded-app"] .addon__price') },
+    brandedDialog: { monthly: text('#addon-branded-app [data-price="branded-monthly"]'), setup: text('#addon-branded-app [data-price="branded-setup"]'), line: text('#addon-branded-app .modal__fact') },
+    extraStrip: text('[data-addon="extra-coach"] [data-extra-coach]'),
+    extraDialog: text('#addon-extra-coach [data-extra-coach]'),
+    freePrice: text('.pcard--free .pcard__amount'),
+    freeLine: text('.pcard--free .pcard__lines p'),
+    saves: text('.saves'),
     amounts,
   };
 };
@@ -333,7 +328,7 @@ export async function pricingChecks({ browser, server, outDir, check, metrics, s
   const out = (metrics.pricing = {});
 
   async function open(path, opts = {}) {
-    const { width = 1280, height = 900, scheme = 'light', reduced = true, mobile = false, tz = 'America/New_York', js = true } = opts;
+    const { width = 1280, height = 900, scheme = 'light', reduced = true, mobile = false, tz = 'America/New_York', js = true, noBundle = false } = opts;
     const context = await browser.newContext({
       viewport: { width, height },
       colorScheme: scheme,
@@ -344,6 +339,8 @@ export async function pricingChecks({ browser, server, outDir, check, metrics, s
       timezoneId: tz,
       javaScriptEnabled: js,
     });
+    // noBundle: JavaScript is on but the pricing script never arrives (blocked, CDN failure): the page must fall back.
+    if (noBundle) await context.route('**/_astro/PricingPage.astro_astro_type_script_*.js', (route) => route.abort());
     const page = await context.newPage();
     page.problems = [];
     page.on('console', (m) => {
@@ -356,7 +353,9 @@ export async function pricingChecks({ browser, server, outDir, check, metrics, s
     });
     await page.goto(server.url + path, { waitUntil: 'load' });
     await page.evaluate(() => document.fonts.ready);
-    if (js) await page.waitForSelector('[data-pricing][data-ready]', { state: 'attached', timeout: 4000 });
+    // The inline failsafe fires at 2.5 s; wait past it and let the checks read what it left behind.
+    if (noBundle) await page.waitForTimeout(3200);
+    else if (js) await page.waitForSelector('[data-pricing][data-ready]', { state: 'attached', timeout: 4000 });
     return page;
   }
 
@@ -378,28 +377,18 @@ export async function pricingChecks({ browser, server, outDir, check, metrics, s
     await sleep(400);
   };
   const close = (page) => page.context().close();
+  const run = (group) => !onlyGroup || onlyGroup === group;
 
-  // ------------------------------------------------------------ 1. the price table against the oracle
-  {
-    let bad = [];
-    for (const region of ['us', 'latam']) {
-      for (const band of bands[region]) {
-        const [coaches, core, perf] = ORACLE[region][band.athletes] ?? [];
-        const want = [coaches, core, perf, annual(core), annual(perf), annual(core) * 12, annual(perf) * 12];
-        const got = [band.coaches, band.core.monthly, band.performance.monthly, band.core.annualMonthly, band.performance.annualMonthly, band.core.annualYearly, band.performance.annualYearly];
-        if (want.join() !== got.join()) bad.push(`${region} ${band.athletes}: want ${want} got ${got}`);
-      }
-      const edu = education[region].map((r) => r.monthly);
-      if (edu.join() !== EDU[region].join()) bad.push(`${region} education ${edu}`);
-      if (addOns.extraCoach[region] !== EXTRA_COACH[region]) bad.push(`${region} extra coach`);
-    }
-    if (addOns.brandedApp.monthly !== BRANDED.monthly || addOns.brandedApp.setup !== BRANDED.setup) bad.push('branded app');
-    if (athleteBands.join() !== sizes.join()) bad.push(`athlete bands ${athleteBands}`);
-    check('pricing/data', 'price table matches the epic and DECISIONS oracle (both regions, annual, yearly, education, add-ons)', bad.length === 0, bad.join('; '));
+  // ------------------------------------------------------------ 1. the price table and the copy against the oracle
+  if (run('data')) {
+    const bad = tableProblems(table);
+    check('pricing/data', 'price table matches the epic and DECISIONS oracle (both regions, annual, yearly, education, add-ons, Free, annual percentage)', bad.length === 0, bad.join('; '));
+    const copyBad = copyProblems({ en, es });
+    check('pricing/data', 'copy holds words and {tokens}, never numbers or amounts; en and es use the same tokens', copyBad.length === 0, copyBad.slice(0, 4).join('; '));
   }
 
   // ------------------------------------------------------------ 2. region detection
-  {
+  if (run('region')) {
     // Data-driven: every zone in the tz database maps to the region its country belongs to.
     const latamCountries = new Set(
       'MX BZ CR SV GT HN NI PA AR BO BR CL CO EC GY PY PE SR UY VE GF CU DO HT JM BS BB TT CW AW BQ SX MF MQ GP BL TC KY AG DM GD KN LC VC AI MS VG'.split(' '),
@@ -455,8 +444,10 @@ export async function pricingChecks({ browser, server, outDir, check, metrics, s
   }
 
   // ------------------------------------------------------------ 3. rendered prices: region x billing x athletes x language
-  {
+  if (run('prices')) {
     const wrong = [];
+    const addonWrong = [];
+    const freeWrong = [];
     let n = 0;
     let isolation = 0;
     for (const locale of ['en', 'es']) {
@@ -475,7 +466,22 @@ export async function pricingChecks({ browser, server, outDir, check, metrics, s
               if (got[key] !== want[key]) wrong.push(`${tag} ${key}: "${got[key]}" want "${want[key]}"`);
             }
             if (got.edu.join() !== want.edu.join()) wrong.push(`${tag} education ${got.edu}`);
-            if (got.extra.some((e) => e !== want.extra)) wrong.push(`${tag} extra coach ${got.extra}`);
+            if (got.extra.length !== 2 || got.extra.some((e) => e !== want.extra)) wrong.push(`${tag} extra coach ${got.extra}`);
+            // Add-ons: every amount read where it shows. Monthly and setup are told apart by their marker and by the
+            // words beside them, in the strip and in the dialog, so swapping or editing one of them fails here.
+            for (const where of ['brandedStrip', 'brandedDialog']) {
+              const g = got[where];
+              const read = brandedFromText(g.line ?? '');
+              if (g.monthly !== fmt(BRANDED.monthly)) addonWrong.push(`${tag} ${where} monthly fee is "${g.monthly}", want ${fmt(BRANDED.monthly)}`);
+              if (g.setup !== fmt(BRANDED.setup)) addonWrong.push(`${tag} ${where} setup fee is "${g.setup}", want ${fmt(BRANDED.setup)}`);
+              if (read.monthly !== fmt(BRANDED.monthly)) addonWrong.push(`${tag} ${where} shows "${read.monthly}" per month, want ${fmt(BRANDED.monthly)} ("${g.line}")`);
+              if (read.setup !== fmt(BRANDED.setup)) addonWrong.push(`${tag} ${where} shows "${read.setup}" as setup, want ${fmt(BRANDED.setup)} ("${g.line}")`);
+            }
+            if (got.extraStrip !== want.extra) addonWrong.push(`${tag} extra coach in the strip is "${got.extraStrip}", want ${want.extra}`);
+            if (got.extraDialog !== want.extra) addonWrong.push(`${tag} extra coach in the dialog is "${got.extraDialog}", want ${want.extra}`);
+            const freeWant = fill(copyFor[locale].plans.free.line, { coaches: String(FREE.coaches), athletes: String(FREE.athletes) });
+            if (got.freePrice !== fmt(FREE.monthly) || got.freeLine !== freeWant) freeWrong.push(`${tag} Free card "${got.freePrice}" / "${got.freeLine}", want ${fmt(FREE.monthly)} / "${freeWant}"`);
+            if (got.saves !== fill(copyFor[locale].controls.annualSaves, { percent: String(ANNUAL_PERCENT) })) freeWrong.push(`${tag} annual saving reads "${got.saves}"`);
             if (got.region !== region || got.billing !== billing || got.athletes !== String(size)) wrong.push(`${tag} data-* is ${got.region}/${got.billing}/${got.athletes}`);
             const stray = got.amounts.filter((a) => !want.allowed.has(a));
             if (stray.length) wrong.push(`${tag} unexpected dollar amounts in the DOM: ${[...new Set(stray)]}`);
@@ -486,14 +492,17 @@ export async function pricingChecks({ browser, server, outDir, check, metrics, s
       }
     }
     check('pricing/prices', `Core and Performance price, meta, billed line, Schools from, education, extra coach (${n} states: en/es x us/latam x monthly/annual x 6 sizes)`, wrong.length === 0, wrong.slice(0, 4).join('; '));
+    check('pricing/addons', `custom-branded app: ${fmt(BRANDED.monthly)} is the monthly fee and ${fmt(BRANDED.setup)} the setup fee, each at its own place in the strip and the dialog (marker and wording; ${n} states: en/es x us/latam x monthly/annual x 6 sizes)`, addonWrong.length === 0, addonWrong.slice(0, 3).join('; '));
+    check('pricing/addons', `extra coach: the price in the strip and in the dialog is ${fmt(EXTRA_COACH.us)} (US) or ${fmt(EXTRA_COACH.latam)} (LatAm), both places, every state`, addonWrong.every((w) => !/extra coach/.test(w)) && wrong.every((w) => !/extra coach/.test(w)));
+    check('pricing/prices', `Free card shows ${fmt(FREE.monthly)} with ${FREE.coaches} coach and ${FREE.athletes} athletes, and the annual saving reads ${ANNUAL_PERCENT}%, from the table in every state`, freeWrong.length === 0, freeWrong.slice(0, 3).join('; '));
     check('pricing/prices', 'no dollar amount outside the current state is anywhere in the DOM, dialogs included', wrong.every((w) => !/unexpected dollar/.test(w)));
     check('pricing/prices', "the other region's exclusive amounts never appear", isolation === 0, `${isolation} states`);
-    const annualMath = sizes.every((n2) => [ORACLE.us, ORACLE.latam].every((r) => r[n2].slice(1).every((m) => annual(m) * 12 === Math.floor((m * 9) / 10) * 12)));
-    check('pricing/prices', 'annual is 10% off rounded down per month; the yearly total is that times 12', annualMath);
+    const annualBad = ['us', 'latam'].flatMap((r) => table.bands[r].flatMap((b) => [b.core, b.performance].filter((p) => p.annualMonthly !== annual(p.monthly) || p.annualYearly !== annual(p.monthly) * 12).map((p) => `${r} ${b.athletes}: ${p.monthly} -> ${p.annualMonthly}/${p.annualYearly}`)));
+    check('pricing/prices', `annual is ${ANNUAL_PERCENT}% off rounded down per month; the yearly total is that times 12 (every band in the table)`, annualBad.length === 0, annualBad.slice(0, 3).join('; '));
   }
 
   // ------------------------------------------------------------ 4. keyboard, announcements, motion
-  {
+  if (run('behaviour')) {
     const page = await open(paths.en, { reduced: false });
     const idle = await page.evaluate(() => ({ live: document.querySelector('[data-live]').textContent, rolling: document.querySelectorAll('.is-rolling').length }));
     check('pricing/behaviour', 'nothing is announced and nothing rolls on first load', idle.live === '' && idle.rolling === 0, JSON.stringify(idle));
@@ -546,7 +555,7 @@ export async function pricingChecks({ browser, server, outDir, check, metrics, s
   }
 
   // ------------------------------------------------------------ 5. dialogs: focus, trap, Escape, backdrop, scroll lock
-  {
+  if (run('dialogs')) {
     for (const [label, width, height, mobile] of [['1280', 1280, 900, false], ['390', 390, 844, true]]) {
       const bad = [];
       const page = await open(`${paths.en}?region=latam`, { width, height, mobile });
@@ -601,8 +610,134 @@ export async function pricingChecks({ browser, server, outDir, check, metrics, s
     }
   }
 
+  // ------------------------------------------------------------ 5b. dialogs: closing and moving on at once never reopens the wrong thing
+  // Regression for a reviewed race: closing a dialog queued a `close` event whose handler gave focus back to the opener.
+  // A keyboard user who closed one dialog and moved straight to another trigger had their focus stolen, and Enter then
+  // opened the first dialog again. Two variants, each cycling through every ordered pair of triggers:
+  //   - same-task: close() and the next trigger's focus() run in one synchronous turn, the worst timing for a late handler;
+  //   - real keys: Escape or the close button, then focus the next trigger and press Enter, the way the reviewer did.
+  if (run('dialogs')) {
+    const ids = ['addon-extra-coach', 'addon-branded-app', 'addon-credits', 'education-rates'];
+    const pairs = ids.flatMap((a) => ids.filter((b) => b !== a).map((b) => [a, b]));
+    const bad = [];
+    let rounds = 0;
+    const page = await open(`${paths.en}?region=latam`);
+    const state = () => page.evaluate((all) => ({ opened: all.filter((i) => document.getElementById(i).open), active: document.activeElement?.getAttribute('data-open-modal') ?? document.activeElement?.tagName }), ids);
+    for (let round = 0; round < 2; round++) {
+      for (const [a, b] of pairs) {
+        for (const via of ['escape', 'button']) {
+          rounds++;
+          const tag = `${a} -> ${b} via ${via}`;
+          await page.locator(`[data-open-modal="${a}"]`).first().focus();
+          await page.keyboard.press('Enter');
+          if (round === 0) {
+            // Same task: no event-loop turn between close and the focus move.
+            await page.evaluate(
+              ([from, next]) => {
+                document.getElementById(from).close();
+                document.querySelector(`[data-open-modal="${next}"]`).focus();
+              },
+              [a, b],
+            );
+            await page.waitForTimeout(40);
+          } else {
+            if (via === 'escape') await page.keyboard.press('Escape');
+            else await page.locator(`dialog#${a} [data-modal-close]`).first().click();
+            await page.locator(`[data-open-modal="${b}"]`).first().focus();
+          }
+          const mid = await state();
+          if (mid.opened.length) bad.push(`${tag}: a dialog is open before Enter (${mid.opened})`);
+          if (mid.active !== b) bad.push(`${tag}: focus is on "${mid.active}" after the move, want ${b}`);
+          await page.keyboard.press('Enter');
+          const after = await state();
+          if (after.opened.join() !== b) bad.push(`${tag}: Enter opened [${after.opened}], want [${b}]`);
+          await page.keyboard.press('Escape');
+          if ((await state()).opened.length) bad.push(`${tag}: Escape left a dialog open`);
+        }
+      }
+    }
+    out.dialogRounds = rounds;
+    check('pricing/dialogs', `close then move to another trigger then Enter opens that dialog, never the previous one (${rounds} rounds: every ordered pair of 4 triggers x Escape and close button x same-task and real-key variants)`, bad.length === 0, bad.slice(0, 3).join('; '));
+    check('pricing/dialogs', 'the race run stayed clean (no console errors)', page.problems.length === 0, page.problems.slice(0, 2).join('; '));
+    await close(page);
+  }
+
+  // ------------------------------------------------------------ 5c. fallback: JavaScript on, pricing script never arrives
+  if (run('fallback')) {
+    for (const [label, width, height, mobile] of [['1280', 1280, 900, false], ['390', 390, 844, true]]) {
+      const bad = [];
+      const page = await open(`${paths.en}?region=latam`, { width, height, mobile, noBundle: true });
+      // Browser time zone is US and the URL asks for LatAm: the fallback must still show one consistent state (US, monthly, 100 athletes).
+      const got = await page.evaluate(readState);
+      const want = expectedState('us', 'monthly', DEFAULT_BAND, 'en');
+      if (!got.fallback) bad.push('data-fallback is not set');
+      if (got.ready) bad.push('data-ready is set although the script never ran');
+      for (const key of ['core', 'performance', 'coreMeta', 'performanceMeta', 'coreBilled', 'performanceBilled', 'schools']) {
+        if (got[key] !== want[key]) bad.push(`${key}: "${got[key]}" want "${want[key]}"`);
+      }
+      if (got.edu.join() !== want.edu.join()) bad.push(`education ${got.edu}`);
+      const view = await page.evaluate(() => {
+        const shown = (sel) => {
+          const e = document.querySelector(sel);
+          if (!e) return false;
+          const r = e.getBoundingClientRect();
+          return getComputedStyle(e).display !== 'none' && getComputedStyle(e).visibility !== 'hidden' && r.width > 0 && r.height > 0;
+        };
+        return {
+          controls: shown('.controls'),
+          selector: shown('select[data-athletes]'),
+          segmented: shown('.seg'),
+          note: shown('.controls-note'),
+          noteText: document.querySelector('.controls-note')?.textContent.trim() ?? '',
+          triggers: [...document.querySelectorAll('[data-open-modal]')].filter((e) => getComputedStyle(e).display !== 'none' && e.getBoundingClientRect().width > 0).length,
+          modalsShown: shown('.modals'),
+          dialogsVisible: [...document.querySelectorAll('.modals dialog')].filter((d) => d.getBoundingClientRect().height > 0).length,
+          brandedFee: document.querySelector('.modals #addon-branded-app [data-price="branded-monthly"]')?.textContent.trim(),
+          overflow: document.documentElement.scrollWidth > document.documentElement.clientWidth + 0.5,
+        };
+      });
+      if (view.controls || view.selector || view.segmented) bad.push('the controls are still on screen');
+      if (!view.note) bad.push('the US/monthly/100-athletes note is not shown');
+      const noteWant = fill(en.controls.noScript, { athletes: String(DEFAULT_BAND) });
+      if (view.noteText !== noteWant) bad.push(`note reads "${view.noteText}", want "${noteWant}"`);
+      if (view.triggers) bad.push(`${view.triggers} dialog trigger(s) still on screen`);
+      if (!view.modalsShown || view.dialogsVisible < 4) bad.push(`dialog content is not inline (${view.dialogsVisible} of 4)`);
+      if (view.brandedFee !== fmt(BRANDED.monthly)) bad.push(`inline branded fee "${view.brandedFee}"`);
+      // Tab through the page: every stop is on screen, and none is a control or dialog trigger the fallback hides.
+      await page.evaluate(() => document.activeElement?.blur());
+      const stops = [];
+      for (let i = 0; i < 120; i++) {
+        await page.keyboard.press('Tab');
+        const st = await page.evaluate(describeFocus);
+        if (st.end) break;
+        stops.push(st);
+      }
+      for (const st of stops) {
+        if (!st.visible || st.ariaHidden) bad.push(`Tab reaches "${st.name}", which is not visible`);
+        if (st.tag === 'select' || /^(More info|Más información)/.test(st.name) || /^(Monthly|Annual|Mensual|Anual)/.test(st.name)) bad.push(`Tab reaches "${st.name}", a control the fallback hides`);
+      }
+      if (stops.length < 10) bad.push(`the Tab walk ended after ${stops.length} stops`);
+      if (view.overflow) bad.push('the page scrolls sideways');
+      // Nothing can move the state, so nothing can contradict it: force the events a control would send.
+      await page.evaluate(() => {
+        const sel = document.querySelector('select[data-athletes]');
+        sel.value = '2000';
+        sel.dispatchEvent(new Event('change', { bubbles: true }));
+        const radio = document.querySelector('input[name="billing"][value="annual"], input[value="annual"]');
+        radio.checked = true;
+        radio.dispatchEvent(new Event('change', { bubbles: true }));
+      });
+      const forced = await page.evaluate(readState);
+      for (const key of ['core', 'performance', 'coreMeta', 'coreBilled', 'performanceBilled']) {
+        if (forced[key] !== want[key]) bad.push(`after a forced change ${key} became "${forced[key]}"`);
+      }
+      check('pricing/fallback', `${label}px: script blocked -> after the failsafe the page shows one honest state (US, monthly, ${DEFAULT_BAND} athletes: ${want.core} / ${want.performance}), hides the controls and dialog triggers, shows the note and the dialog content inline, and the Tab walk reaches nothing hidden`, bad.length === 0, bad.slice(0, 4).join('; '));
+      await close(page);
+    }
+  }
+
   // ------------------------------------------------------------ 6. layout: no overflow, no overlap
-  {
+  if (run('layout')) {
     const worstCoreCta = {};
     for (const width of [390, 1024, 1280, 1440]) {
       const bad = [];
@@ -628,7 +763,7 @@ export async function pricingChecks({ browser, server, outDir, check, metrics, s
   }
 
   // ------------------------------------------------------------ 7. contrast, touch targets, tab order, alt text
-  {
+  if (run('contrast')) {
     for (const scheme of ['light', 'dark']) {
       for (const locale of ['en', 'es']) {
         const page = await open(`${paths[locale]}?region=latam`, { width: 1440, scheme });
@@ -706,7 +841,7 @@ export async function pricingChecks({ browser, server, outDir, check, metrics, s
   }
 
   // ------------------------------------------------------------ 8. links, language switch, no-JS
-  {
+  if (run('links')) {
     const links = {};
     for (const locale of ['en', 'es']) {
       const page = await open(paths[locale]);
@@ -748,7 +883,7 @@ export async function pricingChecks({ browser, server, outDir, check, metrics, s
   }
 
   // ------------------------------------------------------------ 9. screenshots (final pass, settled UI)
-  if (!checksOnly) await captures();
+  if (!checksOnly && !onlyGroup) await captures();
 
   async function captures() {
     await mkdir(outDir, { recursive: true });
@@ -816,6 +951,12 @@ export async function pricingChecks({ browser, server, outDir, check, metrics, s
       await page.keyboard.press('Tab');
       await sleep(200);
       await shot(page, `state-focus-cta-${tag}`);
+      await close(page);
+
+      page = await open(`${paths.en}?region=latam`, { width, height, mobile, noBundle: true });
+      await sleep(300);
+      await page.locator('.top').first().screenshot({ path: `${outDir}state-fallback-top-${tag}.png` });
+      await page.locator('.plans-section').first().screenshot({ path: `${outDir}state-fallback-plans-${tag}.png` });
       await close(page);
     }
   }

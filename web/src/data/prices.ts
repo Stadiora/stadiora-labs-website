@@ -1,8 +1,11 @@
-// The pricing table. Every number on /pricing comes from here; nothing is computed from a formula.
+// The one price table for the whole site. Every amount, count and percentage shown on /pricing comes from
+// here, and so do the "from" prices that other pages teaser (see `prices` at the bottom). Translations hold
+// words and {tokens}, never numbers. Nothing is computed from a formula.
 // Sources: epic Stadiora/Aria#16544 (Core bands, education rates, add-ons) and DECISIONS #3 to #5
 // (Free tier, Performance prices, LatAm education rates). Annual is 10% off, rounded down to a whole
 // dollar per month; the yearly total is that monthly figure times 12. All prices are USD.
-// Only type-level syntax here (no runtime imports): the evidence script loads this file directly.
+// Region detection lives in src/lib/region.ts.
+// Only type-level syntax here (no runtime imports): the evidence and verify scripts load this file directly.
 
 export type Region = 'us' | 'latam';
 export type Billing = 'monthly' | 'annual';
@@ -75,7 +78,11 @@ export const addOns = {
   brandedApp: { monthly: 99, setup: 499 },
 } as const;
 
-export const free = { coaches: 1, athletes: 10 } as const;
+/** The Free plan: no card, so the price is zero. */
+export const free = { monthly: 0, coaches: 1, athletes: 10 } as const;
+
+/** Annual billing takes this percentage off Core and Performance (the annual fields above already include it). */
+export const annualDiscountPercent = 10;
 
 export function bandFor(region: Region, athletes: number): Band {
   return bands[region].find((b) => b.athletes === athletes) ?? bands[region].find((b) => b.athletes === defaultBand)!;
@@ -85,3 +92,16 @@ export function bandFor(region: Region, athletes: number): Band {
 export function usd(amount: number): string {
   return `$${amount.toLocaleString('en-US')}`;
 }
+
+/**
+ * Starting prices that other pages (Teams, Schools, Solutions) teaser, derived from the table above so they
+ * can never drift from /pricing. Monthly USD per region: `prices.coreFrom[region]`.
+ */
+export const prices = {
+  /** Core at the smallest size. */
+  coreFrom: { us: bands.us[0].core.monthly, latam: bands.latam[0].core.monthly },
+  /** Schools and institutions, high-school rate. */
+  highSchool: { us: education.us[0].monthly, latam: education.latam[0].monthly },
+} as const;
+
+export type PriceKey = keyof typeof prices;

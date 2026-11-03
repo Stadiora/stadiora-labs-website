@@ -1,5 +1,6 @@
 ---
 import type { Locale } from '../../i18n';
+import { defaultBand } from '../../data/prices';
 import { en, es, type PricingCopy } from '../../i18n/pages/pricing';
 import Controls from './Controls.astro';
 import PlanCard from './PlanCard.astro';
@@ -26,7 +27,7 @@ const strings = JSON.stringify({
 const plans = ['free', 'core', 'performance', 'schools', 'federations'] as const;
 ---
 
-<div class="pricing" data-pricing data-region="us" data-billing="monthly" data-athletes="100" data-strings={strings}>
+<div class="pricing" data-pricing data-region="us" data-billing="monthly" data-athletes={defaultBand} data-strings={strings}>
   <section class="top" aria-labelledby="pricing-title">
     <div class="container">
       <h1 class="top__title h-lane" id="pricing-title">{copy.h1}</h1>
@@ -50,11 +51,14 @@ const plans = ['free', 'core', 'performance', 'schools', 'federations'] as const
   <p class="sr-only" role="status" aria-live="polite" data-live></p>
 </div>
 
-<!-- Failsafe: if the module below never runs, show the server-rendered prices after a moment. -->
+<!-- Failsafe: if the module below has not started after a moment, switch to the fallback. That is not the
+     enhanced state: data-ready means the script runs, data-fallback means it does not. In the fallback the
+     controls and dialog triggers are hidden and the note explains that the prices shown are US, monthly, 100
+     athletes, so what is on screen always matches what is selected. -->
 <script is:inline>
   setTimeout(function () {
     var el = document.querySelector('[data-pricing]');
-    if (el && !el.hasAttribute('data-ready')) el.setAttribute('data-ready', '');
+    if (el && !el.hasAttribute('data-ready')) el.setAttribute('data-fallback', '');
   }, 2500);
 </script>
 <script>

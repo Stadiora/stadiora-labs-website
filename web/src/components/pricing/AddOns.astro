@@ -1,9 +1,11 @@
 ---
 import type { Locale } from '../../i18n';
-import { addOns, usd } from '../../data/pricing';
+import { addOns, usd } from '../../data/prices';
 import type { PricingCopy } from '../../i18n/pages/pricing';
 import Icon from '../ui/Icon.astro';
 import PricingIcon from './PricingIcon.astro';
+import PriceText from './PriceText.astro';
+import { brandedFee } from './fees';
 
 interface Props {
   locale: Locale;
@@ -18,7 +20,7 @@ const a = copy.addons;
     <div class="addons__panel">
       <h2 class="addons__title" id="addons-title">{a.title}</h2>
       <ul class="addons__list">
-        <li class="addon">
+        <li class="addon" data-addon="extra-coach">
           <span class="addon__icon"><PricingIcon name="users" /></span>
           <div class="addon__text">
             <p class="addon__name">{a.extraCoach.name}</p>
@@ -29,18 +31,18 @@ const a = copy.addons;
             <Icon name="arrow-right" size={16} />
           </button>
         </li>
-        <li class="addon">
+        <li class="addon" data-addon="branded-app">
           <span class="addon__icon"><PricingIcon name="phone" /></span>
           <div class="addon__text">
             <p class="addon__name">{a.brandedApp.name}</p>
-            <p class="addon__price num">{a.brandedApp.price}</p>
+            <p class="addon__price num"><PriceText text={a.brandedApp.price} values={brandedFee.values} attrs={brandedFee.marks} /></p>
           </div>
           <button class="addon__more" type="button" data-open-modal="addon-branded-app" aria-haspopup="dialog">
             {a.more}<span class="sr-only">: {a.brandedApp.name}</span>
             <Icon name="arrow-right" size={16} />
           </button>
         </li>
-        <li class="addon">
+        <li class="addon" data-addon="credits">
           <span class="addon__icon"><PricingIcon name="bars" /></span>
           <div class="addon__text">
             <p class="addon__name">{a.credits.name}</p>
@@ -137,7 +139,8 @@ const a = copy.addons;
     text-underline-offset: 3px;
   }
   /* The dialogs open from JavaScript; without it the details are listed in full below the row. */
-  :global(html:not(.js)) .addon__more {
+  :global(html:not(.js)) .addon__more,
+  :global(.pricing[data-fallback]) .addon__more {
     display: none;
   }
 

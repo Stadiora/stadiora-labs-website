@@ -1,6 +1,7 @@
 ---
 import type { Locale } from '../../i18n';
-import { bandFor, defaultBand, education, usd } from '../../data/pricing';
+import { bandFor, defaultBand, education, free, usd } from '../../data/prices';
+import { fill } from '../../lib/template';
 import type { PricingCopy } from '../../i18n/pages/pricing';
 import Icon from '../ui/Icon.astro';
 import { pricingLinks } from './links';
@@ -19,10 +20,10 @@ const links = pricingLinks(locale);
 // Server-rendered state is always US, monthly, 100 athletes: the no-JS default. The client script
 // swaps in the visitor's region and selection; the other region's numbers never reach the HTML.
 const band = bandFor('us', defaultBand);
-const fill = (text: string, values: Record<string, string>) => text.replace(/\{(\w+)\}/g, (_, k: string) => values[k] ?? '');
 const meta = fill(copy.price.meta, { athletes: band.athletes.toLocaleString('en-US'), coaches: String(band.coaches) });
 const amount = plan === 'core' ? usd(band.core.monthly) : plan === 'performance' ? usd(band.performance.monthly) : '';
-const schoolsFrom = usd(education.us[0].monthly);
+const schoolsFrom = usd(Math.min(...education.us.map((r) => r.monthly)));
+const freeLine = fill(copy.plans.free.line, { coaches: String(free.coaches), athletes: String(free.athletes) });
 
 const cta = {
   free: { href: links.free, label: copy.plans.free.cta, variant: 'secondary' },
@@ -40,7 +41,7 @@ const headingId = `plan-${plan}`;
 
   <p class:list={['pcard__price num', (plan === 'free' || plan === 'federations') && 'pcard__price--text']}>
     {plan === 'schools' && <span class="pcard__from">{copy.price.from}</span>}
-    {plan === 'free' && <span class="pcard__amount">{copy.plans.free.price}</span>}
+    {plan === 'free' && <span class="pcard__amount">{usd(free.monthly)}</span>}
     {plan === 'federations' && <span class="pcard__amount">{copy.plans.federations.price}</span>}
     {(plan === 'core' || plan === 'performance') && <span class="pcard__amount" data-amount={plan}>{amount}</span>}
     {plan === 'schools' && <span class="pcard__amount" data-schools-from>{schoolsFrom}</span>}
@@ -59,7 +60,7 @@ const headingId = `plan-${plan}`;
     {
       plan === 'free' && (
         <>
-          <p>{copy.plans.free.line}</p>
+          <p>{freeLine}</p>
           <p>{copy.plans.free.sub}</p>
         </>
       )
@@ -219,7 +220,8 @@ const headingId = `plan-${plan}`;
     text-underline-offset: 3px;
   }
   /* The rates dialog opens from JavaScript, so without it the button has nothing to open. */
-  :global(html:not(.js)) .pcard__more {
+  :global(html:not(.js)) .pcard__more,
+  :global(.pricing[data-fallback]) .pcard__more {
     display: none;
   }
 
@@ -264,11 +266,12 @@ const headingId = `plan-${plan}`;
       transform: none;
     }
   }
-  /* Hold prices until the client script has chosen a region, so a LatAm visitor never sees US numbers. */
-  :global(html.js .pricing:not([data-ready])) .pcard__amount[data-amount],
-  :global(html.js .pricing:not([data-ready])) .pcard__amount[data-schools-from],
-  :global(html.js .pricing:not([data-ready])) [data-meta],
-  :global(html.js .pricing:not([data-ready])) [data-billed] {
+  /* Hold prices until the client script has chosen a region, so a LatAm visitor never sees US numbers.
+     If the script never starts (data-fallback), the server-rendered US prices are shown with a note. */
+  :global(html.js .pricing:not([data-ready]):not([data-fallback])) .pcard__amount[data-amount],
+  :global(html.js .pricing:not([data-ready]):not([data-fallback])) .pcard__amount[data-schools-from],
+  :global(html.js .pricing:not([data-ready]):not([data-fallback])) [data-meta],
+  :global(html.js .pricing:not([data-ready]):not([data-fallback])) [data-billed] {
     visibility: hidden;
   }
 

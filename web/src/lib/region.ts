@@ -1,9 +1,12 @@
 // Region for pricing, decided on the device from the browser time zone. No network lookup.
 // LatAm is an explicit allow-list of IANA zones in Mexico, Central America, South America and the
 // Caribbean. Puerto Rico and the US Virgin Islands are US, and so is every zone not listed, including
-// an unknown or missing one. Only type imports here: the evidence script loads this file directly.
+// an unknown or missing one. The prices themselves live in src/data/prices.ts.
+// Only type imports here: the evidence and verify scripts load this file directly.
 
-import type { Region } from './pricing';
+import type { Region } from '../data/prices';
+
+export type { Region };
 
 export const latamZones: ReadonlySet<string> = new Set([
   // Mexico
@@ -41,9 +44,22 @@ export function regionFromTimeZone(timeZone: string | null | undefined): Region 
   return timeZone && latamZones.has(timeZone) ? 'latam' : 'us';
 }
 
-/** `?region=latam|us` wins (a test hook, not linked anywhere); otherwise the browser time zone decides. */
-export function detectRegion(search: string, timeZone: string | null | undefined): Region {
+/** `?region=latam|us` is a test hook, not linked anywhere. Anything else is ignored. */
+export function regionFromQuery(search: string): Region | null {
   const forced = new URLSearchParams(search).get('region');
-  if (forced === 'latam' || forced === 'us') return forced;
-  return regionFromTimeZone(timeZone);
+  return forced === 'latam' || forced === 'us' ? forced : null;
+}
+
+/** The browser's IANA time zone, or undefined when it cannot say. Browser only. */
+export function currentTimeZone(): string | undefined {
+  try {
+    return Intl.DateTimeFormat().resolvedOptions().timeZone;
+  } catch {
+    return undefined;
+  }
+}
+
+/** `?region=` wins, otherwise the time zone decides. In the browser: `detectRegion(window.location.search)`. */
+export function detectRegion(search: string, timeZone: string | null | undefined = currentTimeZone()): Region {
+  return regionFromQuery(search) ?? regionFromTimeZone(timeZone);
 }

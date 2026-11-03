@@ -1,8 +1,10 @@
 ---
 import type { Locale } from '../../i18n';
-import { addOns, education, usd } from '../../data/pricing';
+import { addOns, education, usd } from '../../data/prices';
 import type { PricingCopy } from '../../i18n/pages/pricing';
 import Modal from './Modal.astro';
+import PriceText from './PriceText.astro';
+import { brandedFee } from './fees';
 import { pricingLinks } from './links';
 
 interface Props {
@@ -13,20 +15,19 @@ const { locale, copy } = Astro.props;
 const links = pricingLinks(locale);
 const a = copy.addons;
 const close = copy.modal.close;
-// The price leads the sentence, so it can be swapped by region without touching the rest.
-const extraCoachRest = a.extraCoach.priceLine.replace('{amount}', '').trim();
+// Every amount comes from the table. The extra-coach amount is marked so the script can swap it by region.
 ---
 
 <div class="modals">
   <Modal id="addon-extra-coach" title={a.extraCoach.modalTitle} closeLabel={close}>
     <p>{a.extraCoach.body}</p>
-    <p class="modal__fact num"><span data-extra-coach>{usd(addOns.extraCoach.us)}</span> {extraCoachRest}</p>
+    <p class="modal__fact num"><PriceText text={a.extraCoach.priceLine} values={{ amount: usd(addOns.extraCoach.us) }} attrs={{ amount: { 'data-extra-coach': true } }} /></p>
     <p class="modal__note">{a.extraCoach.note}</p>
   </Modal>
 
   <Modal id="addon-branded-app" title={a.brandedApp.modalTitle} closeLabel={close}>
     <p>{a.brandedApp.body}</p>
-    <p class="modal__fact num">{a.brandedApp.priceLine}</p>
+    <p class="modal__fact num"><PriceText text={a.brandedApp.priceLine} values={brandedFee.values} attrs={brandedFee.marks} /></p>
     <div class="modal__actions">
       <a class="btn btn--primary" href={links.talk}>{a.brandedApp.cta}</a>
     </div>
@@ -104,8 +105,9 @@ const extraCoachRest = a.extraCoach.priceLine.replace('{amount}', '').trim();
     font-weight: 600;
   }
 
-  /* Without JavaScript the four dialogs are plain content under the add-ons row. */
-  :global(html:not(.js)) .modals {
+  /* Without JavaScript, or when the script never started, the four dialogs are plain content under the add-ons row. */
+  :global(html:not(.js)) .modals,
+  :global(.pricing[data-fallback]) .modals {
     display: grid;
     gap: 20px;
     width: min(100% - 2 * var(--gutter), var(--content-max));

@@ -88,8 +88,9 @@ const { id, title, closeLabel } = Astro.props;
     margin-top: 22px;
   }
 
-  /* Without JavaScript the details are shown inline instead of in a dialog. */
-  :global(html:not(.js)) .modal {
+  /* Without JavaScript, or when the script never started, the details are shown inline instead of in a dialog. */
+  :global(html:not(.js)) .modal,
+  :global(.pricing[data-fallback]) .modal {
     display: block;
     position: static;
     width: 100%;
@@ -97,7 +98,8 @@ const { id, title, closeLabel } = Astro.props;
     margin: 0;
     box-shadow: none;
   }
-  :global(html:not(.js)) .modal__close {
+  :global(html:not(.js)) .modal__close,
+  :global(.pricing[data-fallback]) .modal__close {
     display: none;
   }
   :global(html:has(dialog.modal[open])) {

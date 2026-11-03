@@ -1,7 +1,7 @@
 // Pricing page copy. Spanish is typed against English, so a missing key is a type error.
 // Spanish in this org omits the opening ¿ and ¡ marks; keep that style.
-// Prices and counts are never written here: they come from src/data/pricing.ts and are substituted
-// into the {tokens} below.
+// No number is ever written here, not a price, a count or a percentage: they come from src/data/prices.ts
+// and are substituted into the {tokens} below. `npm run verify` fails on a digit in this file (except "1:1").
 
 export const en = {
   meta: {
@@ -16,11 +16,11 @@ export const en = {
     billingLegend: 'Billing',
     monthly: 'Monthly',
     annual: 'Annual',
-    annualSaves: 'Annual saves 10%',
+    annualSaves: 'Annual saves {percent}%',
     athletes: 'Athletes:',
     currency: 'Prices in USD',
     noScript:
-      'Showing prices for 100 athletes, billed monthly. To see other sizes or annual billing, turn on JavaScript or talk to us.',
+      'Showing prices for {athletes} athletes, billed monthly. To see other sizes or annual billing, turn on JavaScript or talk to us.',
   },
   price: {
     unit: '/mo',
@@ -34,8 +34,7 @@ export const en = {
   plans: {
     free: {
       name: 'Free',
-      price: '$0',
-      line: '1 coach · up to 10 athletes',
+      line: '{coaches} coach · up to {athletes} athletes',
       sub: 'For one coach getting started. No card needed.',
       cta: 'Start free',
       checks: ['Training programs', 'Athlete app', '1:1 chat'],
@@ -79,10 +78,10 @@ export const en = {
     },
     brandedApp: {
       name: 'Custom-branded app',
-      price: '$99/mo + $499 setup',
+      price: '{monthly}/mo + {setup} setup',
       modalTitle: 'Custom-branded app',
       body: "Your logo, colors and name on the athlete app, built on the same platform. We'll confirm timing and store setup with you.",
-      priceLine: '$99 per month, plus a one-time $499 setup.',
+      priceLine: '{monthly} per month, plus a one-time {setup} setup.',
       cta: 'Talk to us',
     },
     credits: {
@@ -114,7 +113,7 @@ export const en = {
       },
       {
         q: 'Is there a free trial?',
-        a: 'Free is a plan, not a countdown: one coach, up to 10 athletes and no card. Start there, then move up when your roster grows.',
+        a: 'Free is a plan, not a countdown: one coach, up to {athletes} athletes and no card. Start there, then move up when your roster grows.',
       },
       {
         q: 'Can I change plans later?',
@@ -122,7 +121,7 @@ export const en = {
       },
       {
         q: 'How does annual billing work?',
-        a: 'Annual is paid up front for the year and takes 10% off Core and Performance. The price shows the monthly equivalent, with the yearly total underneath. For schools and institutions, talk to us.',
+        a: 'Annual is paid up front for the year and takes {percent}% off Core and Performance. The price shows the monthly equivalent, with the yearly total underneath. For schools and institutions, talk to us.',
       },
       {
         q: 'Do schools get special pricing?',
@@ -130,7 +129,7 @@ export const en = {
       },
       {
         q: 'What happens to athlete data and privacy?',
-        a: "Athletes choose what each coach sees, and admins can't override consent. From the app's privacy settings, athletes can ask for a copy of their data or ask for it to be deleted.",
+        a: "Athletes choose what each coach sees, and admins can't override consent. From the app's privacy settings, athletes can request deletion of their account and data. Our team handles each request, so it isn't instant.",
       },
       {
         q: 'How do minors and guardians work?',
@@ -155,11 +154,11 @@ export const es: PricingCopy = {
     billingLegend: 'Facturación',
     monthly: 'Mensual',
     annual: 'Anual',
-    annualSaves: 'Anual ahorra 10 %',
+    annualSaves: 'Anual ahorra {percent} %',
     athletes: 'Atletas:',
     currency: 'Precios en dólares (USD)',
     noScript:
-      'Se muestran los precios para 100 atletas, con facturación mensual. Para ver otros tamaños o la facturación anual, activa JavaScript o habla con nosotros.',
+      'Se muestran los precios para {athletes} atletas, con facturación mensual. Para ver otros tamaños o la facturación anual, activa JavaScript o habla con nosotros.',
   },
   price: {
     unit: '/mes',
@@ -173,8 +172,7 @@ export const es: PricingCopy = {
   plans: {
     free: {
       name: 'Gratis',
-      price: '$0',
-      line: '1 entrenador · hasta 10 atletas',
+      line: '{coaches} entrenador · hasta {athletes} atletas',
       sub: 'Para un entrenador que está empezando. Sin tarjeta.',
       cta: 'Empieza gratis',
       checks: ['Programas de entrenamiento', 'App para atletas', 'Chat 1:1'],
@@ -218,10 +216,10 @@ export const es: PricingCopy = {
     },
     brandedApp: {
       name: 'App con tu marca',
-      price: '$99/mes + $499 de configuración',
+      price: '{monthly}/mes + {setup} de configuración',
       modalTitle: 'App con tu marca',
       body: 'Tu logo, tus colores y tu nombre en la app para atletas, construida sobre la misma plataforma. Confirmamos contigo los tiempos y la publicación en las tiendas.',
-      priceLine: '$99 al mes, más $499 de configuración única.',
+      priceLine: '{monthly} al mes, más {setup} de configuración única.',
       cta: 'Habla con nosotros',
     },
     credits: {
@@ -253,7 +251,7 @@ export const es: PricingCopy = {
       },
       {
         q: 'Hay una prueba gratuita?',
-        a: 'Gratis es un plan, no una cuenta regresiva: un entrenador, hasta 10 atletas y sin tarjeta. Empieza ahí y sube de plan cuando crezca tu grupo.',
+        a: 'Gratis es un plan, no una cuenta regresiva: un entrenador, hasta {athletes} atletas y sin tarjeta. Empieza ahí y sube de plan cuando crezca tu grupo.',
       },
       {
         q: 'Puedo cambiar de plan después?',
@@ -261,7 +259,7 @@ export const es: PricingCopy = {
       },
       {
         q: 'Cómo funciona la facturación anual?',
-        a: 'El plan anual se paga por adelantado por todo el año y descuenta 10 % en Core y Performance. El precio muestra el equivalente mensual, con el total anual debajo. Para escuelas e instituciones, habla con nosotros.',
+        a: 'El plan anual se paga por adelantado por todo el año y descuenta {percent} % en Core y Performance. El precio muestra el equivalente mensual, con el total anual debajo. Para escuelas e instituciones, habla con nosotros.',
       },
       {
         q: 'Las escuelas tienen precios especiales?',
@@ -269,7 +267,7 @@ export const es: PricingCopy = {
       },
       {
         q: 'Qué pasa con los datos de los atletas y la privacidad?',
-        a: 'Los atletas eligen qué ve cada entrenador y los administradores no pueden anular el consentimiento. Desde la configuración de privacidad de la app, los atletas pueden pedir una copia de sus datos o solicitar que se eliminen.',
+        a: 'Los atletas eligen qué ve cada entrenador y los administradores no pueden anular el consentimiento. Desde la configuración de privacidad de la app, los atletas pueden solicitar que se elimine su cuenta y sus datos. Cada solicitud la atiende nuestro equipo, así que no es instantánea.',
       },
       {
         q: 'Cómo funcionan los menores y los tutores?',

@@ -1,5 +1,7 @@
 ---
 import type { Locale } from '../../i18n';
+import { annualDiscountPercent, free } from '../../data/prices';
+import { fill } from '../../lib/template';
 import type { PricingCopy } from '../../i18n/pages/pricing';
 import Icon from '../ui/Icon.astro';
 
@@ -8,6 +10,8 @@ interface Props {
   copy: PricingCopy;
 }
 const { copy } = Astro.props;
+// FAQ answers may carry {athletes} (Free limit) and {percent} (annual discount); the table supplies both.
+const faqValues = { athletes: String(free.athletes), percent: String(annualDiscountPercent) };
 ---
 
 <section class="section faq" aria-labelledby="faq-title">
@@ -24,7 +28,7 @@ const { copy } = Astro.props;
                 <Icon name="minus" size={22} class="faq__minus" />
               </span>
             </summary>
-            <p class="faq__a">{item.a}</p>
+            <p class="faq__a">{fill(item.a, faqValues)}</p>
           </details>
         ))
       }

@@ -1,8 +1,16 @@
 // Post-build checks for /pricing/ and /es/pricing/. Called from verify-dist.mjs with dist/ and its `fail` recorder.
-// Node type-strips the .ts imports, so the checks read the same price table the page is built from.
+// Node type-strips the .ts imports, so the checks read the same price table and copy the page is built from, and
+// compare them with the hand-typed oracle in pricing-oracle.mjs. The numbers in the table, the copy and the built
+// HTML must all agree with the oracle, so a wrong fee fails `npm run verify` without a browser.
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { addOns, bands, education } from '../../src/data/pricing.ts';
+import * as prices from '../../src/data/prices.ts';
+import { fill } from '../../src/lib/template.ts';
+import { en, es } from '../../src/i18n/pages/pricing.ts';
+import { BRANDED, EXTRA_COACH, FREE, ANNUAL_PERCENT, DEFAULT_BAND, brandedFromText, copyProblems, fmt, tableProblems } from './pricing-oracle.mjs';
+
+const { addOns, bands, education } = prices;
+const copyFor = { en, es };
 
 const pages = [
   { file: 'pricing/index.html', lang: 'en', canonical: 'https://stadioralabs.com/pricing/', og: '/og/home-en.png' },
@@ -26,6 +34,27 @@ function withoutScripts(html) {
   }
 }
 
+// Plain text of an HTML fragment of our own build output: everything outside <...> pairs, entities left as they are.
+function textOf(fragment) {
+  let out = '';
+  let inTag = false;
+  for (const ch of fragment) {
+    if (ch === '<') inTag = true;
+    else if (ch === '>') inTag = false;
+    else if (!inTag) out += ch;
+  }
+  return out.replaceAll('&#39;', "'").replaceAll('&amp;', '&').trim();
+}
+
+// The markup that follows the tag containing `marker`, up to the next `end`, or null. For a tag like
+// `<p class="x" data-astro-cid-1>` pass `class="x"`; the result starts after that tag's closing `>`.
+function inner(html, marker, end) {
+  const at = html.indexOf(marker);
+  const open = at < 0 ? -1 : html.indexOf('>', at);
+  const to = open < 0 ? -1 : html.indexOf(end, open);
+  return to < 0 ? null : html.slice(open + 1, to);
+}
+
 // Dollar amounts that exist only in the LatAm table. They must never be in the HTML: LatAm numbers ship in the
 // script bundle and reach the DOM only for a visitor whose time zone is in the LatAm list.
 function latamOnlyAmounts() {
@@ -47,6 +76,11 @@ export function verifyPricing(dist, report) {
     report(msg);
   };
   const latamOnly = latamOnlyAmounts();
+
+  for (const p of tableProblems(prices)) {
+    fail(`price table (src/data/prices.ts) disagrees with the oracle (scripts/lib/pricing-oracle.mjs): ${p}`);
+  }
+  for (const p of copyProblems({ en, es })) fail(`pricing copy (src/i18n/pages/pricing.ts): ${p}`);
 
   for (const page of pages) {
     const path = join(dist, page.file);
@@ -88,6 +122,41 @@ export function verifyPricing(dist, report) {
       const re = new RegExp(`\\$${amount.toLocaleString('en-US').replace(',', '\\,')}(?![\\d,])`);
       if (re.test(text)) fail(`${page.file}: LatAm-only amount $${amount} is in the HTML`);
     }
+
+    // Amounts are server-rendered from the table. Read each one where it shows, by its marker and by the words next to
+    // it, and compare with the oracle: a wrong monthly fee fails even if the setup fee is right.
+    const copy = copyFor[page.lang];
+    const brandedStrip = inner(html, 'data-addon="branded-app"', '</li>');
+    const brandedDialog = inner(html, 'id="addon-branded-app"', '</dialog>');
+    const extraStrip = inner(html, 'data-addon="extra-coach"', '</li>');
+    const extraDialog = inner(html, 'id="addon-extra-coach"', '</dialog>');
+    for (const [where, fragment, line] of [
+      ['add-ons strip', brandedStrip, inner(brandedStrip ?? '', 'class="addon__price num"', '</p>')],
+      ['branded-app dialog', brandedDialog, inner(brandedDialog ?? '', 'class="modal__fact num"', '</p>')],
+    ]) {
+      if (fragment === null || line === null) {
+        fail(`${page.file}: cannot find the custom-branded app fee in the ${where}`);
+        continue;
+      }
+      const marked = (key) => new RegExp(`data-price="branded-${key}">([^<]*)<`).exec(fragment)?.[1];
+      if (marked('monthly') !== fmt(BRANDED.monthly)) fail(`${page.file}: branded app monthly fee in the ${where} is ${marked('monthly')}, want ${fmt(BRANDED.monthly)}`);
+      if (marked('setup') !== fmt(BRANDED.setup)) fail(`${page.file}: branded app setup fee in the ${where} is ${marked('setup')}, want ${fmt(BRANDED.setup)}`);
+      const read = brandedFromText(textOf(line));
+      if (read.monthly !== fmt(BRANDED.monthly)) fail(`${page.file}: the amount shown per month for the branded app in the ${where} is ${read.monthly}, want ${fmt(BRANDED.monthly)} ("${textOf(line)}")`);
+      if (read.setup !== fmt(BRANDED.setup)) fail(`${page.file}: the amount shown as setup for the branded app in the ${where} is ${read.setup}, want ${fmt(BRANDED.setup)} ("${textOf(line)}")`);
+    }
+    for (const [where, fragment] of [['add-ons strip', extraStrip], ['extra-coach dialog', extraDialog]]) {
+      const got = fragment === null ? null : /data-extra-coach[^>]*>([^<]*)</.exec(fragment)?.[1];
+      if (got !== fmt(EXTRA_COACH.us)) fail(`${page.file}: extra coach in the ${where} is ${got}, want ${fmt(EXTRA_COACH.us)} (US server render)`);
+    }
+    const freeText = textOf(inner(html, 'data-plan="free"', '<ul class="pcard__checks"') ?? '');
+    if (!freeText.includes(fmt(FREE.monthly)) || !freeText.includes(fill(copy.plans.free.line, { coaches: String(FREE.coaches), athletes: String(FREE.athletes) }))) {
+      fail(`${page.file}: the Free card does not show ${fmt(FREE.monthly)} and "${fill(copy.plans.free.line, { coaches: String(FREE.coaches), athletes: String(FREE.athletes) })}"`);
+    }
+    if (!textOf(inner(html, 'class="saves"', '</p>') ?? '').includes(fill(copy.controls.annualSaves, { percent: String(ANNUAL_PERCENT) }))) fail(`${page.file}: the annual saving is not ${ANNUAL_PERCENT}%`);
+    if (!textOf(inner(html, 'class="controls-note"', '</p>') ?? '').includes(fill(copy.controls.noScript, { athletes: String(DEFAULT_BAND) }))) fail(`${page.file}: the fallback note does not name ${DEFAULT_BAND} athletes`);
+    // The script's templates sit in an attribute (data-strings) and are meant to hold tokens; visible text must not.
+    if (/\{(?:percent|athletes|coaches|monthly|setup|amount|total|plan)\}/.test(textOf(text))) fail(`${page.file}: an unfilled {token} is in the HTML`);
 
     // Every "more info" button points at a dialog that exists and has a name.
     for (const m of html.matchAll(/data-open-modal="([^"]+)"/g)) {

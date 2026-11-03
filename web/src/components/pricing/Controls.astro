@@ -1,6 +1,7 @@
 ---
 import type { Locale } from '../../i18n';
-import { athleteBands, defaultBand } from '../../data/pricing';
+import { annualDiscountPercent, athleteBands, defaultBand } from '../../data/prices';
+import { fill } from '../../lib/template';
 import type { PricingCopy } from '../../i18n/pages/pricing';
 import Icon from '../ui/Icon.astro';
 
@@ -24,7 +25,7 @@ const c = copy.controls;
       <span>{c.annual}</span>
     </label>
   </fieldset>
-  <p class="saves"><span class="saves__dot" aria-hidden="true"></span>{c.annualSaves}</p>
+  <p class="saves"><span class="saves__dot" aria-hidden="true"></span>{fill(c.annualSaves, { percent: String(annualDiscountPercent) })}</p>
   <span class="controls__rule" aria-hidden="true"></span>
   <label class="athletes">
     <span class="athletes__label">{c.athletes}</span>
@@ -35,7 +36,7 @@ const c = copy.controls;
   </label>
   <p class="currency">{c.currency}</p>
 </div>
-<p class="controls-note">{c.noScript}</p>
+<p class="controls-note">{fill(c.noScript, { athletes: String(defaultBand) })}</p>
 
 <style>
   .controls {
@@ -178,10 +179,13 @@ const c = copy.controls;
     line-height: 24px;
     text-align: center;
   }
-  :global(html:not(.js)) .controls {
+  /* No JavaScript, or the script never started: the controls would do nothing, so show the note instead. */
+  :global(html:not(.js)) .controls,
+  :global(.pricing[data-fallback]) .controls {
     display: none;
   }
-  :global(html:not(.js)) .controls-note {
+  :global(html:not(.js)) .controls-note,
+  :global(.pricing[data-fallback]) .controls-note {
     display: block;
   }
 

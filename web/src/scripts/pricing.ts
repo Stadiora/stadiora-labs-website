@@ -1,7 +1,10 @@
 // Pricing page behaviour: region, billing toggle, athlete selector, price rendering, dialogs.
 // Everything here is an enhancement. The HTML already holds the US monthly prices for 100 athletes.
-import { bandFor, defaultBand, education, addOns, usd, type Billing, type Region } from '../data/pricing';
-import { detectRegion } from '../data/region';
+// `data-ready` goes on only after every part below has started. If this module never runs or throws, the
+// inline failsafe in PricingPage.astro marks the page `data-fallback` instead and the controls stay hidden.
+import { bandFor, defaultBand, education, addOns, usd, type Billing, type Region } from '../data/prices';
+import { detectRegion } from '../lib/region';
+import { fill } from '../lib/template';
 
 interface Strings {
   billedMonthly: string;
@@ -14,18 +17,6 @@ interface Strings {
 }
 
 const root = document.querySelector<HTMLElement>('[data-pricing]');
-
-function fill(text: string, values: Record<string, string>): string {
-  return text.replace(/\{(\w+)\}/g, (_, key: string) => values[key] ?? '');
-}
-
-function timeZone(): string | undefined {
-  try {
-    return Intl.DateTimeFormat().resolvedOptions().timeZone;
-  } catch {
-    return undefined;
-  }
-}
 
 function setText(el: Element | null, text: string, roll: boolean): void {
   if (!el || el.textContent === text) return;
@@ -43,7 +34,7 @@ function initPrices(host: HTMLElement): void {
   const athletesSelect = host.querySelector<HTMLSelectElement>('select[data-athletes]');
   const live = host.querySelector<HTMLElement>('[data-live]');
 
-  const region: Region = detectRegion(window.location.search, timeZone());
+  const region: Region = detectRegion(window.location.search);
   let billing: Billing = billingInputs.find((i) => i.checked)?.value === 'annual' ? 'annual' : 'monthly';
   let athletes = Number(athletesSelect?.value ?? defaultBand);
 
@@ -103,11 +94,9 @@ function initPrices(host: HTMLElement): void {
   });
 
   render(false);
-  host.setAttribute('data-ready', '');
 }
 
 function initDialogs(host: HTMLElement): void {
-  let opener: HTMLElement | null = null;
   const tabbable =
     'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), summary, [tabindex]:not([tabindex="-1"])';
 
@@ -117,7 +106,9 @@ function initDialogs(host: HTMLElement): void {
     if (trigger) {
       const dialog = document.getElementById(trigger.dataset.openModal ?? '');
       if (dialog instanceof HTMLDialogElement && !dialog.open) {
-        opener = trigger;
+        // Safari does not focus a button on click. showModal() remembers the focused element and hands focus
+        // back to it when the dialog closes, so make sure that element is the trigger.
+        if (document.activeElement !== trigger) trigger.focus({ preventScroll: true });
         dialog.showModal();
       }
       return;
@@ -153,19 +144,14 @@ function initDialogs(host: HTMLElement): void {
       first.focus();
     }
   });
-
-  // `close` does not bubble, so listen in the capture phase. Hand focus back to the button that opened it.
-  host.addEventListener(
-    'close',
-    () => {
-      opener?.focus();
-      opener = null;
-    },
-    true,
-  );
 }
 
+// Focus goes back to the trigger through the dialog's own close steps, which run synchronously inside close().
+// There is deliberately no `close` listener that moves focus: that event is queued, and a late one would pull
+// focus away from whatever the visitor chose in the meantime and open the wrong dialog on the next Enter.
 if (root) {
   initPrices(root);
   initDialogs(root);
+  root.removeAttribute('data-fallback');
+  root.setAttribute('data-ready', '');
 }
