@@ -1,0 +1,88 @@
+---
+import Photo from '../../ui/Photo.astro';
+import type { Locale } from '../../../i18n';
+import type { PowerLabCopy } from '../../../i18n/pages/power-lab';
+
+interface Props {
+  locale: Locale;
+  copy: PowerLabCopy['flow']['camera'];
+}
+const { locale, copy } = Astro.props;
+---
+
+<!-- A phone held sideways, filming the jump. Decorative: the step title and line say it in words. -->
+<div class="pc" aria-hidden="true">
+  <div class="pc__phone">
+    <div class="pc__screen">
+      <Photo slot="f4-powerlab" alt="" ratio="1600/612" sizes="260px" widths={[320, 480]} locale={locale} class="pc__img" />
+      <span class="pc__pill">{copy.pill}</span>
+      <span class="pc__rec"><i></i></span>
+    </div>
+  </div>
+</div>
+
+<style>
+  .pc {
+    display: grid;
+    place-items: center;
+    padding: 14px;
+    border-radius: 12px;
+    background: var(--surface);
+  }
+  .pc__phone {
+    width: 100%;
+    padding: 7px 9px;
+    border-radius: 18px;
+    background: #0b1220;
+    box-shadow: 0 0 0 1px rgb(255 255 255 / 0.12) inset;
+  }
+  .pc__screen {
+    position: relative;
+    aspect-ratio: 2 / 1;
+    overflow: hidden;
+    border-radius: 10px;
+    background: #0b1220;
+  }
+  .pc__screen :global(.photo-pic),
+  .pc__screen :global(.photo) {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 62% 40%;
+  }
+  .pc__screen :global(.photo) {
+    transform: scale(1.35);
+    transform-origin: 62% 45%;
+  }
+  .pc__pill {
+    position: absolute;
+    left: 8px;
+    top: 8px;
+    padding: 1px 8px;
+    border-radius: 999px;
+    background: rgb(11 18 32 / 0.78);
+    color: #fff;
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 18px;
+  }
+  .pc__rec {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    display: grid;
+    place-items: center;
+    width: 28px;
+    height: 28px;
+    margin-top: -14px;
+    border: 2px solid #fff;
+    border-radius: 50%;
+  }
+  .pc__rec i {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: #ef4444;
+  }
+</style>

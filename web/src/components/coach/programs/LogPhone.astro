@@ -1,0 +1,80 @@
+---
+import CoachIcon from '../CoachIcon.astro';
+import Phone from '../../ui/Phone.astro';
+import type { ProgramsCopy } from '../../../i18n/pages/programs';
+
+interface Props {
+  copy: ProgramsCopy['screens']['logPhone'];
+  workout: string;
+}
+const { copy, workout } = Astro.props;
+---
+
+<Phone>
+  <div class="lp">
+    <p class="lp__workout">{workout}</p>
+    <p class="lp__q">{copy.effort}</p>
+    <div class="lp__scale">
+      {copy.scale.map((label, i) => <span class:list={['lp__opt', { 'is-on': i === 1 }]}>{label}</span>)}
+    </div>
+    <p class="lp__note"><CoachIcon name="check" size={14} />{copy.note}</p>
+    <span class="lp__done">{copy.done}</span>
+  </div>
+</Phone>
+
+<style>
+  .lp {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 0.9em;
+    padding: 0.8em 1.1em 1.2em;
+    font-size: 0.82em;
+  }
+  .lp__workout {
+    color: var(--ink-2);
+    font-size: 0.95em;
+    font-weight: 500;
+  }
+  .lp__q {
+    font-family: var(--font-display);
+    font-size: 1.6em;
+    font-weight: 600;
+    line-height: 1.2;
+  }
+  .lp__scale {
+    display: grid;
+    gap: 0.6em;
+  }
+  .lp__opt {
+    display: grid;
+    place-items: center;
+    height: 2.8em;
+    border: 1px solid var(--line);
+    border-radius: 0.8em;
+    font-weight: 500;
+  }
+  .lp__opt.is-on {
+    border: 2px solid var(--cyan);
+    background: var(--cyan-tint);
+    color: var(--ink);
+    font-weight: 600;
+  }
+  .lp__note {
+    display: flex;
+    align-items: center;
+    gap: 0.5em;
+    color: var(--mint-ink);
+    font-size: 0.92em;
+  }
+  .lp__done {
+    display: grid;
+    place-items: center;
+    height: 2.8em;
+    margin-top: auto;
+    border-radius: 0.8em;
+    background: var(--btn-bg);
+    color: var(--btn-ink);
+    font-weight: 600;
+  }
+</style>

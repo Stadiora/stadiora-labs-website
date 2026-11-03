@@ -1,0 +1,51 @@
+---
+import BrowserFrame from '../BrowserFrame.astro';
+import AthletePhone from './AthletePhone.astro';
+import type { Locale } from '../../../i18n';
+import type { ProgramsCopy } from '../../../i18n/pages/programs';
+
+interface Props {
+  locale: Locale;
+  copy: ProgramsCopy;
+  /** Row the frame belongs to, used to pick the sidebar item. */
+  active?: number;
+}
+const { copy, active = 2 } = Astro.props;
+---
+
+<!-- A coach-web screen with the athlete's phone beside it. The phone is hidden when the frame is narrow. -->
+<div class="fp">
+  <div class="fp__in">
+    <BrowserFrame url={copy.browserUrl} side={copy.screens.sidebar} sideActive={active}>
+      <slot />
+    </BrowserFrame>
+    <div class="fp__phone"><AthletePhone copy={copy.screens.phone} /></div>
+  </div>
+</div>
+
+<style>
+  .fp {
+    container-type: inline-size;
+    width: 100%;
+  }
+  .fp__in {
+    position: relative;
+    --phone-w: clamp(150px, 24cqw, 196px);
+  }
+  .fp__phone {
+    display: none;
+  }
+  @container (min-width: 560px) {
+    .fp__in {
+      padding-right: calc(var(--phone-w) - 22px);
+    }
+    .fp__phone {
+      display: block;
+      position: absolute;
+      right: 0;
+      top: 50%;
+      z-index: 2;
+      transform: translateY(-50%);
+    }
+  }
+</style>

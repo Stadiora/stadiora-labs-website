@@ -1,0 +1,64 @@
+---
+import CoachIcon from '../CoachIcon.astro';
+import Phone from '../../ui/Phone.astro';
+import PhoneHead from './PhoneHead.astro';
+import MiniBars from './MiniBars.astro';
+
+interface Props {
+  title: string;
+  value: string;
+  sub: string;
+  source: string;
+  days: string[];
+  values: number[];
+  /** Value that fills a bar to the top. */
+  max: number;
+}
+const { title, value, sub, source, days, values, max } = Astro.props;
+---
+
+<!-- One health metric: today's number, seven days of bars, and where the data came from. -->
+<Phone>
+  <div class="mt">
+    <PhoneHead title={title} />
+    <p class="mt__value num">{value}</p>
+    <p class="mt__sub">{sub}</p>
+    <MiniBars values={values} labels={days} max={max} />
+    <p class="mt__src"><CoachIcon name="check" size={13} />{source}</p>
+  </div>
+</Phone>
+
+<style>
+  .mt {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    padding: 0.2em 1em 1em;
+    font-size: 0.95em;
+  }
+  .mt__value {
+    margin-top: 0.8em;
+    color: var(--ink);
+    font-family: var(--font-display);
+    font-size: 2.2em;
+    font-weight: 600;
+    line-height: 1.1;
+  }
+  .mt__sub {
+    margin-bottom: 1.2em;
+    color: var(--ink-2);
+  }
+  .mt__src {
+    display: flex;
+    align-items: center;
+    gap: 0.5em;
+    margin-top: auto;
+    padding-top: 1em;
+    color: var(--ink-2);
+    font-size: 0.9em;
+  }
+  .mt__src :global(svg) {
+    flex: none;
+    color: var(--mint-ink);
+  }
+</style>

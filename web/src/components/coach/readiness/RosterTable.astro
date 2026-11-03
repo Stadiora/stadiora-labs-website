@@ -1,0 +1,146 @@
+---
+import '../../../styles/coach.css';
+import CoachIcon from '../CoachIcon.astro';
+import BrowserFrame from '../BrowserFrame.astro';
+import type { ReadinessCopy } from '../../../i18n/pages/readiness';
+
+interface Props {
+  copy: ReadinessCopy['coach']['table'];
+}
+const { copy } = Astro.props;
+---
+
+<!-- Team readiness list. Scores and a status only: journal entries are never shown to the coach. -->
+<BrowserFrame url={copy.browserUrl} decorative={false}>
+  <table class="rt">
+    <caption class="rt__cap">{copy.title}</caption>
+    <thead>
+      <tr>
+        {copy.columns.map((c) => <th scope="col">{c}</th>)}
+      </tr>
+    </thead>
+    <tbody>
+      {
+        copy.rows.map((r) => (
+          <tr>
+            <th scope="row">
+              <span class="rt__name">
+                <span class="rt__avatar" aria-hidden="true">{r.name.charAt(0)}</span>
+                {r.name}
+              </span>
+            </th>
+            <td>
+              <span class="rt__score">
+                <span class="rt__num num">{r.score}</span>
+                <span class="co-meter" aria-hidden="true">
+                  <i style={`width:${r.score}%`} />
+                </span>
+              </span>
+            </td>
+            <td>
+              <span class:list={['co-pill', r.ok ? 'co-pill--mint' : 'co-pill--amber']}>
+                <CoachIcon name={r.ok ? 'check' : 'chat'} size={13} />
+                {r.status}
+              </span>
+            </td>
+          </tr>
+        ))
+      }
+    </tbody>
+  </table>
+</BrowserFrame>
+
+<style>
+  .rt {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+    line-height: 20px;
+    text-align: left;
+  }
+  .rt__cap {
+    padding: 4px 0 12px;
+    color: var(--ink);
+    font-family: var(--font-display);
+    font-size: 17px;
+    font-weight: 600;
+    line-height: 24px;
+    text-align: left;
+  }
+  .rt thead th {
+    padding: 8px 10px;
+    border-bottom: 1px solid var(--line);
+    color: var(--ink-2);
+    font-size: 13px;
+    font-weight: 500;
+  }
+  .rt tbody th,
+  .rt tbody td {
+    padding: 11px 10px;
+    border-bottom: 1px solid var(--line);
+    color: var(--ink);
+    font-weight: 500;
+    vertical-align: middle;
+  }
+  .rt tbody tr:last-child th,
+  .rt tbody tr:last-child td {
+    border-bottom: 0;
+  }
+  .rt__name {
+    display: flex;
+    min-width: 0;
+    align-items: center;
+    gap: 10px;
+    white-space: nowrap;
+  }
+  .rt__avatar {
+    display: grid;
+    flex: none;
+    place-items: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--cyan-tint);
+    color: var(--cyan-ink);
+    font-size: 13px;
+    font-weight: 600;
+  }
+  .rt__score {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 110px;
+  }
+  .rt__num {
+    width: 24px;
+    flex: none;
+  }
+  .rt__score .co-meter > i {
+    background: var(--cyan);
+  }
+  .rt__score .co-meter {
+    flex: 1;
+  }
+  .rt .co-pill {
+    white-space: nowrap;
+  }
+
+  @container bf (max-width: 460px) {
+    .rt__score .co-meter,
+    .rt__avatar {
+      display: none;
+    }
+    .rt__score {
+      min-width: 0;
+    }
+    .rt thead th,
+    .rt tbody th,
+    .rt tbody td {
+      padding-inline: 6px;
+    }
+    .rt .co-pill {
+      gap: 4px;
+      padding-inline: 8px;
+    }
+  }
+</style>

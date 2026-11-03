@@ -1,0 +1,99 @@
+---
+import Ring from '../../ui/Ring.astro';
+import Phone from '../../ui/Phone.astro';
+import PhoneHead from './PhoneHead.astro';
+import type { ReadinessCopy } from '../../../i18n/pages/readiness';
+
+interface Props {
+  copy: ReadinessCopy['phones']['goals'];
+}
+const { copy } = Astro.props;
+---
+
+<Phone>
+  <div class="gp">
+    <PhoneHead title={copy.title} />
+    <p class="gp__goal">{copy.goal}</p>
+    <div class="gp__ring">
+      <Ring value={copy.pct} size={120} stroke={12} />
+      <span class="gp__num num">{copy.pct}%</span>
+    </div>
+    <dl class="gp__stats">
+      <div>
+        <dt>{copy.best}</dt>
+        <dd class="num">{copy.bestValue}</dd>
+      </div>
+      <div>
+        <dt>{copy.target}</dt>
+        <dd class="num">{copy.targetValue}</dd>
+      </div>
+    </dl>
+    <p class="gp__by">{copy.setBy}</p>
+  </div>
+</Phone>
+
+<style>
+  .gp {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    padding: 0.2em 1em 1em;
+    font-size: 0.95em;
+  }
+  .gp__goal {
+    margin: 0.4em 0 1em;
+    color: var(--ink);
+    font-family: var(--font-display);
+    font-size: 1.2em;
+    font-weight: 600;
+    line-height: 1.25;
+    text-align: center;
+  }
+  .gp__ring {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: 9.4em;
+    margin: 0 auto;
+  }
+  .gp__ring :global(svg) {
+    width: 100%;
+    height: auto;
+  }
+  .gp__num {
+    position: absolute;
+    color: var(--ink);
+    font-family: var(--font-display);
+    font-size: 2.4em;
+    font-weight: 600;
+    line-height: 1;
+  }
+  .gp__stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.6em;
+    margin: 1.2em 0 0;
+  }
+  .gp__stats div {
+    padding: 0.7em 0.8em;
+    border: 1px solid var(--line);
+    border-radius: 0.7em;
+  }
+  .gp__stats dt {
+    color: var(--ink-2);
+    font-size: 0.9em;
+  }
+  .gp__stats dd {
+    margin: 0.15em 0 0;
+    color: var(--ink);
+    font-size: 1.2em;
+    font-weight: 600;
+  }
+  .gp__by {
+    margin-top: auto;
+    padding-top: 1em;
+    color: var(--ink-2);
+    font-size: 0.9em;
+    text-align: center;
+  }
+</style>

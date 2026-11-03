@@ -1,0 +1,156 @@
+---
+import CoachIcon from '../CoachIcon.astro';
+import type { ProgramsCopy } from '../../../i18n/pages/programs';
+
+interface Props {
+  copy: ProgramsCopy['screens']['send'];
+}
+const { copy } = Astro.props;
+---
+
+<div class="ss">
+  <div class="ss__head">
+    <p class="ss__title">{copy.title}</p>
+    <p class="ss__program">{copy.program}</p>
+  </div>
+  <div class="ss__tabs">
+    {copy.tabs.map((tab, i) => <span class:list={['ss__tab', { 'is-on': i === 0 }]}>{tab}</span>)}
+  </div>
+  <ul class="ss__groups">
+    {
+      copy.groups.map((g, i) => (
+        <li class:list={{ 'is-on': i === 0 }}>
+          <span class="ss__box">{i === 0 && <CoachIcon name="check" size={12} />}</span>
+          <span class="ss__name">{g.name}</span>
+          <span class="ss__meta">{g.meta}</span>
+        </li>
+      ))
+    }
+  </ul>
+  <div class="ss__field">
+    <span class="ss__label">{copy.start}</span>
+    <span class="ss__value"><CoachIcon name="calendar" size={14} />{copy.startValue}</span>
+  </div>
+  <div class="ss__variant">
+    <div>
+      <p class="ss__v-title">{copy.variantTitle}</p>
+      <p class="ss__v-body">{copy.variantBody}</p>
+    </div>
+  </div>
+  <div class="ss__actions"><span class="co-mbtn co-mbtn--primary">{copy.send}</span></div>
+</div>
+
+<style>
+  .ss {
+    display: grid;
+    gap: 12px;
+  }
+  .ss__title {
+    color: var(--ink);
+    font-family: var(--font-display);
+    font-size: 17px;
+    font-weight: 600;
+    line-height: 24px;
+  }
+  .ss__program {
+    color: var(--ink-2);
+    font-size: 13px;
+  }
+  .ss__tabs {
+    display: flex;
+    gap: 16px;
+    border-bottom: 1px solid var(--line);
+  }
+  .ss__tab {
+    padding-bottom: 8px;
+    color: var(--ink-2);
+    font-size: 12.5px;
+  }
+  .ss__tab.is-on {
+    margin-bottom: -1px;
+    border-bottom: 2px solid var(--cyan);
+    color: var(--ink);
+    font-weight: 600;
+  }
+  .ss__groups {
+    display: grid;
+    gap: 8px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .ss__groups li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    font-size: 13px;
+  }
+  .ss__groups li.is-on {
+    border-color: var(--cyan);
+    background: var(--cyan-tint);
+  }
+  .ss__box {
+    display: grid;
+    flex: none;
+    place-items: center;
+    width: 18px;
+    height: 18px;
+    border: 1.5px solid var(--ink-3);
+    border-radius: 5px;
+    color: var(--btn-ink);
+  }
+  .is-on .ss__box {
+    border-color: var(--btn-bg);
+    background: var(--btn-bg);
+  }
+  .ss__name {
+    flex: 1;
+    min-width: 0;
+    color: var(--ink);
+    font-weight: 500;
+  }
+  .ss__meta {
+    color: var(--ink-2);
+  }
+  .ss__field {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    font-size: 13px;
+  }
+  .ss__label {
+    color: var(--ink-2);
+  }
+  .ss__value {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    color: var(--ink);
+  }
+  .ss__variant {
+    padding: 10px 12px;
+    border-left: 3px solid var(--violet);
+    border-radius: 0 8px 8px 0;
+    background: light-dark(#faf8ff, rgb(139 92 246 / 0.08));
+  }
+  .ss__v-title {
+    color: var(--ink);
+    font-size: 13px;
+    font-weight: 600;
+  }
+  .ss__v-body {
+    color: var(--ink-2);
+    font-size: 12.5px;
+  }
+  .ss__actions {
+    display: flex;
+    justify-content: flex-end;
+  }
+</style>

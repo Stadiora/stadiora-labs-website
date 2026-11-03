@@ -1,0 +1,138 @@
+---
+import CoachIcon from '../CoachIcon.astro';
+import { useDict, type Locale } from '../../../i18n';
+import type { ProgramsCopy } from '../../../i18n/pages/programs';
+
+interface Props {
+  locale: Locale;
+  copy: ProgramsCopy['screens']['ai'];
+}
+const { locale, copy } = Astro.props;
+const a = useDict(locale).ai;
+const rows = [
+  { day: 0, key: 'acceleration', spec: '6×30 m' },
+  { day: 1, key: 'tempo', spec: '6×200 m' },
+  { day: 3, key: 'speedEndurance', spec: '3×300 m' },
+] as const;
+---
+
+<div class="as">
+  <p class="as__title"><CoachIcon name="sparkle" size={18} />{copy.title}</p>
+  <div class="as__prompt">
+    <span>{copy.prompt}</span>
+    <span class="as__send"><CoachIcon name="send" size={14} /></span>
+  </div>
+  <div class="as__draft">
+    <div class="as__draft-head">
+      <div>
+        <p class="as__draft-title">{copy.draftTitle}</p>
+        <p class="as__draft-meta">{copy.draftMeta}</p>
+      </div>
+    </div>
+    <ul class="as__rows">
+      {
+        rows.map((r) => (
+          <li>
+            <span class="as__day">{a.days[r.day]}</span>
+            <span>{a.sessions[r.key]} <span class="num">{r.spec}</span></span>
+          </li>
+        ))
+      }
+    </ul>
+    <div class="as__actions">
+      <span class="co-mbtn">{copy.edit}</span>
+      <span class="co-mbtn co-mbtn--primary">{copy.approve}</span>
+    </div>
+  </div>
+  <p class="as__hint">{copy.hint}</p>
+</div>
+
+<style>
+  .as {
+    display: grid;
+    gap: 12px;
+  }
+  .as__title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--ink);
+    font-family: var(--font-display);
+    font-size: 17px;
+    font-weight: 600;
+    line-height: 24px;
+  }
+  .as__title :global(svg) {
+    color: var(--violet-ink);
+  }
+  .as__prompt {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 12px 12px 12px 14px;
+    border: 1.5px solid var(--violet);
+    border-radius: 10px;
+    background: light-dark(#faf8ff, rgb(139 92 246 / 0.08));
+    color: var(--ink);
+    font-size: 13px;
+    line-height: 19px;
+  }
+  .as__send {
+    display: grid;
+    flex: none;
+    place-items: center;
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
+    background: var(--violet-ink);
+    color: var(--bg);
+  }
+  .as__draft {
+    display: grid;
+    gap: 10px;
+    padding: 14px;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    background: var(--bg);
+  }
+  .as__draft-title {
+    color: var(--ink);
+    font-size: 14px;
+    font-weight: 600;
+  }
+  .as__draft-meta {
+    color: var(--ink-2);
+    font-size: 12.5px;
+  }
+  .as__rows {
+    display: grid;
+    gap: 6px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .as__rows li {
+    display: flex;
+    gap: 12px;
+    padding: 7px 10px;
+    border-radius: 8px;
+    background: var(--surface);
+    color: var(--ink);
+    font-size: 13px;
+  }
+  .as__day {
+    width: 28px;
+    color: var(--ink-2);
+    font-weight: 500;
+  }
+  .as__actions {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+  }
+  .as__hint {
+    color: var(--ink-3);
+    font-size: 12.5px;
+  }
+</style>

@@ -1,0 +1,261 @@
+---
+import '../../styles/coach.css';
+import CoachIcon from './CoachIcon.astro';
+
+interface Item {
+  title: string;
+  body: string;
+  icon?: string;
+  /** Violet sparkle for AI rows. */
+  ai?: boolean;
+}
+interface Props {
+  /** Unique id prefix. */
+  id: string;
+  items: Item[];
+  /** Index that is open first. */
+  open?: number;
+  /** Accessible name for the group of rows. */
+  label: string;
+  /** Soft surface plate behind the stage. */
+  plate?: boolean;
+  /** Wider stage column. */
+  wide?: boolean;
+}
+const { id, items, open = 0, label, plate = false, wide = false } = Astro.props;
+
+// Each screen is rendered twice: once in the stage beside the rows (wide screens) and once inside
+// the open row (narrow screens). Screens are illustrations: no ids, nothing focusable.
+const screens = await Promise.all(items.map((_, i) => Astro.slots.render(`screen-${i}`)));
+---
+
+<div class:list={['acc', { 'acc--plate': plate, 'acc--wide': wide }]} data-accordion role="group" aria-label={label}>
+  <div class="acc__list">
+    {
+      items.map((item, i) => (
+        <div class="acc__item" data-open={i === open ? '' : undefined}>
+          <h3 class="acc__h">
+            <button
+              type="button"
+              class="acc__btn"
+              id={`${id}-h-${i}`}
+              aria-expanded={i === open ? 'true' : 'false'}
+              aria-controls={`${id}-p-${i}`}
+            >
+              {item.icon && (
+                <span class="acc__icon" aria-hidden="true">
+                  <CoachIcon name={item.icon as any} size={22} />
+                </span>
+              )}
+              <span class="acc__title">{item.title}</span>
+              {item.ai && (
+                <span class="acc__ai" aria-hidden="true">
+                  <CoachIcon name="sparkle" size={18} />
+                </span>
+              )}
+              <span class="acc__pm" aria-hidden="true" />
+            </button>
+          </h3>
+          <div class="acc__panel" id={`${id}-p-${i}`} role="region" aria-labelledby={`${id}-h-${i}`}>
+            <div class="acc__panel-in">
+              <p class="acc__body">{item.body}</p>
+              <div class="acc__inline" aria-hidden="true" set:html={screens[i]} />
+            </div>
+          </div>
+        </div>
+      ))
+    }
+  </div>
+  <div class="acc__stage" aria-hidden="true">
+    <div class="acc__plate xf">
+      {screens.map((html, i) => <div class="acc__screen" data-active={i === open ? '' : undefined} set:html={html} />)}
+    </div>
+  </div>
+</div>
+
+<style>
+  .acc {
+    display: grid;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    gap: clamp(32px, 5vw, 72px);
+    align-items: center;
+  }
+  .acc--wide {
+    grid-template-columns: minmax(0, 4fr) minmax(0, 8fr);
+  }
+  .acc__list {
+    border-top: 1px solid var(--line);
+  }
+  .acc__item {
+    position: relative;
+    border-bottom: 1px solid var(--line);
+    transition: background-color 0.25s;
+  }
+  .acc__item::before {
+    content: '';
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: var(--lane);
+    background: var(--cyan);
+    transform: scaleY(0);
+    transform-origin: top;
+    transition: transform 0.25s var(--ease-out);
+  }
+  .acc__item[data-open] {
+    background: var(--surface);
+  }
+  .acc__item[data-open]::before {
+    transform: none;
+  }
+  .acc__h {
+    margin: 0;
+    font-size: inherit;
+    line-height: inherit;
+  }
+  .acc__btn {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    width: 100%;
+    min-height: 68px;
+    padding: 14px 20px 14px 24px;
+    border: 0;
+    border-radius: 0;
+    background: none;
+    color: var(--ink);
+    font-family: var(--font-display);
+    font-size: 20px;
+    font-weight: 600;
+    line-height: 26px;
+    text-align: left;
+    cursor: pointer;
+  }
+  .acc__btn:hover .acc__title {
+    color: var(--cyan-ink);
+  }
+  .acc__btn:focus-visible {
+    outline-offset: -3px;
+    border-radius: 0;
+  }
+  .acc__icon {
+    display: grid;
+    flex: none;
+    place-items: center;
+    color: var(--ink-2);
+  }
+  .acc__title {
+    flex: 1;
+    min-width: 0;
+  }
+  .acc__ai {
+    display: grid;
+    flex: none;
+    color: var(--violet-ink);
+  }
+  .acc__pm {
+    position: relative;
+    flex: none;
+    width: 18px;
+    height: 18px;
+    color: var(--ink-2);
+  }
+  .acc__pm::before,
+  .acc__pm::after {
+    content: '';
+    position: absolute;
+    left: 1px;
+    right: 1px;
+    top: 8px;
+    height: 2px;
+    border-radius: 1px;
+    background: currentColor;
+    transition:
+      transform 0.25s var(--ease-out),
+      opacity 0.25s;
+  }
+  .acc__pm::after {
+    transform: rotate(90deg);
+  }
+  .acc__item[data-open] .acc__pm::after {
+    transform: rotate(0);
+    opacity: 0;
+  }
+
+  .acc__panel {
+    display: grid;
+    grid-template-rows: 0fr;
+    visibility: hidden;
+    transition:
+      grid-template-rows 0.25s var(--ease-out),
+      visibility 0s linear 0.25s;
+  }
+  .acc__item[data-open] .acc__panel {
+    grid-template-rows: 1fr;
+    visibility: visible;
+    transition-delay: 0s;
+  }
+  .acc__panel-in {
+    min-height: 0;
+    overflow: hidden;
+  }
+  .acc__body {
+    padding: 0 24px 22px;
+    color: var(--ink-2);
+    font-size: 18px;
+    line-height: 27px;
+  }
+  .acc__inline {
+    display: none;
+  }
+
+  /* Without JavaScript every row stays open and the first screen is shown. */
+  :global(html:not(.js)) .acc__panel {
+    grid-template-rows: 1fr;
+    visibility: visible;
+  }
+
+  .acc__stage {
+    min-width: 0;
+  }
+  .acc--plate .acc__plate {
+    padding: clamp(24px, 4vw, 56px);
+    border-radius: 20px;
+    background: var(--surface);
+  }
+  .acc__plate {
+    align-items: center;
+    justify-items: center;
+  }
+  .acc__screen {
+    width: 100%;
+    min-width: 0;
+    display: grid;
+    justify-items: center;
+  }
+
+  @media (max-width: 960px) {
+    .acc,
+    .acc--wide {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .acc__stage {
+      display: none;
+    }
+    .acc__inline {
+      display: grid;
+      justify-items: center;
+      padding: 4px 16px 24px;
+    }
+    .acc__body {
+      padding-inline: 20px;
+    }
+    .acc__btn {
+      padding-inline: 20px 16px;
+      font-size: 18px;
+    }
+  }
+</style>
+
+<script>
+  import '../../scripts/accordion';
+</script>

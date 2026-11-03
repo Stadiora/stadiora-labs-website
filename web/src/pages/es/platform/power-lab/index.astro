@@ -1,0 +1,11 @@
+---
+import Base from '../../../../layouts/Base.astro';
+import PowerLabPage from '../../../../components/coach/power-lab/PowerLabPage.astro';
+import { powerLabCopy } from '../../../../i18n/pages/power-lab';
+
+const { meta } = powerLabCopy.es;
+---
+
+<Base locale="es" path="/platform/power-lab/" title={meta.title} description={meta.description}>
+  <PowerLabPage locale="es" />
+</Base>

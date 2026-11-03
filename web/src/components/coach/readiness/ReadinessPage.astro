@@ -1,0 +1,142 @@
+---
+import { readinessCopy } from '../../../i18n/pages/readiness';
+import { coachCommon } from '../../../i18n/pages/coach-common';
+import { site } from '../../../data/site';
+import type { Locale } from '../../../i18n';
+import ReadinessCard from '../../ui/ReadinessCard.astro';
+import FeatureHero from '../FeatureHero.astro';
+import Accordion from '../Accordion.astro';
+import HoverRevealRow from '../HoverRevealRow.astro';
+import AlsoInAria from '../AlsoInAria.astro';
+import CtaBand from '../CtaBand.astro';
+import MetricPhone from './MetricPhone.astro';
+import CheckinPhone from './CheckinPhone.astro';
+import ReadinessPhone from './ReadinessPhone.astro';
+import GoalsPhone from './GoalsPhone.astro';
+import MindPhone from './MindPhone.astro';
+import BreathingPhone from './BreathingPhone.astro';
+import JournalPhone from './JournalPhone.astro';
+import MoodPhone from './MoodPhone.astro';
+import RosterTable from './RosterTable.astro';
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const c = readinessCopy[locale];
+const common = coachCommon[locale];
+const p = c.phones;
+---
+
+<FeatureHero
+  locale={locale}
+  variant="split"
+  popAt="inside"
+  eyebrow={c.hero.eyebrow}
+  title={c.hero.title}
+  emphasis={c.hero.emphasis}
+  sub={c.hero.sub}
+  primary={{ label: common.startFree, href: site.signUp }}
+  secondary={{ label: c.hero.secondary, href: `#${c.tracks.id}` }}
+  photo={{ slot: 'p3-readiness', alt: c.hero.photoAlt, ratio: '4/3', sizes: '(max-width: 900px) 100vw, 680px' }}
+  pos="50% 50%"
+>
+  <ReadinessCard slot="pop" label={c.hero.card.label} value={c.hero.card.value} status={c.hero.card.status} />
+</FeatureHero>
+
+<section id={c.tracks.id} class="section rd-tracks" aria-labelledby="rd-tracks-title">
+  <div class="container">
+    <div class="section-head" data-reveal>
+      <p class="co-eyebrow">{c.tracks.eyebrow}</p>
+      <h2 id="rd-tracks-title">{c.tracks.title}</h2>
+    </div>
+    <Accordion id="rd" items={c.tracks.rows} open={c.tracks.defaultOpen} label={c.tracks.title} plate>
+      <MetricPhone slot="screen-0" title={p.sleep.title} value={p.sleep.value} sub={p.sleep.sub} source={p.sleep.source} days={p.sleep.days} values={p.sleep.hours} max={9} />
+      <MetricPhone slot="screen-1" title={p.steps.title} value={p.steps.value} sub={p.steps.sub} source={p.steps.source} days={p.steps.days} values={p.steps.counts} max={12000} />
+      <CheckinPhone slot="screen-2" copy={p.checkin} />
+      <ReadinessPhone slot="screen-3" copy={p.readiness} date={p.date} />
+      <GoalsPhone slot="screen-4" copy={p.goals} />
+      <MindPhone slot="screen-5" copy={p.mind} />
+    </Accordion>
+    <p class="co-demo">{common.demoNote}</p>
+  </div>
+</section>
+
+<section class="section section--surface rd-calm" aria-labelledby="rd-calm-title">
+  <div class="container">
+    <div class="section-head" data-reveal>
+      <h2 id="rd-calm-title">{c.calm.title}</h2>
+    </div>
+    <HoverRevealRow locale={locale} label={c.calm.rowLabel} cards={c.calm.cards}>
+      <BreathingPhone slot="phone-0" copy={c.calm.cards[0].screen} />
+      <JournalPhone slot="phone-1" copy={c.calm.cards[1].screen} />
+      <MoodPhone slot="phone-2" copy={c.calm.cards[2].screen} />
+    </HoverRevealRow>
+  </div>
+</section>
+
+<section class="section rd-coach" aria-labelledby="rd-coach-title">
+  <div class="container rd-coach__grid">
+    <div data-reveal>
+      <h2 id="rd-coach-title">{c.coach.title}</h2>
+      <p class="rd-coach__line">{c.coach.line}</p>
+    </div>
+    <div data-reveal style="--reveal-i:1">
+      <RosterTable copy={c.coach.table} />
+    </div>
+  </div>
+  <div class="container">
+    <p class="rd-foot">{c.footnote}</p>
+  </div>
+</section>
+
+<AlsoInAria locale={locale} ids={c.also} />
+<CtaBand locale={locale} />
+
+<style>
+  .rd-tracks {
+    padding-top: 64px;
+  }
+  .rd-tracks :global(.phone) {
+    --phone-w: 264px;
+  }
+  .rd-tracks .section-head,
+  .rd-calm .section-head {
+    margin-bottom: 40px;
+  }
+  .rd-coach__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    gap: clamp(32px, 6vw, 96px);
+    align-items: center;
+  }
+  .rd-coach h2 {
+    max-width: 14ch;
+    font-size: clamp(28px, 3vw, 40px);
+    line-height: 1.15;
+  }
+  .rd-coach__line {
+    margin-top: 16px;
+    max-width: 34ch;
+    color: var(--ink-2);
+    font-size: 18px;
+    line-height: 28px;
+  }
+  .rd-foot {
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 1px solid var(--line);
+    color: var(--ink-2);
+    font-size: 14px;
+    line-height: 20px;
+  }
+
+  @media (max-width: 960px) {
+    .rd-coach__grid {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .rd-coach h2 {
+      max-width: none;
+    }
+  }
+</style>

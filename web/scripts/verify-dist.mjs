@@ -2,6 +2,7 @@
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { verifyCoachPages } from './lib/platform-coach-verify.mjs';
 import { parse } from 'yaml';
 import { verifyPricing } from './lib/pricing-verify.mjs';
 
@@ -75,6 +76,7 @@ for (const page of pages) {
 verifyPricing(dist, fail);
 
 if (!existsSync(join(dist, 'sitemap-index.xml'))) fail('sitemap-index.xml: missing');
+verifyCoachPages({ dist, fail });
 
 // Budgets from DESIGN.md section 7: hero photos 180 KB, videos 1.5 MB, per delivered file.
 const assets = join(dist, '_astro');

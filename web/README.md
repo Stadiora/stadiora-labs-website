@@ -11,6 +11,7 @@ npm run build      # static output in dist/
 npm run check      # astro check (types and templates)
 npm run verify     # asserts the built pages: SEO tags, hreflang, OG, no placeholders, budgets, Jekyll exclusion
 npm run evidence   # needs a build; Playwright screenshots, interaction checks and measured budgets in .evidence/
+node scripts/evidence.mjs --coach-only   # just the Platform Coach pages, EN and ES (see below); add --checks-only to skip screenshots
 node scripts/evidence.mjs --nav-only   # just the header checks: geometry 1025 to 1440, panel height, drawer and panel focus
 node scripts/evidence.mjs --pricing-only   # just /pricing/ and /es/pricing/: prices, region, dialogs, fallback, layout, contrast, tab walk; add --checks-only to skip the screenshots, and --pricing-group=dialogs (data, region, prices, behaviour, dialogs, fallback, layout, contrast, links) to run one group, e.g. in a loop to look for flakes
 ```
@@ -28,6 +29,13 @@ node scripts/evidence.mjs --pricing-only   # just /pricing/ and /es/pricing/: pr
 - Design tokens: `src/styles/tokens.css` (light and dark). Text accent on light is `#0077A8`; `#00BEF3` is decorative only.
 - Photos: drop a file named after its slot into `src/assets/photos/`; `src/data/photo-alt.json` holds EN and ES alt text.
   A missing slot renders a labelled placeholder and `npm run verify` fails on it.
+- Platform Coach pages (`src/pages/{,es/}platform/{programs,nutrition,readiness,power-lab}/`): thin wrappers around
+  `src/components/coach/{programs,nutrition,readiness,power-lab}/*Page.astro`; all copy is in `src/i18n/pages/` (EN and ES, ES typed
+  against EN) and the shared parts are in `src/components/coach/` and `src/styles/coach.css`. `scripts/lib/platform-coach-verify.mjs`
+  (run by `npm run verify`) fails the build on an unbacked claim, a competitor name, a missing "estimates" or "not a medical check"
+  footnote, a broken hreflang pair or a missing demo link. `scripts/lib/platform-coach-checks.mjs` (run by `evidence`) covers overflow,
+  sideways clipping and overlapping text at 390/1024/1280/1440, WCAG AA in both themes, alt text, heading order, the keyboard walk,
+  the accordion and hover-reveal behaviour, the count-up and a no-JavaScript render.
 - Motion: markup is server-rendered in its final state. `html.js` enables animation, `prefers-reduced-motion`
   keeps the static state, and every moving element has a pause control.
 - Fonts (Sora, Inter; SIL OFL, licences in `src/assets/fonts/`) are self-hosted woff2 files and preloaded.

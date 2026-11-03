@@ -1,0 +1,108 @@
+---
+import CoachIcon from '../CoachIcon.astro';
+import type { ProgramsCopy } from '../../../i18n/pages/programs';
+
+interface Props {
+  copy: ProgramsCopy['screens']['import'];
+}
+const { copy } = Astro.props;
+---
+
+<div class="is">
+  <p class="is__title">{copy.title}</p>
+  <div class="is__drop">
+    <CoachIcon name="upload" size={22} />
+    <p class="is__drop-title">{copy.drop}</p>
+    <p class="is__drop-sub">{copy.formats}</p>
+  </div>
+  <div class="is__file">
+    <CoachIcon name="file" size={18} />
+    <span class="is__file-name">{copy.file}</span>
+    <span class="co-pill co-pill--mint">{copy.ready}</span>
+  </div>
+  <ul class="is__rows">
+    {copy.rows.map((r) => <li><span class="is__day">{r.day}</span><span class="num">{r.text}</span></li>)}
+  </ul>
+  <p class="is__confirm">{copy.confirm}</p>
+  <div class="is__actions"><span class="co-mbtn co-mbtn--primary">{copy.save}</span></div>
+</div>
+
+<style>
+  .is {
+    display: grid;
+    gap: 12px;
+  }
+  .is__title {
+    color: var(--ink);
+    font-family: var(--font-display);
+    font-size: 17px;
+    font-weight: 600;
+    line-height: 24px;
+  }
+  .is__drop {
+    display: grid;
+    justify-items: center;
+    gap: 2px;
+    padding: 14px;
+    border: 1.5px dashed var(--ink-3);
+    border-radius: 10px;
+    color: var(--ink-2);
+    text-align: center;
+  }
+  .is__drop-title {
+    color: var(--ink);
+    font-size: 13px;
+    font-weight: 600;
+  }
+  .is__drop-sub {
+    font-size: 12.5px;
+  }
+  .is__file {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 12px;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    color: var(--ink-2);
+  }
+  .is__file-name {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    color: var(--ink);
+    font-size: 13px;
+    font-weight: 500;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .is__rows {
+    display: grid;
+    gap: 6px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .is__rows li {
+    display: flex;
+    gap: 12px;
+    padding: 7px 10px;
+    border-radius: 8px;
+    background: var(--surface);
+    color: var(--ink);
+    font-size: 13px;
+  }
+  .is__day {
+    width: 28px;
+    color: var(--ink-2);
+    font-weight: 500;
+  }
+  .is__confirm {
+    color: var(--ink-2);
+    font-size: 12.5px;
+  }
+  .is__actions {
+    display: flex;
+    justify-content: flex-end;
+  }
+</style>

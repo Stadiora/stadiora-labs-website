@@ -1,0 +1,123 @@
+---
+import Photo from '../../ui/Photo.astro';
+import CoachIcon from '../CoachIcon.astro';
+import type { Locale } from '../../../i18n';
+import type { PowerLabCopy } from '../../../i18n/pages/power-lab';
+
+interface Props {
+  locale: Locale;
+  copy: PowerLabCopy['flow']['frames'];
+}
+const { locale, copy } = Astro.props;
+const tiles = [0, 1, 2, 3, 4, 5, 6];
+---
+
+<!-- Frame-by-frame marking. Decorative, so the strip carries no focusable controls. -->
+<div class="pf" aria-hidden="true">
+  <div class="pf__view">
+    <Photo slot="f4-powerlab" alt="" ratio="1600/612" sizes="260px" widths={[320, 480]} locale={locale} class="pf__img" />
+  </div>
+  <div class="pf__strip">
+    <span class="pf__pause"><CoachIcon name="pause" size={14} /></span>
+    <div class="pf__frames">
+      {tiles.map(() => <span class="pf__tile" />)}
+      <span class="pf__mark pf__mark--a"></span>
+      <span class="pf__mark pf__mark--b"></span>
+    </div>
+  </div>
+  <p class="pf__labels">
+    <span class="pf__label">{copy.take}</span>
+    <span class="pf__label">{copy.land}</span>
+  </p>
+</div>
+
+<style>
+  .pf {
+    display: grid;
+    gap: 8px;
+    padding: 14px;
+    border-radius: 12px;
+    background: var(--surface);
+  }
+  .pf__view {
+    aspect-ratio: 2 / 1;
+    overflow: hidden;
+    border-radius: 8px;
+  }
+  .pf__view :global(.photo-pic),
+  .pf__view :global(.photo) {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 60% 40%;
+  }
+  .pf__view :global(.photo) {
+    transform: scale(1.4);
+    transform-origin: 60% 45%;
+  }
+  .pf__strip {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+  }
+  .pf__pause {
+    display: grid;
+    flex: none;
+    place-items: center;
+    width: 26px;
+    height: 36px;
+    border-radius: 6px;
+    background: var(--ink);
+    color: var(--bg);
+  }
+  .pf__frames {
+    position: relative;
+    display: grid;
+    flex: 1;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 2px;
+    height: 36px;
+  }
+  .pf__tile {
+    border-radius: 2px;
+    background: linear-gradient(180deg, color-mix(in srgb, var(--ink) 18%, var(--bg)), color-mix(in srgb, var(--ink) 34%, var(--bg)));
+  }
+  .pf__mark {
+    position: absolute;
+    top: -4px;
+    bottom: -4px;
+    width: 3px;
+    border-radius: 2px;
+    background: var(--cyan);
+  }
+  .pf__mark::before {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: -4px;
+    width: 10px;
+    height: 10px;
+    margin-left: -5px;
+    border-radius: 50%;
+    background: var(--cyan);
+  }
+  .pf__mark--a {
+    left: 20%;
+  }
+  .pf__mark--b {
+    left: 72%;
+  }
+  .pf__labels {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    margin: 0;
+    color: var(--ink-2);
+    font-size: 12px;
+    line-height: 18px;
+  }
+  .pf__label {
+    white-space: nowrap;
+  }
+</style>
