@@ -11,6 +11,7 @@ npm run build      # static output in dist/
 npm run check      # astro check (types and templates)
 npm run verify     # asserts the built pages: SEO tags, hreflang, OG, no placeholders, budgets, Jekyll exclusion
 npm run evidence   # needs a build; Playwright screenshots, interaction checks and measured budgets in .evidence/
+node scripts/evidence.mjs --nav-only   # just the header checks: geometry 1025 to 1440, panel height, drawer and panel focus
 ```
 
 - Pages: `/` (EN) and `/es/`. Copy lives in `src/i18n/{en,es}.ts`; `es.ts` is typed against `en.ts`, so `astro check` flags a missing key.
