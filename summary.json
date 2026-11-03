@@ -1,0 +1,1258 @@
+{
+  "results": [
+    {
+      "group": "coach-layout",
+      "name": "en/programs 390: no horizontal overflow, no sideways clipping, no overlapping text",
+      "pass": true,
+      "detail": "overflow 0px, 77 text boxes"
+    },
+    {
+      "group": "coach-console",
+      "name": "en/programs 390: no console errors, failed or 4xx requests",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "coach-layout",
+      "name": "en/programs 1024: no horizontal overflow, no sideways clipping, no overlapping text",
+      "pass": true,
+      "detail": "overflow 0px, 99 text boxes"
+    },
+    {
+      "group": "coach-layout",
+      "name": "en/programs 1280: no horizontal overflow, no sideways clipping, no overlapping text",
+      "pass": true,
+      "detail": "overflow 0px, 102 text boxes"
+    },
+    {
+      "group": "coach-layout",
+      "name": "en/programs 1440: no horizontal overflow, no sideways clipping, no overlapping text",
+      "pass": true,
+      "detail": "overflow 0px, 114 text boxes"
+    },
+    {
+      "group": "coach-console",
+      "name": "en/programs 1440: no console errors, failed or 4xx requests",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "coach-contrast",
+      "name": "en/programs light 390: text meets WCAG AA (4.5:1, 3:1 large)",
+      "pass": true,
+      "detail": "105 text nodes, lowest 5.00:1; 0 over images skipped"
+    },
+    {
+      "group": "coach-contrast",
+      "name": "en/programs light 1440: text meets WCAG AA (4.5:1, 3:1 large)",
+      "pass": true,
+      "detail": "150 text nodes, lowest 4.57:1; 0 over images skipped"
+    },
+    {
+      "group": "coach-a11y",
+      "name": "en/programs: one h1, one main, every img has alt, no skipped heading level",
+      "pass": true,
+      "detail": "h1 1, main 1"
+    },
+    {
+      "group": "coach-a11y",
+      "name": "en/programs: nothing focusable is hidden from assistive tech, every link and button has a name",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "coach-links",
+      "name": "en/programs: every internal link resolves in dist or the live site, or is a planned route",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "coach-links",
+      "name": "en/programs: \"Book a demo\" goes to the contact form with topic=demo",
+      "pass": true,
+      "detail": "1 links: /connect.html?topic=demo"
+    },
+    {
+      "group": "coach-contrast",
+      "name": "en/programs dark 390: text meets WCAG AA (4.5:1, 3:1 large)",
+      "pass": true,
+      "detail": "105 text nodes, lowest 7.32:1; 0 over images skipped"
+    },
+    {
+      "group": "coach-contrast",
+      "name": "en/programs dark 1440: text meets WCAG AA (4.5:1, 3:1 large)",
+      "pass": true,
+      "detail": "150 text nodes, lowest 7.32:1; 0 over images skipped"
+    },
+    {
+      "group": "coach-keyboard",
+      "name": "en/programs: Tab walk visits 44 stops, none hidden, boxless or without a focus ring, no trap",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "coach-nojs",
+      "name": "en/programs: renders without JavaScript (h1 visible, no content stuck faded)",
+      "pass": true,
+      "detail": "2394 characters, 0 faded"
+    },
+    {
+      "group": "coach-layout",
+      "name": "es/programs 390: no horizontal overflow, no sideways clipping, no overlapping text",
+      "pass": true,
+      "detail": "overflow 0px, 77 text boxes"
+    },
+    {
+      "group": "coach-console",
+      "name": "es/programs 390: no console errors, failed or 4xx requests",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "coach-layout",
+      "name": "es/programs 1024: no horizontal overflow, no sideways clipping, no overlapping text",
+      "pass": true,
+      "detail": "overflow 0px, 99 text boxes"
+    },
+    {
+      "group": "coach-layout",
+      "name": "es/programs 1280: no horizontal overflow, no sideways clipping, no overlapping text",
+      "pass": true,
+      "detail": "overflow 0px, 102 text boxes"
+    },
+    {
+      "group": "coach-layout",
+      "name": "es/programs 1440: no horizontal overflow, no sideways clipping, no overlapping text",
+      "pass": true,
+      "detail": "overflow 0px, 114 text boxes"
+    },
+    {
+      "group": "coach-console",
+      "name": "es/programs 1440: no console errors, failed or 4xx requests",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "coach-contrast",
+      "name": "es/programs light 390: text meets WCAG AA (4.5:1, 3:1 large)",
+      "pass": true,
+      "detail": "105 text nodes, lowest 5.00:1; 0 over images skipped"
+    },
+    {
+      "group": "coach-contrast",
+      "name": "es/programs light 1440: text meets WCAG AA (4.5:1, 3:1 large)",
+      "pass": true,
+      "detail": "150 text nodes, lowest 4.57:1; 0 over images skipped"
+    },
+    {
+      "group": "coach-a11y",
+      "name": "es/programs: one h1, one main, every img has alt, no skipped heading level",
+      "pass": true,
+      "detail": "h1 1, main 1"
+    },
+    {
+      "group": "coach-a11y",
+      "name": "es/programs: nothing focusable is hidden from assistive tech, every link and button has a name",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "coach-links",
+      "name": "es/programs: every internal link resolves in dist or the live site, or is a planned route",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "coach-links",
+      "name": "es/programs: internal page links stay in Spanish",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "coach-links",
+      "name": "es/programs: \"Book a demo\" goes to the contact form with topic=demo",
+      "pass": true,
+      "detail": "1 links: /connect.html?topic=demo"
+    },
+    {
+      "group": "coach-contrast",
+      "name": "es/programs dark 390: text meets WCAG AA (4.5:1, 3:1 large)",
+      "pass": true,
+      "detail": "105 text nodes, lowest 7.32:1; 0 over images skipped"
+    },
+    {
+      "group": "coach-contrast",
+      "name": "es/programs dark 1440: text meets WCAG AA (4.5:1, 3:1 large)",
+      "pass": true,
+      "detail": "150 text nodes, lowest 7.32:1; 0 over images skipped"
+    },
+    {
+      "group": "coach-keyboard",
+      "name": "es/programs: Tab walk visits 44 stops, none hidden, boxless or without a focus ring, no trap",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "coach-nojs",
+      "name": "es/programs: renders without JavaScript (h1 visible, no content stuck faded)",
+      "pass": true,
+      "detail": "2782 characters, 0 faded"
+    },
+    {
+      "group": "coach-layout",
+      "name": "en/nutrition 390: no horizontal overflow, no sideways clipping, no overlapping text",
+      "pass": true,
+      "detail": "overflow 0px, 92 text boxes"
+    },
+    {
+      "group": "coach-console",
+      "name": "en/nutrition 390: no console errors, failed or 4xx requests",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "coach-layout",
+      "name": "en/nutrition 1024: no horizontal overflow, no sideways clipping, no overlapping text",
+      "pass": true,
+      "detail": "overflow 0px, 92 text boxes"
+    },
+    {
+      "group": "coach-layout",
+      "name": "en/nutrition 1280: no horizontal overflow, no sideways clipping, no overlapping text",
+      "pass": true,
+      "detail": "overflow 0px, 92 text boxes"
+    },
+    {
+      "group": "coach-layout",
+      "name": "en/nutrition 1440: no horizontal overflow, no sideways clipping, no overlapping text",
+      "pass": true,
+      "detail": "overflow 0px, 92 text boxes"
+    },
+    {
+      "group": "coach-console",
+      "name": "en/nutrition 1440: no console errors, failed or 4xx requests",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "coach-contrast",
+      "name": "en/nutrition light 390: text meets WCAG AA (4.5:1, 3:1 large)",
+      "pass": true,
+      "detail": "119 text nodes, lowest 4.57:1; 0 over images skipped"
+    },
+    {
+      "group": "coach-contrast",
+      "name": "en/nutrition light 1440: text meets WCAG AA (4.5:1, 3:1 large)",
+      "pass": true,
+      "detail": "127 text nodes, lowest 4.57:1; 0 over images skipped"
+    },
+    {
+      "group": "coach-a11y",
+      "name": "en/nutrition: one h1, one main, every img has alt, no skipped heading level",
+      "pass": true,
+      "detail": "h1 1, main 1"
+    },
+    {
+      "group": "coach-a11y",
+      "name": "en/nutrition: nothing focusable is hidden from assistive tech, every link and button has a name",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "coach-links",
+      "name": "en/nutrition: every internal link resolves in dist or the live site, or is a planned route",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "coach-links",
+      "name": "en/nutrition: \"Book a demo\" goes to the contact form with topic=demo",
+      "pass": true,
+      "detail": "1 links: /connect.html?topic=demo"
+    },
+    {
+      "group": "coach-contrast",
+      "name": "en/nutrition dark 390: text meets WCAG AA (4.5:1, 3:1 large)",
+      "pass": true,
+      "detail": "119 text nodes, lowest 7.32:1; 0 over images skipped"
+    },
+    {
+      "group": "coach-contrast",
+      "name": "en/nutrition dark 1440: text meets WCAG AA (4.5:1, 3:1 large)",
+      "pass": true,
+      "detail": "127 text nodes, lowest 7.32:1; 0 over images skipped"
+    },
+    {
+      "group": "coach-keyboard",
+      "name": "en/nutrition: Tab walk visits 39 stops, none hidden, boxless or without a focus ring, no trap",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "coach-nojs",
+      "name": "en/nutrition: renders without JavaScript (h1 visible, no content stuck faded)",
+      "pass": true,
+      "detail": "1562 characters, 0 faded"
+    },
+    {
+      "group": "coach-layout",
+      "name": "es/nutrition 390: no horizontal overflow, no sideways clipping, no overlapping text",
+      "pass": true,
+      "detail": "overflow 0px, 92 text boxes"
+    },
+    {
+      "group": "coach-console",
+      "name": "es/nutrition 390: no console errors, failed or 4xx requests",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "coach-layout",
+      "name": "es/nutrition 1024: no horizontal overflow, no sideways clipping, no overlapping text",
+      "pass": true,
+      "detail": "overflow 0px, 92 text boxes"
+    },
+    {
+      "group": "coach-layout",
+      "name": "es/nutrition 1280: no horizontal overflow, no sideways clipping, no overlapping text",
+      "pass": true,
+      "detail": "overflow 0px, 92 text boxes"
+    },
+    {
+      "group": "coach-layout",
+      "name": "es/nutrition 1440: no horizontal overflow, no sideways clipping, no overlapping text",
+      "pass": true,
+      "detail": "overflow 0px, 92 text boxes"
+    },
+    {
+      "group": "coach-console",
+      "name": "es/nutrition 1440: no console errors, failed or 4xx requests",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "coach-contrast",
+      "name": "es/nutrition light 390: text meets WCAG AA (4.5:1, 3:1 large)",
+      "pass": true,
+      "detail": "119 text nodes, lowest 4.57:1; 0 over images skipped"
+    },
+    {
+      "group": "coach-contrast",
+      "name": "es/nutrition light 1440: text meets WCAG AA (4.5:1, 3:1 large)",
+      "pass": true,
+      "detail": "127 text nodes, lowest 4.57:1; 0 over images skipped"
+    },
+    {
+      "group": "coach-a11y",
+      "name": "es/nutrition: one h1, one main, every img has alt, no skipped heading level",
+      "pass": true,
+      "detail": "h1 1, main 1"
+    },
+    {
+      "group": "coach-a11y",
+      "name": "es/nutrition: nothing focusable is hidden from assistive tech, every link and button has a name",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "coach-links",
+      "name": "es/nutrition: every internal link resolves in dist or the live site, or is a planned route",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "coach-links",
+      "name": "es/nutrition: internal page links stay in Spanish",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "coach-links",
+      "name": "es/nutrition: \"Book a demo\" goes to the contact form with topic=demo",
+      "pass": true,
+      "detail": "1 links: /connect.html?topic=demo"
+    },
+    {
+      "group": "coach-contrast",
+      "name": "es/nutrition dark 390: text meets WCAG AA (4.5:1, 3:1 large)",
+      "pass": true,
+      "detail": "119 text nodes, lowest 7.32:1; 0 over images skipped"
+    },
+    {
+      "group": "coach-contrast",
+      "name": "es/nutrition dark 1440: text meets WCAG AA (4.5:1, 3:1 large)",
+      "pass": true,
+      "detail": "127 text nodes, lowest 7.32:1; 0 over images skipped"
+    },
+    {
+      "group": "coach-keyboard",
+      "name": "es/nutrition: Tab walk visits 39 stops, none hidden, boxless or without a focus ring, no trap",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "coach-nojs",
+      "name": "es/nutrition: renders without JavaScript (h1 visible, no content stuck faded)",
+      "pass": true,
+      "detail": "1860 characters, 0 faded"
+    },
+    {
+      "group": "coach-layout",
+      "name": "en/readiness 390: no horizontal overflow, no sideways clipping, no overlapping text",
+      "pass": true,
+      "detail": "overflow 0px, 70 text boxes"
+    },
+    {
+      "group": "coach-console",
+      "name": "en/readiness 390: no console errors, failed or 4xx requests",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "coach-layout",
+      "name": "en/readiness 1024: no horizontal overflow, no sideways clipping, no overlapping text",
+      "pass": true,
+      "detail": "overflow 0px, 85 text boxes"
+    },
+    {
+      "group": "coach-layout",
+      "name": "en/readiness 1280: no horizontal overflow, no sideways clipping, no overlapping text",
+      "pass": true,
+      "detail": "overflow 0px, 85 text boxes"
+    },
+    {
+      "group": "coach-layout",
+      "name": "en/readiness 1440: no horizontal overflow, no sideways clipping, no overlapping text",
+      "pass": true,
+      "detail": "overflow 0px, 85 text boxes"
+    },
+    {
+      "group": "coach-console",
+      "name": "en/readiness 1440: no console errors, failed or 4xx requests",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "coach-contrast",
+      "name": "en/readiness light 390: text meets WCAG AA (4.5:1, 3:1 large)",
+      "pass": true,
+      "detail": "110 text nodes, lowest 4.67:1; 0 over images skipped"
+    },
+    {
+      "group": "coach-contrast",
+      "name": "en/readiness light 1440: text meets WCAG AA (4.5:1, 3:1 large)",
+      "pass": true,
+      "detail": "123 text nodes, lowest 4.57:1; 0 over images skipped"
+    },
+    {
+      "group": "coach-a11y",
+      "name": "en/readiness: one h1, one main, every img has alt, no skipped heading level",
+      "pass": true,
+      "detail": "h1 1, main 1"
+    },
+    {
+      "group": "coach-a11y",
+      "name": "en/readiness: nothing focusable is hidden from assistive tech, every link and button has a name",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "coach-links",
+      "name": "en/readiness: every internal link resolves in dist or the live site, or is a planned route",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "coach-links",
+      "name": "en/readiness: \"Book a demo\" goes to the contact form with topic=demo",
+      "pass": true,
+      "detail": "1 links: /connect.html?topic=demo"
+    },
+    {
+      "group": "coach-contrast",
+      "name": "en/readiness dark 390: text meets WCAG AA (4.5:1, 3:1 large)",
+      "pass": true,
+      "detail": "110 text nodes, lowest 7.52:1; 0 over images skipped"
+    },
+    {
+      "group": "coach-contrast",
+      "name": "en/readiness dark 1440: text meets WCAG AA (4.5:1, 3:1 large)",
+      "pass": true,
+      "detail": "123 text nodes, lowest 7.52:1; 0 over images skipped"
+    },
+    {
+      "group": "coach-keyboard",
+      "name": "en/readiness: Tab walk visits 48 stops, none hidden, boxless or without a focus ring, no trap",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "coach-nojs",
+      "name": "en/readiness: renders without JavaScript (h1 visible, no content stuck faded)",
+      "pass": true,
+      "detail": "1821 characters, 0 faded"
+    },
+    {
+      "group": "coach-layout",
+      "name": "es/readiness 390: no horizontal overflow, no sideways clipping, no overlapping text",
+      "pass": true,
+      "detail": "overflow 0px, 70 text boxes"
+    },
+    {
+      "group": "coach-console",
+      "name": "es/readiness 390: no console errors, failed or 4xx requests",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "coach-layout",
+      "name": "es/readiness 1024: no horizontal overflow, no sideways clipping, no overlapping text",
+      "pass": true,
+      "detail": "overflow 0px, 85 text boxes"
+    },
+    {
+      "group": "coach-layout",
+      "name": "es/readiness 1280: no horizontal overflow, no sideways clipping, no overlapping text",
+      "pass": true,
+      "detail": "overflow 0px, 85 text boxes"
+    },
+    {
+      "group": "coach-layout",
+      "name": "es/readiness 1440: no horizontal overflow, no sideways clipping, no overlapping text",
+      "pass": true,
+      "detail": "overflow 0px, 85 text boxes"
+    },
+    {
+      "group": "coach-console",
+      "name": "es/readiness 1440: no console errors, failed or 4xx requests",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "coach-contrast",
+      "name": "es/readiness light 390: text meets WCAG AA (4.5:1, 3:1 large)",
+      "pass": true,
+      "detail": "110 text nodes, lowest 4.67:1; 0 over images skipped"
+    },
+    {
+      "group": "coach-contrast",
+      "name": "es/readiness light 1440: text meets WCAG AA (4.5:1, 3:1 large)",
+      "pass": true,
+      "detail": "123 text nodes, lowest 4.57:1; 0 over images skipped"
+    },
+    {
+      "group": "coach-a11y",
+      "name": "es/readiness: one h1, one main, every img has alt, no skipped heading level",
+      "pass": true,
+      "detail": "h1 1, main 1"
+    },
+    {
+      "group": "coach-a11y",
+      "name": "es/readiness: nothing focusable is hidden from assistive tech, every link and button has a name",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "coach-links",
+      "name": "es/readiness: every internal link resolves in dist or the live site, or is a planned route",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "coach-links",
+      "name": "es/readiness: internal page links stay in Spanish",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "coach-links",
+      "name": "es/readiness: \"Book a demo\" goes to the contact form with topic=demo",
+      "pass": true,
+      "detail": "1 links: /connect.html?topic=demo"
+    },
+    {
+      "group": "coach-contrast",
+      "name": "es/readiness dark 390: text meets WCAG AA (4.5:1, 3:1 large)",
+      "pass": true,
+      "detail": "110 text nodes, lowest 7.52:1; 0 over images skipped"
+    },
+    {
+      "group": "coach-contrast",
+      "name": "es/readiness dark 1440: text meets WCAG AA (4.5:1, 3:1 large)",
+      "pass": true,
+      "detail": "123 text nodes, lowest 7.52:1; 0 over images skipped"
+    },
+    {
+      "group": "coach-keyboard",
+      "name": "es/readiness: Tab walk visits 48 stops, none hidden, boxless or without a focus ring, no trap",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "coach-nojs",
+      "name": "es/readiness: renders without JavaScript (h1 visible, no content stuck faded)",
+      "pass": true,
+      "detail": "2162 characters, 0 faded"
+    },
+    {
+      "group": "coach-layout",
+      "name": "en/power-lab 390: no horizontal overflow, no sideways clipping, no overlapping text",
+      "pass": true,
+      "detail": "overflow 0px, 66 text boxes"
+    },
+    {
+      "group": "coach-console",
+      "name": "en/power-lab 390: no console errors, failed or 4xx requests",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "coach-layout",
+      "name": "en/power-lab 1024: no horizontal overflow, no sideways clipping, no overlapping text",
+      "pass": true,
+      "detail": "overflow 0px, 66 text boxes"
+    },
+    {
+      "group": "coach-layout",
+      "name": "en/power-lab 1280: no horizontal overflow, no sideways clipping, no overlapping text",
+      "pass": true,
+      "detail": "overflow 0px, 66 text boxes"
+    },
+    {
+      "group": "coach-layout",
+      "name": "en/power-lab 1440: no horizontal overflow, no sideways clipping, no overlapping text",
+      "pass": true,
+      "detail": "overflow 0px, 66 text boxes"
+    },
+    {
+      "group": "coach-console",
+      "name": "en/power-lab 1440: no console errors, failed or 4xx requests",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "coach-contrast",
+      "name": "en/power-lab light 390: text meets WCAG AA (4.5:1, 3:1 large)",
+      "pass": true,
+      "detail": "96 text nodes, lowest 4.57:1; 0 over images skipped"
+    },
+    {
+      "group": "coach-contrast",
+      "name": "en/power-lab light 1440: text meets WCAG AA (4.5:1, 3:1 large)",
+      "pass": true,
+      "detail": "104 text nodes, lowest 4.57:1; 0 over images skipped"
+    },
+    {
+      "group": "coach-a11y",
+      "name": "en/power-lab: one h1, one main, every img has alt, no skipped heading level",
+      "pass": true,
+      "detail": "h1 1, main 1"
+    },
+    {
+      "group": "coach-a11y",
+      "name": "en/power-lab: nothing focusable is hidden from assistive tech, every link and button has a name",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "coach-links",
+      "name": "en/power-lab: every internal link resolves in dist or the live site, or is a planned route",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "coach-links",
+      "name": "en/power-lab: \"Book a demo\" goes to the contact form with topic=demo",
+      "pass": true,
+      "detail": "1 links: /connect.html?topic=demo"
+    },
+    {
+      "group": "coach-contrast",
+      "name": "en/power-lab dark 390: text meets WCAG AA (4.5:1, 3:1 large)",
+      "pass": true,
+      "detail": "96 text nodes, lowest 7.18:1; 0 over images skipped"
+    },
+    {
+      "group": "coach-contrast",
+      "name": "en/power-lab dark 1440: text meets WCAG AA (4.5:1, 3:1 large)",
+      "pass": true,
+      "detail": "104 text nodes, lowest 7.18:1; 0 over images skipped"
+    },
+    {
+      "group": "coach-keyboard",
+      "name": "en/power-lab: Tab walk visits 39 stops, none hidden, boxless or without a focus ring, no trap",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "coach-nojs",
+      "name": "en/power-lab: renders without JavaScript (h1 visible, no content stuck faded)",
+      "pass": true,
+      "detail": "1339 characters, 0 faded"
+    },
+    {
+      "group": "coach-layout",
+      "name": "es/power-lab 390: no horizontal overflow, no sideways clipping, no overlapping text",
+      "pass": true,
+      "detail": "overflow 0px, 66 text boxes"
+    },
+    {
+      "group": "coach-console",
+      "name": "es/power-lab 390: no console errors, failed or 4xx requests",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "coach-layout",
+      "name": "es/power-lab 1024: no horizontal overflow, no sideways clipping, no overlapping text",
+      "pass": true,
+      "detail": "overflow 0px, 66 text boxes"
+    },
+    {
+      "group": "coach-layout",
+      "name": "es/power-lab 1280: no horizontal overflow, no sideways clipping, no overlapping text",
+      "pass": true,
+      "detail": "overflow 0px, 66 text boxes"
+    },
+    {
+      "group": "coach-layout",
+      "name": "es/power-lab 1440: no horizontal overflow, no sideways clipping, no overlapping text",
+      "pass": true,
+      "detail": "overflow 0px, 66 text boxes"
+    },
+    {
+      "group": "coach-console",
+      "name": "es/power-lab 1440: no console errors, failed or 4xx requests",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "coach-contrast",
+      "name": "es/power-lab light 390: text meets WCAG AA (4.5:1, 3:1 large)",
+      "pass": true,
+      "detail": "96 text nodes, lowest 4.57:1; 0 over images skipped"
+    },
+    {
+      "group": "coach-contrast",
+      "name": "es/power-lab light 1440: text meets WCAG AA (4.5:1, 3:1 large)",
+      "pass": true,
+      "detail": "104 text nodes, lowest 4.57:1; 0 over images skipped"
+    },
+    {
+      "group": "coach-a11y",
+      "name": "es/power-lab: one h1, one main, every img has alt, no skipped heading level",
+      "pass": true,
+      "detail": "h1 1, main 1"
+    },
+    {
+      "group": "coach-a11y",
+      "name": "es/power-lab: nothing focusable is hidden from assistive tech, every link and button has a name",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "coach-links",
+      "name": "es/power-lab: every internal link resolves in dist or the live site, or is a planned route",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "coach-links",
+      "name": "es/power-lab: internal page links stay in Spanish",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "coach-links",
+      "name": "es/power-lab: \"Book a demo\" goes to the contact form with topic=demo",
+      "pass": true,
+      "detail": "1 links: /connect.html?topic=demo"
+    },
+    {
+      "group": "coach-contrast",
+      "name": "es/power-lab dark 390: text meets WCAG AA (4.5:1, 3:1 large)",
+      "pass": true,
+      "detail": "96 text nodes, lowest 7.18:1; 0 over images skipped"
+    },
+    {
+      "group": "coach-contrast",
+      "name": "es/power-lab dark 1440: text meets WCAG AA (4.5:1, 3:1 large)",
+      "pass": true,
+      "detail": "104 text nodes, lowest 7.18:1; 0 over images skipped"
+    },
+    {
+      "group": "coach-keyboard",
+      "name": "es/power-lab: Tab walk visits 39 stops, none hidden, boxless or without a focus ring, no trap",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "coach-nojs",
+      "name": "es/power-lab: renders without JavaScript (h1 visible, no content stuck faded)",
+      "pass": true,
+      "detail": "1593 characters, 0 faded"
+    },
+    {
+      "group": "coach-accordion",
+      "name": "en/programs: each of 5 rows opens alone, drives the stage screen and un-inerts its panel",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "coach-accordion",
+      "name": "en/programs: clicking the open row keeps it open",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "coach-accordion",
+      "name": "en/programs: ArrowDown, End and Home move focus between row headers",
+      "pass": true,
+      "detail": "pg-h-1 pg-h-4 pg-h-0"
+    },
+    {
+      "group": "coach-accordion",
+      "name": "en/readiness: each of 6 rows opens alone, drives the stage screen and un-inerts its panel",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "coach-accordion",
+      "name": "en/readiness: clicking the open row keeps it open",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "coach-accordion",
+      "name": "en/readiness: ArrowDown, End and Home move focus between row headers",
+      "pass": true,
+      "detail": "rd-h-1 rd-h-5 rd-h-0"
+    },
+    {
+      "group": "coach-hover",
+      "name": "en/readiness: hovering each of 3 cards opens only that card and leaving closes it",
+      "pass": true,
+      "detail": "true,true,true"
+    },
+    {
+      "group": "coach-hover",
+      "name": "en/readiness: keyboard focus opens a card and Escape closes it",
+      "pass": true,
+      "detail": "open true, closed true"
+    },
+    {
+      "group": "coach-hover",
+      "name": "en/readiness 390: the row scrolls as one labelled focus stop, cards are not tab stops",
+      "pass": true,
+      "detail": "{\"tab\":0,\"role\":\"group\",\"label\":\"Mindfulness features\",\"cardTab\":0,\"scroll\":true}"
+    },
+    {
+      "group": "coach-hover",
+      "name": "en/readiness 1440 reduced motion: cards fill the row, no scroll, no stray tab stop",
+      "pass": true,
+      "detail": "{\"gap\":4,\"n\":3,\"scroll\":false,\"tab\":-1,\"cardTab\":0}"
+    },
+    {
+      "group": "coach-countup",
+      "name": "en/power-lab: 2 count-ups never leave 0..target, end on the server-rendered value, \".\" separator",
+      "pass": true,
+      "detail": "served 38.4 560, after 38.4 560, 226 frames seen, out of range: "
+    },
+    {
+      "group": "coach-accordion",
+      "name": "es/programs: each of 5 rows opens alone, drives the stage screen and un-inerts its panel",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "coach-accordion",
+      "name": "es/programs: clicking the open row keeps it open",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "coach-accordion",
+      "name": "es/programs: ArrowDown, End and Home move focus between row headers",
+      "pass": true,
+      "detail": "pg-h-1 pg-h-4 pg-h-0"
+    },
+    {
+      "group": "coach-accordion",
+      "name": "es/readiness: each of 6 rows opens alone, drives the stage screen and un-inerts its panel",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "coach-accordion",
+      "name": "es/readiness: clicking the open row keeps it open",
+      "pass": true,
+      "detail": ""
+    },
+    {
+      "group": "coach-accordion",
+      "name": "es/readiness: ArrowDown, End and Home move focus between row headers",
+      "pass": true,
+      "detail": "rd-h-1 rd-h-5 rd-h-0"
+    },
+    {
+      "group": "coach-hover",
+      "name": "es/readiness: hovering each of 3 cards opens only that card and leaving closes it",
+      "pass": true,
+      "detail": "true,true,true"
+    },
+    {
+      "group": "coach-hover",
+      "name": "es/readiness: keyboard focus opens a card and Escape closes it",
+      "pass": true,
+      "detail": "open true, closed true"
+    },
+    {
+      "group": "coach-hover",
+      "name": "es/readiness 390: the row scrolls as one labelled focus stop, cards are not tab stops",
+      "pass": true,
+      "detail": "{\"tab\":0,\"role\":\"group\",\"label\":\"Funciones de atenci\u00f3n plena\",\"cardTab\":0,\"scroll\":true}"
+    },
+    {
+      "group": "coach-hover",
+      "name": "es/readiness 1440 reduced motion: cards fill the row, no scroll, no stray tab stop",
+      "pass": true,
+      "detail": "{\"gap\":4,\"n\":3,\"scroll\":false,\"tab\":-1,\"cardTab\":0}"
+    },
+    {
+      "group": "coach-countup",
+      "name": "es/power-lab: 2 count-ups never leave 0..target, end on the server-rendered value, \",\" separator",
+      "pass": true,
+      "detail": "served 38,4 560, after 38,4 560, 228 frames seen, out of range: "
+    },
+    {
+      "group": "coach-reveal",
+      "name": "programs/en light 1440: every scroll-reveal block reveals once scrolled to",
+      "pass": true,
+      "detail": "0 stuck"
+    },
+    {
+      "group": "coach-reveal",
+      "name": "programs/en light 390: every scroll-reveal block reveals once scrolled to",
+      "pass": true,
+      "detail": "0 stuck"
+    },
+    {
+      "group": "coach-reveal",
+      "name": "programs/en dark 1440: every scroll-reveal block reveals once scrolled to",
+      "pass": true,
+      "detail": "0 stuck"
+    },
+    {
+      "group": "coach-reveal",
+      "name": "programs/en dark 390: every scroll-reveal block reveals once scrolled to",
+      "pass": true,
+      "detail": "0 stuck"
+    },
+    {
+      "group": "coach-reveal",
+      "name": "programs/es light 1440: every scroll-reveal block reveals once scrolled to",
+      "pass": true,
+      "detail": "0 stuck"
+    },
+    {
+      "group": "coach-reveal",
+      "name": "programs/es light 390: every scroll-reveal block reveals once scrolled to",
+      "pass": true,
+      "detail": "0 stuck"
+    },
+    {
+      "group": "coach-reveal",
+      "name": "programs/es dark 1440: every scroll-reveal block reveals once scrolled to",
+      "pass": true,
+      "detail": "0 stuck"
+    },
+    {
+      "group": "coach-reveal",
+      "name": "programs/es dark 390: every scroll-reveal block reveals once scrolled to",
+      "pass": true,
+      "detail": "0 stuck"
+    },
+    {
+      "group": "coach-reveal",
+      "name": "nutrition/en light 1440: every scroll-reveal block reveals once scrolled to",
+      "pass": true,
+      "detail": "0 stuck"
+    },
+    {
+      "group": "coach-reveal",
+      "name": "nutrition/en light 390: every scroll-reveal block reveals once scrolled to",
+      "pass": true,
+      "detail": "0 stuck"
+    },
+    {
+      "group": "coach-reveal",
+      "name": "nutrition/en dark 1440: every scroll-reveal block reveals once scrolled to",
+      "pass": true,
+      "detail": "0 stuck"
+    },
+    {
+      "group": "coach-reveal",
+      "name": "nutrition/en dark 390: every scroll-reveal block reveals once scrolled to",
+      "pass": true,
+      "detail": "0 stuck"
+    },
+    {
+      "group": "coach-reveal",
+      "name": "nutrition/es light 1440: every scroll-reveal block reveals once scrolled to",
+      "pass": true,
+      "detail": "0 stuck"
+    },
+    {
+      "group": "coach-reveal",
+      "name": "nutrition/es light 390: every scroll-reveal block reveals once scrolled to",
+      "pass": true,
+      "detail": "0 stuck"
+    },
+    {
+      "group": "coach-reveal",
+      "name": "nutrition/es dark 1440: every scroll-reveal block reveals once scrolled to",
+      "pass": true,
+      "detail": "0 stuck"
+    },
+    {
+      "group": "coach-reveal",
+      "name": "nutrition/es dark 390: every scroll-reveal block reveals once scrolled to",
+      "pass": true,
+      "detail": "0 stuck"
+    },
+    {
+      "group": "coach-reveal",
+      "name": "readiness/en light 1440: every scroll-reveal block reveals once scrolled to",
+      "pass": true,
+      "detail": "0 stuck"
+    },
+    {
+      "group": "coach-reveal",
+      "name": "readiness/en light 390: every scroll-reveal block reveals once scrolled to",
+      "pass": true,
+      "detail": "0 stuck"
+    },
+    {
+      "group": "coach-reveal",
+      "name": "readiness/en dark 1440: every scroll-reveal block reveals once scrolled to",
+      "pass": true,
+      "detail": "0 stuck"
+    },
+    {
+      "group": "coach-reveal",
+      "name": "readiness/en dark 390: every scroll-reveal block reveals once scrolled to",
+      "pass": true,
+      "detail": "0 stuck"
+    },
+    {
+      "group": "coach-reveal",
+      "name": "readiness/es light 1440: every scroll-reveal block reveals once scrolled to",
+      "pass": true,
+      "detail": "0 stuck"
+    },
+    {
+      "group": "coach-reveal",
+      "name": "readiness/es light 390: every scroll-reveal block reveals once scrolled to",
+      "pass": true,
+      "detail": "0 stuck"
+    },
+    {
+      "group": "coach-reveal",
+      "name": "readiness/es dark 1440: every scroll-reveal block reveals once scrolled to",
+      "pass": true,
+      "detail": "0 stuck"
+    },
+    {
+      "group": "coach-reveal",
+      "name": "readiness/es dark 390: every scroll-reveal block reveals once scrolled to",
+      "pass": true,
+      "detail": "0 stuck"
+    },
+    {
+      "group": "coach-reveal",
+      "name": "power-lab/en light 1440: every scroll-reveal block reveals once scrolled to",
+      "pass": true,
+      "detail": "0 stuck"
+    },
+    {
+      "group": "coach-reveal",
+      "name": "power-lab/en light 390: every scroll-reveal block reveals once scrolled to",
+      "pass": true,
+      "detail": "0 stuck"
+    },
+    {
+      "group": "coach-reveal",
+      "name": "power-lab/en dark 1440: every scroll-reveal block reveals once scrolled to",
+      "pass": true,
+      "detail": "0 stuck"
+    },
+    {
+      "group": "coach-reveal",
+      "name": "power-lab/en dark 390: every scroll-reveal block reveals once scrolled to",
+      "pass": true,
+      "detail": "0 stuck"
+    },
+    {
+      "group": "coach-reveal",
+      "name": "power-lab/es light 1440: every scroll-reveal block reveals once scrolled to",
+      "pass": true,
+      "detail": "0 stuck"
+    },
+    {
+      "group": "coach-reveal",
+      "name": "power-lab/es light 390: every scroll-reveal block reveals once scrolled to",
+      "pass": true,
+      "detail": "0 stuck"
+    },
+    {
+      "group": "coach-reveal",
+      "name": "power-lab/es dark 1440: every scroll-reveal block reveals once scrolled to",
+      "pass": true,
+      "detail": "0 stuck"
+    },
+    {
+      "group": "coach-reveal",
+      "name": "power-lab/es dark 390: every scroll-reveal block reveals once scrolled to",
+      "pass": true,
+      "detail": "0 stuck"
+    }
+  ],
+  "metrics": {
+    "coach-contrast-programs-en-light-390": {
+      "checked": 105,
+      "lowest": 5
+    },
+    "coach-contrast-programs-en-light-1440": {
+      "checked": 150,
+      "lowest": 4.57
+    },
+    "coach-planned-links-programs-en": 14,
+    "coach-contrast-programs-en-dark-390": {
+      "checked": 105,
+      "lowest": 7.32
+    },
+    "coach-contrast-programs-en-dark-1440": {
+      "checked": 150,
+      "lowest": 7.32
+    },
+    "coach-contrast-programs-es-light-390": {
+      "checked": 105,
+      "lowest": 5
+    },
+    "coach-contrast-programs-es-light-1440": {
+      "checked": 150,
+      "lowest": 4.57
+    },
+    "coach-planned-links-programs-es": 14,
+    "coach-contrast-programs-es-dark-390": {
+      "checked": 105,
+      "lowest": 7.32
+    },
+    "coach-contrast-programs-es-dark-1440": {
+      "checked": 150,
+      "lowest": 7.32
+    },
+    "coach-contrast-nutrition-en-light-390": {
+      "checked": 119,
+      "lowest": 4.57
+    },
+    "coach-contrast-nutrition-en-light-1440": {
+      "checked": 127,
+      "lowest": 4.57
+    },
+    "coach-planned-links-nutrition-en": 14,
+    "coach-contrast-nutrition-en-dark-390": {
+      "checked": 119,
+      "lowest": 7.32
+    },
+    "coach-contrast-nutrition-en-dark-1440": {
+      "checked": 127,
+      "lowest": 7.32
+    },
+    "coach-contrast-nutrition-es-light-390": {
+      "checked": 119,
+      "lowest": 4.57
+    },
+    "coach-contrast-nutrition-es-light-1440": {
+      "checked": 127,
+      "lowest": 4.57
+    },
+    "coach-planned-links-nutrition-es": 14,
+    "coach-contrast-nutrition-es-dark-390": {
+      "checked": 119,
+      "lowest": 7.32
+    },
+    "coach-contrast-nutrition-es-dark-1440": {
+      "checked": 127,
+      "lowest": 7.32
+    },
+    "coach-contrast-readiness-en-light-390": {
+      "checked": 110,
+      "lowest": 4.67
+    },
+    "coach-contrast-readiness-en-light-1440": {
+      "checked": 123,
+      "lowest": 4.57
+    },
+    "coach-planned-links-readiness-en": 14,
+    "coach-contrast-readiness-en-dark-390": {
+      "checked": 110,
+      "lowest": 7.52
+    },
+    "coach-contrast-readiness-en-dark-1440": {
+      "checked": 123,
+      "lowest": 7.52
+    },
+    "coach-contrast-readiness-es-light-390": {
+      "checked": 110,
+      "lowest": 4.67
+    },
+    "coach-contrast-readiness-es-light-1440": {
+      "checked": 123,
+      "lowest": 4.57
+    },
+    "coach-planned-links-readiness-es": 14,
+    "coach-contrast-readiness-es-dark-390": {
+      "checked": 110,
+      "lowest": 7.52
+    },
+    "coach-contrast-readiness-es-dark-1440": {
+      "checked": 123,
+      "lowest": 7.52
+    },
+    "coach-contrast-power-lab-en-light-390": {
+      "checked": 96,
+      "lowest": 4.57
+    },
+    "coach-contrast-power-lab-en-light-1440": {
+      "checked": 104,
+      "lowest": 4.57
+    },
+    "coach-planned-links-power-lab-en": 14,
+    "coach-contrast-power-lab-en-dark-390": {
+      "checked": 96,
+      "lowest": 7.18
+    },
+    "coach-contrast-power-lab-en-dark-1440": {
+      "checked": 104,
+      "lowest": 7.18
+    },
+    "coach-contrast-power-lab-es-light-390": {
+      "checked": 96,
+      "lowest": 4.57
+    },
+    "coach-contrast-power-lab-es-light-1440": {
+      "checked": 104,
+      "lowest": 4.57
+    },
+    "coach-planned-links-power-lab-es": 14,
+    "coach-contrast-power-lab-es-dark-390": {
+      "checked": 96,
+      "lowest": 7.18
+    },
+    "coach-contrast-power-lab-es-dark-1440": {
+      "checked": 104,
+      "lowest": 7.18
+    }
+  }
+}
