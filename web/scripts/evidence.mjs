@@ -4,6 +4,7 @@
 //   node scripts/evidence.mjs --nav-only       (header geometry, mega panel height, drawer and panel focus only)
 //   node scripts/evidence.mjs --pricing-only   (the /pricing/ page only: prices, region, dialogs, layout, contrast; add --checks-only to skip screenshots)
 //   node scripts/evidence.mjs --engage-only    (the five Platform pages, EN and ES: overflow, contrast, a11y, interactions)
+//   node scripts/evidence.mjs --home-only      (the home guards only: structure, autoplayers, reduced motion, marquees, hero words, clipping, contrast)
 // Output goes to web/.evidence/ (git-ignored): PNGs plus summary.json. Exit code 1 when a check fails.
 import { mkdir, readdir, readFile, rm, stat, writeFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
@@ -24,6 +25,7 @@ const pricingOnly = process.argv.includes('--pricing-only');
 const engageOnly = process.argv.includes('--engage-only');
 const checksOnly = process.argv.includes('--checks-only');
 const coachOnly = process.argv.includes('--coach-only');
+const homeOnly = process.argv.includes('--home-only');
 
 await rm(outDir, { recursive: true, force: true });
 await mkdir(outDir, { recursive: true });
@@ -111,7 +113,7 @@ if (coachOnly) {
 }
 
 // ---------------------------------------------------------------- 1. static captures
-if (!checksOnly && !navOnly && !engageOnly) {
+if (!checksOnly && !navOnly && !engageOnly && !homeOnly) {
   for (const locale of ['en', 'es']) {
     const path = locale === 'en' ? '/' : '/es/';
     for (const scheme of ['light', 'dark']) {
@@ -137,6 +139,10 @@ if (!checksOnly && !navOnly && !engageOnly) {
 }
 
 // ---------------------------------------------------------------- 1b. header: geometry, mega panel height, drawer and panel focus (fix round B)
+if (homeOnly) {
+  await homeChecks({ open, check, sleep, settle, metrics });
+  await finish();
+}
 if (!engageOnly) await navChecks({ open, check, shot, sleep, checksOnly, metrics });
 if (navOnly) await finish();
 await engageChecks({ open, check, shot, sleep, settle, checksOnly, metrics });
