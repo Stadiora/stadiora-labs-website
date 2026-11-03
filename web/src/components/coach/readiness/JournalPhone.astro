@@ -1,0 +1,44 @@
+---
+import Phone from '../../ui/Phone.astro';
+import PhoneHead from './PhoneHead.astro';
+import type { ReadinessCopy } from '../../../i18n/pages/readiness';
+
+interface Props {
+  copy: ReadinessCopy['calm']['cards'][1]['screen'];
+}
+const { copy } = Astro.props;
+---
+
+<Phone>
+  <div class="jp">
+    <PhoneHead title={copy.title} />
+    <p class="jp__prompt">{copy.prompt}</p>
+    <div class="jp__box"><span>{copy.placeholder}</span></div>
+  </div>
+</Phone>
+
+<style>
+  .jp {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    padding: 0.2em 1em 1.2em;
+    font-size: 0.95em;
+  }
+  .jp__prompt {
+    margin: 0.6em 0 1em;
+    color: var(--ink);
+    font-family: var(--font-display);
+    font-size: 1.35em;
+    font-weight: 600;
+    line-height: 1.25;
+  }
+  .jp__box {
+    flex: 1;
+    min-height: 9em;
+    padding: 0.8em;
+    border: 1px solid var(--line);
+    border-radius: 0.8em;
+    color: var(--ink-3);
+  }
+</style>

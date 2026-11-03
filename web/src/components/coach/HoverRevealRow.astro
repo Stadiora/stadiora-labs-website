@@ -1,0 +1,160 @@
+---
+import '../../styles/coach.css';
+import Photo from '../ui/Photo.astro';
+import type { Locale } from '../../i18n';
+
+interface Card {
+  slot: string;
+  alt: string;
+  label: string;
+  /** Read aloud instead of the phone, which is decorative. */
+  preview: string;
+}
+interface Props {
+  locale: Locale;
+  label: string;
+  cards: Card[];
+}
+const { locale, label, cards } = Astro.props;
+const phones = await Promise.all(cards.map((_, i) => Astro.slots.render(`phone-${i}`)));
+---
+
+<!-- Wide screens: a phone slides up over the photo on hover or focus. Narrow screens and reduced motion:
+     a scroll-snap row with the phone shown under each photo. No JavaScript: the static layout. -->
+<div class="hrr" data-hrr data-label={label}>
+  {
+    cards.map((card, i) => (
+      <article class="hrc" data-hrc data-label={card.label}>
+        <div class="hrc__media">
+          <Photo
+            slot={card.slot}
+            alt={card.alt}
+            ratio="3/4"
+            sizes="(max-width: 720px) 78vw, (max-width: 1100px) 30vw, 440px"
+            widths={[320, 480, 640]}
+            locale={locale}
+          />
+        </div>
+        <div class="hrc__bar">
+          <h3 class="hrc__label">{card.label}</h3>
+        </div>
+        <p class="sr-only">{card.preview}</p>
+        <div class="hrc__phone-wrap" aria-hidden="true">
+          <div class="hrc__phone" set:html={phones[i]} />
+        </div>
+      </article>
+    ))
+  }
+</div>
+
+<style>
+  .hrr {
+    display: flex;
+    gap: 16px;
+    margin: 0;
+    padding: 4px 4px 12px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: thin;
+  }
+  .hrr:focus-visible {
+    outline-offset: 0;
+  }
+  .hrc {
+    --bar-h: 64px;
+    position: relative;
+    flex: 0 0 min(78%, 320px);
+    overflow: hidden;
+    scroll-snap-align: start;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-card);
+    background: var(--bg);
+    container-type: inline-size;
+  }
+  .hrc__media {
+    overflow: hidden;
+  }
+  .hrc__bar {
+    display: flex;
+    align-items: center;
+    min-height: var(--bar-h);
+    padding: 0 20px;
+    border-top: 1px solid var(--line);
+    background: var(--bg);
+  }
+  .hrc__label {
+    font-size: 19px;
+    line-height: 26px;
+  }
+
+  /* Static: the phone's top shows in a band under the label. */
+  .hrc__phone-wrap {
+    position: relative;
+    height: 62cqw;
+    overflow: hidden;
+    background: var(--surface);
+    -webkit-mask-image: linear-gradient(#000 78%, transparent);
+    mask-image: linear-gradient(#000 78%, transparent);
+  }
+  .hrc__phone {
+    --phone-w: 60cqw;
+    width: var(--phone-w);
+    margin: 18px auto 0;
+  }
+
+  /* Interactive: three columns, the phone rises over the photo. */
+  @media (min-width: 721px) and (prefers-reduced-motion: no-preference) {
+    :global(html.js) .hrr {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 24px;
+      overflow: visible;
+      padding: 0;
+      scroll-snap-type: none;
+    }
+    :global(html.js) .hrc {
+      flex: none;
+      transition:
+        transform 0.35s var(--ease-out),
+        box-shadow 0.35s var(--ease-out);
+    }
+    :global(html.js) .hrc.is-open {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow-lift);
+    }
+    :global(html.js) .hrc__phone-wrap {
+      position: absolute;
+      inset: auto 0 var(--bar-h) 0;
+      height: calc((100% - var(--bar-h)) * 0.46);
+      background: none;
+      pointer-events: none;
+      -webkit-mask-image: none;
+      mask-image: none;
+    }
+    :global(html.js) .hrc__phone {
+      --phone-w: 62cqw;
+      position: absolute;
+      left: 50%;
+      top: 0;
+      margin: 0;
+      transform: translate(-50%, 104%);
+      transition: transform 0.35s var(--ease-out);
+    }
+    :global(html.js) .hrc.is-open .hrc__phone {
+      transform: translate(-50%, 8%);
+    }
+    :global(html.js) .hrc__media {
+      position: relative;
+    }
+  }
+
+  @media (max-width: 1100px) and (min-width: 721px) {
+    .hrc__label {
+      font-size: 17px;
+    }
+  }
+</style>
+
+<script>
+  import '../../scripts/hover-reveal';
+</script>

@@ -1,0 +1,160 @@
+---
+import '../../styles/coach.css';
+
+interface Step {
+  title: string;
+  line: string;
+}
+interface Props {
+  steps: Step[];
+  /** "Step" / "Paso", read before each title by screen readers. */
+  stepWord: string;
+  /** open: numbered heads joined by a dotted line; card: each step in its own bordered card. */
+  variant?: 'open' | 'card';
+  label?: string;
+}
+const { steps, stepWord, variant = 'open', label } = Astro.props;
+---
+
+<ol class:list={['sf', `sf--${variant}`]} data-reveal aria-label={label}>
+  {
+    steps.map((step, i) => (
+      <li class="sf__step" style={`--i:${i}`}>
+        <div class="sf__head">
+          <span class="sf__num num" aria-hidden="true">
+            {i + 1}
+          </span>
+          <h3 class="sf__title">
+            <span class="sr-only">{stepWord} {i + 1}: </span>
+            {step.title}
+          </h3>
+          {variant === 'open' && i < steps.length - 1 && <span class="sf__dots" aria-hidden="true" />}
+        </div>
+        <div class="sf__screen">
+          <slot name={`step-${i}`} />
+        </div>
+        <p class="sf__line">{step.line}</p>
+      </li>
+    ))
+  }
+</ol>
+
+<style>
+  .sf {
+    display: grid;
+    grid-template-columns: repeat(var(--sf-cols, 3), minmax(0, 1fr));
+    grid-template-rows: auto 1fr auto;
+    column-gap: 40px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .sf__step {
+    display: grid;
+    grid-template-rows: subgrid;
+    grid-row: span 3;
+    min-width: 0;
+  }
+  .sf__head {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    min-height: 44px;
+  }
+  .sf__num {
+    display: grid;
+    flex: none;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--cyan-tint);
+    color: var(--cyan-ink);
+    font-size: 18px;
+    font-weight: 600;
+  }
+  .sf__title {
+    font-size: 22px;
+    line-height: 28px;
+  }
+  .sf__screen {
+    display: grid;
+    flex: 1;
+    align-items: start;
+    margin-top: 20px;
+  }
+  .sf__line {
+    margin-top: 16px;
+    color: var(--ink-2);
+    font-size: 17px;
+    line-height: 26px;
+  }
+
+  /* Dotted connector: drawn left to right once, when the list scrolls into view. */
+  .sf__dots {
+    flex: 1 1 24px;
+    min-width: 24px;
+    height: 0;
+    margin: 0 -32px 0 4px;
+    border-top: 2px dotted var(--cyan);
+  }
+  :global(html.js) .sf[data-reveal] .sf__dots {
+    clip-path: inset(0 100% 0 0);
+    transition: clip-path 0.6s var(--ease-out) calc(var(--i, 0) * 200ms + 300ms);
+  }
+  :global(html.js) .sf[data-reveal].is-in .sf__dots {
+    clip-path: inset(0);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    :global(html.js) .sf[data-reveal] .sf__dots {
+      clip-path: inset(0);
+    }
+  }
+
+  /* Card variant */
+  .sf--card {
+    column-gap: 16px;
+  }
+  .sf--card .sf__step {
+    padding: 20px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-card);
+    background: var(--bg);
+  }
+  .sf--card .sf__num {
+    width: 36px;
+    height: 36px;
+    font-size: 16px;
+  }
+  .sf--card .sf__title {
+    font-size: 18px;
+    line-height: 24px;
+  }
+  .sf--card .sf__line {
+    margin-top: 14px;
+    font-size: 15px;
+    line-height: 22px;
+  }
+  .sf--card .sf__screen {
+    align-items: center;
+  }
+
+  @media (max-width: 960px) {
+    .sf {
+      grid-template-columns: minmax(0, 1fr);
+      grid-template-rows: none;
+      row-gap: 40px;
+    }
+    .sf__step {
+      grid-template-rows: auto auto auto;
+      grid-row: auto;
+    }
+    .sf__dots {
+      display: none;
+    }
+    .sf--card {
+      row-gap: 16px;
+    }
+  }
+</style>

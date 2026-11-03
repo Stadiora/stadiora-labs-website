@@ -1,0 +1,63 @@
+---
+import CoachIcon from '../CoachIcon.astro';
+
+interface Props {
+  name: string;
+  food: string;
+  kcal: string;
+  /** Show the chevron used by the coach plan rows. */
+  chevron?: boolean;
+}
+const { name, food, kcal, chevron = false } = Astro.props;
+---
+
+<!-- Neutral tile instead of a food photo: no brand marks, nothing to mislead. -->
+<div class="mr">
+  <span class="mr__tile"><CoachIcon name="plate" size={20} /></span>
+  <span class="mr__text">
+    <span class="mr__name">{name}</span>
+    <span class="mr__food">{food}</span>
+  </span>
+  <span class="mr__kcal num">{kcal}</span>
+  {chevron && <CoachIcon name="chevron-right" size={16} />}
+</div>
+
+<style>
+  .mr {
+    display: flex;
+    align-items: center;
+    gap: 0.8em;
+    min-width: 0;
+    color: var(--ink-3);
+  }
+  .mr__tile {
+    display: grid;
+    flex: none;
+    place-items: center;
+    width: 2.7em;
+    height: 2.7em;
+    border-radius: 0.6em;
+    background: var(--cyan-tint);
+    color: var(--cyan-ink);
+  }
+  .mr__text {
+    display: grid;
+    flex: 1;
+    min-width: 0;
+  }
+  .mr__name {
+    color: var(--ink);
+    font-weight: 600;
+    line-height: 1.25;
+  }
+  .mr__food {
+    color: var(--ink-2);
+    font-size: 0.9em;
+    line-height: 1.3;
+  }
+  .mr__kcal {
+    color: var(--ink);
+    font-size: 0.92em;
+    white-space: nowrap;
+  }
+</style>

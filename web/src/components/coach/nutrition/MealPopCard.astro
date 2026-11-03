@@ -1,0 +1,88 @@
+---
+import '../../../styles/coach.css';
+import type { NutritionCopy } from '../../../i18n/pages/nutrition';
+
+interface Props {
+  copy: NutritionCopy['hero']['meal'];
+}
+const { copy } = Astro.props;
+const fills = ['var(--cyan)', 'var(--cyan-ink)', 'var(--ink-3)'];
+---
+
+<!-- Meal estimate card from the athlete app, fictional values. -->
+<div class="mp">
+  <div class="mp__head">
+    <p class="mp__label">{copy.label}</p>
+    <span class="co-pill">{copy.badge}</span>
+  </div>
+  <p class="mp__kcal"><span class="num">{copy.kcal}</span> <span class="mp__unit">{copy.unit}</span></p>
+  <ul class="mp__macros">
+    {
+      copy.macros.map((m, i) => (
+        <li>
+          <span class="mp__name">{m.name}</span>
+          <span class="co-meter"><i style={`width:${m.pct}%;background:${fills[i]}`}></i></span>
+          <span class="mp__value num">{m.value}</span>
+        </li>
+      ))
+    }
+  </ul>
+</div>
+
+<style>
+  .mp {
+    width: min(320px, calc(100vw - 64px));
+    padding: 18px 20px 20px;
+    border: 1px solid var(--pop-border);
+    border-radius: var(--radius-card);
+    background: var(--bg);
+    box-shadow: var(--shadow-pop);
+  }
+  .mp__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .mp__label {
+    color: var(--ink);
+    font-size: 16px;
+    font-weight: 500;
+    line-height: 24px;
+  }
+  .mp__kcal {
+    margin-top: 2px;
+    color: var(--ink);
+    font-family: var(--font-display);
+    font-size: 44px;
+    font-weight: 600;
+    line-height: 52px;
+    letter-spacing: -0.02em;
+  }
+  .mp__unit {
+    font-size: 24px;
+    font-weight: 600;
+  }
+  .mp__macros {
+    display: grid;
+    gap: 6px;
+    margin: 10px 0 0;
+    padding: 0;
+    list-style: none;
+  }
+  .mp__macros li {
+    display: grid;
+    grid-template-columns: 96px minmax(0, 1fr) 44px;
+    align-items: center;
+    gap: 12px;
+    color: var(--ink);
+    font-size: 14px;
+    line-height: 20px;
+  }
+  .mp__name {
+    color: var(--ink-2);
+  }
+  .mp__value {
+    text-align: right;
+  }
+</style>

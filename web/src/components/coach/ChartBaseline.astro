@@ -1,0 +1,205 @@
+---
+import '../../styles/coach.css';
+
+interface Props {
+  title: string;
+  /** Unit shown above the y axis. */
+  unit: string;
+  baseline: string;
+  above: string;
+  xLabels: string[];
+  values: number[];
+  /** Baseline band, in data units. */
+  band: [number, number];
+  /** y axis range, in data units. */
+  range: [number, number];
+  /** Text alternative for the whole chart. */
+  label: string;
+  demo: string;
+}
+const { title, unit, baseline, above, xLabels, values, band, range, label, demo } = Astro.props;
+
+const [min, max] = range;
+const span = max - min;
+const pct = (v: number) => ((v - min) / span) * 100;
+const n = values.length;
+const x = (i: number) => 4 + (i * 92) / (n - 1);
+const points = values.map((v, i) => `${x(i).toFixed(2)},${(100 - pct(v)).toFixed(2)}`).join(' ');
+const ticks = [30, 34, 38, 42].filter((t) => t >= min && t <= max);
+const last = values.length - 1;
+---
+
+<figure class="cb co-card" data-reveal>
+  <figcaption class="cb__title">{title}</figcaption>
+  <div class="cb__chart">
+    <span class="cb__unit" aria-hidden="true">{unit}</span>
+    <div class="cb__plot" role="img" aria-label={label}>
+      {ticks.map((t) => <span class="cb__grid" style={`bottom:${pct(t)}%`}><span class="cb__tick num">{t}</span></span>)}
+      <div class="cb__band" style={`bottom:${pct(band[0])}%;height:${pct(band[1]) - pct(band[0])}%`}>
+        <span class="cb__band-label">{baseline}</span>
+      </div>
+      <svg class="cb__svg" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+        <polyline class="cb__line" points={points} fill="none" />
+      </svg>
+      {
+        values.map((v, i) => (
+          <span class="cb__dot" style={`left:${x(i)}%;bottom:${pct(v)}%;--i:${i}`} />
+        ))
+      }
+      <span class="cb__above" style={`bottom:calc(${pct(values[last])}% + 16px)`}>{above}</span>
+      {xLabels.map((l, i) => <span class="cb__x num" style={`left:${x(i)}%`}>{l}</span>)}
+    </div>
+  </div>
+  <p class="cb__demo">{demo}</p>
+</figure>
+
+<style>
+  .cb {
+    margin: 0;
+    padding: 24px 24px 20px;
+  }
+  .cb__title {
+    color: var(--ink);
+    font-family: var(--font-display);
+    font-size: 18px;
+    font-weight: 600;
+    line-height: 26px;
+  }
+  .cb__chart {
+    position: relative;
+    margin-top: 20px;
+    padding: 32px 0 30px 40px;
+  }
+  .cb__unit {
+    position: absolute;
+    left: 0;
+    top: 0;
+    color: var(--ink-3);
+    font-size: 13px;
+    line-height: 18px;
+  }
+  .cb__plot {
+    position: relative;
+    height: clamp(180px, 18vw, 230px);
+  }
+  .cb__grid {
+    position: absolute;
+    left: 0;
+    right: 0;
+    border-top: 1px solid var(--line);
+  }
+  .cb__tick {
+    position: absolute;
+    left: -40px;
+    top: -10px;
+    width: 32px;
+    color: var(--ink-3);
+    font-size: 13px;
+    line-height: 20px;
+    text-align: right;
+  }
+  .cb__band {
+    position: absolute;
+    left: 0;
+    right: 0;
+    background: var(--cyan-tint);
+  }
+  .cb__band-label {
+    position: absolute;
+    right: 8px;
+    bottom: 4px;
+    color: var(--ink-2);
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 18px;
+  }
+  .cb__svg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+  }
+  .cb__line {
+    stroke: var(--ink);
+    stroke-width: 2px;
+    stroke-linejoin: round;
+    stroke-linecap: round;
+    vector-effect: non-scaling-stroke;
+  }
+  .cb__dot {
+    position: absolute;
+    width: 9px;
+    height: 9px;
+    margin: 0 0 -4.5px -4.5px;
+    border-radius: 50%;
+    background: var(--cyan);
+    box-shadow: 0 0 0 2px var(--bg);
+  }
+  .cb__above {
+    position: absolute;
+    right: 0;
+    padding: 2px 10px;
+    border-radius: 999px;
+    background: light-dark(#d9f6ea, rgb(52 211 153 / 0.18));
+    color: var(--mint-ink);
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 20px;
+    white-space: nowrap;
+  }
+  .cb__x {
+    position: absolute;
+    top: calc(100% + 8px);
+    transform: translateX(-50%);
+    color: var(--ink-3);
+    font-size: 13px;
+    line-height: 18px;
+  }
+  .cb__demo {
+    margin-top: 4px;
+    color: var(--ink-3);
+    font-size: 13px;
+    line-height: 18px;
+  }
+
+  /* Draws once when the card scrolls into view; static without JavaScript or with reduced motion. */
+  :global(html.js) .cb[data-reveal] .cb__line {
+    clip-path: inset(-4px 100% -4px -4px);
+    transition: clip-path 0.9s var(--ease-out) 0.2s;
+  }
+  :global(html.js) .cb[data-reveal].is-in .cb__line {
+    clip-path: inset(-4px);
+  }
+  :global(html.js) .cb[data-reveal] .cb__dot,
+  :global(html.js) .cb[data-reveal] .cb__above {
+    opacity: 0;
+    transition: opacity 0.3s ease calc(0.2s + var(--i, 7) * 0.11s);
+  }
+  :global(html.js) .cb[data-reveal].is-in .cb__dot,
+  :global(html.js) .cb[data-reveal].is-in .cb__above {
+    opacity: 1;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    :global(html.js) .cb[data-reveal] .cb__line {
+      clip-path: inset(-4px);
+    }
+    :global(html.js) .cb[data-reveal] .cb__dot,
+    :global(html.js) .cb[data-reveal] .cb__above {
+      opacity: 1;
+    }
+  }
+
+  @media (max-width: 720px) {
+    .cb {
+      padding: 20px 16px 16px;
+    }
+    .cb__chart {
+      padding-left: 34px;
+    }
+    .cb__tick {
+      left: -34px;
+      width: 26px;
+    }
+  }
+</style>

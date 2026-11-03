@@ -9,6 +9,7 @@ import { fileURLToPath } from 'node:url';
 import { chromium } from 'playwright';
 import { navChecks } from './lib/nav-checks.mjs';
 import { pricingChecks } from './lib/pricing-checks.mjs';
+import { platformCoachChecks } from './lib/platform-coach-checks.mjs';
 import { serve } from './lib/static-server.mjs';
 
 const root = fileURLToPath(new URL('..', import.meta.url));
@@ -16,6 +17,7 @@ const outDir = `${root}.evidence/`;
 const navOnly = process.argv.includes('--nav-only');
 const pricingOnly = process.argv.includes('--pricing-only');
 const checksOnly = process.argv.includes('--checks-only');
+const coachOnly = process.argv.includes('--coach-only');
 
 await rm(outDir, { recursive: true, force: true });
 await mkdir(outDir, { recursive: true });
@@ -90,6 +92,13 @@ async function finish() {
 // ---------------------------------------------------------------- 0. pricing page (its own contexts, time zones and checks)
 if (pricingOnly) {
   await pricingChecks({ browser, server, outDir, check, metrics, sleep, checksOnly });
+  await finish();
+}
+
+// Platform Coach pages (programs, nutrition, readiness, power lab); `--coach-only` runs just these.
+const coachRun = () => platformCoachChecks({ open, check, shot, el, sleep, settle, checksOnly, metrics, server, browser, outDir });
+if (coachOnly) {
+  await coachRun();
   await finish();
 }
 
@@ -656,4 +665,5 @@ const dist = await readdir(`${root}dist/_astro`);
 check('perf', 'no video files shipped (budget 1.5 MB each)', !dist.some((f) => /\.(mp4|webm)$/.test(f)));
 
 await pricingChecks({ browser, server, outDir, check, metrics, sleep, checksOnly });
+await coachRun();
 await finish();

@@ -1,0 +1,145 @@
+---
+import CoachIcon from '../CoachIcon.astro';
+import type { ProgramsCopy } from '../../../i18n/pages/programs';
+
+interface Props {
+  copy: ProgramsCopy['screens']['templates'];
+}
+const { copy } = Astro.props;
+const icons = ['activity', 'run', 'bars', 'run', 'activity', 'target'] as const;
+---
+
+<div class="ts">
+  <div class="ts__head">
+    <p class="ts__title">{copy.title}</p>
+    <span class="ts__search"><CoachIcon name="search" size={14} />{copy.search}</span>
+  </div>
+  <div class="ts__tabs">
+    {copy.tabs.map((tab, i) => <span class:list={['ts__tab', { 'is-on': i === 0 }]}>{tab}</span>)}
+  </div>
+  <div class="ts__grid">
+    {
+      copy.cards.map((card, i) => (
+        <div class:list={['ts__card', { 'is-selected': i === copy.selected }]}>
+          <span class="ts__tile">
+            <CoachIcon name={icons[i]} size={22} />
+            {i === copy.selected && (
+              <span class="ts__check">
+                <CoachIcon name="check" size={12} />
+              </span>
+            )}
+          </span>
+          <span class="ts__name">{card.name} · {card.meta}</span>
+          <span class="ts__desc">{card.desc}</span>
+        </div>
+      ))
+    }
+  </div>
+</div>
+
+<style>
+  .ts__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .ts__title {
+    color: var(--ink);
+    font-family: var(--font-display);
+    font-size: 17px;
+    font-weight: 600;
+    line-height: 24px;
+  }
+  .ts__search {
+    display: none;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 12px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    color: var(--ink-3);
+    font-size: 12px;
+  }
+  .ts__tabs {
+    display: flex;
+    gap: 16px;
+    margin: 12px 0 14px;
+    overflow: hidden;
+    border-bottom: 1px solid var(--line);
+  }
+  .ts__tab {
+    padding: 0 0 8px;
+    color: var(--ink-2);
+    font-size: 12.5px;
+    white-space: nowrap;
+  }
+  .ts__tab.is-on {
+    margin-bottom: -1px;
+    border-bottom: 2px solid var(--cyan);
+    color: var(--ink);
+    font-weight: 600;
+  }
+  .ts__grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+  .ts__card {
+    display: grid;
+    gap: 4px;
+    align-content: start;
+    padding: 8px;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    background: var(--bg);
+  }
+  .ts__card.is-selected {
+    border: 2px solid var(--cyan);
+    padding: 7px;
+  }
+  .ts__tile {
+    position: relative;
+    display: grid;
+    place-items: center;
+    aspect-ratio: 16 / 7;
+    border-radius: 6px;
+    background: linear-gradient(135deg, var(--surface-2), var(--cyan-tint));
+    color: var(--ink-2);
+  }
+  .ts__check {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    display: grid;
+    place-items: center;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: var(--ink);
+    color: var(--bg);
+  }
+  .ts__name {
+    color: var(--ink);
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 16px;
+  }
+  .ts__desc {
+    display: none;
+    color: var(--ink-2);
+    font-size: 11.5px;
+    line-height: 15px;
+  }
+  @container bf (min-width: 560px) {
+    .ts__grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+    .ts__search {
+      display: inline-flex;
+    }
+    .ts__desc {
+      display: block;
+    }
+  }
+</style>

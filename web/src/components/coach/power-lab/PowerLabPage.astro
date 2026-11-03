@@ -1,0 +1,221 @@
+---
+import { powerLabCopy } from '../../../i18n/pages/power-lab';
+import { coachCommon } from '../../../i18n/pages/coach-common';
+import { site } from '../../../data/site';
+import type { Locale } from '../../../i18n';
+import FeatureHero from '../FeatureHero.astro';
+import StepFlow from '../StepFlow.astro';
+import ChartBaseline from '../ChartBaseline.astro';
+import AlsoInAria from '../AlsoInAria.astro';
+import CtaBand from '../CtaBand.astro';
+import CoachIcon from '../CoachIcon.astro';
+import CameraScreen from './CameraScreen.astro';
+import FrameScreen from './FrameScreen.astro';
+import ResultScreen from './ResultScreen.astro';
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const c = powerLabCopy[locale];
+const common = coachCommon[locale];
+---
+
+<FeatureHero
+  locale={locale}
+  variant="banner"
+  eyebrow={c.hero.eyebrow}
+  title={c.hero.title}
+  emphasis={c.hero.emphasis}
+  sub={c.hero.sub}
+  primary={{ label: common.startFree, href: site.signUp }}
+  secondary={{ label: c.hero.secondary, href: `#${c.flow.id}` }}
+  photo={{ slot: 'f4-powerlab', alt: c.hero.photoAlt, ratio: '1600/612', sizes: '(max-width: 900px) 100vw, 1376px' }}
+  pos="60% 50%"
+  posMobile="58% 50%"
+  zoom={1.14}
+  copyMax="54%"
+/>
+
+<section id={c.flow.id} class="section pl-flow" aria-labelledby="pl-flow-title">
+  <div class="container">
+    <h2 id="pl-flow-title" class="sr-only">{c.flow.title}</h2>
+    <div class="pl-flow__grid">
+      <StepFlow steps={c.flow.steps} stepWord={common.stepWord} variant="card">
+        <CameraScreen slot="step-0" locale={locale} copy={c.flow.camera} />
+        <FrameScreen slot="step-1" locale={locale} copy={c.flow.frames} />
+        <ResultScreen slot="step-2" locale={locale} copy={c.flow.result} />
+      </StepFlow>
+      <div class="pl-flow__chart">
+        <ChartBaseline
+          title={c.chart.title}
+          unit={c.chart.unit}
+          baseline={c.chart.baseline}
+          above={c.chart.above}
+          xLabels={c.chart.weeks}
+          values={c.chart.values}
+          band={c.chart.band}
+          range={c.chart.range}
+          label={c.chart.label}
+          demo={c.flow.result.demo}
+        />
+      </div>
+    </div>
+    <p class="pl-chart-line">{c.chart.line}</p>
+    <div class="pl-honest">
+      <CoachIcon name="info" size={22} />
+      <p class="pl-honest__text">{c.honest.text}</p>
+      <p class="pl-honest__sports">{c.honest.sports}</p>
+    </div>
+  </div>
+</section>
+
+<section class="section section--surface pl-tests" aria-labelledby="pl-tests-title">
+  <div class="container pl-tests__grid">
+    <h2 id="pl-tests-title" class="pl-tests__title" data-reveal>{c.tests.title}</h2>
+    <div>
+      <ul class="pl-tests__list">
+        {
+          c.tests.items.map((item, i) => (
+            <li data-reveal style={`--reveal-i:${i}`}>
+              <span class="pl-tests__icon">
+                <CoachIcon name="activity" size={18} />
+              </span>
+              {item}
+            </li>
+          ))
+        }
+      </ul>
+      <p class="pl-tests__note">{c.tests.note}</p>
+    </div>
+  </div>
+</section>
+
+<AlsoInAria locale={locale} ids={c.also} />
+<CtaBand locale={locale} />
+
+<style>
+  .pl-flow {
+    padding-top: 40px;
+    padding-bottom: 56px;
+  }
+  .pl-flow__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 58fr) minmax(0, 42fr);
+    gap: 16px;
+    align-items: stretch;
+  }
+  .pl-flow__chart {
+    display: flex;
+    min-width: 0;
+  }
+  .pl-flow__chart :global(.cb) {
+    flex: 1;
+  }
+  .pl-chart-line {
+    margin-top: 16px;
+    color: var(--ink-2);
+    font-size: 16px;
+    line-height: 24px;
+  }
+  .pl-honest {
+    display: flex;
+    gap: 14px;
+    align-items: center;
+    margin-top: 24px;
+    padding: 16px 22px;
+    border-radius: var(--radius-card);
+    background: var(--surface);
+    color: var(--ink-2);
+  }
+  .pl-honest :global(svg) {
+    flex: none;
+    color: var(--ink);
+  }
+  .pl-honest__text {
+    flex: 1;
+    font-size: 16px;
+    line-height: 24px;
+  }
+  .pl-honest__sports {
+    flex: none;
+    font-size: 15px;
+    line-height: 22px;
+  }
+  .pl-tests__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    gap: clamp(32px, 6vw, 96px);
+    align-items: start;
+  }
+  .pl-tests__title {
+    max-width: 12ch;
+    font-size: clamp(28px, 3vw, 40px);
+    line-height: 1.15;
+  }
+  .pl-tests__list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px 40px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .pl-tests__list li {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    color: var(--ink);
+    font-size: 18px;
+    font-weight: 500;
+    line-height: 26px;
+  }
+  .pl-tests__icon {
+    display: grid;
+    flex: none;
+    place-items: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    background: var(--cyan-tint);
+    color: var(--cyan-ink);
+  }
+  .pl-tests__note {
+    margin-top: 28px;
+    padding-top: 20px;
+    border-top: 1px solid var(--line);
+    color: var(--ink-2);
+    font-size: 15px;
+    line-height: 22px;
+  }
+
+  @media (max-width: 1200px) {
+    .pl-flow__grid {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+  @media (max-width: 960px) {
+    .pl-tests__grid {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .pl-tests__title {
+      max-width: none;
+    }
+  }
+  @media (max-width: 640px) {
+    .pl-honest {
+      flex-wrap: wrap;
+      align-items: flex-start;
+    }
+    .pl-honest__text {
+      flex: 1 1 calc(100% - 40px);
+    }
+    .pl-honest__sports {
+      padding-left: 36px;
+    }
+    .pl-tests__list {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 14px;
+    }
+  }
+</style>

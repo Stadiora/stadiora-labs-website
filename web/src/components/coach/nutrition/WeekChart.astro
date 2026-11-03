@@ -1,0 +1,161 @@
+---
+import '../../../styles/coach.css';
+import type { NutritionCopy } from '../../../i18n/pages/nutrition';
+
+interface Props {
+  copy: NutritionCopy['flow']['week'];
+}
+const { copy } = Astro.props;
+const target = 140;
+const top = 200;
+---
+
+<!-- Coach view of one athlete's protein for the week. The chart is one labelled image. -->
+<div class="wc co-card">
+  <div class="wc__head">
+    <div>
+      <p class="wc__title">{copy.title}</p>
+      <p class="wc__meta">{copy.meta}</p>
+    </div>
+    <span class="wc__more" aria-hidden="true"><i></i><i></i><i></i></span>
+  </div>
+  <div class="wc__chart" role="img" aria-label={copy.chartLabel}>
+    <div class="wc__axis" aria-hidden="true">
+      <span style={`bottom:100%`} class="num">200 g</span>
+      <span style={`bottom:${(target / top) * 100}%`} class="wc__axis-target num">140 g</span>
+      <span style="bottom:0" class="num">0 g</span>
+    </div>
+    <div class="wc__plot" aria-hidden="true">
+      <span class="wc__target" style={`bottom:${(target / top) * 100}%`}></span>
+      <ul class="wc__bars">
+        {
+          copy.values.map((v, i) => (
+            <li class:list={['wc__col', { 'is-below': v < target }]} style={`--i:${i}`}>
+              <span class="wc__bar" style={`height:${(v / top) * 100}%`}></span>
+              <span class="wc__day">{copy.days[i]}</span>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </div>
+</div>
+
+<style>
+  .wc {
+    padding: 16px 16px 14px;
+  }
+  .wc__head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .wc__title {
+    color: var(--ink);
+    font-family: var(--font-display);
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 22px;
+  }
+  .wc__meta {
+    margin-top: 2px;
+    color: var(--ink-2);
+    font-size: 14px;
+    line-height: 20px;
+  }
+  .wc__more {
+    display: inline-flex;
+    gap: 3px;
+    padding-top: 8px;
+  }
+  .wc__more i {
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: var(--ink-3);
+  }
+  .wc__chart {
+    display: grid;
+    grid-template-columns: 44px minmax(0, 1fr);
+    gap: 8px;
+    height: 176px;
+    margin-top: 14px;
+    padding-bottom: 22px;
+  }
+  .wc__axis {
+    position: relative;
+    color: var(--ink-2);
+    font-size: 12px;
+    line-height: 16px;
+  }
+  .wc__axis span {
+    position: absolute;
+    right: 0;
+    transform: translateY(50%);
+    white-space: nowrap;
+  }
+  .wc__axis-target {
+    color: var(--ink);
+    font-weight: 600;
+  }
+  .wc__plot {
+    position: relative;
+  }
+  .wc__target {
+    position: absolute;
+    right: 0;
+    left: 0;
+    z-index: 1;
+    border-top: 1.5px dashed var(--ink-3);
+  }
+  .wc__bars {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 8px;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    border-bottom: 1px solid var(--line);
+  }
+  .wc__col {
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+  }
+  .wc__bar {
+    width: min(100%, 28px);
+    border-radius: 3px 3px 0 0;
+    background: var(--cyan);
+    transform-origin: bottom;
+  }
+  .wc__col.is-below .wc__bar {
+    background: var(--surface-2);
+    box-shadow: inset 0 0 0 1px var(--line);
+  }
+  .wc__day {
+    position: absolute;
+    top: calc(100% + 6px);
+    color: var(--ink-2);
+    font-size: 12px;
+    line-height: 16px;
+  }
+
+  /* Bars grow once when the step list scrolls into view. */
+  :global(html.js) :global(.sf[data-reveal]:not(.is-in)) .wc__bar {
+    transform: scaleY(0);
+  }
+  .wc__bar {
+    transition: transform 0.6s var(--ease-out) calc(var(--i, 0) * 70ms + 500ms);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    :global(html.js) :global(.sf[data-reveal]:not(.is-in)) .wc__bar {
+      transform: none;
+    }
+    .wc__bar {
+      transition: none;
+    }
+  }
+</style>

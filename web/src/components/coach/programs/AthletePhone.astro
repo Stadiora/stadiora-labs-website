@@ -1,0 +1,166 @@
+---
+import CoachIcon from '../CoachIcon.astro';
+import Phone from '../../ui/Phone.astro';
+import type { ProgramsCopy } from '../../../i18n/pages/programs';
+
+interface Props {
+  copy: ProgramsCopy['screens']['phone'];
+  class?: string;
+}
+const { copy, class: cls } = Astro.props;
+const tabIcons = ['home', 'calendar', 'bars', 'list'] as const;
+---
+
+<Phone class={cls}>
+  <div class="ap">
+    <div class="ap__head">
+      <div>
+        <p class="ap__title">{copy.title}</p>
+        <p class="ap__date">{copy.date}</p>
+      </div>
+      <CoachIcon name="chevron-right" size={16} />
+    </div>
+    <p class="ap__section">{copy.section}</p>
+    <div class="ap__card">
+      <div class="ap__card-head">
+        <div>
+          <p class="ap__workout">{copy.workout}</p>
+          <p class="ap__week">{copy.week}</p>
+        </div>
+      </div>
+      <ul class="ap__items">
+        {
+          copy.items.map((item) => (
+            <li>
+              <span class="ap__radio" />
+              <span>
+                <span class="ap__item">{item.name}</span>
+                {item.meta && <span class="ap__meta">{item.meta}</span>}
+              </span>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+    <span class="ap__log">{copy.log}</span>
+    <div class="ap__tabs">
+      {
+        copy.tabs.map((tab, i) => (
+          <span class:list={['ap__tab', { 'is-on': i === 0 }]}>
+            <CoachIcon name={tabIcons[i]} size={14} />
+            {tab}
+          </span>
+        ))
+      }
+    </div>
+  </div>
+</Phone>
+
+<style>
+  .ap {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    min-height: 0;
+    padding: 0.4em 1em 0;
+    font-size: 0.78em;
+  }
+  .ap__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    color: var(--ink-3);
+  }
+  .ap__title {
+    font-family: var(--font-display);
+    font-size: 1.45em;
+    font-weight: 600;
+    line-height: 1.2;
+  }
+  .ap__date {
+    color: var(--ink-2);
+    font-size: 0.95em;
+  }
+  .ap__section {
+    margin: 1em 0 0.5em;
+    color: var(--ink);
+    font-size: 1em;
+    font-weight: 600;
+  }
+  .ap__card {
+    padding: 0.8em;
+    border: 1px solid var(--line);
+    border-radius: 0.9em;
+    background: var(--bg);
+  }
+  .ap__workout {
+    font-size: 1.05em;
+    font-weight: 600;
+    line-height: 1.25;
+  }
+  .ap__week {
+    color: var(--ink-2);
+    font-size: 0.9em;
+  }
+  .ap__items {
+    display: grid;
+    gap: 0.7em;
+    margin: 0.9em 0 0;
+    padding: 0.9em 0 0;
+    border-top: 1px solid var(--line);
+    list-style: none;
+  }
+  .ap__items li {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.7em;
+  }
+  .ap__radio {
+    flex: none;
+    width: 1.15em;
+    height: 1.15em;
+    margin-top: 0.05em;
+    border: 1.5px solid var(--ink-3);
+    border-radius: 50%;
+  }
+  .ap__item {
+    display: block;
+    font-size: 0.98em;
+    font-weight: 500;
+    line-height: 1.25;
+  }
+  .ap__meta {
+    display: block;
+    color: var(--ink-2);
+    font-size: 0.86em;
+    line-height: 1.25;
+  }
+  .ap__log {
+    display: grid;
+    place-items: center;
+    height: 2.7em;
+    margin-top: auto;
+    border-radius: 0.7em;
+    background: var(--btn-bg);
+    color: var(--btn-ink);
+    font-size: 1em;
+    font-weight: 600;
+  }
+  .ap__tabs {
+    display: flex;
+    justify-content: space-between;
+    margin: 0.7em -1em 0;
+    padding: 0.6em 1em 0.8em;
+    border-top: 1px solid var(--line);
+  }
+  .ap__tab {
+    display: grid;
+    justify-items: center;
+    gap: 0.15em;
+    color: var(--ink-3);
+    font-size: 0.72em;
+  }
+  .ap__tab.is-on {
+    color: var(--cyan-ink);
+  }
+</style>

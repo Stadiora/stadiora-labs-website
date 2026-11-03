@@ -1,0 +1,92 @@
+---
+import CoachIcon from '../CoachIcon.astro';
+import Phone from '../../ui/Phone.astro';
+import PhoneHead from './PhoneHead.astro';
+import type { ReadinessCopy } from '../../../i18n/pages/readiness';
+
+interface Props {
+  copy: ReadinessCopy['phones']['mind'];
+}
+const { copy } = Astro.props;
+const icons = ['lotus', 'file', 'smile'] as const;
+---
+
+<Phone>
+  <div class="mp">
+    <PhoneHead title={copy.title} back={false} />
+    <p class="mp__lead">{copy.lead}</p>
+    <ul class="mp__tiles">
+      {
+        copy.tiles.map((t, i) => (
+          <li>
+            <span class="mp__icon">
+              <CoachIcon name={icons[i]} size={18} />
+            </span>
+            <span class="mp__text">
+              <span class="mp__name">{t.name}</span>
+              <span class="mp__line">{t.line}</span>
+            </span>
+            <CoachIcon name="chevron-right" size={12} />
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</Phone>
+
+<style>
+  .mp {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    padding: 0.2em 1em 1em;
+    font-size: 0.95em;
+  }
+  .mp__lead {
+    margin: 0.5em 0 1.1em;
+    color: var(--ink);
+    font-family: var(--font-display);
+    font-size: 1.3em;
+    font-weight: 600;
+    line-height: 1.25;
+  }
+  .mp__tiles {
+    display: grid;
+    gap: 0.7em;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .mp__tiles li {
+    display: flex;
+    align-items: center;
+    gap: 0.8em;
+    padding: 0.8em;
+    border: 1px solid var(--line);
+    border-radius: 0.8em;
+    color: var(--ink-3);
+  }
+  .mp__icon {
+    display: grid;
+    flex: none;
+    place-items: center;
+    width: 2.6em;
+    height: 2.6em;
+    border-radius: 0.7em;
+    background: var(--cyan-tint);
+    color: var(--cyan-ink);
+  }
+  .mp__text {
+    display: grid;
+    flex: 1;
+    min-width: 0;
+  }
+  .mp__name {
+    color: var(--ink);
+    font-weight: 600;
+  }
+  .mp__line {
+    color: var(--ink-2);
+    font-size: 0.9em;
+  }
+</style>

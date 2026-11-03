@@ -1,0 +1,272 @@
+---
+import '../../styles/coach.css';
+import Photo from '../ui/Photo.astro';
+import type { Locale } from '../../i18n';
+
+interface Cta {
+  label: string;
+  href: string;
+}
+interface Props {
+  locale: Locale;
+  /** banner: full-width photo with the copy over a fade on the left; split: copy beside the photo. */
+  variant: 'banner' | 'split';
+  eyebrow: string;
+  title: string;
+  /** Phrase inside the title that gets the cyan lane underline. */
+  emphasis?: string;
+  sub?: string;
+  primary: Cta;
+  secondary: Cta;
+  photo: { slot: string; alt: string; ratio: string; sizes: string; widths?: number[] };
+  /** object-position for desktop and mobile crops, e.g. `70% 40%`. */
+  pos?: string;
+  posMobile?: string;
+  /** Flip the photo so its subject sits on the right, away from the copy. */
+  mirror?: boolean;
+  /** Split only: `overlap` hangs the pop card over the photo's left edge, `inside` keeps it within the photo. */
+  popAt?: 'overlap' | 'inside';
+  /** Split only: photo frame ratio on desktop and on a stacked layout. The image is cropped to fit. */
+  ratio?: string;
+  ratioMobile?: string;
+  /** Banner only, wide screens: enlarge the photo from its left edge to move the subject right, away from the copy. */
+  zoom?: number;
+  /** Banner only: width of the copy column, e.g. `46%`. */
+  copyMax?: string;
+}
+const {
+  locale,
+  variant,
+  eyebrow,
+  title,
+  emphasis,
+  sub,
+  primary,
+  secondary,
+  photo,
+  pos = '50% 50%',
+  posMobile,
+  mirror = false,
+  popAt = 'overlap',
+  ratio = '2 / 1',
+  ratioMobile = '4 / 3',
+  zoom,
+  copyMax,
+} = Astro.props;
+
+const at = emphasis ? title.indexOf(emphasis) : -1;
+const parts = at >= 0 ? [title.slice(0, at), emphasis!, title.slice(at + emphasis!.length)] : [title];
+const vars = [`--pos:${pos}`, `--pos-m:${posMobile ?? pos}`, `--fh-ratio:${ratio}`, `--fh-ratio-m:${ratioMobile}`, zoom ? `--zoom:${zoom}` : '', copyMax ? `--copy-max:${copyMax}` : '']
+  .filter(Boolean)
+  .join(';');
+---
+
+<section class:list={['fh', `fh--${variant}`, `fh--pop-${popAt}`, { 'fh--mirror': mirror, 'fh--zoom': !!zoom }]} aria-labelledby="fh-title" style={vars}>
+  <div class="container">
+    <div class="fh__frame">
+      <div class="fh__media">
+        <div class="fh__img">
+          <Photo
+            slot={photo.slot}
+            alt={photo.alt}
+            ratio={photo.ratio}
+            sizes={photo.sizes}
+            widths={photo.widths ?? [640, 1000, 1600]}
+            locale={locale}
+            eager
+          />
+        </div>
+        <div class="fh__pop"><slot name="pop" /></div>
+      </div>
+      <div class="fh__copy">
+        <p class="co-eyebrow">{eyebrow}</p>
+        <h1 id="fh-title" class="fh__title">
+          {parts.length === 3 ? <>{parts[0]}<span class="lane-under">{parts[1]}</span>{parts[2]}</> : parts[0]}
+        </h1>
+        {sub && <p class="fh__sub">{sub}</p>}
+        <div class="fh__cta">
+          <a class="btn btn--lg btn--primary" href={primary.href}>{primary.label}</a>
+          <a class="btn btn--lg btn--secondary" href={secondary.href}>{secondary.label}</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .fh {
+    padding-top: 24px;
+    padding-bottom: 48px;
+  }
+  .fh__title {
+    font-size: clamp(36px, 3.9vw, 56px);
+    line-height: 1.07;
+    letter-spacing: -0.02em;
+    text-wrap: balance;
+  }
+  .fh__sub {
+    max-width: 34em;
+    margin-top: 20px;
+    color: var(--ink-2);
+    font-size: 22px;
+    line-height: 32px;
+  }
+  .fh__cta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-top: 32px;
+  }
+
+  /* Banner */
+  .fh--banner .fh__frame {
+    position: relative;
+    display: flex;
+    align-items: center;
+    min-height: clamp(400px, 36vw, 500px);
+    overflow: hidden;
+    border-radius: 20px;
+    background: var(--surface);
+  }
+  .fh--banner .fh__media,
+  .fh--banner .fh__img {
+    position: absolute;
+    inset: 0;
+  }
+  .fh--banner .fh__pop {
+    display: none;
+  }
+  .fh--banner .fh__img::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      90deg,
+      light-dark(rgb(255 255 255 / 0.97), rgb(6 14 32 / 0.96)) 0%,
+      light-dark(rgb(255 255 255 / 0.94), rgb(6 14 32 / 0.92)) 38%,
+      light-dark(rgb(255 255 255 / 0.5), rgb(6 14 32 / 0.5)) 52%,
+      transparent 70%
+    );
+    pointer-events: none;
+  }
+  .fh--banner .fh__copy {
+    position: relative;
+    max-width: var(--copy-max, min(58%, 720px));
+    padding: 56px 0 56px clamp(28px, 4vw, 56px);
+  }
+
+  /* Split */
+  .fh--split .fh__frame {
+    display: grid;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    gap: clamp(40px, 5vw, 80px);
+    align-items: center;
+  }
+  .fh--split .fh__copy {
+    padding-block: 24px;
+  }
+  .fh--split .fh__media {
+    position: relative;
+    order: 2;
+  }
+  .fh--split .fh__img {
+    aspect-ratio: var(--fh-ratio);
+    overflow: hidden;
+    border-radius: 20px;
+  }
+  .fh--split .fh__pop {
+    position: absolute;
+    left: clamp(-40px, -2.5vw, -16px);
+    bottom: 36px;
+    z-index: 1;
+  }
+  .fh--split .fh__pop:empty {
+    display: none;
+  }
+  .fh--pop-inside .fh__pop {
+    left: 20px;
+    bottom: 20px;
+  }
+
+  .fh__img :global(.photo) {
+    object-position: var(--pos);
+  }
+  .fh--mirror .fh__img :global(.photo) {
+    transform: scaleX(-1);
+  }
+  @media (min-width: 901px) {
+    .fh--zoom .fh__img :global(.photo) {
+      transform: scale(var(--zoom));
+      transform-origin: 0% 22%;
+    }
+  }
+
+  @media (max-width: 1100px) {
+    .fh--banner .fh__copy {
+      max-width: var(--copy-max, 60%);
+    }
+  }
+
+  @media (max-width: 900px) {
+    .fh--banner .fh__frame {
+      display: block;
+      min-height: 0;
+      overflow: visible;
+      border-radius: 0;
+      background: none;
+    }
+    .fh--banner .fh__media {
+      position: relative;
+      inset: auto;
+      overflow: hidden;
+      border-radius: 16px;
+      aspect-ratio: 16 / 11;
+    }
+    .fh--banner .fh__img {
+      inset: 0;
+    }
+    .fh--banner .fh__img::after {
+      display: none;
+    }
+    .fh--banner .fh__copy {
+      max-width: none;
+      padding: 28px 0 0;
+    }
+    .fh--split .fh__frame {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 28px;
+    }
+    .fh--split .fh__media {
+      order: -1;
+    }
+    .fh--split .fh__img {
+      aspect-ratio: var(--fh-ratio-m);
+    }
+    .fh--split .fh__pop {
+      position: relative;
+      left: auto;
+      bottom: auto;
+      margin: -40px 0 0 16px;
+    }
+    .fh__img :global(.photo) {
+      object-position: var(--pos-m);
+    }
+    .fh__sub {
+      font-size: 18px;
+      line-height: 26px;
+    }
+  }
+
+  @media (max-width: 720px) {
+    .fh {
+      padding-top: 12px;
+      padding-bottom: 40px;
+    }
+    .fh__cta {
+      flex-direction: column;
+    }
+    .fh__cta .btn {
+      width: 100%;
+    }
+  }
+</style>

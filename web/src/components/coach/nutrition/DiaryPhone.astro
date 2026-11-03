@@ -1,0 +1,100 @@
+---
+import CoachIcon from '../CoachIcon.astro';
+import Phone from '../../ui/Phone.astro';
+import MealRow from './MealRow.astro';
+import type { NutritionCopy } from '../../../i18n/pages/nutrition';
+
+interface Props {
+  copy: NutritionCopy['flow']['diary'];
+}
+const { copy } = Astro.props;
+---
+
+<!-- Athlete food diary. The phone is cropped at the bottom so it lines up with the cards beside it. -->
+<div class="dp">
+  <Phone>
+    <div class="dp__body">
+      <div class="dp__nav">
+        <CoachIcon name="chevron-left" size={14} />
+        <span class="dp__today">{copy.title}</span>
+        <CoachIcon name="chevron-right" size={14} />
+      </div>
+      <ul class="dp__meals">
+        {
+          copy.meals.map((m) => (
+            <li>
+              <MealRow name={m.name} food={m.food} kcal={m.kcal} />
+            </li>
+          ))
+        }
+      </ul>
+      <div class="dp__actions">
+        <span class="dp__btn dp__btn--flat"><CoachIcon name="barcode" size={14} />{copy.scan}</span>
+        <span class="dp__btn dp__btn--solid"><CoachIcon name="camera" size={14} />{copy.snap}</span>
+      </div>
+    </div>
+  </Phone>
+</div>
+
+<style>
+  .dp {
+    --phone-w: 232px;
+    display: flex;
+    justify-content: center;
+    height: calc(var(--phone-w) * 1.34);
+    overflow: hidden;
+  }
+  .dp__body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.7em;
+    padding: 0.5em 0.9em 0;
+    font-size: 0.86em;
+  }
+  .dp__nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.3em 1.2em 0.5em;
+    color: var(--ink-3);
+  }
+  .dp__today {
+    color: var(--ink);
+    font-weight: 600;
+  }
+  .dp__meals {
+    display: grid;
+    margin: 0 -0.9em;
+    padding: 0;
+    list-style: none;
+  }
+  .dp__meals li {
+    padding: 0.7em 0.9em;
+    border-top: 1px solid var(--line);
+  }
+  .dp__actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.6em;
+    margin-top: 0.3em;
+  }
+  .dp__btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.35em;
+    min-height: 2.8em;
+    padding: 0 0.3em;
+    border: 1px solid var(--line);
+    border-radius: 0.7em;
+    font-size: 0.82em;
+    font-weight: 600;
+    line-height: 1.1;
+    text-align: center;
+  }
+  .dp__btn--solid {
+    border-color: transparent;
+    background: var(--btn-bg);
+    color: var(--btn-ink);
+  }
+</style>
