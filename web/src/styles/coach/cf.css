@@ -314,9 +314,12 @@ html:not(.js) .cf-page .rv-mask {
   }
 }
 
-/* A hidden tab stops every loop on the page (set by scripts/coach/index.ts). */
-.cf-tab-hidden main *,
-.cf-tab-hidden main *::before,
-.cf-tab-hidden main *::after {
+/* One moving stage is one pause unit (scripts/coach/stages.ts). Its autoplayer sets data-ap="off" while the unit is hovered, holds
+   focus (the accordion buttons live inside their unit), is off screen, sits in a hidden tab or runs under reduced motion, and every
+   CSS loop inside it stops together with its clip. One-shot replies (the count-up, the accordion screen sliding in) are not loops
+   and finish on their own. */
+[data-cf-stage][data-ap='off'] :not(.count, .acc__screen),
+[data-cf-stage][data-ap='off'] :not(.count, .acc__screen)::before,
+[data-cf-stage][data-ap='off'] :not(.count, .acc__screen)::after {
   animation-play-state: paused !important;
 }

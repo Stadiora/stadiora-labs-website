@@ -6,6 +6,8 @@ import { existsSync, readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { coachSlugs } from './platform-coach-verify.mjs';
 import { contrastProbe } from './contrast.mjs';
+import { coachAiContrastChecks } from './coach-contrast-checks.mjs';
+import { coachMotionChecks } from './coach-motion-checks.mjs';
 
 const dist = fileURLToPath(new URL('../../dist/', import.meta.url));
 const widths = [
@@ -211,9 +213,8 @@ export async function platformCoachChecks({ open, check, shot, el, sleep, settle
           const page = await open({ width, height, scheme, reduced: true, mobile: width < 500 }, path);
           await settle(page);
           // The shared probe (also used by the home and engage checks) knows the fixed nav over a dark hero, visually hidden text and
-          // [data-decorative]. Aria-hidden demo screens are measured too, since sighted users read them. The home AI demo stage is
-          // the home checks' territory (its avatar chips are measured there), so it is left out here.
-          await page.evaluate(() => document.querySelectorAll('.ai-stage').forEach((n) => n.setAttribute('data-decorative', '')));
+          // [data-decorative]. Aria-hidden demo screens are measured too, since sighted users read them, and so is the whole AI demo
+          // stage: nothing on a page is exempt unless the element itself carries [data-decorative].
           const c = await page.evaluate(contrastProbe, { includeAriaHidden: true });
           check('coach-contrast', `${tag} ${scheme} ${width}: text meets WCAG AA (4.5:1, 3:1 large)`, c.failCount === 0, `${c.checked} text nodes, lowest ${c.min.toFixed(2)}:1${c.failCount ? `, failing: ${JSON.stringify(c.fails)}` : ''}; ${c.skippedImage} over images skipped`);
           metrics[`coach-contrast-${slug}-${locale}-${scheme}-${width}`] = { checked: c.checked, lowest: Number(c.min.toFixed(2)) };
@@ -269,7 +270,12 @@ export async function platformCoachChecks({ open, check, shot, el, sleep, settle
     }
   }
 
+  // The AI demo on the programs page: canary and every frame of its timeline (the rest-state probe above sees only some cards).
+  await coachAiContrastChecks({ open, check, sleep, settle });
+
   // ---- 2. interactions (motion on)
+  // Hover and focus pause, measured on rendered values for every moving stage on every page.
+  await coachMotionChecks({ open, check, sleep, settle, metrics });
   for (const locale of locales) {
     // Accordions: programs and readiness.
     for (const slug of ['programs', 'readiness']) {

@@ -30,7 +30,7 @@ const { id, items, open = 0, label, backdrop, wide = false } = Astro.props;
 const screens = await Promise.all(items.map((_, i) => Astro.slots.render(`screen-${i}`)));
 ---
 
-<div class:list={['acc', { 'acc--wide': wide }]} data-accordion role="group" aria-label={label}>
+<div class:list={['acc', { 'acc--wide': wide }]} id={`${id}-acc`} data-accordion data-cf-stage="accordion" role="group" aria-label={label}>
   <div class="acc__list">
     {
       items.map((item, i) => (
@@ -71,7 +71,7 @@ const screens = await Promise.all(items.map((_, i) => Astro.slots.render(`screen
     {
       backdrop && (
         <>
-          <video muted playsinline loop preload="none" data-clip data-poster={`/home/media/${backdrop}.webp`} tabindex="-1">
+          <video muted playsinline loop preload="none" data-clip data-ap-within={`#${id}-acc`} data-poster={`/home/media/${backdrop}.webp`} tabindex="-1">
             <source src={`/home/media/${backdrop}.webm`} type="video/webm" />
             <source src={`/home/media/${backdrop}.mp4`} type="video/mp4" />
           </video>

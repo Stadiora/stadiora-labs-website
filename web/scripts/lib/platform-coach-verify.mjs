@@ -127,7 +127,7 @@ export function verifyCoachPages({ dist, fail }) {
       if (!/\brel="[^"]*noopener/.test(m[0])) failHere(`${page.file}: target=_blank link without noopener`);
     }
 
-    verifyCoachFloodlight({ html, file: page.file, slug: page.slug, lang: page.lang, fail: failHere });
+    verifyCoachFloodlight({ html, file: page.file, slug: page.slug, lang: page.lang, dist, fail: failHere });
 
     // The language switch and the hreflang pair must point at each other.
     if (!html.includes(`href="${page.alt}"`)) failHere(`${page.file}: no link to the ${page.lang === 'en' ? 'Spanish' : 'English'} version`);

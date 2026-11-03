@@ -75,7 +75,7 @@ const items = c.rows.map((r) => ({ title: r.title, body: r.body, ai: r.key === '
         </div>
         <p class="lead rv" style="--i:1">{c.proof.sub}</p>
       </div>
-      <div class="pg-send rv" style="--i:1">
+      <div class="pg-send rv" style="--i:1" data-cf-stage="send">
         <div class="pg-send__col">
           <p class="pg-send__label">{c.proof.plan}</p>
           <div class="cf-panel reading pg-send__panel">

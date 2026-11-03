@@ -12,6 +12,10 @@ export const POSTER_BUDGET_BYTES = 120 * 1024;
 // over the WebM, MP4 and poster, so a swapped or re-rendered clip fails until someone checks it for text and updates the entry.
 export const TEXT_FREE_MEDIA = {
   'ai-bg': '82d7531a7c3b2dde',
+  'coach-nutrition': '61fa56060b9823e7',
+  'coach-powerlab': '26ce09d55020648f',
+  'coach-programs': '7ac1bf4edae39701',
+  'coach-readiness': '1a9a26ad89bf81c1',
   'engage-bg': '648bdbedf0a8614a',
   'night-stadium': '62013905b740b5c4',
   'pillar-nutrition': '3e372fae7c626474',

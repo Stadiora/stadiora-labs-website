@@ -16,7 +16,7 @@ interface Props {
 const { steps, stepWord, variant = 'open', label } = Astro.props;
 ---
 
-<ol class:list={['sf', `sf--${variant}`]} data-reveal aria-label={label}>
+<ol class:list={['sf', `sf--${variant}`]} data-reveal data-cf-stage={variant === 'open' ? 'steps' : undefined} aria-label={label}>
   {
     steps.map((step, i) => (
       <li class="sf__step" style={`--i:${i}`}>

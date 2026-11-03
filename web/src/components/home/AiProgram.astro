@@ -36,11 +36,12 @@ const plan: Session[][] = [
   ],
 ];
 const draft = plan[0].map((x, k) => ({ ...x, id: `r${k + 1}` }));
+// Initials are 10px text, so each chip pairs its fill with an ink that reaches AA (the phone avatars in phone.css use the same fills).
 const avatars = [
-  { ini: 'VA', color: '#00BEF3' },
-  { ini: 'DM', color: '#8B5CF6' },
-  { ini: 'JR', color: '#34D399' },
-  { ini: '+15', color: '#FF4D5E' },
+  { ini: 'VA', color: '#0077A8', ink: '#fff' },
+  { ini: 'DM', color: '#7C4DE8', ink: '#fff' },
+  { ini: 'JR', color: '#34D399', ink: '#04101F' },
+  { ini: '+15', color: '#D6263A', ink: '#fff' },
 ];
 ---
 
@@ -79,7 +80,7 @@ const avatars = [
               <b>{s.calendarTitle}</b>
               <span class="sp">
                 <span class="avs">
-                  {avatars.map((a) => <i style={`--c:${a.color}`}>{a.ini}</i>)}
+                  {avatars.map((a) => <i style={`--c:${a.color};color:${a.ink}`}>{a.ini}</i>)}
                 </span>
                 <span class="seg">
                   <span>{s.range[0]}</span><span class="on">{s.range[1]}</span><span>{s.range[2]}</span>
