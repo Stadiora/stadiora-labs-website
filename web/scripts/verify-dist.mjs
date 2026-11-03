@@ -8,6 +8,7 @@ import { verifyPricing } from './lib/pricing-verify.mjs';
 import { pendingReport } from './lib/engage-links.mjs';
 import { engagePages, verifyEngagePages } from './lib/engage-verify.mjs';
 import { verifySolutions } from './lib/verify-solutions.mjs';
+import { verifyHomeMedia, verifyHomeVideos } from './lib/home-verify.mjs';
 
 const dist = fileURLToPath(new URL('../dist/', import.meta.url));
 const errors = [];
@@ -74,7 +75,9 @@ for (const page of pages) {
   for (const m of html.matchAll(/<img\b[^>]*>/g)) {
     if (!/\salt(=|\s|\/?>)/.test(m[0])) fail(`${page.file}: img without alt: ${m[0].slice(0, 80)}`);
   }
+  verifyHomeVideos({ dist, html, file: page.file, fail });
 }
+verifyHomeMedia({ dist, fail });
 
 verifyPricing(dist, fail);
 verifySolutions({ dist, fail });

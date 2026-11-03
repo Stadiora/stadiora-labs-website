@@ -2,7 +2,8 @@
 // Rules every primitive follows:
 //  - Reduced motion is checked live; nothing autoplays or loops under it and every effect has a still state.
 //  - An autoplayer runs only while its host is on screen, the tab is visible, and the pointer and focus are
-//    elsewhere. The state is mirrored to data-ap / data-ap-why so the guards can assert it.
+//    elsewhere. The state is mirrored to data-ap / data-ap-why (and the hover/focus element is marked
+//    data-ap-scope) so the guards can assert it.
 //  - Only transform, opacity and clip-path animate (plus short filter swaps).
 
 const RMQ = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -39,6 +40,8 @@ export interface Autoplayer {
 
 export function autoplayer(host: HTMLElement, opts: AutoplayerOptions): Autoplayer {
   const within = opts.within ?? host;
+  // Marks the element whose hover and focus pause this host, so the guards can find it.
+  within.setAttribute('data-ap-scope', '');
   const seen = { visible: false, hover: false, focus: false };
   let running = false;
   let first = true;
