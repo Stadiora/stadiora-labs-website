@@ -1,0 +1,286 @@
+---
+import Page from '../../layouts/Page.astro';
+import Photo from '../ui/Photo.astro';
+import CtaBand from '../ui/CtaBand.astro';
+import PersonCard from '../company/PersonCard.astro';
+import { about } from '../../i18n/pages/about';
+import { altFor } from '../../i18n/pages/common';
+import { clientLogos } from '../../data/logos';
+import { useDict, type Locale } from '../../i18n';
+import { hrefFor } from '../../data/nav';
+import { investorsHref } from '../../lib/links';
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const c = about[locale];
+const t = useDict(locale);
+const logos = clientLogos;
+const icons = {
+  science: 'M9 3h6M10 3v6.2L4.6 18.4A2 2 0 0 0 6.3 21.4h11.4a2 2 0 0 0 1.7-3L14 9.2V3M7.5 15h9',
+  access: 'M4 20V13M10 20V9M16 20V5M22 20H2',
+};
+---
+
+<Page locale={locale} path="/about/" title={c.meta.title} description={c.meta.description}>
+  <section class="ahero" aria-labelledby="about-title">
+    <div class="container ahero__grid">
+      <div class="ahero__copy">
+        <p class="eyebrow">{c.eyebrow}</p>
+        <h1 id="about-title" class="ahero__title h-lane">{c.title}</h1>
+        <p class="ahero__sub">{c.sub}</p>
+        <p class="ahero__mission">{c.mission}</p>
+      </div>
+      <div class="ahero__photo">
+        <Photo slot="c1-about-track" ratio="16/9" sizes="(max-width: 1100px) 92vw, 760px" alt={altFor('c1-about-track', locale)} eager />
+      </div>
+    </div>
+  </section>
+
+  <section class="values section--tight-top">
+    <div class="container values__grid">
+      {
+        c.values.map((v) => (
+          <div class="pcard value">
+            <svg class="value__icon" viewBox="0 0 24 24" width="44" height="44" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              {v.id === 'science' && <path d={icons.science} />}
+              {v.id === 'access' && <path d={icons.access} />}
+              {v.id === 'coaches' && (
+                <>
+                  <circle cx="12" cy="6.5" r="2.7" />
+                  <circle cx="5.2" cy="9.2" r="2.1" />
+                  <circle cx="18.8" cy="9.2" r="2.1" />
+                  <path d="M7.6 20v-3.4a4.4 4.4 0 0 1 8.8 0V20M1.6 17v-1.5a3.4 3.4 0 0 1 4.2-3.3M22.4 17v-1.5a3.4 3.4 0 0 0-4.2-3.3" />
+                </>
+              )}
+            </svg>
+            <div>
+              <h2 class="value__title">{v.title}</h2>
+              <p class="value__text">{v.text}</p>
+            </div>
+          </div>
+        ))
+      }
+    </div>
+  </section>
+
+  <section class="team section section--surface" aria-labelledby="team-title">
+    <div class="container">
+      <div class="team__head">
+        <h2 id="team-title" class="team__title h-lane">{c.team.title}</h2>
+        <p class="team__hint">{c.team.hint}</p>
+      </div>
+      <ul class="team__grid">
+        {
+          c.team.people.map((person) => (
+            <li class="team__item">
+              <PersonCard {person} linkLabel={c.team.linkLabel} closeLabel={c.team.close} />
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <section class="partners" aria-labelledby="partners-label">
+    <div class="container partners__inner">
+      <div class="partners__count">
+        <p class="partners__label" id="partners-label">{t.logos.label}</p>
+        <p class="partners__num num">{t.logos.count}</p>
+      </div>
+      <ul class="partners__list" aria-label={t.logos.listLabel}>
+        {
+          logos.map((logo) => (
+            <li class="partners__item" style={`--lh:${logo.h}px`}>
+              <img class="only-light" src={`/logos/${logo.slug}-mono-dark.${logo.ext}`} alt={logo.name} width={Math.round((logo.h * logo.width) / logo.height)} height={logo.h} loading="lazy" decoding="async" />
+              <img class="only-dark" src={`/logos/${logo.slug}-mono-light.${logo.ext}`} alt={logo.name} width={Math.round((logo.h * logo.width) / logo.height)} height={logo.h} loading="lazy" decoding="async" />
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <CtaBand
+    id="work-title"
+    title={c.work.title}
+    actions={[
+      { label: c.work.contact, href: hrefFor('contact', locale) },
+      { label: c.work.investors, href: investorsHref, tone: 'outline' },
+    ]}
+  />
+</Page>
+
+<style>
+  .ahero {
+    padding-block: 48px 40px;
+  }
+  .ahero__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    gap: 48px;
+    align-items: center;
+  }
+  .ahero__title {
+    margin-top: 12px;
+    font-size: clamp(40px, 4.7vw, 64px);
+    line-height: 1.07;
+    letter-spacing: -0.02em;
+    text-wrap: balance;
+  }
+  .ahero__sub {
+    margin-top: 28px;
+    color: var(--ink-2);
+    font-size: clamp(18px, 1.7vw, 22px);
+    line-height: 1.45;
+  }
+  .ahero__mission {
+    margin-top: 24px;
+    padding-left: 20px;
+    border-left: 4px solid var(--cyan-ink);
+    color: var(--ink);
+    font-size: clamp(18px, 1.7vw, 22px);
+    line-height: 1.4;
+  }
+  .ahero__photo {
+    overflow: hidden;
+    border-radius: var(--radius-card);
+  }
+  .values__grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 20px;
+  }
+  .value {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: 20px 24px;
+  }
+  .value__icon {
+    flex: none;
+    color: var(--cyan-ink);
+  }
+  .value__title {
+    font-size: 20px;
+    line-height: 26px;
+  }
+  .value__text {
+    margin-top: 2px;
+    color: var(--ink-2);
+    font-size: 17px;
+    line-height: 24px;
+  }
+  .team {
+    margin-top: 40px;
+  }
+  .team__head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 8px 24px;
+  }
+  .team__title {
+    font-size: clamp(28px, 3vw, 40px);
+    line-height: 1.15;
+  }
+  .team__hint {
+    color: var(--ink-2);
+    font-size: 16px;
+  }
+  .team__grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 16px;
+    margin-top: 28px;
+  }
+  .team__item {
+    display: flex;
+    min-width: 0;
+  }
+  .team__item :global(.person) {
+    flex: 1;
+  }
+  .partners {
+    padding-block: 36px 48px;
+    border-top: 1px solid var(--line);
+  }
+  .partners__inner {
+    display: flex;
+    align-items: center;
+    gap: 40px;
+  }
+  .partners__count {
+    flex: none;
+    padding-right: 40px;
+    border-right: 1px solid var(--line);
+  }
+  .partners__label {
+    color: var(--ink-2);
+    font-size: 16px;
+  }
+  .partners__num {
+    font-family: var(--font-display);
+    font-size: 64px;
+    font-weight: 700;
+    line-height: 1.05;
+    margin-top: 6px;
+  }
+  .partners__list {
+    display: flex;
+    flex: 1;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px 32px;
+  }
+  .partners__item img {
+    display: block;
+    width: auto;
+    height: var(--lh);
+    max-width: none;
+  }
+  @media (max-width: 1280px) {
+    .team__grid {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+  @media (max-width: 1100px) {
+    .ahero__grid {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 32px;
+    }
+    .values__grid {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .team__grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .partners__inner {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 24px;
+    }
+    .partners__count {
+      padding-right: 0;
+      border-right: 0;
+    }
+  }
+  @media (max-width: 720px) {
+    .ahero {
+      padding-block: 32px 24px;
+    }
+    .team__grid {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .partners__item img {
+      height: calc(var(--lh) * 0.75);
+    }
+  }
+</style>
+
+<script>
+  import '../../scripts/team-popover';
+</script>

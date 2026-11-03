@@ -1,0 +1,417 @@
+---
+import Page from '../../layouts/Page.astro';
+import Photo from '../ui/Photo.astro';
+import Icon from '../ui/Icon.astro';
+import { contact } from '../../i18n/pages/contact';
+import { altFor } from '../../i18n/pages/common';
+import { site } from '../../data/site';
+import { hrefFor } from '../../data/nav';
+import type { Locale } from '../../i18n';
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const c = contact[locale];
+const f = c.fields;
+const mailPayload = JSON.stringify({
+  to: site.email,
+  demoSubject: c.mail.demoSubject,
+  questionSubject: c.mail.questionSubject,
+  labels: c.mail.labels,
+  opening: c.opening,
+});
+---
+
+<Page locale={locale} path="/contact/" title={c.meta.title} description={c.meta.description}>
+  <section class="contact">
+    <div class="container contact__grid">
+      <div class="contact__main">
+        <h1 class="contact__title h-lane">{c.title}</h1>
+        <p class="contact__sub">{c.sub}</p>
+      </div>
+
+      <aside class="contact__side" aria-label={c.chat.title}>
+        <div class="contact__photo">
+          <Photo slot="c2-contact-coach" ratio="4/5" sizes="(max-width: 900px) 92vw, 640px" alt={altFor('c2-contact-coach', locale)} />
+        </div>
+        <div class="pcard chat" id="chat">
+          <h2 class="chat__title">{c.chat.title}</h2>
+          <ul class="chat__list">
+            <li>
+              <a class="chat__row" href={site.whatsappUrl} target="_blank" rel="noopener noreferrer">
+                <svg class="chat__icon" viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M3 21l1.7-5A8.5 8.5 0 1 1 8 19.3L3 21z" />
+                  <path d="M9 9.2c0 3.2 2.6 5.8 5.8 5.8l1.1-1.4-1.9-1-.9.7c-.9-.4-1.7-1.2-2.1-2.1l.7-.9-1-1.9L9 9.2z" />
+                </svg>
+                <span><strong>{c.chat.whatsapp}</strong> · <span class="num">{site.whatsappLabel}</span></span>
+              </a>
+            </li>
+            <li>
+              <a class="chat__row" href={`mailto:${site.email}`}>
+                <Icon name="mail" size={32} class="chat__icon" />
+                <span><strong>{c.chat.email}</strong> · {site.email}</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+      </aside>
+
+      <form
+        class="form"
+        id="contact-form"
+        action={`mailto:${site.email}`}
+        method="post"
+        enctype="text/plain"
+        data-contact-form
+        data-mail={mailPayload}
+        data-err-name={c.errors.name}
+        data-err-email={c.errors.email}
+        data-err-role={c.errors.role}
+      >
+        <fieldset class="seg">
+          <legend class="sr-only">{c.topicLabel}</legend>
+          <label class="seg__opt">
+            <input type="radio" name="topic" value="demo" id="topic-demo" checked />
+            <span>{c.topics.demo}</span>
+          </label>
+          <label class="seg__opt">
+            <input type="radio" name="topic" value="question" id="topic-question" />
+            <span>{c.topics.question}</span>
+          </label>
+        </fieldset>
+
+        <div class="form__grid">
+          <div class="field">
+            <label for="f-name">{f.name.label}</label>
+            <input id="f-name" name="name" type="text" autocomplete="name" placeholder={f.name.placeholder} required aria-describedby="e-name" />
+            <p class="field__error" id="e-name" hidden></p>
+          </div>
+          <div class="field">
+            <label for="f-email">{f.email.label}</label>
+            <input id="f-email" name="email" type="email" autocomplete="email" inputmode="email" placeholder={f.email.placeholder} required aria-describedby="e-email" />
+            <p class="field__error" id="e-email" hidden></p>
+          </div>
+          <div class="field">
+            <label for="f-role">{f.role.label}</label>
+            <select id="f-role" name="role" required aria-describedby="e-role">
+              <option value="" selected disabled>{f.role.placeholder}</option>
+              {f.role.options.map((o) => <option value={o.label}>{o.label}</option>)}
+            </select>
+            <p class="field__error" id="e-role" hidden></p>
+          </div>
+          <div class="field">
+            <label for="f-org">{f.org.label}</label>
+            <input id="f-org" name="organization" type="text" autocomplete="organization" placeholder={f.org.placeholder} />
+          </div>
+          <div class="field field--wide only-demo" data-demo-only>
+            <label for="f-athletes">{f.athletes.label}</label>
+            <select id="f-athletes" name="athletes">
+              <option value="" selected>{f.athletes.placeholder}</option>
+              {f.athletes.options.map((o) => <option value={o}>{o}</option>)}
+            </select>
+          </div>
+          <div class="field field--wide">
+            <label for="f-message">
+              <span class="for-demo">{f.message.demo}</span>
+              <span class="for-question">{f.message.question}</span>
+            </label>
+            <textarea id="f-message" name="message" rows="4" placeholder={f.message.placeholder}></textarea>
+          </div>
+        </div>
+
+        <button class="btn btn--primary btn--lg form__submit" type="submit">
+          <span class="for-demo">{c.submit.demo}</span>
+          <span class="for-question">{c.submit.question}</span>
+        </button>
+        <p class="form__note">
+          {c.note}{' '}
+          <a class="link" href={hrefFor('privacy', locale)}>{c.privacy}</a>
+        </p>
+        <p class="form__note form__note--mail">{c.mailtoNote}</p>
+        <p class="form__status" role="status" aria-live="polite" data-status></p>
+      </form>
+    </div>
+  </section>
+</Page>
+
+<style>
+  .contact {
+    padding-block: 56px 88px;
+  }
+  .contact__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 0.92fr);
+    grid-template-areas:
+      'main side'
+      'form side';
+    grid-template-rows: auto 1fr;
+    column-gap: 56px;
+    align-items: start;
+  }
+  .contact__main {
+    grid-area: main;
+  }
+  .contact__side {
+    grid-area: side;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    padding-top: 8px;
+  }
+  .form {
+    grid-area: form;
+    margin-top: 32px;
+  }
+  .contact__title {
+    font-size: clamp(48px, 6vw, 80px);
+    line-height: 1.04;
+    letter-spacing: -0.025em;
+  }
+  .contact__sub {
+    margin-top: 24px;
+    color: var(--ink-2);
+    font-size: clamp(22px, 2.4vw, 32px);
+    line-height: 1.25;
+  }
+  .contact__photo {
+    overflow: hidden;
+    border-radius: var(--radius-card);
+  }
+  .contact__photo :global(.photo) {
+    width: 100%;
+    max-height: 560px;
+  }
+  .chat {
+    padding: 28px 32px;
+    box-shadow: 0 2px 12px rgb(0 0 0 / 0.06);
+  }
+  .chat__title {
+    font-size: 28px;
+    line-height: 34px;
+  }
+  .chat__list {
+    margin-top: 12px;
+  }
+  .chat__list li + li {
+    border-top: 1px solid var(--line);
+  }
+  .chat__row {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    min-height: 44px;
+    padding-block: 18px;
+    color: var(--ink);
+    font-size: 18px;
+    text-decoration: none;
+  }
+  .chat__row:hover span {
+    text-decoration: underline;
+  }
+  .chat__row :global(.chat__icon),
+  .chat__icon {
+    flex: none;
+    color: var(--cyan-ink);
+  }
+
+  /* Topic: a segmented control built from real radio inputs, so it works without JavaScript. */
+  .seg {
+    display: inline-flex;
+    max-width: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    border: 1.5px solid var(--btn-line);
+    border-radius: var(--radius-ctl);
+  }
+  .seg__opt {
+    position: relative;
+    display: flex;
+    flex: 1 1 auto;
+  }
+  .seg__opt input {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+  }
+  .seg__opt span {
+    display: flex;
+    flex: 1;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    padding: 0 28px;
+    color: var(--ink);
+    font-size: 17px;
+    font-weight: 500;
+    white-space: nowrap;
+    transition:
+      background-color 0.2s,
+      color 0.2s;
+  }
+  .seg__opt input:checked + span {
+    background: var(--btn-bg);
+    color: var(--btn-ink);
+  }
+  .seg__opt input:focus-visible + span {
+    outline: 2px solid var(--cyan-ink);
+    outline-offset: -4px;
+  }
+
+  .form__grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
+    margin-top: 28px;
+  }
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-width: 0;
+  }
+  .field--wide {
+    grid-column: 1 / -1;
+  }
+  .field label {
+    font-size: 16px;
+    font-weight: 500;
+  }
+  .field input,
+  .field select,
+  .field textarea {
+    width: 100%;
+    min-height: 44px;
+    padding: 10px 16px;
+    border: 1.5px solid var(--line);
+    border-radius: var(--radius-ctl);
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--font-body);
+    font-size: 17px;
+  }
+  .field textarea {
+    min-height: 120px;
+    resize: vertical;
+  }
+  .field input::placeholder,
+  .field textarea::placeholder {
+    color: var(--ink-3);
+  }
+  .field select {
+    appearance: none;
+    padding-right: 44px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238a94a6' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    background-size: 18px;
+  }
+  .field select:has(option[value='']:checked) {
+    color: var(--ink-3);
+  }
+  .field input:focus-visible,
+  .field select:focus-visible,
+  .field textarea:focus-visible {
+    border-color: var(--cyan-ink);
+    outline: 2px solid var(--cyan-ink);
+    outline-offset: 1px;
+  }
+  .field [aria-invalid='true'] {
+    border-color: var(--amber-ink);
+  }
+  .field__error {
+    color: var(--amber-ink);
+    font-size: 15px;
+    font-weight: 500;
+  }
+  .field__error[hidden] {
+    display: none;
+  }
+  .form__submit {
+    margin-top: 28px;
+  }
+  .form__note {
+    margin-top: 14px;
+    color: var(--ink-2);
+    font-size: 16px;
+  }
+  .form__note--mail {
+    margin-top: 4px;
+  }
+  .form__status {
+    margin-top: 12px;
+    color: var(--ink);
+    font-size: 16px;
+    font-weight: 500;
+  }
+  .form__status:empty {
+    display: none;
+  }
+
+  /* Topic-driven parts use :has() so the page still behaves with JavaScript off. */
+  .form:has(#topic-demo:checked) .for-question,
+  .form:has(#topic-question:checked) .for-demo,
+  .form:has(#topic-question:checked) .only-demo {
+    display: none;
+  }
+
+  @media (max-width: 900px) {
+    .contact {
+      padding-block: 36px 64px;
+    }
+    .contact__grid {
+      display: flex;
+      flex-direction: column;
+    }
+    .contact__side {
+      display: contents;
+    }
+    .contact__main {
+      order: 1;
+    }
+    .chat {
+      order: 2;
+      margin-top: 28px;
+    }
+    .form {
+      order: 3;
+    }
+    .contact__photo {
+      order: 4;
+      margin-top: 40px;
+    }
+    .contact__photo :global(.photo) {
+      max-height: 440px;
+    }
+  }
+  @media (max-width: 560px) {
+    .form__grid {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .seg {
+      display: flex;
+    }
+    .seg__opt span {
+      padding: 0 12px;
+      white-space: normal;
+      text-align: center;
+    }
+    .form__submit {
+      width: 100%;
+    }
+    .chat {
+      padding: 22px 20px;
+    }
+    .chat__row {
+      gap: 14px;
+      font-size: 16px;
+      overflow-wrap: anywhere;
+    }
+  }
+</style>
+
+<script>
+  import '../../scripts/contact-form';
+</script>
