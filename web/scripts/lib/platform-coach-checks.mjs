@@ -176,7 +176,7 @@ const contrast = () => {
   const hidden = (e) => {
     for (let n = e; n && n !== document.documentElement; n = n.parentElement) {
       const cs = getComputedStyle(n);
-      if (cs.display === 'none' || cs.visibility === 'hidden' || parseFloat(cs.opacity) === 0) return true;
+      if (cs.display === 'none' || cs.visibility === 'hidden' || parseFloat(cs.opacity) === 0 || n.hasAttribute('data-decorative')) return true;
     }
     return false;
   };
