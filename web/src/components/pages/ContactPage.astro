@@ -1,9 +1,11 @@
 ---
-import Page from '../../layouts/Page.astro';
+import SolutionsPage from '../../layouts/SolutionsPage.astro';
+import SxHero from '../solutions/SxHero.astro';
+import FinalNight from '../solutions/FinalNight.astro';
 import Photo from '../ui/Photo.astro';
 import Icon from '../ui/Icon.astro';
 import { contact } from '../../i18n/pages/contact';
-import { altFor } from '../../i18n/pages/common';
+import { altFor, common } from '../../i18n/pages/common';
 import { site } from '../../data/site';
 import { hrefFor } from '../../data/nav';
 import type { Locale } from '../../i18n';
@@ -13,6 +15,7 @@ interface Props {
 }
 const { locale } = Astro.props;
 const c = contact[locale];
+const k = common[locale];
 const f = c.fields;
 const mailPayload = JSON.stringify({
   to: site.email,
@@ -23,42 +26,13 @@ const mailPayload = JSON.stringify({
 });
 ---
 
-<Page locale={locale} path="/contact/" title={c.meta.title} description={c.meta.description}>
-  <section class="contact">
-    <div class="container contact__grid">
-      <div class="contact__main">
-        <h1 class="contact__title h-lane">{c.title}</h1>
-        <p class="contact__sub">{c.sub}</p>
-      </div>
+<SolutionsPage locale={locale} path="/contact/" title={c.meta.title} description={c.meta.description}>
+  <SxHero locale={locale} variant="compact" id="contact-hero" title={c.title} lead={c.sub} />
 
-      <aside class="contact__side" aria-label={c.chat.title}>
-        <div class="contact__photo">
-          <Photo slot="c2-contact-coach" ratio="4/5" sizes="(max-width: 900px) 92vw, 640px" alt={altFor('c2-contact-coach', locale)} />
-        </div>
-        <div class="pcard chat" id="chat">
-          <h2 class="chat__title">{c.chat.title}</h2>
-          <ul class="chat__list">
-            <li>
-              <a class="chat__row" href={site.whatsappUrl} target="_blank" rel="noopener noreferrer">
-                <svg class="chat__icon" viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                  <path d="M3 21l1.7-5A8.5 8.5 0 1 1 8 19.3L3 21z" />
-                  <path d="M9 9.2c0 3.2 2.6 5.8 5.8 5.8l1.1-1.4-1.9-1-.9.7c-.9-.4-1.7-1.2-2.1-2.1l.7-.9-1-1.9L9 9.2z" />
-                </svg>
-                <span><strong>{c.chat.whatsapp}</strong> · <span class="num">{site.whatsappLabel}</span></span>
-              </a>
-            </li>
-            <li>
-              <a class="chat__row" href={`mailto:${site.email}`}>
-                <Icon name="mail" size={32} class="chat__icon" />
-                <span><strong>{c.chat.email}</strong> · {site.email}</span>
-              </a>
-            </li>
-          </ul>
-        </div>
-      </aside>
-
+  <section class="sx-sec contact">
+    <div class="wrap contact__grid">
       <form
-        class="form"
+        class="form sx-form"
         id="contact-form"
         action={`mailto:${site.email}`}
         method="post"
@@ -120,10 +94,15 @@ const mailPayload = JSON.stringify({
           </div>
         </div>
 
-        <button class="btn btn--primary btn--lg form__submit" type="submit">
-          <span class="for-demo">{c.submit.demo}</span>
-          <span class="for-question">{c.submit.question}</span>
-        </button>
+        <div class="form__actions">
+          <button class="btn btn--primary btn--lg form__submit" type="submit">
+            <span class="for-demo">{c.submit.demo}</span>
+            <span class="for-question">{c.submit.question}</span>
+          </button>
+          <span class="sx-burst" aria-hidden="true" data-decorative>
+            {Array.from({ length: 10 }, (_, i) => <i style={`--a:${i * 36}deg`} />)}
+          </span>
+        </div>
         <p class="form__note">
           {c.note}{' '}
           <a class="link" href={hrefFor('privacy', locale)}>{c.privacy}</a>
@@ -131,104 +110,83 @@ const mailPayload = JSON.stringify({
         <p class="form__note form__note--mail">{c.mailtoNote}</p>
         <p class="form__status" role="status" aria-live="polite" data-status></p>
       </form>
+
+      <aside class="contact__side" aria-label={c.chat.title} data-section data-sx-contact>
+        <figure class="sx-ph">
+          <Photo slot="c2-contact-coach" ratio="4/5" sizes="(max-width: 900px) 92vw, 640px" alt={altFor('c2-contact-coach', locale)} />
+          <svg class="sx-ph__ring" viewBox="0 0 400 500" aria-hidden="true" data-decorative>
+            <ellipse cx="200" cy="250" rx="190" ry="140"></ellipse>
+            <circle class="sx-ph__dot" r="8" fill="#00BEF3"></circle>
+          </svg>
+        </figure>
+        <div class="chat impact" id="chat">
+          <h2 class="chat__title">{c.chat.title}</h2>
+          <ul class="chat__list">
+            <li>
+              <a class="chat__row" href={site.whatsappUrl} target="_blank" rel="noopener noreferrer">
+                <svg class="chat__icon" viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M3 21l1.7-5A8.5 8.5 0 1 1 8 19.3L3 21z" />
+                  <path d="M9 9.2c0 3.2 2.6 5.8 5.8 5.8l1.1-1.4-1.9-1-.9.7c-.9-.4-1.7-1.2-2.1-2.1l.7-.9-1-1.9L9 9.2z" />
+                </svg>
+                <span><strong>{c.chat.whatsapp}</strong> · <span class="num">{site.whatsappLabel}</span></span>
+              </a>
+            </li>
+            <li>
+              <a class="chat__row" href={`mailto:${site.email}`}>
+                <Icon name="mail" size={32} class="chat__icon" />
+                <span><strong>{c.chat.email}</strong> · {site.email}</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+      </aside>
     </div>
   </section>
-</Page>
+
+  <FinalNight title={k.ctaTitle} actions={[{ label: k.startFree, href: site.signUp }, { label: k.seePricing, href: hrefFor('pricing', locale) }]} />
+</SolutionsPage>
+
 
 <style>
   .contact {
-    padding-block: 56px 88px;
+    padding-block: clamp(56px, 7vw, 96px);
   }
   .contact__grid {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 0.92fr);
-    grid-template-areas:
-      'main side'
-      'form side';
-    grid-template-rows: auto 1fr;
-    column-gap: 56px;
+    grid-template-columns: minmax(0, 1.08fr) minmax(0, 0.92fr);
+    column-gap: clamp(32px, 4vw, 56px);
     align-items: start;
   }
-  .contact__main {
-    grid-area: main;
-  }
   .contact__side {
-    grid-area: side;
     display: flex;
     flex-direction: column;
     gap: 24px;
-    padding-top: 8px;
   }
-  .form {
-    grid-area: form;
-    margin-top: 32px;
-  }
-  .contact__title {
-    font-size: clamp(48px, 6vw, 80px);
-    line-height: 1.04;
-    letter-spacing: -0.025em;
-  }
-  .contact__sub {
-    margin-top: 24px;
-    color: var(--ink-2);
-    font-size: clamp(22px, 2.4vw, 32px);
-    line-height: 1.25;
-  }
-  .contact__photo {
-    overflow: hidden;
-    border-radius: var(--radius-card);
-  }
-  .contact__photo :global(.photo) {
-    width: 100%;
-    max-height: 560px;
-  }
-  .chat {
-    padding: 28px 32px;
-    box-shadow: 0 2px 12px rgb(0 0 0 / 0.06);
-  }
-  .chat__title {
-    font-size: 28px;
-    line-height: 34px;
-  }
-  .chat__list {
-    margin-top: 12px;
-  }
-  .chat__list li + li {
-    border-top: 1px solid var(--line);
-  }
-  .chat__row {
-    display: flex;
-    align-items: center;
-    gap: 20px;
-    min-height: 44px;
-    padding-block: 18px;
-    color: var(--ink);
-    font-size: 18px;
-    text-decoration: none;
-  }
-  .chat__row:hover span {
-    text-decoration: underline;
-  }
-  .chat__row :global(.chat__icon),
-  .chat__icon {
-    flex: none;
-    color: var(--cyan-ink);
+  .sx-form {
+    padding: clamp(24px, 3vw, 40px);
+    border: 1px solid var(--line);
+    border-radius: 28px;
+    background: var(--surface);
   }
 
-  /* Topic: a segmented control built from real radio inputs, so it works without JavaScript. */
+  /* Topic: a segmented control built from real radio inputs, so it works without JavaScript.
+     Where :has() exists a thumb glides between the two options on a spring. */
   .seg {
-    display: inline-flex;
+    position: relative;
+    display: inline-grid;
+    grid-auto-columns: 1fr;
+    grid-auto-flow: column;
     max-width: 100%;
     margin: 0;
-    padding: 0;
-    overflow: hidden;
-    border: 1.5px solid var(--btn-line);
-    border-radius: var(--radius-ctl);
+    padding: 4px;
+    border: 1.5px solid var(--line);
+    border-radius: 999px;
+    background: var(--bg);
   }
   .seg__opt {
     position: relative;
+    z-index: 1;
     display: flex;
-    flex: 1 1 auto;
   }
   .seg__opt input {
     position: absolute;
@@ -246,13 +204,12 @@ const mailPayload = JSON.stringify({
     justify-content: center;
     min-height: 44px;
     padding: 0 28px;
+    border-radius: 999px;
     color: var(--ink);
     font-size: 17px;
     font-weight: 500;
     white-space: nowrap;
-    transition:
-      background-color 0.2s,
-      color 0.2s;
+    transition: color 0.25s;
   }
   .seg__opt input:checked + span {
     background: var(--btn-bg);
@@ -260,7 +217,32 @@ const mailPayload = JSON.stringify({
   }
   .seg__opt input:focus-visible + span {
     outline: 2px solid var(--cyan-ink);
-    outline-offset: -4px;
+    outline-offset: 2px;
+  }
+  /* The thumb is the ::after, glides to the new option, and the option paints its own fill once the thumb has arrived. */
+  @supports selector(:has(*)) {
+    .seg::after {
+      content: '';
+      position: absolute;
+      top: 4px;
+      bottom: 4px;
+      left: 4px;
+      width: calc(50% - 4px);
+      border-radius: 999px;
+      background: var(--btn-bg);
+    }
+    .seg[data-ready]::after {
+      transition: transform 520ms var(--e-spring);
+    }
+    .seg:has(#topic-question:checked)::after {
+      transform: translateX(100%);
+    }
+    .seg[data-ready] .seg__opt span {
+      transition: color 0.25s, background-color 0s;
+    }
+    .seg[data-ready] .seg__opt input:checked + span {
+      transition: color 0.25s, background-color 0s 440ms;
+    }
   }
 
   .form__grid {
@@ -289,11 +271,14 @@ const mailPayload = JSON.stringify({
     min-height: 44px;
     padding: 10px 16px;
     border: 1.5px solid var(--line);
-    border-radius: var(--radius-ctl);
+    border-radius: 14px;
     background: var(--bg);
     color: var(--ink);
     font-family: var(--font-body);
     font-size: 17px;
+    transition:
+      border-color 0.2s,
+      box-shadow 0.3s;
   }
   .field textarea {
     min-height: 120px;
@@ -314,12 +299,16 @@ const mailPayload = JSON.stringify({
   .field select:has(option[value='']:checked) {
     color: var(--ink-3);
   }
+  /* The glow sits on top of the 2px focus outline, which stays for keyboard users. */
   .field input:focus-visible,
   .field select:focus-visible,
   .field textarea:focus-visible {
     border-color: var(--cyan-ink);
     outline: 2px solid var(--cyan-ink);
     outline-offset: 1px;
+    box-shadow:
+      0 0 0 6px rgb(0 190 243 / 0.16),
+      0 0 28px rgb(0 190 243 / 0.28);
   }
   .field [aria-invalid='true'] {
     border-color: var(--amber-ink);
@@ -332,7 +321,9 @@ const mailPayload = JSON.stringify({
   .field__error[hidden] {
     display: none;
   }
-  .form__submit {
+  .form__actions {
+    position: relative;
+    display: inline-flex;
     margin-top: 28px;
   }
   .form__note {
@@ -344,10 +335,26 @@ const mailPayload = JSON.stringify({
     margin-top: 4px;
   }
   .form__status {
-    margin-top: 12px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 16px;
+    padding: 12px 16px;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    background: var(--bg);
     color: var(--ink);
     font-size: 16px;
     font-weight: 500;
+  }
+  .form__status::before {
+    content: '';
+    flex: none;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--cyan);
+    box-shadow: 0 0 0 4px rgb(0 190 243 / 0.2);
   }
   .form__status:empty {
     display: none;
@@ -360,32 +367,111 @@ const mailPayload = JSON.stringify({
     display: none;
   }
 
-  @media (max-width: 900px) {
-    .contact {
-      padding-block: 36px 64px;
+  .sx-ph {
+    position: relative;
+    margin: 0;
+    overflow: hidden;
+    isolation: isolate;
+    border-radius: 28px;
+    box-shadow: 0 40px 90px -40px rgb(0 190 243 / 0.4);
+  }
+  .sx-ph :global(picture) {
+    display: block;
+  }
+  .sx-ph :global(.photo) {
+    display: block;
+    width: 100%;
+    max-height: 520px;
+    object-fit: cover;
+    transform-origin: 50% 40%;
+    animation: sxDrift 24s ease-in-out infinite alternate;
+  }
+  .sx-ph__ring {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+  }
+  .sx-ph__ring ellipse {
+    fill: none;
+    stroke: rgb(255 255 255 / 0.35);
+    stroke-width: 1.4;
+    stroke-dasharray: 2 9;
+  }
+  .sx-ph__dot {
+    offset-path: path('M10,250 a190,140 0 1,0 380,0 a190,140 0 1,0 -380,0');
+    offset-rotate: 0deg;
+    animation: orbitDot 14s linear infinite;
+  }
+  @keyframes sxDrift {
+    from {
+      transform: scale(1.02);
     }
+    to {
+      transform: scale(1.1) translate(-1.5%, -1%);
+    }
+  }
+  [data-section][data-ap='off'] .sx-ph :global(.photo),
+  [data-section][data-ap='off'] .sx-ph__dot {
+    animation-play-state: paused;
+  }
+
+  /* The chat card is a dark stage in both themes. */
+  .chat {
+    padding: 28px 32px;
+    border: 1px solid rgb(255 255 255 / 0.14);
+    border-radius: 24px;
+  }
+  .chat__title {
+    font-size: 28px;
+    line-height: 34px;
+  }
+  .chat__list {
+    margin-top: 12px;
+  }
+  .chat__list li + li {
+    border-top: 1px solid rgb(255 255 255 / 0.14);
+  }
+  .chat__row {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    min-height: 44px;
+    padding-block: 18px;
+    color: #fff;
+    font-size: 18px;
+    text-decoration: none;
+  }
+  .chat__row:hover span {
+    text-decoration: underline;
+  }
+  .chat__row :global(.chat__icon),
+  .chat__icon {
+    flex: none;
+    color: var(--cyan);
+  }
+
+  @media (max-width: 1000px) {
     .contact__grid {
       display: flex;
       flex-direction: column;
+      gap: 32px;
     }
     .contact__side {
       display: contents;
     }
-    .contact__main {
+    .sx-form {
       order: 1;
     }
     .chat {
       order: 2;
-      margin-top: 28px;
     }
-    .form {
+    .sx-ph {
       order: 3;
     }
-    .contact__photo {
-      order: 4;
-      margin-top: 40px;
-    }
-    .contact__photo :global(.photo) {
+    .sx-ph :global(.photo) {
       max-height: 440px;
     }
   }
@@ -394,13 +480,14 @@ const mailPayload = JSON.stringify({
       grid-template-columns: minmax(0, 1fr);
     }
     .seg {
-      display: flex;
+      display: grid;
     }
     .seg__opt span {
       padding: 0 12px;
       white-space: normal;
       text-align: center;
     }
+    .form__actions,
     .form__submit {
       width: 100%;
     }
@@ -411,6 +498,20 @@ const mailPayload = JSON.stringify({
       gap: 14px;
       font-size: 16px;
       overflow-wrap: anywhere;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .seg[data-ready]::after,
+    .seg[data-ready] .seg__opt span,
+    .seg[data-ready] .seg__opt input:checked + span,
+    .field input,
+    .field select,
+    .field textarea {
+      transition: none;
+    }
+    .sx-ph :global(.photo),
+    .sx-ph__dot {
+      animation: none;
     }
   }
 </style>

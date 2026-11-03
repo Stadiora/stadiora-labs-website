@@ -37,6 +37,27 @@ node scripts/evidence.mjs --engage-only # just the Platform page checks, EN and 
   The approved post-submit status (EN and ES) is written out in `scripts/lib/contact-contract.mjs`, independent of
   `src/i18n/pages/contact.ts`; verify and evidence compare the page with it word for word, so editing that copy means
   editing the contract too.
+- Solutions, Resources, About and Contact in Floodlight (DESIGN-4 section 6): every page runs on `src/layouts/SolutionsPage.astro`
+  (the foundation, the motion kit and `src/styles/solutions/solutions.css`; everything in the lane is prefixed `sx-`). The hero is
+  `src/components/solutions/SxHero.astro` (impact, mesh, orbits, display H1; the Schools and Coaches swap line is one sentence for a
+  screen reader and its visible words are `aria-hidden`), every page ends on `FinalNight.astro` (night-stadium clip, HTML title) and
+  the dark footer. Copy for the added strings is in `src/i18n/pages/solutions-fx.ts` (EN and ES). Page scripts are in
+  `src/scripts/solutions/` (`index.ts` starts them, then the kit): `swap.ts` (hero word swap), `feed.ts` (clubs team feed),
+  `morph.ts` (athletes app morph), `contact.ts` (topic thumb, submit burst). Each one only animates away from the finished still
+  frame, uses `autoplayer()` (so it stops on hover, focus, off screen, in a hidden tab and under reduced motion) and never writes
+  copy: the contact burst is ten decorative dots, and the status text still comes only from `contact-contract.mjs`.
+  The Coaches hero clip is `public/solutions/media/sx-coaches.{webm,mp4,webp}` (lane clips are named `sx-*`, carry no words, and
+  follow the clip markup and budget above; the home clips `night-stadium`, `ai-bg`, `engage-bg`, `tile-chalk`, `tile-hurdler`
+  and `reel` are the only other text-free clips, and the `pillar-*` clips have titles baked in, so a page may not use them).
+  `scripts/lib/solutions-floodlight-verify.mjs` (run by `npm run verify`) fails the build on a missing mesh or orbits, an H1
+  that is not the display face, too few dark surfaces, a final that is not on the night-stadium clip or sits after the footer,
+  a clip off the text-free list or with wrong markup or over budget, a swap line a screen reader cannot read as one sentence,
+  decoration that is neither `aria-hidden` nor a labelled image, a burst that carries text, a pre-rendered status or a topic
+  control that is not two radios. `scripts/lib/solutions-floodlight-checks.mjs` (run by `evidence`) drives Chromium: the
+  Floodlight anatomy in the light theme, text cut off by a clipping ancestor at 390 and 1440 (`clip-probe.mjs`), the swap line
+  moving, resting under reduced motion and pausing on hover, the coaches clip, the clubs feed, the athletes morph, the About "A"
+  window and the contact thumb, burst and approved status text. `solutions-checks.mjs` still owns overflow, overlap, contrast,
+  target size, forms and prices; its overlap probe now reads a tight display line by its line box, and ignores `.sr` text.
 - Platform pages (`src/pages/{,es/}platform/{messaging,guardian-portal,teams,custom-branded-apps,integrations}/`): thin
   wrappers around `src/components/engage/*Page.astro`; all copy is in `src/i18n/pages/engage.ts` (EN and ES, ES typed against EN).
   Every claim on them is backed by Aria code, see the PR's claims table. `scripts/lib/engage-verify.mjs` (run by `npm run verify`)

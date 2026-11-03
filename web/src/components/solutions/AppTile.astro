@@ -4,6 +4,7 @@ import Phone from '../ui/Phone.astro';
 import Icon from '../ui/Icon.astro';
 import { altFor } from '../../i18n/pages/common';
 import { site } from '../../data/site';
+import { athleteBrands } from './athlete-brands';
 import type { AthletesCopy } from '../../i18n/pages/athletes';
 import type { Locale } from '../../i18n';
 
@@ -11,8 +12,11 @@ interface Props {
   app: AthletesCopy['apps'][number];
   copy: AthletesCopy;
   locale: Locale;
+  index?: number;
 }
-const { app, copy, locale } = Astro.props;
+const { app, copy, locale, index = 0 } = Astro.props;
+// Each app's own colour, the same one the hero morph wears.
+const brand = athleteBrands[app.id];
 
 const icons: Record<string, string> = {
   run: '/apps/run-with-aria.webp',
@@ -34,8 +38,8 @@ const tint: Record<string, string> = {
 };
 ---
 
-<article class:list={['app', `app--${app.id}`]} data-reveal>
-  <div class="app__photo">
+<article class:list={['app', 'rv', `app--${app.id}`]} style={`--bc:${brand.c};--i:${index}`}>
+  <div class="app__photo" data-clip-window="y">
     <Photo slot={app.slot} ratio="3/4" sizes="(max-width: 720px) 92vw, (max-width: 1100px) 46vw, 310px" alt={altFor(app.slot, locale)} />
     <Phone class="app__phone">
       <div class="ap">
@@ -102,27 +106,88 @@ const tint: Record<string, string> = {
 
 <style>
   .app {
+    position: relative;
     display: flex;
     flex-direction: column;
     min-width: 0;
     overflow: hidden;
     border: 1px solid var(--line);
-    border-radius: var(--radius-card);
-    background: var(--bg);
+    border-radius: 24px;
+    background: var(--surface);
+    transition:
+      transform 300ms var(--e-out),
+      box-shadow 300ms var(--e-out);
+  }
+  /* the app's own colour rings the tile when it is pointed at or focused */
+  .app::before {
+    content: '';
+    position: absolute;
+    inset: -1px;
+    z-index: 3;
+    border-radius: inherit;
+    padding: 2px;
+    background: var(--bc);
+    -webkit-mask:
+      linear-gradient(#000 0 0) content-box,
+      linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    opacity: 0;
+    transition: opacity 300ms;
+    pointer-events: none;
+  }
+  .app:hover,
+  .app:focus-within {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lift);
+  }
+  .app:hover::before,
+  .app:focus-within::before {
+    opacity: 1;
   }
   .app__photo {
     position: relative;
     overflow: hidden;
   }
+  .app__photo::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, transparent 45%, color-mix(in srgb, var(--bc) 55%, transparent));
+    pointer-events: none;
+  }
   .app__photo :global(.photo) {
     display: block;
+    transition: transform 900ms var(--e-out);
   }
   .app__photo :global(.app__phone) {
     --phone-w: 150px;
     position: absolute;
+    z-index: 1;
     top: 62%;
     left: 50%;
     transform: translateX(-50%);
+    transition: transform 500ms var(--e-out);
+  }
+  /* with a mouse the phone rests low and rises to show today's session; touch and keyboard see it already up */
+  @media (hover: hover) and (pointer: fine) {
+    .app__photo :global(.app__phone) {
+      transform: translateX(-50%) translateY(14%);
+    }
+    .app:hover .app__photo :global(.app__phone),
+    .app:focus-within .app__photo :global(.app__phone) {
+      transform: translateX(-50%) translateY(-30%);
+    }
+    .app:hover .app__photo :global(.photo) {
+      transform: scale(1.06);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .app,
+    .app__photo :global(.photo),
+    .app__photo :global(.app__phone) {
+      transition: none;
+    }
   }
   .app__body {
     display: flex;

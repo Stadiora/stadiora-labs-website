@@ -1,0 +1,29 @@
+---
+// Floodlight wrapper for the Solutions, Resources and company pages (DESIGN-4 section 6): the shared base with the hero
+// flag (the dark hero sits under the floating nav), the page utilities, the lane styles and the lane motion script.
+import '../styles/pages.css';
+import '../styles/home/phone.css';
+import '../styles/solutions/solutions.css';
+import Base from './Base.astro';
+import StoreSheet from '../components/home/StoreSheet.astro';
+import type { Locale } from '../i18n';
+
+interface Props {
+  locale: Locale;
+  path: string;
+  title: string;
+  description: string;
+  noindex?: boolean;
+}
+const props = Astro.props;
+---
+
+<Base {...props} hero>
+  <div class="sx-page">
+    <slot />
+  </div>
+  <StoreSheet locale={props.locale} />
+  <script>
+    import '../scripts/solutions';
+  </script>
+</Base>

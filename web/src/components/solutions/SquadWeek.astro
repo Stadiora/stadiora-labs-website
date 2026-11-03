@@ -1,10 +1,13 @@
 ---
 import type { ClubsCopy } from '../../i18n/pages/clubs';
+import type { SolutionsFxCopy } from '../../i18n/pages/solutions-fx';
+import SquadFeed from './SquadFeed.astro';
 
 interface Props {
   copy: ClubsCopy;
+  fx: SolutionsFxCopy['clubs'];
 }
-const { copy } = Astro.props;
+const { copy, fx } = Astro.props;
 const w = copy.week;
 
 // Mini line chart geometry (viewBox units). The y axis is fixed at 30 to 50 cm.
@@ -16,8 +19,21 @@ const label = (values: number[]) =>
   w.chartLabel.replace('{first}', String(values[0])).replace('{last}', String(values[values.length - 1]));
 ---
 
-<section class="squad" aria-label={w.title}>
-  <div class="container" data-tabs data-reveal>
+<section class="squad sx-stage impact" data-section aria-labelledby="squad-h">
+  <div class="mesh" aria-hidden="true">
+    <i class="b b5"></i><i class="b b1"></i><i class="b b2"></i><i class="b b3"></i><i class="b b4"></i><i class="vig"></i>
+  </div>
+  <div class="orbits" aria-hidden="true">
+    <svg viewBox="0 0 1600 800"><ellipse cx="800" cy="400" rx="760" ry="250"></ellipse><ellipse class="dash" cx="800" cy="400" rx="560" ry="170"></ellipse></svg>
+  </div>
+  <div class="wrap">
+    <div class="sq-head">
+      <span class="eyebrow">{fx.stageLabel}</span>
+      <h2 class="d d2 lines" id="squad-h"><span><span>{fx.stageTitle}</span></span></h2>
+      <p class="lead rv">{fx.stageLead}</p>
+    </div>
+    <div class="sq-grid">
+  <div class="sq-main rv" data-tabs>
     <div class="tabs squad__tabs" role="tablist" aria-label={w.tabsLabel}>
       {
         copy.squads.map((s) => (
@@ -38,7 +54,7 @@ const label = (values: number[]) =>
       <span class="tabs__lane" aria-hidden="true"></span>
     </div>
 
-    <div class="squad__card xf">
+    <div class="squad__card reading xf">
       {
         copy.squads.map((s) => {
           const on = s.id === copy.defaultSquad;
@@ -46,20 +62,20 @@ const label = (values: number[]) =>
           return (
             <div class="squad__panel" role="tabpanel" id={`squad-panel-${s.id}`} aria-labelledby={`squad-tab-${s.id}`} data-active={on ? '' : undefined} inert={!on}>
               <div class="squad__top">
-                <h2 class="squad__title">
+                <h3 class="squad__title">
                   {s.label} · {w.title}
-                </h2>
+                </h3>
                 <p class="squad__range">{w.range}</p>
               </div>
               <div class="squad__tiles">
                 <article class="tile">
-                  <h3 class="tile__label">
+                  <h4 class="tile__label">
                     <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                       <circle cx="12" cy="12" r="8.5" />
                       <path d="m12 8 3.6 2.6-1.4 4.2H9.8l-1.4-4.2zM12 3.5V8M15.6 10.6l4.2-1.4M14.2 14.8l2.6 3.6M9.8 14.8l-2.6 3.6M8.4 10.6 4.2 9.2" />
                     </svg>
                     {w.fixture}
-                  </h3>
+                  </h4>
                   <p class="tile__big">
                     {s.fixture.day} · vs {s.fixture.opponent}
                   </p>
@@ -69,12 +85,12 @@ const label = (values: number[]) =>
                 </article>
 
                 <article class="tile">
-                  <h3 class="tile__label">
+                  <h4 class="tile__label">
                     <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                       <path d="M12 4 7 19h10zM9.2 12h5.6M5 19h14" />
                     </svg>
                     {w.practices}
-                  </h3>
+                  </h4>
                   <ul class="tile__rows">
                     {
                       s.practices.map((p) => (
@@ -88,7 +104,7 @@ const label = (values: number[]) =>
                 </article>
 
                 <article class="tile">
-                  <h3 class="tile__label">{w.availability}</h3>
+                  <h4 class="tile__label">{w.availability}</h4>
                   <ul class="avail">
                     <li><span class="dot" aria-hidden="true"></span><span class="num">{s.available}</span> {w.states.available}</li>
                     <li><span class="dot dot--amber" aria-hidden="true"></span><span class="num">{s.doubtful}</span> {w.states.doubtful}</li>
@@ -97,23 +113,23 @@ const label = (values: number[]) =>
                 </article>
 
                 <article class="tile">
-                  <h3 class="tile__label">
+                  <h4 class="tile__label">
                     <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                       <path d="M4 10v4h3l6 4V6L7 10zM16.5 9a4 4 0 0 1 0 6M7 14l1 5h2.5l-1-4.2" />
                     </svg>
                     {w.announcement}
-                  </h3>
+                  </h4>
                   <p class="tile__big">{s.note}</p>
                   <p class="tile__sub"><span class="num">{s.read}</span> {w.of} <span class="num">{s.total}</span> {w.read}</p>
                 </article>
 
                 <article class="tile tile--chart">
-                  <h3 class="tile__label">
+                  <h4 class="tile__label">
                     <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                       <path d="M5 19v-6M12 19V5M19 19v-10" />
                     </svg>
                     <span>{w.powerLab}<span class="tile__metric">{w.metric}</span><span class="tile__note">{w.metricNote}</span></span>
-                  </h3>
+                  </h4>
                   <svg class="chart" viewBox="0 0 300 126" role="img" aria-label={label(s.cmj)}>
                     {[30, 40, 50].map((tick) => (
                       <g>
@@ -139,21 +155,47 @@ const label = (values: number[]) =>
       }
     </div>
   </div>
+  <SquadFeed {copy} {fx} />
+    </div>
+  </div>
 </section>
 
 <style>
-  .squad {
-    padding-block: 32px 56px;
-    background: var(--surface);
+  .sq-head {
+    display: grid;
+    gap: 22px;
+    max-width: 860px;
+    margin-bottom: clamp(36px, 5vw, 64px);
+  }
+  .sq-head h2 {
+    font-size: var(--fs-d2);
+    margin: 0;
+  }
+  .sq-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: clamp(32px, 4vw, 64px);
+    align-items: center;
+  }
+  .sq-main {
+    min-width: 0;
   }
   .squad__tabs {
-    margin-bottom: 24px;
+    margin-bottom: 20px;
   }
   .squad__card {
     padding: 28px;
     border: 1px solid var(--line);
-    border-radius: var(--radius-card);
+    border-radius: 24px;
     background: var(--bg);
+    box-shadow: 0 30px 80px -40px rgba(0, 0, 0, 0.7);
+  }
+  .sq-grid :global(.sq-phone) {
+    width: 380px;
+    height: 680px;
+    display: grid;
+    place-items: center;
+    border-radius: 32px;
   }
   .squad__panel {
     min-width: 0;
@@ -175,11 +217,12 @@ const label = (values: number[]) =>
   }
   .squad__tiles {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1.5fr);
+    grid-template-columns: repeat(6, minmax(0, 1fr));
     gap: 14px;
     margin-top: 20px;
   }
   .tile {
+    grid-column: span 2;
     display: flex;
     flex-direction: column;
     gap: 10px;
@@ -283,25 +326,34 @@ const label = (values: number[]) =>
     fill: var(--cyan-ink);
   }
 
-  @media (max-width: 1280px) {
-    .squad__tiles {
-      grid-template-columns: repeat(3, minmax(0, 1fr));
+  .tile--chart {
+    grid-column: span 4;
+  }
+  @media (max-width: 1100px) {
+    .sq-grid {
+      grid-template-columns: minmax(0, 1fr);
+      justify-items: stretch;
     }
-    .tile--chart {
-      grid-column: span 2;
+    .sq-grid :global(.sq-phone) {
+      justify-self: center;
+      max-width: 100%;
     }
   }
   @media (max-width: 900px) {
     .squad__tiles {
       grid-template-columns: repeat(2, minmax(0, 1fr));
     }
+    .tile {
+      grid-column: auto;
+    }
     .tile--chart {
       grid-column: span 2;
     }
   }
   @media (max-width: 720px) {
-    .squad {
-      padding-block: 24px 40px;
+    .sq-grid :global(.sq-phone) {
+      width: 100%;
+      height: 640px;
     }
     .squad__card {
       padding: 16px;

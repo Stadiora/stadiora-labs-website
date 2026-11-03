@@ -1,7 +1,11 @@
 ---
-import Page from '../../layouts/Page.astro';
+import SolutionsPage from '../../layouts/SolutionsPage.astro';
+import SxHero from '../solutions/SxHero.astro';
+import FinalNight from '../solutions/FinalNight.astro';
 import Photo from '../ui/Photo.astro';
 import { caseStudies } from '../../i18n/pages/caseStudies';
+import { common } from '../../i18n/pages/common';
+import { site } from '../../data/site';
 import { contactHref } from '../../lib/links';
 import { localePath } from '../../i18n';
 import type { Locale } from '../../i18n';
@@ -11,22 +15,16 @@ interface Props {
 }
 const { locale } = Astro.props;
 const c = caseStudies[locale];
+const k = common[locale];
 // There are no real stories yet. Placeholder cards exist only in `astro dev`, never in the built site.
 const dev = import.meta.env.DEV;
 const storyHref = localePath('/resources/case-studies/sample-story/', locale);
 const featured = c.dev.featured;
 ---
 
-<Page locale={locale} path="/resources/case-studies/" title={c.meta.title} description={c.meta.description} noindex>
-  <section class="cs-head">
-    <div class="container">
-      <h1 class="cs-head__title">{c.title}</h1>
-      <p class="cs-head__sub">{c.sub}</p>
-    </div>
-  </section>
-
-  <section class="cs" data-outcome-filter aria-label={c.title}>
-    <div class="container">
+<SolutionsPage locale={locale} path="/resources/case-studies/" title={c.meta.title} description={c.meta.description} noindex>
+  <SxHero locale={locale} variant="compact" title={c.title} lead={c.sub}>
+    <section slot="below" class="cs" data-outcome-filter aria-label={c.title}>
       <div class="filter">
         <p class="filter__label" id="filter-label">{c.filterLabel}</p>
         <div class="filter__chips" role="group" aria-labelledby="filter-label">
@@ -82,8 +80,12 @@ const featured = c.dev.featured;
           </p>
         </div>
       </div>
+    </section>
+  </SxHero>
 
-      <div class="strip share">
+  <section class="sx-sec share-section" aria-label={c.share.title}>
+    <div class="wrap">
+      <div class="strip share rv">
         <p class="strip__text">{c.share.title}</p>
         <div class="strip__actions">
           <a class="btn btn--secondary btn--lg" href={contactHref(locale, 'question')}>{c.share.cta}</a>
@@ -91,26 +93,13 @@ const featured = c.dev.featured;
       </div>
     </div>
   </section>
-</Page>
+
+  <FinalNight title={k.ctaTitle} actions={[{ label: k.bookDemo, href: contactHref(locale, 'demo') }, { label: k.startFree, href: site.signUp }]} />
+</SolutionsPage>
 
 <style>
-  .cs-head {
-    padding-block: 48px 8px;
-  }
-  .cs-head__title {
-    font-size: clamp(36px, 4.6vw, 60px);
-    line-height: 1.1;
-    letter-spacing: -0.02em;
-    text-wrap: balance;
-  }
-  .cs-head__sub {
-    margin-top: 12px;
-    color: var(--ink-2);
-    font-size: clamp(18px, 1.7vw, 24px);
-    line-height: 1.4;
-  }
-  .cs {
-    padding-block: 24px 80px;
+  .share-section {
+    padding-block: clamp(48px, 6vw, 80px);
   }
   .filter {
     display: flex;
@@ -119,6 +108,7 @@ const featured = c.dev.featured;
     gap: 12px 16px;
   }
   .filter__label {
+    color: #fff;
     font-size: 18px;
     font-weight: 500;
   }
@@ -134,25 +124,29 @@ const featured = c.dev.featured;
   .chip {
     min-height: 44px;
     padding: 0 20px;
-    border: 1.5px solid var(--btn-line);
-    border-radius: var(--radius-ctl);
-    background: var(--bg);
-    color: var(--ink);
+    border: 1.5px solid rgba(255, 255, 255, 0.35);
+    border-radius: 999px;
+    background: transparent;
+    color: #fff;
     font-family: var(--font-body);
     font-size: 16px;
     cursor: pointer;
     transition:
       background-color 0.2s,
-      color 0.2s;
+      color 0.2s,
+      transform 0.3s var(--e-spring, cubic-bezier(0.34, 1.56, 0.64, 1));
   }
   .chip:hover {
-    background: var(--surface);
+    background: rgba(255, 255, 255, 0.12);
+  }
+  .chip:active {
+    transform: scale(0.96);
   }
   .chip[aria-pressed='true'] {
-    border-color: var(--btn-bg);
-    background: var(--btn-bg);
-    color: var(--btn-ink);
-    font-weight: 500;
+    border-color: #fff;
+    background: #fff;
+    color: #08132b;
+    font-weight: 600;
   }
   .stage {
     margin-top: 28px;
@@ -171,9 +165,12 @@ const featured = c.dev.featured;
     flex-direction: column;
     min-width: 0;
     overflow: hidden;
-    border: 1px solid var(--line);
-    border-radius: var(--radius-card);
-    background: var(--bg);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 24px;
+    background: rgba(9, 18, 40, 0.58);
+    -webkit-backdrop-filter: blur(16px);
+    backdrop-filter: blur(16px);
+    color: #fff;
   }
   .story[hidden] {
     display: none;
@@ -223,18 +220,18 @@ const featured = c.dev.featured;
     text-decoration: underline;
   }
   .story__meta {
-    color: var(--ink-2);
+    color: #c4cedd;
     font-size: 16px;
   }
   .story__stat {
     margin-top: auto;
     padding-top: 12px;
-    color: var(--ink-2);
+    color: #c4cedd;
     font-size: 16px;
   }
   .story__stat .num {
     margin-right: 6px;
-    color: var(--ink);
+    color: #fff;
     font-size: 40px;
     font-weight: 700;
     line-height: 1;
@@ -243,7 +240,7 @@ const featured = c.dev.featured;
     display: inline-flex;
     align-items: center;
     gap: 8px;
-    color: var(--ink);
+    color: #fff;
     font-size: 14px;
   }
   .stamp--on-photo {
@@ -252,13 +249,13 @@ const featured = c.dev.featured;
     left: 12px;
     padding: 4px 12px;
     border-radius: 8px;
-    background: var(--bg);
+    background: rgba(4, 10, 26, 0.85);
   }
   .logo-slot {
     padding: 14px 18px;
-    border: 1.5px dashed var(--ink-3);
+    border: 1.5px dashed #8d99ae;
     border-radius: 8px;
-    color: var(--ink-2);
+    color: #c4cedd;
     font-size: 14px;
   }
   .empty {
@@ -266,6 +263,11 @@ const featured = c.dev.featured;
     place-items: center;
     min-height: 200px;
     text-align: center;
+  }
+  .empty:hover,
+  .empty:focus-within {
+    transform: none;
+    box-shadow: none;
   }
   .empty[hidden] {
     display: none;
@@ -279,13 +281,10 @@ const featured = c.dev.featured;
   .empty__hint {
     display: block;
     margin-top: 6px;
-    color: var(--ink-2);
+    color: #c4cedd;
     font-family: var(--font-body);
     font-size: 17px;
     font-weight: 400;
-  }
-  .share {
-    margin-top: 32px;
   }
   @media (max-width: 1100px) {
     .grid {
@@ -305,12 +304,6 @@ const featured = c.dev.featured;
     }
   }
   @media (max-width: 720px) {
-    .cs-head {
-      padding-block: 32px 4px;
-    }
-    .cs {
-      padding-bottom: 56px;
-    }
     .grid {
       grid-template-columns: minmax(0, 1fr);
     }
@@ -319,7 +312,8 @@ const featured = c.dev.featured;
     }
   }
   @media (prefers-reduced-motion: reduce) {
-    .stage {
+    .stage,
+    .chip {
       transition: none;
     }
   }

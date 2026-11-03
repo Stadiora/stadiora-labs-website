@@ -8,6 +8,7 @@ import { verifyPricing } from './lib/pricing-verify.mjs';
 import { pendingReport } from './lib/engage-links.mjs';
 import { engagePages, verifyEngagePages } from './lib/engage-verify.mjs';
 import { verifySolutions } from './lib/verify-solutions.mjs';
+import { verifySolutionsFloodlight } from './lib/solutions-floodlight-verify.mjs';
 import { verifyHomeClaims, verifyHomeMedia, verifyHomeSelectors, verifyHomeVideos } from './lib/home-verify.mjs';
 
 const dist = fileURLToPath(new URL('../dist/', import.meta.url));
@@ -83,6 +84,7 @@ verifyHomeSelectors({ root: fileURLToPath(new URL('../', import.meta.url)), fail
 
 verifyPricing(dist, fail);
 verifySolutions({ dist, fail });
+verifySolutionsFloodlight({ dist, fail });
 const pendingLinks = new Map();
 verifyEngagePages({ dist, fail, pending: pendingLinks });
 

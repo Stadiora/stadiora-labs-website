@@ -1,0 +1,1070 @@
+/* Floodlight Solutions lane (DESIGN-4 section 6: Schools, Coaches, Clubs, Athletes, Case studies, About, Contact).
+   Everything here is prefixed sx- or scoped under .sx-page so it cannot reach the home, pricing, coach or engage pages.
+   The foundation (.d, .lead, .eyebrow, .mesh, .orbits, .rv, .lines, .pop, .glass, .media-frame, .final) is floodlight.css.
+   The base state of every motion here is the finished still frame; scripts/solutions/* only animate away from it. */
+
+/* ---------- shared: reveals fall back to visible without a script ---------- */
+html:not(.js) .sx-page .rv,
+html:not(.js) .sx-page .lines > span > span,
+html:not(.js) .sx-page .rv-mask {
+  opacity: 1;
+  transform: none;
+  clip-path: none;
+}
+
+/* The reveal mask keeps room under the baseline so a comma tail or the lane underline is not shaved.
+   Layout-neutral: the extra padding is taken back by the margins, and the gap between two stacked lines stays .04em. */
+.sx-page .lines > span {
+  padding-bottom: 0.1em;
+  margin-bottom: -0.1em;
+}
+.sx-page .lines > span + span {
+  margin-top: -0.22em;
+}
+.sx-page .lines:not(.in) > span > span {
+  transform: translateY(125%);
+}
+
+/* a reading section between the dark stages */
+.sx-sec {
+  position: relative;
+  padding-block: clamp(64px, 8vw, 112px);
+}
+
+/* ---------- hero (impact, mesh and orbits) ---------- */
+.sx-hero {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  padding: 150px 0 120px;
+}
+.sx-hero--compact {
+  padding: 150px 0 96px;
+}
+.sx-hero .orbits {
+  z-index: 1;
+  opacity: 0.9;
+}
+.sx-hero .orbits svg {
+  width: 120%;
+  left: -30%;
+  top: 58%;
+}
+.sx-hero__grid {
+  position: relative;
+  z-index: 3;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 56px;
+  align-items: center;
+}
+.sx-hero--split .sx-hero__grid {
+  grid-template-columns: minmax(0, 1.08fr) minmax(0, 0.92fr);
+}
+.sx-hero__copy {
+  position: relative;
+  min-width: 0;
+}
+.sx-hero__copy .eyebrow {
+  color: #b7c2d4;
+}
+.sx-hero .sx-h1 {
+  margin: 26px 0 0;
+  font-size: clamp(44px, 6.4vw, 108px);
+  color: #fff;
+  text-wrap: balance;
+  overflow-wrap: break-word;
+}
+.sx-hero--split .sx-h1 {
+  font-size: clamp(42px, 5.4vw, 92px);
+}
+.sx-hero--compact .sx-h1 {
+  font-size: clamp(44px, 6.4vw, 108px);
+}
+.sx-hero .lead {
+  margin-top: 28px;
+  color: #c4cedd;
+  max-width: 40ch;
+}
+.sx-hero__cta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 34px;
+}
+.sx-hero__cta .btn--ghost {
+  color: #fff;
+}
+.sx-hero__media {
+  position: relative;
+  min-width: 0;
+}
+
+/* ---------- word swap (M3): the still is word 1; scripts/solutions/swap.ts swaps the letters ---------- */
+.sx-swapline {
+  display: block;
+  margin: 24px 0 0;
+  font-size: clamp(28px, 3.3vw, 54px);
+  color: #e6ecf6;
+  line-height: 1;
+  /* the condensed display face has a very narrow space */
+  word-spacing: 0.16em;
+}
+.sx-swapline .sx-pre,
+.sx-swapline .sx-post {
+  white-space: pre-wrap;
+}
+.sx-slot {
+  position: relative;
+  display: inline-grid;
+  vertical-align: bottom;
+  padding-bottom: 0.16em;
+  transition: width 700ms var(--e-out);
+}
+.sx-slot::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 0.09em;
+  min-height: 4px;
+  border-radius: 9px;
+  background: var(--grad-brand);
+  box-shadow: 0 0 24px rgba(0, 190, 243, 0.55);
+}
+.sx-w {
+  grid-area: 1 / 1;
+  justify-self: start;
+  display: flex;
+  white-space: pre;
+}
+.sx-part {
+  display: inline-flex;
+}
+.sx-ch,
+.sx-sp {
+  display: inline-block;
+}
+.sx-ch {
+  --t: calc(var(--k) / var(--m));
+  color: #34d399;
+  color: color-mix(in srgb, #8b5cf6 calc(clamp(0, (var(--t) - 0.5) * 2, 1) * 100%), color-mix(in srgb, #34d399 calc(clamp(0, var(--t) * 2, 1) * 100%), #00bef3));
+}
+.sx-w.out .sx-ch,
+.sx-w.out .sx-sp {
+  will-change: transform, filter, opacity;
+  animation: sxWOut 420ms var(--e-inout) forwards;
+  animation-delay: calc(var(--k, 0) * 16ms);
+}
+.sx-w.in .sx-ch,
+.sx-w.in .sx-sp {
+  will-change: transform, filter, opacity;
+  animation: sxWIn 760ms var(--e-out) both;
+  animation-delay: calc(140ms + var(--k, 0) * 24ms);
+}
+@keyframes sxWOut {
+  to {
+    opacity: 0;
+    filter: blur(14px);
+    transform: translateY(-38%) scaleY(0.9);
+  }
+}
+@keyframes sxWIn {
+  from {
+    opacity: 0;
+    filter: blur(18px);
+    transform: translateY(48%) scaleY(1.25);
+  }
+}
+
+/* ---------- conveyor (M4): side lanes loop in CSS, the centre lane steps one block per word ---------- */
+.sx-cv {
+  position: relative;
+  display: grid;
+  gap: 14px;
+  height: clamp(420px, 44vw, 640px);
+  -webkit-mask: linear-gradient(180deg, transparent 0, #000 12%, #000 84%, transparent 100%);
+  mask: linear-gradient(180deg, transparent 0, #000 12%, #000 84%, transparent 100%);
+  transform: translate3d(var(--cvx, 0), var(--cvy, 0), 0);
+  transition: transform 600ms var(--e-out);
+}
+.sx-cv--mini {
+  grid-template-columns: 0.6fr 1fr 0.6fr;
+  max-width: 560px;
+  margin-inline: auto;
+}
+.sx-cv--grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  max-width: 640px;
+  margin-inline: auto;
+}
+.sx-lane {
+  position: relative;
+  overflow: hidden;
+  min-width: 0;
+}
+/* three copies of the tiles: the run moves by exactly one copy, so the loop is seamless */
+.sx-run {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding-bottom: 14px;
+  animation: sxLane var(--dur, 64s) linear infinite;
+  will-change: transform;
+}
+.sx-run.down {
+  animation-direction: reverse;
+}
+@keyframes sxLane {
+  to {
+    transform: translateY(-33.3333%);
+  }
+}
+[data-section][data-ap='off'] .sx-run,
+[data-section].is-off .sx-run {
+  animation-play-state: paused;
+}
+.sx-tile {
+  position: relative;
+  flex: none;
+  overflow: hidden;
+  border-radius: 18px;
+  background: #0b1730;
+}
+.sx-tile img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.sx-tile.sq {
+  aspect-ratio: 1;
+}
+.sx-tile.p45 {
+  aspect-ratio: 4 / 5;
+}
+.sx-mid {
+  container-type: size;
+}
+.sx-col {
+  /* the no-JS position of block 1: lane half-height minus the tiles above the middle of its big tile */
+  --y: calc(50cqh - 4.02cqw - 56px);
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  transform: translateY(var(--y));
+  will-change: transform;
+}
+.sx-col.anim {
+  transition: transform 1150ms var(--e-slam);
+}
+.sx-col .sx-tile {
+  transition:
+    filter 800ms,
+    opacity 800ms;
+  filter: saturate(0.7) brightness(0.62);
+}
+.sx-col .sx-tile.sm {
+  width: 66%;
+}
+.sx-col .sx-tile.big {
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  border-radius: 22px;
+}
+.sx-col .sx-tile.big img {
+  transform: scale(1.14);
+  transition: transform 7s linear;
+}
+.sx-col .sx-tile.on {
+  filter: none;
+}
+.sx-col .sx-tile.big.on img {
+  transform: scale(1);
+}
+.sx-col .sx-tile.big::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: inset 0 0 0 2px rgba(0, 190, 243, 0);
+  transition: box-shadow 600ms;
+}
+.sx-col .sx-tile.big.on::after {
+  box-shadow: inset 0 0 0 2px rgba(0, 190, 243, 0.9);
+}
+.sx-col.snap .sx-tile,
+.sx-col.snap .sx-tile.big img,
+.sx-col.snap .sx-tile.big::after {
+  transition: none;
+}
+.sx-sweep {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  opacity: 0;
+  pointer-events: none;
+  background: linear-gradient(110deg, transparent 30%, rgba(255, 255, 255, 0.55) 48%, transparent 66%);
+}
+
+/* ---------- dark stage section ---------- */
+.sx-stage {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  padding-block: clamp(72px, 9vw, 136px);
+}
+.sx-stage > .orbits {
+  z-index: 1;
+}
+.sx-stage > .wrap {
+  position: relative;
+  z-index: 3;
+}
+.sx-stage .eyebrow {
+  color: #b7c2d4;
+}
+.sx-stage h2,
+.sx-stage h3 {
+  color: #fff;
+}
+.sx-stage .reading :is(h2, h3) {
+  color: var(--ink);
+}
+.sx-stage .lead {
+  color: #c4cedd;
+}
+
+/* ---------- Floodlight cards (the old flat card, restyled across this lane) ---------- */
+.sx-page .pcard {
+  position: relative;
+  border: 1px solid var(--line);
+  border-radius: 24px;
+  background: var(--surface);
+  box-shadow: none;
+  transition:
+    transform 300ms var(--e-out),
+    box-shadow 300ms var(--e-out);
+}
+.sx-page .pcard::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  padding: 1.5px;
+  background: var(--grad-brand);
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0;
+  transition: opacity 300ms;
+  pointer-events: none;
+}
+.sx-page .pcard:hover,
+.sx-page .pcard:focus-within {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lift);
+}
+.sx-page .pcard:hover::before,
+.sx-page .pcard:focus-within::before {
+  opacity: 1;
+}
+
+/* inside a dark stage or hero a card is glass */
+.sx-hero .sx-hero__below {
+  position: relative;
+  z-index: 3;
+  margin-top: clamp(40px, 5vw, 72px);
+}
+.sx-hero .pcard,
+.sx-stage .pcard {
+  background: rgba(9, 18, 40, 0.58);
+  -webkit-backdrop-filter: blur(16px) saturate(1.4);
+  backdrop-filter: blur(16px) saturate(1.4);
+  border-color: rgba(255, 255, 255, 0.14);
+  color: #fff;
+}
+
+/* a reading panel on a dark stage follows the page theme (white in light, navy in dark) */
+.sx-stage .pcard.reading {
+  background: var(--bg);
+  color: var(--ink);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  border-color: var(--line);
+}
+
+/* ---------- hero clip with live cards (coaches) ---------- */
+.sx-clip {
+  aspect-ratio: 4 / 5;
+  max-height: 660px;
+  margin-inline: auto;
+  border-radius: 28px;
+  box-shadow: 0 40px 90px -30px rgba(0, 190, 243, 0.35);
+}
+.sx-clip .vid-shade {
+  background: linear-gradient(180deg, rgba(4, 10, 26, 0) 55%, rgba(4, 10, 26, 0.6));
+}
+.sx-pop {
+  position: absolute;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  font-size: 14px;
+  line-height: 1.25;
+}
+.sx-pop small {
+  display: block;
+  color: #46536a;
+  font: 500 11px/1.2 var(--f-mono);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.sx-pop b {
+  font-family: var(--f-display);
+  font-weight: 800;
+  font-stretch: 88%;
+  font-size: 28px;
+  line-height: 1;
+}
+.sx-pop .st {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 4px;
+  color: #0f7a55;
+  font-weight: 600;
+  font-size: 13px;
+}
+.sx-pop--ready {
+  left: 16px;
+  top: 7%;
+}
+.sx-pop--session {
+  right: 16px;
+  bottom: 7%;
+}
+.sx-pop--session b {
+  font-size: 18px;
+  display: block;
+}
+.sx-pop--session .tick {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: #d9f5ea;
+  color: #0f7a55;
+}
+.sx-pop--session span.meta {
+  color: #46536a;
+  font-size: 13px;
+}
+.sx-demo {
+  position: absolute;
+  z-index: 4;
+  left: 16px;
+  bottom: 14px;
+  font: 500 11px/1 var(--f-mono);
+  letter-spacing: 0.08em;
+  color: rgba(255, 255, 255, 0.8);
+  background: rgba(4, 10, 26, 0.55);
+  padding: 7px 10px;
+  border-radius: 8px;
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+}
+
+/* ---------- clubs: team-feed phone on the engage clip ---------- */
+.sq-phone .dphone {
+  z-index: 2;
+}
+.sqf {
+  position: absolute;
+  inset: 44px 0 0;
+  display: none;
+  flex-direction: column;
+}
+.sqf[data-on] {
+  display: flex;
+}
+.sqf .ph-body {
+  gap: 10px;
+}
+.sqf__prog {
+  margin-top: 12px;
+  background: rgba(255, 255, 255, 0.2);
+}
+.sqf__prog i {
+  transform-origin: 0 50%;
+}
+.sqf__read {
+  margin-top: 8px;
+  font-size: 11.5px;
+  color: #c4cedd;
+}
+.sqf__avail {
+  display: grid;
+  gap: 8px;
+  margin-top: 10px;
+  font-size: 13px;
+}
+.sqf__avail li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.sqf__avail b {
+  font-weight: 700;
+}
+
+/* ---------- athletes: hero morph (white-label phone) ---------- */
+.sx-morph {
+  position: relative;
+  height: 640px;
+  max-width: 560px;
+  margin-inline: auto;
+}
+.sx-morph .dphone {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+.sx-ms {
+  position: absolute;
+  top: 50%;
+  width: 200px;
+  height: 410px;
+  padding: 8px;
+  border-radius: 34px;
+  background: #0a0f1c;
+  box-shadow: 0 30px 70px -20px rgba(0, 0, 0, 0.7);
+  opacity: 0.9;
+}
+.sx-ms .s {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  border-radius: 27px;
+  background: var(--bc);
+}
+.sx-ms.l1 {
+  left: 2%;
+  transform: translateY(-50%) rotate(-8deg);
+}
+.sx-ms.r1 {
+  right: 2%;
+  transform: translateY(-50%) rotate(8deg);
+}
+.sx-scr {
+  position: absolute;
+  inset: 0;
+  padding: 54px 16px 16px;
+  color: #fff;
+  background: var(--bc);
+  transition: background-color 700ms var(--e-out);
+}
+.sx-scr .an {
+  font: 900 30px/0.9 var(--f-display);
+  font-variation-settings: 'wdth' 70;
+  text-transform: uppercase;
+  letter-spacing: -0.01em;
+  min-height: 2em;
+}
+.sx-scr .mk {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  margin-bottom: 14px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.95);
+  color: var(--bc);
+  font: 800 18px/1 var(--f-display);
+}
+.sx-scr .hl {
+  height: 110px;
+  margin-top: 12px;
+  border-radius: 16px;
+  background-color: rgba(255, 255, 255, 0.2);
+  background-image: var(--img);
+  background-size: cover;
+  background-position: center;
+}
+.sx-scr .tc {
+  margin-top: 14px;
+  padding: 12px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.96);
+  color: #08132b;
+  font-size: 12px;
+}
+.sx-scr .tc b {
+  display: block;
+  font-size: 14px;
+}
+.sx-scr .tc-k {
+  display: block;
+  color: #5b6678;
+  font: 600 10px/1 var(--f-mono);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.sx-scr .tc-s {
+  display: block;
+  color: #5b6678;
+}
+.sx-scr .tc-st {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.sx-scr .tc-st i {
+  flex: none;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--bc);
+}
+.sx-aplabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 40px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.sx-aplab {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 12px 16px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 16px;
+  color: #c4cedd;
+  font-size: 13px;
+  transition:
+    border-color 300ms,
+    background-color 300ms;
+}
+.sx-aplab.on {
+  border-color: transparent;
+  background: rgba(255, 255, 255, 0.12);
+}
+.sx-aplab b {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #fff;
+  font-size: 15px;
+}
+.sx-aplab b i {
+  flex: none;
+  width: 10px;
+  height: 10px;
+  border-radius: 3px;
+  background: var(--bc);
+}
+
+/* athletes: the apps grid and the "in every app" stage */
+.sx-apps__grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 20px;
+}
+.sx-every {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 20px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.sx-every li {
+  display: grid;
+  gap: 18px;
+  align-content: start;
+  min-height: 180px;
+  padding: 28px;
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 1.25;
+}
+.sx-every svg {
+  color: var(--cyan);
+}
+.sx-stage .strip {
+  margin-top: 24px;
+  background: rgba(9, 18, 40, 0.58);
+  border-color: rgba(255, 255, 255, 0.14);
+  color: #fff;
+}
+
+/* ---------- about: the "A" window and the mission orbit ---------- */
+.sx-a {
+  position: relative;
+  display: grid;
+  place-items: center;
+  margin: 0 auto;
+  width: min(100%, 560px);
+  aspect-ratio: 600 / 640;
+}
+.sx-a__ring {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+.sx-a__ring ellipse {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.14);
+  stroke-width: 1.4;
+}
+.sx-a__ring .dash {
+  stroke: rgba(0, 190, 243, 0.45);
+  stroke-dasharray: 2 10;
+}
+.sx-a__dot {
+  offset-rotate: 0deg;
+  animation: orbitDot var(--d, 16s) linear infinite;
+}
+.sx-a__dot--a {
+  offset-path: path('M10,320 a290,240 0 1,0 580,0 a290,240 0 1,0 -580,0');
+  --d: 18s;
+}
+.sx-a__dot--b {
+  offset-path: path('M60,320 a240,196 0 1,0 480,0 a240,196 0 1,0 -480,0');
+  --d: 13s;
+  animation-direction: reverse;
+}
+.sx-a__glyph {
+  position: relative;
+  z-index: 1;
+  font-size: clamp(300px, 42vw, 560px);
+  line-height: 0.82;
+  font-weight: 900;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  background-image: linear-gradient(180deg, rgba(4, 10, 26, 0.05), rgba(4, 10, 26, 0.45)), var(--photo);
+  background-size: auto, auto 100%;
+  background-position: 0 0, 30% 50%;
+  background-repeat: no-repeat;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-stroke: 2px rgba(255, 255, 255, 0.55);
+  animation: sxPan 26s ease-in-out infinite alternate;
+}
+@keyframes sxPan {
+  from {
+    background-position: 0 0, 15% 50%;
+  }
+  to {
+    background-position: 0 0, 85% 50%;
+  }
+}
+[data-section][data-ap='off'] .sx-a__dot,
+[data-section][data-ap='off'] .sx-a__glyph,
+.is-off .sx-a__dot,
+.is-off .sx-a__glyph {
+  animation-play-state: paused;
+}
+.sx-mission {
+  text-align: center;
+}
+.sx-mission .orbits svg {
+  width: 150%;
+  left: -25%;
+}
+.sx-mission .orbits .fdot--a {
+  offset-path: path('M40,400 a760,260 0 1,0 1520,0 a760,260 0 1,0 -1520,0');
+  --d: 26s;
+}
+.sx-mission .orbits .fdot--b {
+  offset-path: path('M200,400 a600,200 0 1,0 1200,0 a600,200 0 1,0 -1200,0');
+  --d: 19s;
+}
+.sx-mission__line {
+  max-width: 19ch;
+  margin: 0 auto;
+  font-size: clamp(38px, 5.6vw, 96px);
+  color: #fff;
+  text-wrap: balance;
+}
+.sx-mission__line .sx-mission__lead {
+  font-style: normal;
+  color: #00bef3;
+}
+.sx-values {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 20px;
+  margin-top: clamp(48px, 6vw, 80px);
+  text-align: left;
+}
+.sx-value {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 24px 26px;
+}
+.sx-value svg {
+  flex: none;
+  color: var(--cyan);
+}
+.sx-value h2 {
+  font-size: 22px;
+  line-height: 28px;
+  color: #fff;
+}
+.sx-value p {
+  margin-top: 2px;
+  color: #c4cedd;
+  font-size: 17px;
+  line-height: 24px;
+}
+.sx-team__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px 24px;
+}
+.sx-team__head h2 {
+  font-size: clamp(40px, 5vw, 72px);
+}
+.sx-team__head p {
+  color: var(--ink-2);
+  font-size: 16px;
+}
+.sx-team__grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 16px;
+  margin-top: 32px;
+}
+.sx-team__grid > li {
+  display: flex;
+  min-width: 0;
+}
+.sx-team__grid .person {
+  flex: 1;
+}
+.sx-partners {
+  padding-block: 0 clamp(64px, 8vw, 112px);
+}
+.sx-partners__inner {
+  display: flex;
+  align-items: center;
+  gap: 40px;
+  padding-top: 40px;
+  border-top: 1px solid var(--line);
+}
+.sx-partners__count {
+  flex: none;
+  padding-right: 40px;
+  border-right: 1px solid var(--line);
+}
+.sx-partners__count p:first-child {
+  color: var(--ink-2);
+  font-size: 16px;
+}
+.sx-partners__num {
+  margin-top: 6px;
+  font-size: clamp(56px, 6vw, 88px);
+}
+.sx-partners__list {
+  display: flex;
+  flex: 1;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px 32px;
+}
+.sx-partners__list img {
+  display: block;
+  width: auto;
+  height: var(--lh);
+  max-width: none;
+}
+
+/* ---------- contact: orbit-dot burst on the submit button (decoration only; the words come from the status line) ---------- */
+.sx-burst {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+.sx-burst i {
+  position: absolute;
+  left: -5px;
+  top: -5px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #00bef3;
+  opacity: 0;
+}
+.sx-burst i:nth-child(3n + 2) {
+  background: #8b5cf6;
+}
+.sx-burst i:nth-child(3n) {
+  background: #34d399;
+}
+.sx-burst.go i {
+  animation: sxBurst 1000ms var(--e-out, ease-out) both;
+}
+@keyframes sxBurst {
+  from {
+    opacity: 1;
+    transform: rotate(var(--a)) translateX(30px) scale(0.7);
+  }
+  60% {
+    opacity: 1;
+    transform: rotate(var(--a)) translateX(84px) scale(1.1);
+  }
+  to {
+    opacity: 0;
+    transform: rotate(var(--a)) translateX(108px) scale(0.9);
+  }
+}
+
+/* ---------- final CTA (night-stadium clip) ---------- */
+.sx-final.final.media-frame {
+  border-radius: 0;
+}
+.sx-final .fdot--a {
+  offset-path: path('M40,400 a760,260 0 1,0 1520,0 a760,260 0 1,0 -1520,0');
+  --d: 22s;
+}
+.sx-final .fdot--b {
+  offset-path: path('M200,400 a600,200 0 1,0 1200,0 a600,200 0 1,0 -1200,0');
+  --d: 16s;
+}
+.sx-final .d1 {
+  font-size: clamp(48px, 8.4vw, 150px);
+  text-wrap: balance;
+}
+.sx-final .final-ctas .btn--ghost {
+  color: #fff;
+}
+@media (max-width: 640px) {
+  .sx-final .final-ctas .btn {
+    flex: 1 1 100%;
+  }
+}
+
+/* ---------- responsive ---------- */
+@media (max-width: 1100px) {
+  .sx-hero {
+    padding: 128px 0 88px;
+  }
+  .sx-hero--split .sx-hero__grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 48px;
+  }
+  .sx-cv {
+    height: clamp(380px, 70vw, 520px);
+  }
+  .sx-apps__grid,
+  .sx-every {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .sx-a {
+    width: min(100%, 440px);
+  }
+  .sx-values {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .sx-team__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .sx-partners__inner {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 24px;
+  }
+  .sx-partners__count {
+    padding-right: 0;
+    border-right: 0;
+  }
+}
+@media (max-width: 1280px) and (min-width: 1101px) {
+  .sx-team__grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+@media (max-width: 720px) {
+  .sx-hero {
+    padding: 112px 0 64px;
+  }
+  .sx-hero__cta .btn {
+    flex: 1 1 100%;
+  }
+  .sx-apps__grid,
+  .sx-team__grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .sx-partners__list img {
+    height: calc(var(--lh) * 0.75);
+  }
+  .sx-every li {
+    min-height: 0;
+    padding: 20px;
+    font-size: 17px;
+  }
+  .sx-cv {
+    height: 380px;
+  }
+  .sx-morph {
+    height: 600px;
+  }
+  .sx-ms {
+    display: none;
+  }
+  .sx-pop--ready {
+    left: 10px;
+  }
+  .sx-pop--session {
+    right: 10px;
+  }
+}
+
+/* ---------- reduced motion: the still frame, nothing loops ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .sx-run,
+  .sx-burst i,
+  .sx-a__dot,
+  .sx-a__glyph {
+    animation: none !important;
+  }
+  .sx-slot,
+  .sx-cv,
+  .sx-col.anim {
+    transition: none;
+  }
+  .sx-col .sx-tile.big img {
+    transform: none;
+    transition: none;
+  }
+  .sx-page .pcard,
+  .sx-page .pcard:hover,
+  .sx-page .pcard:focus-within {
+    transform: none;
+  }
+}

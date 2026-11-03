@@ -33,14 +33,23 @@ const layout = () => {
   for (let node = walker.nextNode(); node; node = walker.nextNode()) {
     const e = node.parentElement;
     if (!node.textContent.trim() || !e || ['SCRIPT', 'STYLE', 'NOSCRIPT', 'OPTION'].includes(e.tagName)) continue;
-    if (!shown(e) || e.closest('.skip-link, .sr-only, [data-decorative]') || getComputedStyle(e).position === 'fixed') continue;
+    if (!shown(e) || e.closest('.skip-link, .sr-only, .sr, [data-decorative]') || getComputedStyle(e).position === 'fixed') continue;
     // Closed <details> bodies and text cut off by an overflow:hidden ancestor are not painted.
     const closed = e.closest('details:not([open])');
     if (closed && !e.closest('summary')) continue;
     const range = document.createRange();
     range.selectNodeContents(node);
+    // A tight display line (line-height under the font's own height) paints well inside its content area: judge it by its ink.
+    const cs0 = getComputedStyle(e);
+    const lineHeight = Number.parseFloat(cs0.lineHeight);
+    const ctx = document.createElement('canvas').getContext('2d');
+    ctx.font = `${cs0.fontStyle} ${cs0.fontWeight} ${cs0.fontSize} ${cs0.fontFamily}`;
+    const m = ctx.measureText(cs0.textTransform === 'uppercase' ? node.textContent.toUpperCase() : node.textContent);
     for (const r of range.getClientRects()) {
-      let box = { left: r.left, right: r.right, top: r.top, bottom: r.bottom };
+      const tight = lineHeight > 0 && lineHeight < r.height;
+      const top = tight ? r.top + (m.fontBoundingBoxAscent - m.actualBoundingBoxAscent) : r.top;
+      const bottom = tight ? r.bottom - (m.fontBoundingBoxDescent - m.actualBoundingBoxDescent) : r.bottom;
+      let box = { left: r.left, right: r.right, top, bottom };
       for (let n = e.parentElement; n && n !== document.documentElement && box; n = n.parentElement) {
         const cs = getComputedStyle(n);
         if (cs.overflowX === 'visible' && cs.overflowY === 'visible') continue;

@@ -1,0 +1,94 @@
+---
+// The photo conveyor (M4). `mini` is the schools one: two side lanes that loop and a centre lane that steps one block
+// per swapped word (scripts/solutions/swap.ts moves it). `grid` is the clubs one: three lanes that only loop.
+// Every photo is decorative (alt=""); no words are baked into any of them.
+import type { ConveyorTile } from './conveyors';
+
+interface Props {
+  variant: 'mini' | 'grid';
+  laneA: ConveyorTile[];
+  laneB: ConveyorTile[];
+  laneC?: ConveyorTile[];
+  /** mini: one photo set slug per swap word. */
+  blocks?: string[];
+}
+const { variant, laneA, laneB, laneC, blocks = [] } = Astro.props;
+const IMG = '/home/img/';
+const copies = [0, 1, 2];
+// Centre lane: [clone of the last block] + one block per word + [clones of the first two], so the step after the last word keeps going down.
+const mid = blocks.length ? [blocks.length - 1, ...blocks.map((_, i) => i), 0, 1] : [];
+const ACTIVE = 1;
+const lanes =
+  variant === 'grid'
+    ? [
+        { tiles: laneA, dir: '', dur: '64s' },
+        { tiles: laneB, dir: 'down', dur: '78s' },
+        { tiles: laneC ?? laneA, dir: '', dur: '56s' },
+      ]
+    : [];
+---
+
+{
+  variant === 'mini' ? (
+    <div class="sx-cv sx-cv--mini" aria-hidden="true" data-sx-cv>
+      <div class="sx-lane">
+        <div class="sx-run" style="--dur:64s">
+          {copies.map((c) => laneA.map((tile, i) => (
+            <div class={`sx-tile ${tile.shape}`}>
+              <img src={tile.src} alt="" width={tile.w} height={tile.h} loading={c === 0 && i < 2 ? 'eager' : 'lazy'} decoding="async" />
+            </div>
+          )))}
+        </div>
+      </div>
+      <div class="sx-lane sx-mid">
+        <div class="sx-col" data-sx-col>
+          {mid.map((j, bi) => (
+            <>
+              <div class:list={['sx-tile', 'sm', 'sq', { on: bi === ACTIVE }]}>
+                <img src={`${IMG}${blocks[j]}-tile-1x1-480.webp`} alt="" width="480" height="480" loading={bi === ACTIVE ? 'eager' : 'lazy'} decoding="async" />
+              </div>
+              <div class:list={['sx-tile', 'big', { on: bi === ACTIVE }]} data-big>
+                <img
+                  src={`${IMG}${blocks[j]}-big-560.webp`}
+                  alt=""
+                  width="560"
+                  height="700"
+                  loading={bi === ACTIVE || bi === ACTIVE + 1 ? 'eager' : 'lazy'}
+                  fetchpriority={bi === ACTIVE ? 'high' : undefined}
+                  decoding="async"
+                />
+                <i class="sx-sweep"></i>
+              </div>
+              <div class:list={['sx-tile', 'sm', 'p45', { on: bi === ACTIVE }]}>
+                <img src={`${IMG}${blocks[j]}-tile-4x5-480.webp`} alt="" width="480" height="600" loading={bi === ACTIVE ? 'eager' : 'lazy'} decoding="async" />
+              </div>
+            </>
+          ))}
+        </div>
+      </div>
+      <div class="sx-lane">
+        <div class="sx-run down" style="--dur:78s">
+          {copies.map((c) => laneB.map((tile, i) => (
+            <div class={`sx-tile ${tile.shape}`}>
+              <img src={tile.src} alt="" width={tile.w} height={tile.h} loading={c === 0 && i < 2 ? 'eager' : 'lazy'} decoding="async" />
+            </div>
+          )))}
+        </div>
+      </div>
+    </div>
+  ) : (
+    <div class="sx-cv sx-cv--grid" aria-hidden="true" data-sx-cv>
+      {lanes.map((lane) => (
+        <div class="sx-lane">
+          <div class:list={['sx-run', lane.dir]} style={`--dur:${lane.dur}`}>
+            {copies.map((c) => lane.tiles.map((tile, i) => (
+              <div class={`sx-tile ${tile.shape}`}>
+                <img src={tile.src} alt="" width={tile.w} height={tile.h} loading={c === 0 && i < 2 ? 'eager' : 'lazy'} decoding="async" />
+              </div>
+            )))}
+          </div>
+        </div>
+      ))}
+    </div>
+  )
+}
