@@ -2,6 +2,7 @@
 import type { Locale } from '../../i18n';
 import { useEngage } from '../../i18n/pages/engage';
 import { site } from '../../data/site';
+import { contactHref } from './links';
 import Photo from '../ui/Photo.astro';
 import FinalCta from '../home/FinalCta.astro';
 import FeatureHero from './FeatureHero.astro';
@@ -86,7 +87,7 @@ const g = e.integrations;
 </section>
 
 <AlsoInAria locale={locale} items={g.also} />
-<FinalCta locale={locale} />
+<FinalCta locale={locale} demoHref={contactHref(locale, 'demo')} />
 
 <style>
   .live {

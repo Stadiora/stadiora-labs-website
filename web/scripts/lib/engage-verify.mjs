@@ -2,6 +2,7 @@
 // integrations) in both languages. verify-dist.mjs calls verifyEngagePages once with its `fail` collector.
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
+import { checkLinks } from './engage-links.mjs';
 
 const origin = 'https://stadioralabs.com';
 const slugs = ['messaging', 'guardian-portal', 'teams', 'custom-branded-apps', 'integrations'];
@@ -36,7 +37,12 @@ const forbidden = [
 const competitors = /everfit|trainerize|trainheroic|teambuildr|truecoach|sportsengine|teamsnap/i;
 const integrationBrands = /garmin|strava|polar/i;
 
-export function verifyEngagePages({ dist, fail }) {
+// DESIGN-2 section 0.4: demo CTAs go to /contact/?topic=demo and "Talk to us" to /contact/?topic=question.
+const demoLabel = /^(book a (school )?demo|agenda una demo( escolar)?)$/i;
+const talkLabel = /^(talk to us|habla con nosotros)$/i;
+
+/** `pending` is a Map that checkLinks fills with the routes other open PRs own; the caller prints it. */
+export function verifyEngagePages({ dist, fail, pending = new Map() }) {
   for (const page of engagePages) {
     const path = join(dist, page.file);
     if (!existsSync(path)) {
@@ -103,6 +109,17 @@ export function verifyEngagePages({ dist, fail }) {
     for (const m of html.matchAll(/<a\b[^>]*\btarget="_blank"[^>]*>/g)) {
       if (!/\brel="[^"]*noopener/.test(m[0])) fail(`${page.file}: target=_blank link without noopener`);
     }
+
+    const prefix = page.lang === 'es' ? '/es' : '';
+    for (const m of html.matchAll(/<a\b([^>]*)>([\s\S]*?)<\/a>/g)) {
+      const href = m[1].match(/\shref="([^"]*)"/)?.[1] ?? '';
+      const label = text(m[2]).trim();
+      if (demoLabel.test(label) && href !== `${prefix}/contact/?topic=demo`) fail(`${page.file}: "${label}" goes to ${href}, expected ${prefix}/contact/?topic=demo`);
+      if (talkLabel.test(label) && href !== `${prefix}/contact/?topic=question`) fail(`${page.file}: "${label}" goes to ${href}, expected ${prefix}/contact/?topic=question`);
+    }
+    if (/bookings\.cloud\.microsoft/.test(html)) fail(`${page.file}: links to the external booking page; demo calls to action use the contact page`);
+
+    checkLinks({ dist, page, html, fail, pending });
 
     // The language switch and the hreflang pair must point at each other.
     if (!html.includes(`href="${page.alt}"`)) fail(`${page.file}: no link to the ${page.lang === 'en' ? 'Spanish' : 'English'} version`);

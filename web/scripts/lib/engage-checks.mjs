@@ -2,10 +2,15 @@
 // check recorder and screenshot helpers.
 //   node scripts/evidence.mjs --engage-only          (these checks plus screenshots)
 //   node scripts/evidence.mjs --engage-only --checks-only
+import { clipProbe } from './clip-probe.mjs';
 import { contrastProbe } from './contrast.mjs';
 import { engagePages } from './engage-verify.mjs';
 
 const widths = [390, 1024, 1280, 1440];
+// Messaging (four narrow columns) and Teams (a table and tab strip in a panel) lose their minimum width between
+// the four required widths, so the clipping check also sweeps these.
+const sweepWidths = [360, 414, 480, 600, 720, 900, 1100, 1180, 1181, 1240, 1280, 1320, 1360, 1400, 1440, 1600];
+const sweepPages = ['messaging', 'teams'];
 
 const names = {
   messaging: 'messaging',
@@ -66,6 +71,8 @@ export async function engageChecks({ open, check, shot, sleep, settle, checksOnl
       await settle(page);
       const o = await page.evaluate(overflowProbe);
       check(group, `${label}: no horizontal overflow at ${width}px`, o.scrollWidth <= o.vw && o.wideCount === 0, `scrollWidth ${o.scrollWidth} vs ${o.vw}${o.wideCount ? `, wide: ${o.wide.join('; ')}` : ''}`);
+      const k = await page.evaluate(clipProbe);
+      check(group, `${label}: no visible text is cut off by a clipping ancestor at ${width}px`, k.cutCount === 0, `${k.checked} text elements${k.cutCount ? `, cut: ${k.cut.join('; ')}` : ''}`);
       if (width === 1440) {
         const a = await page.evaluate(a11yProbe);
         check(group, `${label}: every image has an alt attribute`, a.noAlt.length === 0, a.noAlt.join(', '));
@@ -74,6 +81,19 @@ export async function engageChecks({ open, check, shot, sleep, settle, checksOnl
         check(group, `${label}: page problems (console errors, 4xx, failed requests)`, page.problems.length === 0, page.problems.slice(0, 3).join('; '));
       }
       await page.context().close();
+    }
+
+    // 1b. The same clipping check at in-between widths for the two pages that wrap their demo content.
+    if (sweepPages.includes(names[p.slug])) {
+      const failures = [];
+      for (const width of sweepWidths) {
+        const page = await open({ width, height: width < 500 ? 844 : 900, reduced: true, mobile: width < 500 }, p.path);
+        await settle(page);
+        const k = await page.evaluate(clipProbe);
+        if (k.cutCount) failures.push(`${width}px: ${k.cut.slice(0, 2).join('; ')}`);
+        await page.context().close();
+      }
+      check(group, `${label}: no visible text is cut off at ${sweepWidths.length} widths from ${sweepWidths[0]} to ${sweepWidths.at(-1)}px`, failures.length === 0, failures.join(' | '));
     }
 
     // 2. WCAG AA in both themes, aria-hidden demo text included.

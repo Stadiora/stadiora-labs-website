@@ -29,8 +29,13 @@ node scripts/evidence.mjs --engage-only # just the Platform page checks, EN and 
 - Platform pages (`src/pages/{,es/}platform/{messaging,guardian-portal,teams,custom-branded-apps,integrations}/`): thin
   wrappers around `src/components/engage/*Page.astro`; all copy is in `src/i18n/pages/engage.ts` (EN and ES, ES typed against EN).
   Every claim on them is backed by Aria code, see the PR's claims table. `scripts/lib/engage-verify.mjs` (run by `npm run verify`)
-  fails the build on an unbacked claim, a user or customer count, a competitor name, "all wearables", or a broken link, and
-  `scripts/lib/engage-checks.mjs` (run by `evidence`) covers overflow at 390/1024/1280/1440, WCAG AA in both themes, alt text,
+  fails the build on an unbacked claim, a user or customer count, a competitor name, "all wearables", a demo call to action that
+  does not go to `/contact/?topic=demo` (or "Talk to us" to `?topic=question`), or an internal link that does not resolve.
+  The link guard (`scripts/lib/engage-links.mjs`) checks every internal href on the ten pages against `dist/`, the legacy pages at
+  the repo root and the element ids it points at. Routes that other open PRs own (`pendingRoutes`: pricing, solutions, about,
+  contact, case studies, the coach pages) are an explicit list and are printed as `pending` by `npm run verify`, never passed
+  silently; a typo of one of them fails. Delete an entry when its PR has merged. `scripts/lib/engage-checks.mjs` (run by
+  `evidence`) covers overflow and clipped text (`clip-probe.mjs`) at 390/1024/1280/1440, WCAG AA in both themes, alt text,
   heading order, the Guardian child switcher and the Teams school price (`?region=latam` shows the LatAm price).
 - Design tokens: `src/styles/tokens.css` (light and dark). Text accent on light is `#0077A8`; `#00BEF3` is decorative only.
 - Photos: drop a file named after its slot into `src/assets/photos/`; `src/data/photo-alt.json` holds EN and ES alt text.

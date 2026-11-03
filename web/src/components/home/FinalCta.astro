@@ -7,8 +7,10 @@ interface Props {
   locale: Locale;
   // Replaces the coach button, e.g. "Talk to us" on the custom-branded apps page.
   middle?: { label: string; href: string };
+  // Replaces the booking link on the "Book a school demo" button.
+  demoHref?: string;
 }
-const { locale, middle } = Astro.props;
+const { locale, middle, demoHref } = Astro.props;
 const t = useDict(locale);
 const c = t.cta;
 ---
@@ -19,7 +21,7 @@ const c = t.cta;
     <div class="cta__actions">
       <a class="btn btn--lg btn--white" href="#get-app" data-open-sheet>{c.download}</a>
       <a class="btn btn--lg btn--on-band" href={middle?.href ?? site.signUp}>{middle?.label ?? c.coach}</a>
-      <a class="btn btn--lg btn--on-band" href={site.booking} rel="noopener">{c.school}</a>
+      <a class="btn btn--lg btn--on-band" href={demoHref ?? site.booking} rel={demoHref ? undefined : 'noopener'}>{c.school}</a>
     </div>
   </div>
 

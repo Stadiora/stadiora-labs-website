@@ -2,7 +2,7 @@
 import type { Locale } from '../../i18n';
 import { useEngage } from '../../i18n/pages/engage';
 import { hrefFor } from '../../data/nav';
-import { site } from '../../data/site';
+import { contactHref } from './links';
 import Photo from '../ui/Photo.astro';
 import Phone from '../ui/Phone.astro';
 import FinalCta from '../home/FinalCta.astro';
@@ -29,7 +29,7 @@ const tabIcons = ['home', 'calendar', 'chat', 'file'] as const;
   title={g.title}
   sub={g.sub}
   ctas={[
-    { label: g.ctaPrimary, href: site.booking },
+    { label: g.ctaPrimary, href: contactHref(locale, 'demo') },
     { label: g.ctaSecondary, href: '#how', kind: 'secondary' },
   ]}
 >
@@ -144,13 +144,13 @@ const tabIcons = ['home', 'calendar', 'chat', 'file'] as const;
     </div>
     <div class="price__links">
       <a class="link link-arrow" href={hrefFor('pricing', locale)}>{g.pricing.see}<EIcon name="arrow-right" size={18} /></a>
-      <a class="link link-arrow" href={hrefFor('contact', locale)}>{g.pricing.talk}<EIcon name="arrow-right" size={18} /></a>
+      <a class="link link-arrow" href={contactHref(locale, 'question')}>{g.pricing.talk}<EIcon name="arrow-right" size={18} /></a>
     </div>
   </div>
 </section>
 
 <AlsoInAria locale={locale} items={g.also} />
-<FinalCta locale={locale} />
+<FinalCta locale={locale} demoHref={contactHref(locale, 'demo')} />
 
 <style>
   .how {
