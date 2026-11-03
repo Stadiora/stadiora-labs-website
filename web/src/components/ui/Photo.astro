@@ -27,6 +27,9 @@ const match = Object.entries(files).find(([path]) => path.split('/').pop()!.repl
 const image = match?.[1].default;
 const text = alt ?? photoAlt[slot]?.[getLocale(locale)] ?? '';
 const [rw, rh] = ratio.split('/').map(Number);
+// The fallback <img src> would otherwise be the full-size master; cap it at the largest srcset width.
+const fallbackWidth = image ? Math.min(image.width, Math.max(...widths)) : 0;
+const fallbackHeight = image ? Math.round((fallbackWidth * image.height) / image.width) : 0;
 ---
 
 {
@@ -34,6 +37,8 @@ const [rw, rh] = ratio.split('/').map(Number);
     <Picture
       src={image}
       alt={text}
+      width={fallbackWidth}
+      height={fallbackHeight}
       widths={widths}
       sizes={sizes}
       formats={['avif', 'webp']}

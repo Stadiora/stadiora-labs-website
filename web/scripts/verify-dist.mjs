@@ -79,6 +79,7 @@ if (existsSync(assets)) {
     const size = statSync(join(assets, name)).size;
     if (/\.(mp4|webm)$/.test(name) && size > 1.5 * 1024 * 1024) fail(`_astro/${name}: video over 1.5 MB`);
     if (/\.(png|jpe?g)$/.test(name) && size > 400 * 1024) fail(`_astro/${name}: raster over 400 KB`);
+    if (/^h\d-.*\.(avif|webp)$/.test(name) && size > 180 * 1024) fail(`_astro/${name}: hero photo over 180 KB`);
   }
 }
 
