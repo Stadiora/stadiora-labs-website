@@ -97,6 +97,41 @@ if (!checksOnly) {
 }
 
 // ---------------------------------------------------------------- 2. interactions (motion on)
+// Hero cycle: the first painted word is "coaches" (also in the no-JS HTML) and the rotation visits all seven
+// words in order, with the three photo tiles on the same set as the word.
+{
+  const expected = {
+    '/': ['coaches', 'high school teams', 'soccer academies', 'track and field', 'gyms and studios', 'nutrition coaches', 'universities'],
+    '/es/': ['entrenadores', 'equipos escolares', 'academias de fútbol', 'equipos de atletismo', 'gimnasios y estudios', 'coaches de nutrición', 'universidades'],
+  };
+  for (const [path, words] of Object.entries(expected)) {
+    const file = path === '/' ? 'index.html' : 'es/index.html';
+    const html = await readFile(`${root}dist/${file}`, 'utf8');
+    const staticWord = html.match(/<span[^>]*class="hero__static"[^>]*>([^<]*)<\/span>/)?.[1]?.trim();
+    check('hero', `${path} first painted word (HTML, no JS) is "${words[0]}"`, staticWord === words[0], `static word "${staticWord}"`);
+    const domOrder = [...html.matchAll(/<span[^>]*class="hero__word"[^>]*>([^<]*)<\/span>/g)].map((m) => m[1].trim());
+    check('hero', `${path} rotation order is ${words.length} words, coaches first`, JSON.stringify(domOrder) === JSON.stringify(words), domOrder.join(' | '));
+  }
+  const page = await open({ width: 1440, height: 900 });
+  await page.mouse.move(2, 2);
+  const seen = [];
+  const mismatched = [];
+  const t0 = Date.now();
+  while (Date.now() - t0 < 24000) {
+    const s = await page.evaluate(() => ({
+      word: document.querySelector('.hero__word[data-active]')?.textContent?.trim(),
+      sets: [...document.querySelectorAll('[data-hero-slot] .hero__ph[data-active]')].map((e) => e.dataset.set),
+      index: [...document.querySelectorAll('.hero__word')].findIndex((e) => e.hasAttribute('data-active')),
+    }));
+    if (seen[seen.length - 1] !== s.word) seen.push(s.word);
+    if (s.sets.some((v) => Number(v) !== s.index)) mismatched.push(`${s.word}:${s.sets}`);
+    await sleep(250);
+  }
+  check('hero', 'rotation cycles coaches -> ... -> universities -> coaches in order', JSON.stringify(seen.slice(0, 8)) === JSON.stringify([...expected['/'], expected['/'][0]]), seen.join(' > '));
+  check('hero', 'photo sets stay in sync with the word through the whole cycle', mismatched.length <= 2, `${mismatched.length} samples out of step (a crossfade frame can lag)`);
+  await page.context().close();
+}
+
 {
   const page = await open({ width: 1440, height: 900 });
   await page.mouse.move(2, 2);
@@ -204,11 +239,23 @@ if (!checksOnly) {
   await sleep(3200);
   const p1 = await pos();
   check('brand', 'retro stack advances on its own', p0 !== p1, `${p0} -> ${p1}`);
+  const fronts = new Set();
+  const tFan = Date.now();
+  while (Date.now() - tFan < 21000 && fronts.size < 8) {
+    fronts.add(await page.evaluate(() => document.querySelector('.retro__card[data-pos="0"] img')?.getAttribute('alt')));
+    await sleep(250);
+  }
+  check('brand', 'stack cycles through all 8 retro images', fronts.size === 8, `${fronts.size} distinct front cards`);
   if (!checksOnly) await el(page, '.brand', 'state-brand-retro-stack');
   await page.locator('[data-retro-pause]').click();
   const p2 = await pos();
   await sleep(3200);
   check('brand', 'pause control stops the stack', p2 === (await pos()));
+  const fan = await page.evaluate(() => {
+    const cards = [...document.querySelectorAll('.retro__card')].filter((c) => parseFloat(getComputedStyle(c).opacity) > 0.9);
+    return { visible: cards.length, positions: cards.map((c) => c.dataset.pos).sort() };
+  });
+  check('brand', 'five overlapping cards are visible as a fan', fan.visible === 5, `${fan.visible} visible, positions ${fan.positions.join(',')}`);
   await page.locator('[data-retro-pause]').click();
 
   // Store chooser dialog
@@ -281,13 +328,15 @@ if (!checksOnly) {
       .filter((a) => a.playState === 'running' && a.effect?.getComputedTiming().iterations === Infinity)
       .map((a) => a.animationName ?? a.id ?? 'unnamed'),
   );
-  check('reduced-motion', 'hero shows the static sentence, no rotation', first.length > 0 && wordBefore === wordAfter, `"${first}"; active word stays "${wordAfter}"`);
+  check('reduced-motion', 'hero shows the static word "coaches", no rotation', first === 'coaches' && wordBefore === wordAfter, `"${first}"; active word stays "${wordAfter}"`);
   check('reduced-motion', 'no infinite animation is running', infinite.length === 0, infinite.join(','));
-  const fakeProgress = await page.evaluate(() => {
-    const first = document.querySelector('.retro__card[data-pos="0"]');
-    return [...document.querySelectorAll('.retro__card')].filter((c) => c !== first && getComputedStyle(c).display !== 'none').length;
-  });
-  check('reduced-motion', 'retro stack shows only its front card', fakeProgress === 0, `${fakeProgress} extra cards visible`);
+  const fanBefore = await page.evaluate(() => [...document.querySelectorAll('.retro__card')].map((c) => c.dataset.pos).join(','));
+  await sleep(2800);
+  const fan = await page.evaluate(() => ({
+    order: [...document.querySelectorAll('.retro__card')].map((c) => c.dataset.pos).join(','),
+    visible: [...document.querySelectorAll('.retro__card')].filter((c) => getComputedStyle(c).display !== 'none' && parseFloat(getComputedStyle(c).opacity) > 0.9).length,
+  }));
+  check('reduced-motion', 'retro stack is a static fan of five cards, no cycling', fan.visible === 5 && fan.order === fanBefore, `${fan.visible} cards visible, order ${fanBefore} -> ${fan.order}`);
   await page.context().close();
 }
 
@@ -300,6 +349,73 @@ for (const path of ['/', '/es/']) {
     check('responsive', `${path} @${width}: no horizontal scroll`, over <= 0, over > 0 ? `${over}px over` : '');
     await page.context().close();
   }
+}
+
+// ---------------------------------------------------------------- 4b. layout and content details (fix round A)
+for (const [path, locale] of [
+  ['/', 'en'],
+  ['/es/', 'es'],
+]) {
+  for (const width of [1440, 1360, 1280, 1024]) {
+    const page = await open({ width, height: 900, reduced: true }, path);
+    await settle(page);
+    const ai = await page.evaluate(() => {
+      const box = (s) => document.querySelector(s)?.getBoundingClientRect();
+      const typed = document.querySelector('[data-ai-typed]');
+      const lh = parseFloat(getComputedStyle(typed).lineHeight);
+      const ask = box('.ai__ask');
+      const program = box('.ai__program');
+      const cal = box('.ai__cal');
+      // A word wider than its box would break mid-word ("Acceleratio / n"): measure each word on one line.
+      const brokenWords = [...document.querySelectorAll('.ai__event-name, .ai__event-spec, .ai__row')].filter((e) => {
+        if (getComputedStyle(e).display === 'none' || e.getBoundingClientRect().width === 0) return false;
+        const probe = document.createElement('span');
+        probe.style.cssText = 'position:absolute;visibility:hidden;white-space:nowrap;font:inherit;letter-spacing:inherit';
+        e.appendChild(probe);
+        const room = e.clientWidth - parseFloat(getComputedStyle(e).paddingLeft) - parseFloat(getComputedStyle(e).paddingRight);
+        const tooWide = e.textContent.trim().split(/\s+/).some((w) => ((probe.textContent = w), probe.getBoundingClientRect().width > room + 0.5));
+        probe.remove();
+        return tooWide;
+      }).length;
+      const clipped = brokenWords + [...document.querySelectorAll('.ai__event-name, .ai__event-spec, .ai__spec')].filter((e) => e.scrollWidth > e.clientWidth + 1).length;
+      return { lines: Math.round(typed.getBoundingClientRect().height / lh), ask: Math.round(ask.width), program: Math.round(program.width), cal: Math.round(cal.width), clipped };
+    });
+    check('ai-layout', `${locale} @${width}: the prompt reads in 2 to 3 lines`, ai.lines >= 2 && ai.lines <= 3, `${ai.lines} lines in a ${ai.ask}px card`);
+    check('ai-layout', `${locale} @${width}: ask card is wider than the program card on the three-column row, no word breaks mid-word`, ai.clipped === 0 && (width < 1360 || ai.ask >= ai.program * 1.1), `ask ${ai.ask} / program ${ai.program} / calendar ${ai.cal}px, ${ai.clipped} clipped`);
+    await page.context().close();
+  }
+}
+{
+  const page = await open({ width: 1440, height: 900, reduced: true });
+  await settle(page);
+  const apps = await page.evaluate(() => {
+    const loaded = (img) => img.complete && img.naturalWidth > 0;
+    const hero = [...document.querySelectorAll('.bp__hero img')];
+    const thumbs = [...document.querySelectorAll('.bp__list--tiles b img')];
+    return {
+      hero: hero.length,
+      heroLoaded: hero.filter(loaded).length,
+      thumbs: thumbs.length,
+      thumbsLoaded: thumbs.filter(loaded).length,
+      distinct: new Set([...hero, ...thumbs].map((i) => i.currentSrc.replace(/-[0-9a-f]+\.[a-z]+$/, ''))).size,
+      missing: document.querySelectorAll('.photo--missing').length,
+    };
+  });
+  check('apps', 'three phone screens carry real photos, FitMG rows carry thumbnails', apps.hero === 3 && apps.heroLoaded === 3 && apps.thumbs === 4 && apps.thumbsLoaded === 4 && apps.missing === 0, `${apps.heroLoaded}/${apps.hero} hero photos, ${apps.thumbsLoaded}/${apps.thumbs} thumbnails loaded, ${apps.distinct} distinct files`);
+  const logos = await page.evaluate(() => {
+    const imgs = [...document.querySelectorAll('.marquee__group:not([aria-hidden]) .logos__item img.only-light')];
+    return { heights: imgs.map((i) => Math.round(i.getBoundingClientRect().height)), widths: imgs.map((i) => Math.round(i.getBoundingClientRect().width)), opacity: Number(getComputedStyle(imgs[0]).opacity) };
+  });
+  check('logos', 'logos are sized by optical area, not one shared height', new Set(logos.heights).size >= 4, `heights ${logos.heights.join('/')}, widths ${logos.widths.join('/')}`);
+  const lin = (v) => ((v /= 255) <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4);
+  const L = (c) => 0.2126 * lin(c[0]) + 0.7152 * lin(c[1]) + 0.0722 * lin(c[2]);
+  const mix = (fg, a, bg) => fg.map((v, i) => v * a + bg[i] * (1 - a));
+  const onLight = mix([11, 18, 32], logos.opacity, [255, 255, 255]);
+  const ratio = (L([255, 255, 255]) + 0.05) / (L(onLight) + 0.05);
+  check('logos', 'mono-dark (#0B1220) at 70-80% opacity keeps AA contrast on white', logos.opacity >= 0.7 && logos.opacity <= 0.8 && ratio >= 4.5, `opacity ${logos.opacity}, ${ratio.toFixed(1)}:1`);
+  const load = await page.evaluate(() => document.querySelector('.pcard--load')?.textContent ?? '');
+  check('claims', 'training load card carries no unbacked "In range" verdict', !/in range|en rango/i.test(load) && /RPE/.test(load), load.replace(/\s+/g, ' ').trim());
+  await page.context().close();
 }
 
 // ---------------------------------------------------------------- 5. measured budgets

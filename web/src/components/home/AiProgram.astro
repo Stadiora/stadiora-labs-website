@@ -117,10 +117,10 @@ const sessions = [
   .ai__panel {
     position: relative;
     display: grid;
-    grid-template-columns: minmax(0, 0.8fr) 36px minmax(0, 1.1fr) 36px minmax(0, 2.2fr);
+    grid-template-columns: minmax(0, 1.25fr) 28px minmax(0, 1fr) 28px minmax(0, 1.9fr);
     align-items: center;
     margin-top: 40px;
-    padding: 28px;
+    padding: 28px 16px;
     border-radius: 18px;
     background: var(--surface);
   }
@@ -136,7 +136,7 @@ const sessions = [
   }
 
   .ai__ask {
-    padding: 22px 22px 22px 24px;
+    padding: 20px 18px 20px 20px;
     border-left: 2px solid var(--violet);
   }
   .ai__ask-title {
@@ -152,17 +152,19 @@ const sessions = [
     color: var(--violet);
   }
   .ai__input {
-    position: relative;
+    display: flex;
+    flex-direction: column;
     margin-top: 16px;
-    min-height: 118px;
-    padding: 14px 56px 14px 14px;
+    padding: 12px;
     border: 1px solid var(--line);
     border-radius: var(--radius-ctl);
     background: var(--bg);
   }
+  /* Room for three lines so typing does not move the card. */
   .ai__typed {
-    font-size: 16px;
-    line-height: 24px;
+    min-height: 66px;
+    font-size: 15px;
+    line-height: 22px;
     color: var(--ink);
   }
   .ai__typed.is-typing::after {
@@ -181,9 +183,8 @@ const sessions = [
     }
   }
   .ai__send {
-    position: absolute;
-    right: 12px;
-    bottom: 12px;
+    align-self: flex-end;
+    margin-top: 6px;
     display: grid;
     place-items: center;
     width: 40px;
@@ -215,9 +216,9 @@ const sessions = [
   }
   .ai__row {
     display: grid;
-    grid-template-columns: 52px 1fr;
-    gap: 8px;
-    font-size: 15px;
+    grid-template-columns: 44px minmax(0, 1fr);
+    gap: 6px;
+    font-size: 14px;
     line-height: 20px;
   }
   .ai__day,
@@ -247,7 +248,7 @@ const sessions = [
   }
 
   .ai__cal {
-    padding: 18px 18px 18px;
+    padding: 18px 14px;
   }
   .ai__cal-head {
     display: flex;
@@ -267,6 +268,7 @@ const sessions = [
     color: var(--ink-2);
   }
   .ai__grid {
+    container-type: inline-size;
     border: 1px solid var(--line);
     border-radius: 10px;
     overflow: hidden;
@@ -286,7 +288,7 @@ const sessions = [
   .ai__cell {
     position: relative;
     min-height: 168px;
-    padding: 6px 3px;
+    padding: 6px 2px;
     border-left: 1px solid var(--line);
   }
   .ai__cell:first-child {
@@ -303,13 +305,15 @@ const sessions = [
   .ai__event {
     position: relative;
     display: block;
-    padding: 5px 2px 5px 5px;
+    padding: 5px 1px 5px 4px;
     border-left: var(--lane) solid var(--cyan);
     border-radius: 6px;
     background: var(--cyan-tint);
     color: var(--ink);
-    font-size: 11px;
-    line-height: 15px;
+    /* A seven-column cell is ~70px wide: scale the text with the grid so "Acceleration" never breaks mid-word. */
+    font-size: clamp(9.5px, calc(2.42cqw - 2.2px), 10.5px);
+    line-height: 14px;
+    letter-spacing: -0.01em;
   }
   .ai__event-name,
   .ai__event-spec {
@@ -406,20 +410,42 @@ const sessions = [
     }
   }
 
-  @media (max-width: 1100px) {
+  /* Tablet: ask and program share the first row, the calendar takes the full second row. */
+  @media (max-width: 1359px) {
     .ai__panel {
-      grid-template-columns: minmax(0, 1fr);
-      gap: 12px;
+      grid-template-columns: minmax(0, 1fr) 36px minmax(0, 1fr);
+      gap: 12px 0;
       padding: 20px;
     }
-    .ai__arrow {
+    .ai__typed {
+      min-height: 44px;
+    }
+    .ai__event {
+      font-size: 12px;
+      line-height: 16px;
+    }
+    .ai__arrow:last-of-type,
+    .ai__cal {
+      grid-column: 1 / -1;
+    }
+    .ai__arrow:last-of-type {
       transform: rotate(90deg);
-      margin-block: 8px;
+      margin-block: 8px 0;
+    }
+    .ai__ask,
+    .ai__program {
+      align-self: stretch;
     }
   }
   @media (max-width: 720px) {
     .ai__panel {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 12px;
       padding: 14px;
+    }
+    .ai__arrow {
+      transform: rotate(90deg);
+      margin-block: 8px;
     }
     /* Phone: the week becomes a list of the days that have a session. */
     .ai__grid-head {

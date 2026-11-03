@@ -36,7 +36,7 @@ const bars = [36, 58, 78, 50, 68, 62, 92];
           ))
         }
       </div>
-      <p class="pcard__status"><span class="dot dot--mint" aria-hidden="true"></span>{e.load.status}</p>
+      <p class="pcard__status">{e.load.status}</p>
     </div>
   </div>
 
@@ -123,15 +123,6 @@ const bars = [36, 58, 78, 50, 68, 62, 92];
     color: var(--ink-2);
     font-size: 15px;
     line-height: 20px;
-  }
-  .dot {
-    flex: none;
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-  }
-  .dot--mint {
-    background: var(--mint);
   }
 
   .pcard--load {

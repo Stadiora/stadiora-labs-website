@@ -3,6 +3,7 @@ import { useDict, type Locale } from '../../i18n';
 import { hrefFor } from '../../data/nav';
 import { site } from '../../data/site';
 import Phone from '../ui/Phone.astro';
+import Photo from '../ui/Photo.astro';
 import Icon from '../ui/Icon.astro';
 
 interface Props {
@@ -25,6 +26,19 @@ function parts(key: 'run' | 'aria12' | 'lift' | 'fitmg') {
 }
 const apps = ['run', 'aria12', 'lift', 'fitmg'] as const;
 const nav = ['activity', 'run', 'chat', 'menu'] as const;
+
+// Real photos for the demo screens (decorative: the phones are aria-hidden). `pos` is the object-position crop.
+const heroPhotos = {
+  run: { slot: 'p1-training', pos: '18% 55%' },
+  aria12: { slot: 'h2-academies-tile-sq', pos: '50% 80%' },
+  lift: { slot: 'h5-gyms-big', pos: '50% 36%' },
+} as const;
+const thumbs = [
+  { slot: 'h5-gyms-tile-sq', pos: '60% 40%' },
+  { slot: 'h7-universities-tile-sq', pos: '50% 22%' },
+  { slot: 'h5-gyms-tile-45', pos: '50% 30%' },
+  { slot: 'h7-universities-tile-45', pos: '30% 28%' },
+] as const;
 ---
 
 <section class="section apps" aria-labelledby="apps-title">
@@ -48,7 +62,11 @@ const nav = ['activity', 'run', 'chat', 'menu'] as const;
                   <span class="bp__logo" />
                   <span class="bp__name">{names[key].name}</span>
                 </div>
-                <div class="bp__hero" />
+                <div class="bp__hero" style={key !== 'fitmg' ? `--pos:${heroPhotos[key].pos}` : undefined}>
+                  {key !== 'fitmg' && (
+                    <Photo slot={heroPhotos[key].slot} ratio="2/1" sizes="(max-width: 1024px) 200px, 220px" widths={[240, 480]} alt="" />
+                  )}
+                </div>
                 <div class="bp__body">
                   {key === 'run' && (
                     <>
@@ -91,7 +109,9 @@ const nav = ['activity', 'run', 'chat', 'menu'] as const;
                       <ul class="bp__list bp__list--tiles">
                         {a.screen.fitmg.rows.map((row, n) => (
                           <li>
-                            <b />
+                            <b style={`--pos:${thumbs[n % thumbs.length].pos}`}>
+                              <Photo slot={thumbs[n % thumbs.length].slot} ratio="1/1" sizes="64px" widths={[64, 128]} alt="" />
+                            </b>
                             <span>
                               {row}
                               <small class="num">{a.screen.fitmg.sets[n]}</small>
@@ -208,7 +228,13 @@ const nav = ['activity', 'run', 'chat', 'menu'] as const;
   .bp__hero {
     flex: none;
     height: 7.8em;
+    overflow: hidden;
     background: var(--brand-hero);
+  }
+  .bp__hero :global(.photo),
+  .bp__list--tiles b :global(.photo) {
+    height: 100%;
+    object-position: var(--pos, 50% 50%);
   }
   .bp__body {
     flex: 1;
@@ -285,8 +311,9 @@ const nav = ['activity', 'run', 'chat', 'menu'] as const;
   }
   .bp__list--tiles b {
     flex: none;
-    width: 2.2em;
-    height: 2.2em;
+    width: 2.6em;
+    height: 2.6em;
+    overflow: hidden;
     border-radius: 0.4em;
     background: linear-gradient(135deg, #3a3a3a, #1c1c1c);
   }

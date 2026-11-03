@@ -87,7 +87,6 @@ export const es: Dict = {
       nutrition: 'coaches de nutrición',
       universities: 'universidades',
     },
-    staticWord: 'entrenadores y equipos',
     sentence:
       'La plataforma de coaching para entrenadores, equipos escolares, academias de fútbol, equipos de atletismo, gimnasios y estudios, coaches de nutrición y universidades',
     sub: 'Entrenamiento, nutrición, preparación y mensajes en un solo lugar, para que los atletas y sus entrenadores vean el panorama completo.',
@@ -173,7 +172,7 @@ export const es: Dict = {
     load: {
       label: 'Carga de entrenamiento · esta semana',
       days: ['L', 'M', 'M', 'J', 'V', 'S', 'D'],
-      status: 'En rango',
+      status: 'RPE × minutos',
     },
     goal: { label: 'Meta', value: '72%', text: 'Correr 400 m en menos de 58 s' },
     checkin: {

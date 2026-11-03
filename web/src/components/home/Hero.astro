@@ -27,7 +27,7 @@ const slots = [
         <span class="hero__visual" aria-hidden="true">
           <span class="hero__lead">{t.hero.lead}</span>
           <span class="hero__words" data-hero-words>
-            <span class="hero__static">{t.hero.staticWord}</span>
+            <span class="hero__static">{t.hero.words[heroSets[0].word]}</span>
             {
               heroSets.map((set, i) => (
                 <span class="hero__word" data-active={i === 0 ? '' : undefined}>

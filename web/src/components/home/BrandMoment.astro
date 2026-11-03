@@ -12,6 +12,9 @@ interface Props {
 const { locale } = Astro.props;
 const t = useDict(locale);
 const b = t.brand;
+
+// Where the mark sits in each square print, as a horizontal object-position for the portrait crop.
+const focus = [70, 50, 40, 70, 25, 60, 35, 35];
 ---
 
 <section class="section brand" aria-labelledby="brand-title">
@@ -36,10 +39,10 @@ const b = t.brand;
       <div class="retro" role="group" aria-label={b.stackLabel} data-retro>
         {
           retroSlots.map((slot, i) => (
-            <figure class="retro__card" data-pos={i}>
+            <figure class="retro__card" data-pos={i} style={`--fx:${focus[i]}%`}>
               <div class="retro__paper">
                 <div class="retro__img">
-                  <Photo slot={slot} ratio="1/1" sizes="(max-width: 720px) 60vw, 380px" widths={[320, 640]} />
+                  <Photo slot={slot} ratio="4/7" sizes="(max-width: 720px) 62vw, 440px" widths={[480, 720, 960]} />
                 </div>
               </div>
             </figure>
@@ -84,12 +87,12 @@ const b = t.brand;
   }
   .brand__grid {
     display: grid;
-    grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
-    gap: clamp(32px, 4vw, 72px);
+    grid-template-columns: minmax(0, 0.78fr) minmax(0, 1.22fr);
+    gap: clamp(20px, 2vw, 32px);
     align-items: center;
   }
   .brand__title {
-    font-size: clamp(48px, 6.4vw, 92px);
+    font-size: clamp(44px, 5.9vw, 86px);
     line-height: 1.02;
     letter-spacing: -0.03em;
   }
@@ -159,24 +162,28 @@ const b = t.brand;
     transform: translateX(4px);
   }
 
-  /* Retro stack: square cream cards, fanned. data-pos 0 is the front card. */
+  /* Retro stack: five portrait cream cards fanned to the right, as in the mock. data-pos 0 is the front card.
+     Offsets are in card widths (--x) and card heights (--y); --k compresses the fan on narrow screens. */
   .brand__stack {
     position: relative;
     justify-self: end;
     width: 100%;
-    max-width: 640px;
+    max-width: 940px;
+    /* Let the fan run to the viewport edge, like the mock. */
+    margin-right: calc(16px - (100vw - min(100vw - 2 * var(--gutter), var(--content-max))) / 2);
+    --k: 1;
   }
   .retro {
     position: relative;
-    aspect-ratio: 1.12 / 1;
+    aspect-ratio: 1.5 / 1;
   }
   .retro__card {
     position: absolute;
-    left: 3%;
-    top: 14%;
-    width: 52%;
+    left: 1%;
+    top: 7%;
+    width: 33.5%;
     margin: 0;
-    transform: translate(var(--x), var(--y)) rotate(var(--rot)) scale(var(--s, 1));
+    transform: translate(calc(var(--x) * var(--k) * 100%), calc(var(--y) * 100%)) rotate(var(--rot));
     z-index: calc(10 - var(--p));
     opacity: var(--o, 1);
     transition:
@@ -185,57 +192,57 @@ const b = t.brand;
   }
   .retro__card[data-pos='0'] {
     --p: 0;
-    --x: 0%;
-    --y: 4%;
-    --rot: -6deg;
+    --x: 0;
+    --y: 0.04;
+    --rot: -8deg;
   }
   .retro__card[data-pos='1'] {
     --p: 1;
-    --x: 22%;
-    --y: -10%;
-    --rot: 3deg;
+    --x: 0.58;
+    --y: 0.03;
+    --rot: 1deg;
   }
   .retro__card[data-pos='2'] {
     --p: 2;
-    --x: 44%;
-    --y: -9%;
-    --rot: 8deg;
+    --x: 0.9;
+    --y: -0.02;
+    --rot: 6deg;
   }
   .retro__card[data-pos='3'] {
     --p: 3;
-    --x: 64%;
-    --y: -3%;
-    --rot: 12deg;
+    --x: 1.43;
+    --y: 0.07;
+    --rot: 11deg;
   }
   .retro__card[data-pos='4'] {
     --p: 4;
-    --x: 82%;
-    --y: 6%;
-    --rot: 16deg;
+    --x: 1.95;
+    --y: 0.1;
+    --rot: 14deg;
   }
   .retro__card[data-pos='5'],
   .retro__card[data-pos='6'],
   .retro__card[data-pos='7'] {
     --p: 5;
-    --x: 82%;
-    --y: 6%;
-    --rot: 16deg;
+    --x: 1.95;
+    --y: 0.1;
+    --rot: 14deg;
     --o: 0;
   }
   .retro__card.is-lift {
-    --y: -8%;
-    --rot: 6deg;
+    --y: -0.06;
+    --rot: -3deg;
     transition-duration: 0.2s;
   }
   .retro__paper {
-    padding: 4.2%;
-    border-radius: 7px;
+    padding: 4.5%;
+    border-radius: 8px;
     background:
       radial-gradient(circle at 20% 15%, rgb(120 90 40 / 0.1), transparent 55%),
       radial-gradient(circle at 85% 90%, rgb(120 90 40 / 0.14), transparent 50%), #f1e6cf;
     box-shadow:
       0 1px 0 rgb(255 255 255 / 0.6) inset,
-      0 14px 30px rgb(8 19 43 / 0.22);
+      0 18px 40px rgb(8 19 43 / 0.24);
   }
   :root[data-theme='dark'] .retro__paper {
     outline: 1px solid var(--line);
@@ -244,6 +251,11 @@ const b = t.brand;
     position: relative;
     overflow: hidden;
     border-radius: 2px;
+  }
+  /* The prints carry their own cream border; scaling trims it so only the card paper shows. */
+  .retro__img :global(img) {
+    transform: scale(1.06);
+    object-position: var(--fx, 50%) 50%;
   }
   /* Halftone dots over the print. */
   .retro__img::after {
@@ -283,9 +295,10 @@ const b = t.brand;
     display: none;
   }
 
+  /* Reduced motion keeps the fan static: all five cards stay put, nothing cycles. */
   @media (prefers-reduced-motion: reduce) {
-    .retro__card:not([data-pos='0']) {
-      display: none;
+    .retro__card {
+      transition: none;
     }
     .retro__pause {
       display: none;
@@ -295,9 +308,12 @@ const b = t.brand;
   @media (max-width: 900px) {
     .brand__grid {
       grid-template-columns: 1fr;
+      gap: 40px;
     }
     .brand__stack {
       justify-self: center;
+      margin-right: 0;
+      max-width: 720px;
     }
   }
   @media (max-width: 720px) {
@@ -305,8 +321,15 @@ const b = t.brand;
       font-size: 18px;
       line-height: 26px;
     }
+    .brand__stack {
+      --k: 0.62;
+    }
+    .retro {
+      aspect-ratio: 1.1 / 1;
+    }
     .retro__card {
-      width: 56%;
+      left: 2%;
+      width: 46%;
     }
   }
 </style>

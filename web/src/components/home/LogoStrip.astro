@@ -8,7 +8,6 @@ interface Props {
 }
 const { locale } = Astro.props;
 const t = useDict(locale);
-const H = 48;
 ---
 
 <section class="logos" aria-labelledby="logos-label">
@@ -23,13 +22,13 @@ const H = 48;
           [false, true].map((dup) => (
             <ul class="marquee__group" aria-hidden={dup ? 'true' : undefined}>
               {clientLogos.map((logo) => (
-                <li class="logos__item">
+                <li class="logos__item" style={`--lh:${logo.h}px`}>
                   <img
                     class="only-light"
                     src={`/logos/${logo.slug}-mono-dark.${logo.ext}`}
                     alt={dup ? '' : logo.name}
-                    width={Math.round((H * logo.width) / logo.height)}
-                    height={H}
+                    width={Math.round((logo.h * logo.width) / logo.height)}
+                    height={logo.h}
                     loading="lazy"
                     decoding="async"
                   />
@@ -37,8 +36,8 @@ const H = 48;
                     class="only-dark"
                     src={`/logos/${logo.slug}-mono-light.${logo.ext}`}
                     alt={dup ? '' : logo.name}
-                    width={Math.round((H * logo.width) / logo.height)}
-                    height={H}
+                    width={Math.round((logo.h * logo.width) / logo.height)}
+                    height={logo.h}
                     loading="lazy"
                     decoding="async"
                   />
@@ -100,12 +99,16 @@ const H = 48;
   }
   .logos__item {
     flex: none;
+    display: grid;
+    align-items: center;
+    height: 64px;
     line-height: 0;
   }
+  /* Mono marks (#0B1220 on light, #FFFFFF on dark) at 76% keep about 9:1 against the page. */
   .logos__item img {
-    height: 48px;
+    height: var(--lh, 48px);
     width: auto;
-    opacity: 0.6;
+    opacity: 0.76;
     transition: opacity 0.2s;
   }
   .logos__item img:hover {
@@ -191,8 +194,11 @@ const H = 48;
     .logos__marquee :global(.marquee__group[aria-hidden='true']) {
       display: none;
     }
+    .logos__item {
+      height: auto;
+    }
     .logos__item img {
-      height: 36px;
+      height: calc(var(--lh, 48px) * 0.62);
       max-width: 100%;
     }
     .logos__pause {

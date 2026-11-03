@@ -85,7 +85,6 @@ export const en = {
       nutrition: 'nutrition coaches',
       universities: 'universities',
     },
-    staticWord: 'coaches and teams',
     sentence:
       'The coaching platform for coaches, high school teams, soccer academies, track and field, gyms and studios, nutrition coaches and universities',
     sub: 'Training, nutrition, readiness and messaging in one place, so athletes and their coaches see the full picture.',
@@ -171,7 +170,7 @@ export const en = {
     load: {
       label: 'Training load · this week',
       days: ['M', 'T', 'W', 'T', 'F', 'S', 'S'],
-      status: 'In range',
+      status: 'RPE × minutes',
     },
     goal: { label: 'Goal', value: '72%', text: 'Run 400 m under 58 s' },
     checkin: {

@@ -1,6 +1,6 @@
 // Retro stack: every 2400ms the front card lifts, tilts and slides to the back (200ms + 400ms).
 // Pauses on hover/focus, when offscreen, or when the user presses the pause button.
-// Reduced motion keeps the front card only (handled in CSS) and this script does nothing.
+// Reduced motion keeps the five-card fan static and this script does nothing.
 const root = document.querySelector<HTMLElement>('[data-retro]');
 const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
 
