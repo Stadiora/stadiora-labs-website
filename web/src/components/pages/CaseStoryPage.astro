@@ -1,0 +1,198 @@
+---
+import Page from '../../layouts/Page.astro';
+import Photo from '../ui/Photo.astro';
+import { caseStudies } from '../../i18n/pages/caseStudies';
+import { hrefFor } from '../../data/nav';
+import type { Locale } from '../../i18n';
+
+// Dev-only story template (never built: the route returns no paths in production).
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const c = caseStudies[locale];
+const s = c.dev.story;
+---
+
+<Page locale={locale} path="/resources/case-studies/sample-story/" title={`${s.title} | Stadiora Labs`} description={s.banner} noindex>
+  <p class="banner" role="note" data-placeholder><span class="dot dot--amber" aria-hidden="true"></span>{s.banner}</p>
+  <article class="story">
+    <div class="container story__grid">
+      <div class="story__main">
+        <a class="link back" href={hrefFor('caseStudies', locale)}>← {s.back}</a>
+        <div class="story__intro">
+          <p class="logo-slot">{s.logo}</p>
+          <h1 class="story__title">{s.title}</h1>
+        </div>
+        <ul class="stats">
+          {s.stats.map((stat) => (
+            <li class="stats__item">
+              <p class="stats__value num">{stat.value}</p>
+              <p class="stats__label">{stat.label}</p>
+            </li>
+          ))}
+        </ul>
+        <div class="story__photo">
+          <Photo slot="h3-highschool-big" ratio="16/9" sizes="(max-width: 1100px) 92vw, 760px" {locale} />
+        </div>
+      </div>
+      <aside class="summary">
+        <dl class="summary__list">
+          {s.summary.map((row) => (
+            <div class="summary__row">
+              <dt>{row.term}:</dt>
+              <dd>{row.value}</dd>
+            </div>
+          ))}
+        </dl>
+        <figure class="quote">
+          <blockquote>{s.quote}</blockquote>
+          <figcaption>
+            <span class="quote__avatar" aria-hidden="true"></span>
+            <span>{s.who}</span>
+          </figcaption>
+        </figure>
+      </aside>
+    </div>
+  </article>
+</Page>
+
+<style>
+  .banner {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px max(var(--gutter), calc((100% - var(--content-max)) / 2));
+    background: light-dark(#fde8c6, #3a2a0a);
+    color: var(--ink);
+    font-size: 16px;
+  }
+  .story {
+    padding-block: 32px 80px;
+  }
+  .story__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+    gap: 40px;
+    align-items: start;
+  }
+  .back {
+    display: inline-block;
+    margin-bottom: 16px;
+  }
+  .story__intro {
+    display: flex;
+    align-items: flex-start;
+    gap: 24px;
+  }
+  .logo-slot {
+    flex: none;
+    display: grid;
+    place-items: center;
+    width: 140px;
+    height: 120px;
+    border: 1.5px dashed var(--ink-3);
+    border-radius: 8px;
+    color: var(--ink-2);
+    font-size: 15px;
+    text-align: center;
+  }
+  .story__title {
+    font-size: clamp(30px, 3.6vw, 48px);
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    text-wrap: balance;
+  }
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    margin-block: 32px;
+  }
+  .stats__item {
+    padding-inline: 24px;
+    border-left: 1px solid var(--line);
+  }
+  .stats__item:first-child {
+    padding-left: 0;
+    border-left: 0;
+  }
+  .stats__value {
+    font-size: clamp(32px, 3.6vw, 52px);
+    font-weight: 700;
+    line-height: 1.1;
+  }
+  .stats__label {
+    margin-top: 4px;
+    color: var(--ink-2);
+    font-size: 18px;
+  }
+  .story__photo {
+    overflow: hidden;
+    border-radius: var(--radius-card);
+  }
+  .summary {
+    padding: 28px;
+    border-radius: var(--radius-card);
+    background: var(--surface);
+  }
+  .summary__row {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    padding-block: 14px;
+    border-bottom: 1px solid var(--line);
+    font-size: 17px;
+  }
+  .summary__row:first-child {
+    padding-top: 0;
+  }
+  .summary__row dd {
+    color: var(--ink-2);
+    text-align: right;
+  }
+  .quote {
+    margin-top: 24px;
+    padding: 24px;
+    border-radius: 12px;
+    background: var(--bg);
+  }
+  .quote blockquote {
+    font-size: 22px;
+    font-style: italic;
+    line-height: 1.35;
+  }
+  .quote figcaption {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-top: 24px;
+    color: var(--ink-2);
+    font-size: 16px;
+  }
+  .quote__avatar {
+    flex: none;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: var(--surface-2);
+  }
+  @media (max-width: 1100px) {
+    .story__grid {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+  @media (max-width: 720px) {
+    .story__intro {
+      flex-direction: column;
+    }
+    .stats {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 20px;
+    }
+    .stats__item,
+    .stats__item:first-child {
+      padding-inline: 0;
+      border-left: 0;
+    }
+  }
+</style>
