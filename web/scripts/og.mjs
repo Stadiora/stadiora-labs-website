@@ -9,8 +9,8 @@ const read = (p) => readFile(new URL(p, `file://${root}/`));
 const b64 = async (p, type) => `data:${type};base64,${(await read(p)).toString('base64')}`;
 
 const cards = {
-  en: { lead: 'The coaching platform for', word: 'coaches and teams', tag: 'Training, nutrition, readiness and messaging in one place.' },
-  es: { lead: 'La plataforma de coaching para', word: 'entrenadores y equipos', tag: 'Entrenamiento, nutrición, readiness y mensajes en un solo lugar.' },
+  en: { lead: 'The coaching platform for', word: 'coaches and teams', tag: 'Training, nutrition, readiness and messaging in one place.', readiness: 'Readiness', status: 'Ready to train' },
+  es: { lead: 'La plataforma de coaching para', word: 'entrenadores y equipos', tag: 'Entrenamiento, nutrición, preparación y mensajes en un solo lugar.', readiness: 'Preparación', status: 'Listo para entrenar' },
 };
 
 const [sora, inter, logo, photo] = await Promise.all([
@@ -39,7 +39,7 @@ p{position:absolute;left:72px;bottom:64px;width:560px;font-size:24px;line-height
 <h1><em>${c.lead}</em><span>${c.word}</span></h1>
 <p>${c.tag}</p>
 <div class="photo"></div>
-<div class="card">Readiness<b>82</b><i></i>${c.lead.startsWith('The') ? 'Ready to train' : 'Listo para entrenar'}</div>`;
+<div class="card">${c.readiness}<b>82</b><i></i>${c.status}</div>`;
 
 await mkdir(new URL('public/og/', `file://${root}/`), { recursive: true });
 const browser = await chromium.launch();
