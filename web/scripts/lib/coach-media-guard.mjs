@@ -36,6 +36,8 @@ export function readVideos(html) {
       kind,
       // The hero names its poster outright; the clips further down defer it (data-poster) until they are near the screen.
       poster: attr(open, 'poster') ?? attr(open, 'data-poster'),
+      // A src on the <video> itself wins over its <source> children, so it would play an unvalidated clip.
+      ownSrc: attr(open, 'src'),
       sources: [...m[0].matchAll(/<source\b[^>]*>/g)].map((s) => ({ src: attr(s[0], 'src'), type: attr(s[0], 'type') })),
     };
   });
@@ -54,6 +56,7 @@ export function verifyCoachMedia({ html, file, slug, dist, fail }) {
   for (const v of videos) {
     const stems = new Set();
     const note = (what) => fail(`${file}: ${v.kind} video ${what}`);
+    if (v.ownSrc !== undefined) note(`sets src="${v.ownSrc}" on the <video> element, which overrides its validated <source> children; use the paired WebM/MP4 <source> elements only`);
     for (const ext of ['webm', 'mp4']) {
       const list = v.sources.filter((s) => s.src?.endsWith(`.${ext}`));
       if (list.length !== 1) {
