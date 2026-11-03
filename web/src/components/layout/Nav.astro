@@ -44,27 +44,29 @@ const appStores: Record<string, { label: string; href: string }[]> = {
             <span>{t.nav.platform}</span><span class="pm" aria-hidden="true"></span>
           </button>
           <div class="mega mega--platform" id="mega-platform" data-mega-panel>
-            <div class="mega__cols">
-              {
-                platformColumns.map((col, i) => (
-                  <div class="mega__col" style={`--i:${i}`}>
-                    <div class="mega__photo">
-                      <Photo slot={col.photo} ratio="16/10" sizes="280px" widths={[280, 560]} locale={locale} />
+            <div class="mega__body">
+              <div class="mega__cols">
+                {
+                  platformColumns.map((col, i) => (
+                    <div class="mega__col" style={`--i:${i}`}>
+                      <div class="mega__photo">
+                        <Photo slot={col.photo} ratio="16/10" sizes="280px" widths={[280, 560]} locale={locale} />
+                      </div>
+                      <p class="mega__label">{t.nav.groups[col.key]}</p>
+                      <ul>
+                        {col.items.map((id) => (
+                          <li>
+                            <a class="mega__link" href={hrefFor(id, locale)} data-mega-link>
+                              <span class="mega__name">{t.nav.items[id].name}</span>
+                              <span class="mega__desc">{t.nav.items[id].desc}</span>
+                            </a>
+                          </li>
+                        ))}
+                      </ul>
                     </div>
-                    <p class="mega__label">{t.nav.groups[col.key]}</p>
-                    <ul>
-                      {col.items.map((id) => (
-                        <li>
-                          <a class="mega__link" href={hrefFor(id, locale)} data-mega-link>
-                            <span class="mega__name">{t.nav.items[id].name}</span>
-                            <span class="mega__desc">{t.nav.items[id].desc}</span>
-                          </a>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                ))
-              }
+                  ))
+                }
+              </div>
             </div>
             <div class="mega__foot">
               <span>{t.nav.newToAria}</span>
@@ -78,43 +80,45 @@ const appStores: Record<string, { label: string; href: string }[]> = {
             <span>{t.nav.solutions}</span><span class="pm" aria-hidden="true"></span>
           </button>
           <div class="mega mega--solutions" id="mega-solutions" data-mega-panel>
-            <div class="mega__cols mega__cols--2">
-              <div class="mega__col">
-                <p class="mega__label">{t.nav.groups.audiences}</p>
-                <ul>
-                  {
-                    solutionItems.map((id) => (
-                      <li>
-                        <a class="mega__link" href={hrefFor(id, locale)} data-mega-link>
-                          <span class="mega__name">{t.nav.items[id].name}</span>
-                          <span class="mega__desc">{t.nav.items[id].desc}</span>
-                        </a>
-                      </li>
-                    ))
-                  }
-                </ul>
-              </div>
-              <div class="mega__col">
-                <p class="mega__label">{t.nav.groups.apps}</p>
-                <ul>
-                  {
-                    appLinks.map((app) => (
-                      <li class="mega__app">
-                        <span class="mega__name">{t.nav.apps[app.key].name}</span>
-                        <span class="mega__desc">{t.nav.apps[app.key].status}</span>
-                        {app.live && (
-                          <span class="mega__stores">
-                            {appStores[app.key].map((s) => (
-                              <a class="link" href={s.href} rel="noopener" data-mega-link>
-                                {s.label}
-                              </a>
-                            ))}
-                          </span>
-                        )}
-                      </li>
-                    ))
-                  }
-                </ul>
+            <div class="mega__body">
+              <div class="mega__cols mega__cols--2">
+                <div class="mega__col">
+                  <p class="mega__label">{t.nav.groups.audiences}</p>
+                  <ul>
+                    {
+                      solutionItems.map((id) => (
+                        <li>
+                          <a class="mega__link" href={hrefFor(id, locale)} data-mega-link>
+                            <span class="mega__name">{t.nav.items[id].name}</span>
+                            <span class="mega__desc">{t.nav.items[id].desc}</span>
+                          </a>
+                        </li>
+                      ))
+                    }
+                  </ul>
+                </div>
+                <div class="mega__col">
+                  <p class="mega__label">{t.nav.groups.apps}</p>
+                  <ul>
+                    {
+                      appLinks.map((app) => (
+                        <li class="mega__app">
+                          <span class="mega__name">{t.nav.apps[app.key].name}</span>
+                          <span class="mega__desc">{t.nav.apps[app.key].status}</span>
+                          {app.live && (
+                            <span class="mega__stores">
+                              {appStores[app.key].map((s) => (
+                                <a class="link" href={s.href} rel="noopener" data-mega-link>
+                                  {s.label}
+                                </a>
+                              ))}
+                            </span>
+                          )}
+                        </li>
+                      ))
+                    }
+                  </ul>
+                </div>
               </div>
             </div>
             <div class="mega__foot">
@@ -133,21 +137,23 @@ const appStores: Record<string, { label: string; href: string }[]> = {
             <span>{t.nav.resources}</span><span class="pm" aria-hidden="true"></span>
           </button>
           <div class="mega mega--resources" id="mega-resources" data-mega-panel>
-            <div class="mega__cols mega__cols--1">
-              <div class="mega__col">
-                <p class="mega__label">{t.nav.groups.learn}</p>
-                <ul>
-                  {
-                    resourceItems.map((id) => (
-                      <li>
-                        <a class="mega__link" href={hrefFor(id, locale)} data-mega-link>
-                          <span class="mega__name">{t.nav.items[id].name}</span>
-                          <span class="mega__desc">{t.nav.items[id].desc}</span>
-                        </a>
-                      </li>
-                    ))
-                  }
-                </ul>
+            <div class="mega__body">
+              <div class="mega__cols mega__cols--1">
+                <div class="mega__col">
+                  <p class="mega__label">{t.nav.groups.learn}</p>
+                  <ul>
+                    {
+                      resourceItems.map((id) => (
+                        <li>
+                          <a class="mega__link" href={hrefFor(id, locale)} data-mega-link>
+                            <span class="mega__name">{t.nav.items[id].name}</span>
+                            <span class="mega__desc">{t.nav.items[id].desc}</span>
+                          </a>
+                        </li>
+                      ))
+                    }
+                  </ul>
+                </div>
               </div>
             </div>
             <div class="mega__foot">
@@ -256,6 +262,12 @@ const appStores: Record<string, { label: string; href: string }[]> = {
   }
   :global(html[data-scrolled]) .nav__logo :global(img) {
     transform: scale(0.85);
+  }
+
+  /* While the mobile drawer is open the page behind it does not scroll (nav.ts also marks it inert). */
+  :global(html[data-scroll-lock]) {
+    overflow: hidden;
+    scrollbar-gutter: stable;
   }
 
   .nav__menu {
@@ -387,7 +399,11 @@ const appStores: Record<string, { label: string; href: string }[]> = {
     top: calc(100% + 6px);
     left: 50%;
     width: min(1200px, calc(100vw - 2 * var(--gutter)));
-    padding: 28px 32px 0;
+    display: flex;
+    flex-direction: column;
+    /* Fits the space under the fixed header: the columns scroll, the footer CTA stays in view. */
+    max-height: calc(100vh - var(--nav-cur) - 22px);
+    max-height: calc(100dvh - var(--nav-cur) - 22px);
     border: 1px solid var(--pop-border);
     border-radius: var(--radius-card);
     background: var(--bg);
@@ -424,6 +440,15 @@ const appStores: Record<string, { label: string; href: string }[]> = {
   }
   .mega--resources {
     width: 400px;
+  }
+  .mega__body {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+    padding: 28px 32px 20px;
+    border-radius: var(--radius-card) var(--radius-card) 0 0;
   }
   .mega__cols {
     display: grid;
@@ -495,10 +520,10 @@ const appStores: Record<string, { label: string; href: string }[]> = {
     font-size: 14px;
   }
   .mega__foot {
+    flex: none;
     display: flex;
     align-items: center;
     gap: 12px;
-    margin: 20px -32px 0;
     padding: 14px 32px;
     border-top: 1px solid var(--line);
     border-radius: 0 0 var(--radius-card) var(--radius-card);
@@ -512,7 +537,16 @@ const appStores: Record<string, { label: string; href: string }[]> = {
     min-height: 44px;
   }
 
-  @media (max-width: 1180px) {
+  /* Desktop bar tiers (the longest labels are Spanish: Plataforma, Soluciones, Iniciar sesión, Empieza gratis).
+     From 1440px the full-size bar fits with room to spare; from 1280px a compact bar does; below 1280px the
+     drawer takes over. nav.ts matches the same 1280px edge. evidence.mjs measures the bar every 5px from 1025
+     to 1440 in EN and ES, so a longer label that no longer fits fails the check. */
+  @media (min-width: 1280px) {
+    .nav__menu {
+      min-width: max-content;
+    }
+  }
+  @media (min-width: 1280px) and (max-width: 1439.98px) {
     .nav__logo :global(img) {
       width: 176px;
     }
@@ -533,7 +567,7 @@ const appStores: Record<string, { label: string; href: string }[]> = {
   }
 
   /* Mobile: the same markup becomes a full-height drawer with accordion groups. */
-  @media (max-width: 1024px) {
+  @media (max-width: 1279.98px) {
     .nav__burger {
       display: grid;
     }
@@ -560,7 +594,7 @@ const appStores: Record<string, { label: string; href: string }[]> = {
       flex: none;
       overflow-y: auto;
       overscroll-behavior: contain;
-      padding: 8px var(--gutter) 32px;
+      padding: 8px max(var(--gutter), calc((100vw - 640px) / 2)) 32px;
       background: var(--bg);
     }
     .nav[data-menu-open] .nav__menu {
@@ -605,6 +639,7 @@ const appStores: Record<string, { label: string; href: string }[]> = {
       position: static;
       display: none;
       width: auto;
+      max-height: none;
       padding: 0 0 12px;
       border: 0;
       border-radius: 0;
@@ -619,6 +654,11 @@ const appStores: Record<string, { label: string; href: string }[]> = {
     .mega[data-open] {
       display: block;
       transform: none;
+    }
+    .mega__body {
+      overflow: visible;
+      padding: 0;
+      border-radius: 0;
     }
     .mega::before,
     .mega__photo {

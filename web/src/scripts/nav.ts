@@ -1,4 +1,6 @@
-// Header behaviour: compaction on scroll, mega menu (hover, click, keyboard, focus trap), mobile drawer.
+// Header behaviour: compaction on scroll, mega menus (hover, click, keyboard; focus is confined to the open
+// panel however it was opened) and the mobile drawer (focus moves in and is trapped, the page behind is inert
+// and does not scroll, Escape and close return focus to the burger).
 const nav = document.querySelector<HTMLElement>('[data-nav]');
 
 if (nav) {
@@ -7,7 +9,8 @@ if (nav) {
   const burger = nav.querySelector<HTMLButtonElement>('[data-nav-burger]');
   const menu = nav.querySelector<HTMLElement>('[data-nav-menu]');
   const items = [...nav.querySelectorAll<HTMLElement>('[data-mega-item]')];
-  const desktop = window.matchMedia('(min-width: 1025px)');
+  // Same edge as the drawer breakpoint in Nav.astro (the drawer is below 1280px).
+  const desktop = window.matchMedia('(min-width: 1280px)');
 
   type Entry = { item: HTMLElement; trigger: HTMLButtonElement; panel: HTMLElement };
   const entries: Entry[] = items.flatMap((item) => {
@@ -18,7 +21,6 @@ if (nav) {
 
   let current: Entry | null = null;
   let sticky = false;
-  let viaKeyboard = false;
   let hoverTimer = 0;
   let leaveTimer = 0;
 
@@ -41,8 +43,27 @@ if (nav) {
   );
   applyScroll();
 
-  const focusables = (panel: HTMLElement) =>
-    [...panel.querySelectorAll<HTMLElement>('[data-mega-link]')].filter((el) => el.offsetParent !== null || el === document.activeElement);
+  const TABBABLE = 'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled])';
+  const isShown = (el: HTMLElement) => el.getClientRects().length > 0 && getComputedStyle(el).visibility !== 'hidden' && !el.closest('[inert]');
+  const tabbables = (scope: HTMLElement) => [...scope.querySelectorAll<HTMLElement>(TABBABLE)].filter(isShown);
+  const focusables = (panel: HTMLElement) => [...panel.querySelectorAll<HTMLElement>('[data-mega-link]')].filter(isShown);
+
+  // Keeps Tab and Shift+Tab inside `order`. Focus that is outside it (or on a non-tabbable node) enters at an end.
+  const confineTab = (event: KeyboardEvent, order: HTMLElement[]) => {
+    if (!order.length) return;
+    const i = order.indexOf(document.activeElement as HTMLElement);
+    const last = order.length - 1;
+    if (i === -1) {
+      event.preventDefault();
+      order[event.shiftKey ? last : 0].focus();
+    } else if (event.shiftKey && i === 0) {
+      event.preventDefault();
+      order[last].focus();
+    } else if (!event.shiftKey && i === last) {
+      event.preventDefault();
+      order[0].focus();
+    }
+  };
 
   const warmImages = (panel: HTMLElement) => {
     panel.querySelectorAll<HTMLImageElement>('img[loading="lazy"]').forEach((img) => {
@@ -56,10 +77,9 @@ if (nav) {
     else scrim.removeAttribute('data-on');
   };
 
-  function open(entry: Entry, opts: { keyboard?: boolean; pin?: boolean } = {}) {
+  function open(entry: Entry, opts: { pin?: boolean } = {}) {
     if (current && current !== entry) close(false);
     current = entry;
-    viaKeyboard = !!opts.keyboard;
     sticky = !!opts.pin;
     entry.trigger.setAttribute('aria-expanded', 'true');
     entry.panel.setAttribute('data-open', '');
@@ -72,7 +92,6 @@ if (nav) {
     const entry = current;
     current = null;
     sticky = false;
-    viaKeyboard = false;
     entry.trigger.setAttribute('aria-expanded', 'false');
     entry.panel.removeAttribute('data-open');
     setScrim(false);
@@ -82,16 +101,19 @@ if (nav) {
   for (const entry of entries) {
     const { item, trigger, panel } = entry;
 
-    trigger.addEventListener('click', (event) => {
-      const keyboard = (event as MouseEvent).detail === 0;
+    trigger.addEventListener('click', () => {
       if (current === entry && (sticky || !desktop.matches)) close(false);
-      else open(entry, { keyboard, pin: true });
+      else {
+        open(entry, { pin: true });
+        // Safari and Firefox on macOS do not focus a button on click; the confinement starts from the trigger.
+        trigger.focus();
+      }
     });
 
     trigger.addEventListener('keydown', (event) => {
       if (event.key === 'ArrowDown') {
         event.preventDefault();
-        open(entry, { keyboard: true, pin: true });
+        open(entry, { pin: true });
         focusables(panel)[0]?.focus();
       } else if (event.key === 'ArrowRight' || event.key === 'ArrowLeft') {
         if (!desktop.matches) return;
@@ -101,7 +123,7 @@ if (nav) {
         event.preventDefault();
         next.focus();
         const nextEntry = entries.find((e) => e.trigger === next);
-        if (current && nextEntry) open(nextEntry, { keyboard: true, pin: true });
+        if (current && nextEntry) open(nextEntry, { pin: true });
         else if (current) close(false);
       }
     });
@@ -124,12 +146,6 @@ if (nav) {
     });
 
     panel.addEventListener('keydown', (event) => {
-      if (event.key === 'Escape') {
-        event.preventDefault();
-        event.stopPropagation();
-        close(true);
-        return;
-      }
       const links = focusables(panel);
       const i = links.indexOf(document.activeElement as HTMLElement);
       if (event.key === 'ArrowDown' || event.key === 'ArrowRight') {
@@ -149,54 +165,81 @@ if (nav) {
     });
   }
 
-  // Focus trap while a menu opened from the keyboard is open (desktop panels only).
+  // Escape closes the drawer or the open panel; focus goes back to what opened it when it was inside.
   document.addEventListener('keydown', (event) => {
-    if (!current || !viaKeyboard || !desktop.matches) return;
     if (event.key === 'Escape') {
-      event.preventDefault();
-      close(true);
+      if (drawerOpen()) {
+        event.preventDefault();
+        closeDrawer(true);
+      } else if (current) {
+        event.preventDefault();
+        const { item, trigger } = current;
+        const hadFocus = item.contains(document.activeElement);
+        close(false);
+        if (hadFocus) trigger.focus();
+      }
       return;
     }
-    if (event.key !== 'Tab') return;
-    const order = [current.trigger, ...focusables(current.panel)];
-    const i = order.indexOf(document.activeElement as HTMLElement);
-    if (i === -1) return;
-    event.preventDefault();
-    const next = order[(i + (event.shiftKey ? -1 : 1) + order.length) % order.length];
-    next.focus();
+    if (event.key !== 'Tab' || event.defaultPrevented) return;
+    if (drawerOpen()) confineTab(event, tabbables(nav));
+    else if (current && desktop.matches) confineTab(event, [current.trigger, ...focusables(current.panel)]);
   });
 
-  // Escape from the trigger itself, and click or tap outside.
-  document.addEventListener('keydown', (event) => {
-    if (event.key === 'Escape' && current && !viaKeyboard) close(true);
-  });
+  // Click or tap outside closes a desktop panel.
   document.addEventListener('pointerdown', (event) => {
     if (!current || !desktop.matches) return;
     if (!(event.target as Element).closest('[data-mega-item]')) close(false);
   });
 
   // Mobile drawer
-  const setDrawer = (on: boolean) => {
-    if (!burger) return;
-    if (on) nav.setAttribute('data-menu-open', '');
-    else nav.removeAttribute('data-menu-open');
-    burger.setAttribute('aria-expanded', String(on));
-    burger.setAttribute('aria-label', (on ? burger.dataset.labelClose : burger.dataset.labelOpen) ?? '');
-    root.style.overflow = on ? 'hidden' : '';
-  };
-  burger?.addEventListener('click', () => setDrawer(!nav.hasAttribute('data-menu-open')));
-  menu?.addEventListener('click', (event) => {
-    if ((event.target as Element).closest('a')) setDrawer(false);
-  });
-  document.addEventListener('keydown', (event) => {
-    if (event.key === 'Escape' && nav.hasAttribute('data-menu-open')) {
-      setDrawer(false);
-      burger?.focus();
+  let inerted: HTMLElement[] = [];
+  const setPageInert = (on: boolean) => {
+    for (const el of inerted) el.removeAttribute('inert');
+    inerted = [];
+    if (!on) return;
+    for (let node: HTMLElement = nav; node !== document.body && node.parentElement; node = node.parentElement) {
+      for (const sibling of node.parentElement.children) {
+        if (sibling === node || !(sibling instanceof HTMLElement) || ['SCRIPT', 'STYLE', 'LINK'].includes(sibling.tagName)) continue;
+        if (sibling.hasAttribute('inert')) continue;
+        sibling.setAttribute('inert', '');
+        inerted.push(sibling);
+      }
     }
+  };
+
+  function drawerOpen() {
+    return nav!.hasAttribute('data-menu-open');
+  }
+
+  function openDrawer() {
+    if (!burger || drawerOpen()) return;
+    close(false);
+    nav!.setAttribute('data-menu-open', '');
+    burger.setAttribute('aria-expanded', 'true');
+    burger.setAttribute('aria-label', burger.dataset.labelClose ?? '');
+    root.setAttribute('data-scroll-lock', '');
+    setPageInert(true);
+    (menu ? tabbables(menu)[0] : undefined)?.focus();
+  }
+
+  function closeDrawer(restoreFocus: boolean) {
+    if (!burger || !drawerOpen()) return;
+    nav!.removeAttribute('data-menu-open');
+    burger.setAttribute('aria-expanded', 'false');
+    burger.setAttribute('aria-label', burger.dataset.labelOpen ?? '');
+    root.removeAttribute('data-scroll-lock');
+    setPageInert(false);
+    close(false);
+    if (restoreFocus) burger.focus();
+  }
+
+  burger?.addEventListener('click', () => (drawerOpen() ? closeDrawer(true) : openDrawer()));
+  menu?.addEventListener('click', (event) => {
+    if ((event.target as Element).closest('a')) closeDrawer(false);
   });
   desktop.addEventListener('change', () => {
     close(false);
-    setDrawer(false);
+    closeDrawer(false);
   });
 }
 
