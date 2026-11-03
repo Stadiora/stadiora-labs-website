@@ -24,12 +24,11 @@ node scripts/evidence.mjs --pricing-only   # just /pricing/ and /es/pricing/: pr
   import { detectRegion } from '../lib/region';        // server: detectRegion('', 'America/New_York'); client: detectRegion(window.location.search)
   ```
 
-- Pages: `/` (EN) and `/es/`. Copy lives in `src/i18n/{en,es}.ts`; `es.ts` is typed against `en.ts`, so `astro check` flags a missing key.
+  `prices.coreFrom` and `prices.highSchool` are derived from the table, so they cannot drift. `src/components/pricing/` is for the pricing page only.
 - Solutions (schools, coaches, teams-and-clubs, athletes), Resources (case studies), About and Contact exist in EN and ES.
   Copy is in `src/i18n/pages/*.ts`, page bodies in `src/components/pages/`, and `src/pages/**` are thin route files.
   `npm run verify` and `npm run evidence` cover them (`scripts/lib/verify-solutions.mjs`, `scripts/lib/solutions-checks.mjs`).
-- Prices: `src/lib/region.ts` picks US or LatAm from the browser timezone (`?region=us|latam` overrides). The HTML always
-  ships the US price, so no-JS visitors see it.
+  Their price teasers come from `src/data/prices.ts` and `src/lib/region.ts` (the same table and detector as `/pricing/`, nothing is copied). The HTML ships the US price, so no-JS visitors see it; the script swaps in the LatAm price. The evidence run checks each teaser against `/pricing/` for `?region=us`, `?region=latam` and the time zones in between.
 - Case studies: the production page is an honest "coming soon" state, noindex and out of the sitemap. Placeholder cards and a
   sample story page render only under `npm run dev`, and the build never emits them.
 - Contact has no form endpoint yet: a valid submit opens the visitor's email app (mailto) and never claims a message was sent.

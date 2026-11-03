@@ -1,17 +1,34 @@
 ---
-import { prices, usd, type PriceKey } from '../../lib/region';
+import { bands, education, prices, usd, type PriceKey } from '../../data/prices';
+import { segments } from '../../lib/template';
 
 interface Props {
   price: PriceKey;
-  /** Copy with a `{price}` marker, e.g. `Core from {price}/mo for 25 athletes`. Omit to render only the price. */
+  /** Copy with a `{price}` marker and optionally `{athletes}`, e.g. `Core from {price}/mo for {athletes} athletes`. Omit to render only the price. */
   text?: string;
 }
 const { price, text } = Astro.props;
-const value = prices[price];
-const [before, after] = (text ?? '{price}').split('{price}');
+
+// The athlete count each starting price is quoted for, read from the same table, so copy never holds a digit.
+const athletes: Record<PriceKey, number> = {
+  coreFrom: bands.us[0].athletes,
+  highSchool: education.us[0].athletes,
+};
 ---
 
-<Fragment>{before}</Fragment><span class="rprice" data-region-price data-us={usd(value.us)} data-latam={usd(value.latam)}>{usd(value.us)}</span><Fragment>{after}</Fragment>
+{
+  segments(text ?? '{price}').map((s) =>
+    'token' in s ? (
+      s.token === 'price' ? (
+        <span class="rprice" data-region-price={price}>{usd(prices[price].us)}</span>
+      ) : s.token === 'athletes' ? (
+        athletes[price]
+      ) : null
+    ) : (
+      s.text
+    ),
+  )
+}
 
 <script>
   import '../../scripts/region';

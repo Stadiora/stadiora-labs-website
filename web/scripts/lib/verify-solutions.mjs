@@ -2,6 +2,11 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { CONTACT_EMAIL, approvedNote, approvedOpening, findDeliveryClaims } from './contact-contract.mjs';
+import { EDU, FREE, ORACLE, fmt } from './pricing-oracle.mjs';
+
+// What the teasers must show for US visitors (and no-JavaScript visitors): Core from at 25 athletes, high school at 100.
+const teaserUs = { coreFrom: fmt(ORACLE.us[25][1]), highSchool: fmt(EDU.us[0]) };
+const teaserAthletes = { coreFrom: 25, highSchool: 100 };
 
 const ORIGIN = 'https://stadioralabs.com';
 
@@ -105,9 +110,14 @@ export function verifySolutions({ dist, fail }) {
       if (route.noindex) need(/noindex/.test(robots), 'must be noindex until a real case study exists');
       else need(!/noindex/.test(robots), 'must be indexable');
 
-      // Region-aware prices: the server renders the US price, and both prices travel as data attributes.
-      for (const m of html.matchAll(/<[a-z]+[^>]*data-region-price[^>]*>/g)) {
-        need(/data-us="\$\d+"/.test(m[0]) && /data-latam="\$\d+"/.test(m[0]), `region price missing data-us/data-latam: ${m[0].slice(0, 80)}`);
+      // Price teasers: the server renders the US value and the count it is quoted for, both read from the shared table
+      // (src/data/prices.ts) and compared here with the oracle typed in pricing-oracle.mjs. LatAm values are not in the HTML.
+      need(!/\sdata-(us|latam)=/.test(html), 'region prices must not carry data-us / data-latam attributes (LatAm prices come from the shared table in the script bundle)');
+      for (const m of html.matchAll(/<span class="rprice" data-region-price="(\w+)"[^>]*>([^<]*)<\/span>([^<]*)/g)) {
+        const [, key, shown, after] = m;
+        need(shown === teaserUs[key], `${key} teaser shows ${shown}, expected ${teaserUs[key]}`);
+        const quoted = /\d+/.exec(after)?.[0];
+        if (route.path === '/solutions/schools/' || route.path === '/solutions/coaches/') need(Number(quoted) === teaserAthletes[key], `${key} teaser quotes ${quoted} athletes, expected ${teaserAthletes[key]}`);
       }
 
       if (route.path === '/contact/') {
@@ -131,6 +141,15 @@ export function verifySolutions({ dist, fail }) {
         for (const script of pageScripts(html, dist)) {
           for (const what of findDeliveryClaims(script, lang)) need(false, `a script on the page claims receipt or delivery: ${what}`);
         }
+      }
+
+      need(!/\{(price|athletes|coaches)\}/.test(html), 'an unfilled {price}, {athletes} or {coaches} token');
+
+      if (route.path === '/solutions/coaches/') {
+        // The Free plan limits come from the shared table; the oracle holds them typed by hand.
+        const limits = new RegExp(`\\b${FREE.coaches} (coach|entrenador), (up to|hasta) ${FREE.athletes} (athletes|atletas)`);
+        need(limits.test(pageText(html)), `Free plan line must state ${FREE.coaches} coach and ${FREE.athletes} athletes`);
+        need(new RegExp(`<meta name="description" content="[^"]*${FREE.coaches} (coach|entrenador) (and up to|y hasta) ${FREE.athletes} (athletes|atletas)`).test(html), 'meta description must state the Free plan limits');
       }
 
       if (route.path === '/solutions/schools/' && lang === 'en') {

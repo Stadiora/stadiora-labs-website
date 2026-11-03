@@ -2,6 +2,7 @@
 // athletes, case studies, about, contact; EN and ES). Called from evidence.mjs with its page opener and recorders.
 import { mkdir } from 'node:fs/promises';
 import { CONTACT_EMAIL, findDeliveryClaims, statusText } from './contact-contract.mjs';
+import { solutionsPriceChecks } from './solutions-price-checks.mjs';
 
 const pages = [
   ['schools', '/solutions/schools/'],
@@ -102,9 +103,6 @@ async function focusProblems(page, stops = 220) {
   return { seen, missing, hidden };
 }
 
-const visiblePrices = () =>
-  [...document.querySelectorAll('[data-region-price]')].map((e) => ({ shown: e.textContent.trim(), us: e.dataset.us, latam: e.dataset.latam }));
-
 export async function solutionsChecks({ open, settle, check, sleep, metrics, measure, outDir, checksOnly }) {
   const shotsDir = `${outDir}solutions/`;
   await mkdir(shotsDir, { recursive: true });
@@ -172,43 +170,8 @@ export async function solutionsChecks({ open, settle, check, sleep, metrics, mea
     await plain.context().close();
   }
 
-  // ---------------------------------------------------------- region pricing
-  const priced = ['/solutions/schools/', '/solutions/coaches/', '/solutions/teams-and-clubs/'];
-  const cases = [
-    ['America/Mexico_City', '', 'latam'],
-    ['America/Bogota', '', 'latam'],
-    ['America/Argentina/Buenos_Aires', '', 'latam'],
-    ['America/Sao_Paulo', '', 'latam'],
-    ['America/Puerto_Rico', '', 'us'],
-    ['America/New_York', '', 'us'],
-    ['Europe/Madrid', '', 'us'],
-    ['America/New_York', '?region=latam', 'latam'],
-    ['America/Mexico_City', '?region=us', 'us'],
-  ];
-  for (const path of priced) {
-    for (const locale of ['en', 'es']) {
-      const bad = [];
-      let count = 0;
-      for (const [timezoneId, search, expected] of cases) {
-        const page = await open({ width: 1440, height: 900, timezoneId }, `${localized(locale, path)}${search}`);
-        const prices = await page.evaluate(visiblePrices);
-        count = prices.length;
-        for (const p of prices) {
-          const want = expected === 'latam' ? p.latam : p.us;
-          if (p.shown !== want) bad.push(`${timezoneId}${search}: shows ${p.shown}, wants ${want}`);
-          if (p.us === p.latam) bad.push(`${timezoneId}: us and latam values are equal (${p.us})`);
-        }
-        await page.context().close();
-      }
-      check('solutions-region', `${localized(locale, path)}: ${count} price(s) follow the visitor's region (timezone and ?region= override), one value shown`, bad.length === 0 && count > 0, bad.slice(0, 3).join('; '));
-    }
-  }
-  for (const path of priced) {
-    const page = await open({ width: 1440, height: 900, js: false, timezoneId: 'America/Mexico_City' }, path);
-    const prices = await page.evaluate(visiblePrices);
-    check('solutions-region', `${path} without JavaScript: the US price is served`, prices.length > 0 && prices.every((p) => p.shown === p.us), JSON.stringify(prices));
-    await page.context().close();
-  }
+  // ---------------------------------------------------------- region pricing: teasers equal /pricing (solutions-price-checks.mjs)
+  await solutionsPriceChecks({ open, check });
 
   // ---------------------------------------------------------- clubs: squad tabs by keyboard and click
   for (const locale of ['en', 'es']) {

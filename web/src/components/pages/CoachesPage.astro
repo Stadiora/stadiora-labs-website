@@ -10,6 +10,8 @@ import { common, altFor } from '../../i18n/pages/common';
 import { coaches } from '../../i18n/pages/coaches';
 import { contactHref } from '../../lib/links';
 import { hrefFor } from '../../data/nav';
+import { free } from '../../data/prices';
+import { fill } from '../../lib/template';
 import { site } from '../../data/site';
 import type { Locale } from '../../i18n';
 
@@ -19,9 +21,11 @@ interface Props {
 const { locale } = Astro.props;
 const c = coaches[locale];
 const k = common[locale];
+// The Free plan's limits come from the shared price table; the copy holds {tokens}.
+const freeLimits = { coaches: String(free.coaches), athletes: String(free.athletes) };
 ---
 
-<Page locale={locale} path="/solutions/coaches/" title={c.meta.title} description={c.meta.description}>
+<Page locale={locale} path="/solutions/coaches/" title={c.meta.title} description={fill(c.meta.description, freeLimits)}>
   <FeatureHero
     eyebrow={c.eyebrow}
     title={c.title}
@@ -40,7 +44,7 @@ const k = common[locale];
   <section class="strip-section" aria-label={c.free.lead}>
     <div class="container">
       <div class="strip">
-        <p class="strip__text"><strong>{c.free.lead}</strong>{c.free.text}</p>
+        <p class="strip__text"><strong>{c.free.lead}</strong>{fill(c.free.text, freeLimits)}</p>
         <div class="strip__actions">
           <span class="strip__price"><RegionPrice price="coreFrom" text={c.free.core} /></span>
           <a class="btn btn--primary btn--lg" href={site.signUp}>{k.startFree}</a>

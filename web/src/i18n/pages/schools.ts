@@ -40,7 +40,7 @@ const en = {
   },
   pricing: {
     lead: 'Education pricing:',
-    text: ' high schools from {price}/mo for 100 athletes',
+    text: ' high schools from {price}/mo for {athletes} athletes',
     link: 'See pricing',
     cta: 'Book a school demo',
   },
@@ -89,7 +89,7 @@ const es: SchoolsCopy = {
   },
   pricing: {
     lead: 'Precios para educación:',
-    text: ' colegios desde {price}/mes para 100 atletas',
+    text: ' colegios desde {price}/mes para {athletes} atletas',
     link: 'Ver precios',
     cta: 'Agenda una demo escolar',
   },

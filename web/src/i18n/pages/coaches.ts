@@ -3,7 +3,7 @@ const en = {
   meta: {
     title: 'Aria for coaches | Stadiora Labs',
     description:
-      'Plans, food, check-ins and chat in one place, so your time goes to coaching. Start free with 1 coach and up to 10 athletes, no card.',
+      'Plans, food, check-ins and chat in one place, so your time goes to coaching. Start free with {coaches} coach and up to {athletes} athletes, no card.',
   },
   eyebrow: 'For coaches',
   title: "Coach every athlete like they're your only one.",
@@ -56,8 +56,8 @@ const en = {
   },
   free: {
     lead: 'Start free:',
-    text: ' 1 coach, up to 10 athletes, no card.',
-    core: 'Core from {price}/mo for 25 athletes',
+    text: ' {coaches} coach, up to {athletes} athletes, no card.',
+    core: 'Core from {price}/mo for {athletes} athletes',
   },
 };
 
@@ -67,7 +67,7 @@ const es: CoachesCopy = {
   meta: {
     title: 'Aria para entrenadores | Stadiora Labs',
     description:
-      'Planes, comida, check-ins y chat en un solo lugar, para que tu tiempo sea para entrenar. Empieza gratis con 1 entrenador y hasta 10 atletas, sin tarjeta.',
+      'Planes, comida, check-ins y chat en un solo lugar, para que tu tiempo sea para entrenar. Empieza gratis con {coaches} entrenador y hasta {athletes} atletas, sin tarjeta.',
   },
   eyebrow: 'Para entrenadores',
   title: 'Entrena a cada atleta como si fuera el único.',
@@ -120,8 +120,8 @@ const es: CoachesCopy = {
   },
   free: {
     lead: 'Empieza gratis:',
-    text: ' 1 entrenador, hasta 10 atletas, sin tarjeta.',
-    core: 'Core desde {price}/mes para 25 atletas',
+    text: ' {coaches} entrenador, hasta {athletes} atletas, sin tarjeta.',
+    core: 'Core desde {price}/mes para {athletes} atletas',
   },
 };
 
