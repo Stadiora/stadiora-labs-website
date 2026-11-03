@@ -5,6 +5,7 @@
 import { clipProbe } from './clip-probe.mjs';
 import { contrastProbe } from './contrast.mjs';
 import { engagePages } from './engage-verify.mjs';
+import { EDU, fmt } from './pricing-oracle.mjs';
 
 const widths = [390, 1024, 1280, 1440];
 // Messaging (four narrow columns) and Teams (a table and tab strip in a panel) lose their minimum width between
@@ -162,31 +163,54 @@ export async function engageChecks({ open, check, shot, sleep, settle, checksOnl
       await page.context().close();
     }
 
-    // Teams: school price is US by default and LatAm with ?region=latam.
+    // Teams and Pricing read the same price table and region code (src/data/prices.ts, src/lib/region.ts), so for the
+    // same visitor they must show the same schools price. Expected values come from the hand-typed oracle, not the table.
     {
-      const read = async (query, init) => {
-        const page = await open({ width: 1440, height: 900, init }, `${base}/platform/teams/${query}`);
-        await settle(page);
-        const price = await page.evaluate(() => document.querySelector('[data-region-price]')?.textContent?.trim());
-        const us = await page.evaluate(() => document.querySelector('[data-region-price]')?.dataset.us);
-        const latam = await page.evaluate(() => document.querySelector('[data-region-price]')?.dataset.latam);
-        if (!checksOnly && query) await shot(page, `engage-${lang}-teams-latam`, { fullPage: false, clip: { x: 0, y: 0, width: 1440, height: 900 } });
+      const read = async (path, { timezoneId, init } = {}) => {
+        const page = await open({ width: 1440, height: 900, timezoneId, init }, path);
+        const teams = path.includes('/platform/teams/');
+        if (!teams) await page.waitForSelector('[data-pricing][data-ready]', { state: 'attached', timeout: 4000 }).catch(() => {});
+        const got = await page.evaluate((isTeams) => {
+          const text = (sel) => document.querySelector(sel)?.textContent?.trim() ?? null;
+          return isTeams
+            ? { price: text('[data-school="price"]'), athletes: text('[data-school="athletes"]') }
+            : { price: text('[data-edu-rate="highSchool"]'), from: text('[data-schools-from]') };
+        }, teams);
+        if (!checksOnly && teams && path.endsWith('?region=latam')) {
+          const box = await page.locator('section[aria-labelledby="schools-title"]').boundingBox();
+          if (box) await shot(page, `engage-${lang}-teams-schools-latam`, { fullPage: true, clip: { x: 0, y: box.y + (await page.evaluate(() => scrollY)), width: 1440, height: box.height } });
+        }
         await page.context().close();
-        return { price, us, latam };
+        return got;
       };
-      const us = await read('');
-      const latam = await read('?region=latam');
-      const forcedUs = await read('?region=us');
-      check(group, `${lang}/teams: school price defaults to the US price`, us.price === us.us && us.us === '$99', JSON.stringify(us));
-      check(group, `${lang}/teams: ?region=latam shows the LatAm price`, latam.price === latam.latam && latam.latam === '$69', JSON.stringify(latam));
-      check(group, `${lang}/teams: ?region=us forces the US price`, forcedUs.price === '$99', JSON.stringify(forcedUs));
-      const bogota = await read('', () => {
-        const real = Intl.DateTimeFormat.prototype.resolvedOptions;
-        Intl.DateTimeFormat.prototype.resolvedOptions = function () {
-          return { ...real.call(this), timeZone: 'America/Bogota' };
-        };
-      });
-      check(group, `${lang}/teams: a Bogota time zone shows the LatAm price`, bogota.price === '$69', JSON.stringify(bogota));
+      const cases = [
+        ['?region=us', 'us', { query: '?region=us' }],
+        ['?region=latam', 'latam', { query: '?region=latam' }],
+        ['New York time zone, no query', 'us', { timezoneId: 'America/New_York' }],
+        ['a ?region=us override beats a Bogota time zone', 'us', { query: '?region=us', timezoneId: 'America/Bogota' }],
+        ['a ?region=nonsense is ignored (Bogota time zone)', 'latam', { query: '?region=nonsense', timezoneId: 'America/Bogota' }],
+        ['missing time zone', 'us', { init: () => { Intl.DateTimeFormat.prototype.resolvedOptions = () => ({}); } }],
+        // Zones the first version of this page got wrong (its own list was shorter than the Pricing lane's).
+        ...[
+          ['Pacific/Galapagos', 'latam'],
+          ['Pacific/Easter', 'latam'],
+          ['America/Nassau', 'latam'],
+          ['America/Catamarca', 'latam'],
+          ['America/Bogota', 'latam'],
+          ['America/Santiago', 'latam'],
+          ['America/Havana', 'latam'],
+          ['America/Puerto_Rico', 'us'],
+          ['America/St_Thomas', 'us'],
+          ['Europe/Madrid', 'us'],
+        ].map(([zone, region]) => [`${zone} time zone`, region, { timezoneId: zone }]),
+      ];
+      for (const [name, region, { query = '', ...visitor }] of cases) {
+        const want = fmt(EDU[region][0]);
+        const teams = await read(`${base}/platform/teams/${query}`, visitor);
+        const pricing = await read(`${base}/pricing/${query}`, visitor);
+        const ok = teams.price === want && pricing.price === want && pricing.from === want && teams.athletes === '100';
+        check(group, `${lang}: Teams and Pricing both show the ${region === 'us' ? 'US' : 'LatAm'} schools price ${want} for ${name}`, ok, JSON.stringify({ teams, pricing }));
+      }
     }
 
     // Teams: the reports anchor exists, so the shared reports route lands on the right tile.

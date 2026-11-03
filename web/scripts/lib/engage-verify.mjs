@@ -2,7 +2,11 @@
 // integrations) in both languages. verify-dist.mjs calls verifyEngagePages once with its `fail` collector.
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { checkLinks } from './engage-links.mjs';
+import { BRANDED, EDU, fmt } from './pricing-oracle.mjs';
+
+const copySource = fileURLToPath(new URL('../../src/i18n/pages/engage.ts', import.meta.url));
 
 const origin = 'https://stadioralabs.com';
 const slugs = ['messaging', 'guardian-portal', 'teams', 'custom-branded-apps', 'integrations'];
@@ -43,6 +47,10 @@ const talkLabel = /^(talk to us|habla con nosotros)$/i;
 
 /** `pending` is a Map that checkLinks fills with the routes other open PRs own; the caller prints it. */
 export function verifyEngagePages({ dist, fail, pending = new Map() }) {
+  // Translations hold words and {tokens}, never amounts: those come from src/data/prices.ts.
+  for (const [n, line] of readFileSync(copySource, 'utf8').split('\n').entries()) {
+    if (/\$\s?\d|\d\s?(USD|dólares|dollars)/i.test(line)) fail(`src/i18n/pages/engage.ts:${n + 1}: a price in the copy ("${line.trim().slice(0, 60)}"); use a {token} filled from src/data/prices.ts`);
+  }
   for (const page of engagePages) {
     const path = join(dist, page.file);
     if (!existsSync(path)) {
@@ -101,7 +109,19 @@ export function verifyEngagePages({ dist, fail, pending = new Map() }) {
       if (/<img[^>]*(garmin|strava|polar)/i.test(html)) fail(`${page.file}: shows a Garmin, Strava or Polar logo`);
       for (const needle of ['Apple Health', 'Health Connect']) if (!copy.includes(needle)) fail(`${page.file}: does not name ${needle}`);
     }
-    if (page.slug === 'custom-branded-apps' && !/\$99/.test(copy)) fail(`${page.file}: the add-on price is missing`);
+    // Prices come from src/data/prices.ts (the one table /pricing also reads) and are checked against the hand-typed
+    // oracle, so a wrong table entry fails here. The HTML holds the US rate; LatAm rates exist only in the script bundle.
+    if (page.slug === 'custom-branded-apps') {
+      const addon = text(html.match(/<p\b[^>]*\bdata-addon\b[^>]*>([\s\S]*?)<\/p>/)?.[1] ?? '');
+      if (!addon.includes(fmt(BRANDED.monthly)) || !addon.includes(fmt(BRANDED.setup))) fail(`${page.file}: the add-on line "${addon.trim()}" does not show ${fmt(BRANDED.monthly)} monthly and ${fmt(BRANDED.setup)} setup`);
+    }
+    if (page.slug === 'teams') {
+      const price = text(html.match(/<strong\b[^>]*\bdata-school="price"[^>]*>([\s\S]*?)<\/strong>/)?.[1] ?? '').trim();
+      const athletes = text(html.match(/<span\b[^>]*\bdata-school="athletes"[^>]*>([\s\S]*?)<\/span>/)?.[1] ?? '').trim();
+      if (price !== fmt(EDU.us[0])) fail(`${page.file}: the schools price in the HTML is "${price}", expected the US high-school rate ${fmt(EDU.us[0])}`);
+      if (athletes !== '100') fail(`${page.file}: the schools teaser shows "${athletes}" athletes, expected 100`);
+      if (copy.includes(fmt(EDU.latam[0]))) fail(`${page.file}: the LatAm schools price ${fmt(EDU.latam[0])} is in the HTML; it belongs in the script bundle only`);
+    }
 
     for (const m of html.matchAll(/<img\b[^>]*>/g)) {
       if (!/\salt(=|\s|\/?>)/.test(m[0])) fail(`${page.file}: img without alt: ${m[0].slice(0, 80)}`);

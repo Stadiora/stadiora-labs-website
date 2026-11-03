@@ -12,13 +12,11 @@ import { fileURLToPath } from 'node:url';
 
 const repoRoot = fileURLToPath(new URL('../../../', import.meta.url));
 
-const pr28 = 'PR #28 (pricing)';
 const pr30 = 'PR #30 (solutions, about, contact, case studies)';
 const pr31 = 'PR #31 (platform coach pages)';
 const unowned = 'no open PR (linked by the foundation nav and footer, status "planned" in data/site.ts)';
 
 export const pendingRoutes = new Map([
-  ['/pricing/', pr28],
   ['/solutions/coaches/', pr30],
   ['/solutions/teams-and-clubs/', pr30],
   ['/solutions/schools/', pr30],

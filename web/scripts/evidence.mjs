@@ -38,7 +38,7 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 const sections = ['hero', 'logos', 'ai', 'pillars', 'engage', 'brand', 'apps', 'voices', 'cta'];
 
 async function open(opts, path = '/') {
-  const { width, height, scheme = 'light', reduced = false, init, mobile = false } = opts;
+  const { width, height, scheme = 'light', reduced = false, init, mobile = false, timezoneId } = opts;
   const context = await browser.newContext({
     viewport: { width, height },
     colorScheme: scheme,
@@ -46,6 +46,7 @@ async function open(opts, path = '/') {
     deviceScaleFactor: 1,
     hasTouch: mobile,
     isMobile: mobile,
+    ...(timezoneId ? { timezoneId } : {}),
   });
   if (init) await context.addInitScript(init);
   const page = await context.newPage();
