@@ -66,14 +66,28 @@ node scripts/evidence.mjs --engage-only # just the Platform page checks, EN and 
   window and the contact thumb, burst and approved status text. It also runs two measuring modules, both on rendered pixels:
   `solutions-motion-checks.mjs` samples the transforms, boxes and clip times of every hover scope (the hero, conveyors, stages,
   morph, feed) while it runs, while the pointer is over it, while focus is inside it, offscreen and in a hidden tab (a flag is
-  never read, so a CSS override that keeps a conveyor moving fails), and `solutions-pixel-contrast.mjs` photographs each page
-  five times (as it is, text hidden, text black, text white, and the text alone on a blank page) and scores the glyph interior of
-  every text node against the real backdrop (4.5:1, 3:1 for large text) at 390 and 1440, EN and ES, light and dark. The blank-page
-  mask keeps a stroke in the measurement when a layer paints over it (an orbit dot over the closing call), so an erased stroke
-  reads 1:1 and fails instead of being dropped as an edge. It then repeats it in the moving page (the gradient lettering and the
-  mesh at five phases, video frames included, and the sections with orbit dots on the shared clock at six elapsed times) and on
-  every app of the athletes morph. A canary overlay proves the measurement can fail, and a mutation check re-applies the reviewed
-  z-order (dots over the lettering) to Coaches and requires 21,500 ms and 5,500 ms frames to fail while the shipped one passes. `solutions-checks.mjs` still owns overflow, overlap, contrast,
+  never read, so a CSS override that keeps a conveyor moving fails), and `solutions-pixel-contrast.mjs` takes five photographs
+  (real ink, hidden, black, white, and isolated black text on white). It compares sampled glyph interiors with the hidden-ink
+  backdrop, using 4.5:1 or 3:1 for large text. The configured cases are 390/1440, EN/ES and light/dark, with reduced-motion stills,
+  five animation phases, six shared-clock times in orbit sections, and the four athlete apps. Transitions are suppressed only
+  during each measurement and restored after real ink has resolved; production button styling is unchanged.
+
+  **Pixel-contrast coverage boundary.** PR #35's committed-head mutation table uses these proof IDs; claims are limited to
+  those payloads and variants, not arbitrary paint-order analysis:
+
+  | Proof ID | Covered regression |
+  | --- | --- |
+  | `front-text-erase` | Athletes EN/light/1440: erase the existing app name after moving it in front of the phone as a z-index 10 sibling; the ordinary exported guard fails. |
+  | `descendant-erase` | Same variant: erase the name inside the front phone; the ordinary exported guard fails. |
+  | `dot-half`, `dot-opaque` | Coaches EN/light/1440: reviewed foreground dots at half/full opacity fail the ordinary exported moving assertion. |
+  | `transition-restored` | Removing measurement transition suppression destabilizes repeated frozen About ES/dark/390 "Inversionistas" ratios; the clean control stays near 18.42:1. |
+  | `identity` | Unchanged guard: the scoped athlete/coaches checks and repeated About measurements pass. |
+
+  **NOT COVERED:** the fanned `.sx-morph > .sx-ms.l1` and `.r1` phone subtrees (even their visible text), the explicit
+  `PURE_DECORATION` selectors, hidden/near-transparent/1px-clipped text, nodes with no qualifying sampled pixels, arbitrary
+  overlays or layouts, and motion between sampled frames. There is no rectangle exemption around the front `.dphone`.
+  The solid/gradient/faded canaries remain checks, not broader mutation-coverage claims.
+  `solutions-checks.mjs` still owns overflow, overlap, contrast,
   target size, forms and prices; its overlap probe now reads a tight display line by its line box, and ignores `.sr` text.
 - Platform pages (`src/pages/{,es/}platform/{messaging,guardian-portal,teams,custom-branded-apps,integrations}/`): thin
   wrappers around `src/components/engage/*Page.astro`; all copy is in `src/i18n/pages/engage.ts` (EN and ES, ES typed against EN).

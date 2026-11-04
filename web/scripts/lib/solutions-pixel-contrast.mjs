@@ -1,36 +1,29 @@
 // Pixel contrast for the Solutions, Resources and company pages (EN and ES, light and dark, 390 and 1440, reduced motion).
 //
-// The DOM probe in contrast.mjs cannot score text over an image or a gradient, so a heading painted in gradient lettering
-// on the mesh, or a label on glass, was skipped. This measures what is actually composited:
+// The DOM probe in contrast.mjs cannot score text over an image or a gradient. This samples composited pixels:
 //   1. the page is photographed five times with only the text changed: as it is, with the text invisible (the real backdrop
 //      under every glyph, text-shadow and glass included), with the text forced black and with it forced white, and as a glyph
 //      mask (only the text, black on a blank white page, same layout and same animation frame);
 //   2. black and white differ by the glyph coverage over the real backdrop, and the mask gives the coverage of the text alone. A
 //      pixel is "glyph interior" when either says the glyph covers it completely (anti-aliased edges are not scored). The mask is
 //      what keeps a glyph in the measurement when something paints OVER it in the real photograph (an orbit dot, a badge, a
-//      scrim): that layer lowers the black/white difference, but not the mask, so the obstructed stroke is still scored, and it
-//      reads as the failure it is;
+//      scrim): that layer lowers the black/white difference, but not the mask;
 //   3. for every glyph sample the colour that really reached the screen (gradient stops and anything painted over the text
 //      included) is compared with the backdrop that pixel has without the text, as a WCAG contrast ratio. A stroke that a
-//      foreground layer erases reads 1:1 and fails; no partly covered sample is dropped. The lowest sample of a text node is
+//      foreground layer erases can read 1:1. The lowest sampled interior pixel of a text node is
 //      its score: 4.5:1, or 3:1 for large text (24 px, or 18.66 px at weight 700).
-// A node that is faded by `opacity` is scored with its fade in the real photograph, and aria-hidden or decorative text is
-// scored like any other: a reader who sees it has to be able to read it. Screen-reader-only text (a clipped 1px box) paints
-// nothing and is skipped. The one exception is PURE_DECORATION below: a
-// single letterform filled with a photograph, and a watermark. Those are backdrop (WCAG 1.4.3 exempts pure decoration), so
-// they stay as they are in all five photographs and sit behind the text that is scored. A canary page proves the
-// measurement can fail. Reduced motion renders one frame, so the moving page is measured too (see "moving backdrops and
-// lettering" below): the mesh, the gradient lettering and the clips are parked at several phases, and the athlete morph is
-// stepped through every app.
+// Enumeration skips hidden, near-transparent and 1px-clipped text, PURE_DECORATION and FAN_PHONE_TEXT below. Nodes without
+// enough sampled pixels return null. Motion is sampled at selected frames, not continuously. See README's pixel-contrast
+// coverage boundary: the committed-head proof IDs cover front-text/descendant erasure, both reviewed foreground-dot cases,
+// repeated transition-free captures and the clean control; they do not prove arbitrary overlays, clipping or text layouts.
 import { inflateSync } from 'node:zlib';
 
-// Each of these is aria-hidden in the markup, which the selector requires, so a copy that a reader could rely on is never skipped.
+// Explicit decorative backdrops, left unchanged in the photographs.
 export const PURE_DECORATION = '.sx-a__glyph[aria-hidden="true"], .footer__wordmark[aria-hidden="true"]';
 
-// A solid device drawn IN FRONT of neighbouring phones that are fanned out behind it (the athletes hero): the words of a neighbour
-// that this device covers (its bezel and edge anti-aliasing included, 4 px) are not on screen, so those samples are not glyph samples. Nothing else is exempt: a decoration that
-// paints over text it was not designed to cover (an orbit dot) is a failure.
-export const OCCLUDERS = '.dphone';
+// Only the intentionally occluded fanned neighbours' subtrees are exempt, including their visible words. The front phone and
+// siblings painted over it remain candidates (proofs: front-text-erase, descendant-erase). No rectangle or paint-order inference.
+export const FAN_PHONE_TEXT = '.sx-morph > .sx-ms.l1, .sx-morph > .sx-ms.r1';
 
 const pages = [
   ['schools', '/solutions/schools/'],
@@ -118,7 +111,7 @@ const ratio = (a, b) => (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05);
 
 // ---------------------------------------------------------------- in-page helpers (serialised, so self-contained)
 
-// Every visible text node with the line boxes it occupies, in page coordinates.
+// Candidate text nodes and their line boxes, in page coordinates.
 const enumerate = () => {
   const skip = 'script, style, noscript, template, title';
   const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
@@ -146,13 +139,12 @@ const enumerate = () => {
     }
     return false;
   };
-  const occluders = window.__pcOcclude ? [...document.querySelectorAll(window.__pcOcclude)].map((o) => [o, o.getBoundingClientRect()]) : [];
   const out = [];
   while (walker.nextNode()) {
     const t = walker.currentNode;
     const text = t.nodeValue.replace(/\s+/g, ' ').trim();
     const el = t.parentElement;
-    if (!text || !el || el.closest(skip) || (window.__pcDecor && el.closest(window.__pcDecor))) continue;
+    if (!text || !el || el.closest(skip) || (window.__pcDecor && el.closest(window.__pcDecor)) || (window.__pcFan && el.closest(window.__pcFan))) continue;
     const cs = getComputedStyle(el);
     // screen-reader text (a 1px clipped box) paints nothing, so what lies under its overflow belongs to other text
     if (cs.visibility === 'hidden' || cs.display === 'none' || opacityOf(el) < 0.05 || clipped(el)) continue;
@@ -163,8 +155,7 @@ const enumerate = () => {
     if (!rects.length) continue;
     const size = parseFloat(cs.fontSize);
     const weight = Number(cs.fontWeight) || 400;
-    const covered = occluders.filter(([o]) => !o.contains(el)).map(([, r]) => [r.left + sx - 4, r.top + sy - 4, r.right + sx + 4, r.bottom + sy + 4]);
-    out.push({ text: text.slice(0, 40), path: path(el), size, weight, large: size >= 24 || (size >= 18.66 && weight >= 700), op: opacityOf(el), rects, covered });
+    out.push({ text: text.slice(0, 40), path: path(el), size, weight, large: size >= 24 || (size >= 18.66 && weight >= 700), op: opacityOf(el), rects });
   }
   return out;
 };
@@ -225,16 +216,25 @@ async function photograph(page, mode, w, h, clip) {
 }
 
 /**
- * Scores every text node of the page as it stands (the caller has settled it). `clip` limits the photographs and the nodes
- * to one region (page coordinates). Returns one record per scored node.
+ * Samples candidate text nodes as the page stands (the caller has settled it). `clip` limits the photographs to one region
+ * (page coordinates). A record's score is null when no pixels meet the sampling thresholds.
  */
 export async function scorePage(page, { clip } = {}) {
   const { w, h } = await page.evaluate(docSize);
-  await page.evaluate(([decor, occlude]) => ((window.__pcDecor = decor), (window.__pcOcclude = occlude)), [PURE_DECORATION, OCCLUDERS]);
+  await page.evaluate(([decor, fan]) => ((window.__pcDecor = decor), (window.__pcFan = fan)), [PURE_DECORATION, FAN_PHONE_TEXT]);
   const nodes = await page.evaluate(enumerate);
   const shots = {};
-  for (const mode of ['real', 'hide', 'black', 'white', 'mask']) shots[mode] = await photograph(page, mode, w, h, clip);
-  await page.evaluate(setInk, 'real');
+  const transitions = await page.addStyleTag({ content: '*, *::before, *::after { transition: none !important; }' });
+  try {
+    for (const mode of ['real', 'hide', 'black', 'white', 'mask']) shots[mode] = await photograph(page, mode, w, h, clip);
+  } finally {
+    await page.evaluate(setInk, 'real');
+    await transitions.evaluate((style) => {
+      // Resolve restored ink while transitions are still suppressed, before returning to production styling.
+      document.body.offsetHeight;
+      style.remove();
+    });
+  }
 
   const stat = nodes.map(() => ({ n: 0, min: Infinity, at: null, thin: 0, thinMin: Infinity }));
   const count = shots.real.bands.length;
@@ -277,7 +277,6 @@ export async function scorePage(page, { clip } = {}) {
         const yb = Math.min(y0 + ih, Math.ceil(bt)) - y0;
         for (let y = Math.max(0, ya); y < yb; y++) {
           for (let x = xa; x < xb; x++) {
-            if (node.covered.some(([cl, ct, cr, cb]) => x >= cl && x < cr && y + y0 >= ct && y + y0 < cb)) continue;
             const o = (y * iw + x) * 4;
             const seen = over(x, y, op);
             const bare = alone(x, y, op);
@@ -304,7 +303,7 @@ export async function scorePage(page, { clip } = {}) {
   return nodes.map((node, k) => {
     const s = stat[k];
     const measured = s.n > 0 ? s.min : s.thin >= 4 ? s.thinMin : null;
-    return { ...node, rects: undefined, covered: undefined, score: measured, interior: s.n, at: s.at, estimated: s.n === 0 && s.thin >= 4 };
+    return { ...node, rects: undefined, score: measured, interior: s.n, at: s.at, estimated: s.n === 0 && s.thin >= 4 };
   });
 }
 

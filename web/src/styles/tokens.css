@@ -34,8 +34,9 @@
   descent-override: 22.5%;
   line-gap-override: 0%;
 }
-/* The same for the display face, in the two widths the site sets it in (62% for the uppercase .d lines, 88% for headings), so a
-   late Archivo does not re-wrap a headline: size-adjust scales Arial Bold to the average advance width of Archivo at that width. */
+/* Display fallback for the site's 62% uppercase lines and 88% headings: size-adjust approximates Archivo's average advances
+   and the overrides match line metrics, reducing swap CLS. Cap height and weight still differ; wrapping is not guaranteed
+   (the Schools EN/1440 H1 changes from three lines to two when Archivo arrives). */
 @font-face {
   font-family: 'Archivo Fallback';
   src: local('Arial Bold'), local('Arial-BoldMT'), local('Liberation Sans Bold'), local('LiberationSans-Bold'), local('Helvetica Bold'), local('Helvetica-Bold');
