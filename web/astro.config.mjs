@@ -15,8 +15,8 @@ export default defineConfig({
     sitemap({
       // The case-study index is noindex until there is a real story to show, so it stays out of the sitemap.
       filter: (page) => !page.includes('/resources/case-studies/') && !page.endsWith('/404/'),
-      // The carried legacy pages that should be indexed. Investors, the business cards, connect and the redirect stubs stay out.
-      customPages: ['lead-magnet.html', 'lead-magnet-es.html', 'api.html', 'api-es.html', 'privacy.html', 'terms.html'].map((p) => `https://stadioralabs.com/${p}`),
+      // The carried legacy pages that should be indexed (connect is the public link hub). Investors, the business cards and the redirect stubs stay out.
+      customPages: ['connect.html', 'lead-magnet.html', 'lead-magnet-es.html', 'api.html', 'api-es.html', 'privacy.html', 'terms.html'].map((p) => `https://stadioralabs.com/${p}`),
       i18n: { defaultLocale: 'en', locales: { en: 'en', es: 'es' } },
     }),
   ],

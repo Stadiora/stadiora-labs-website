@@ -11,6 +11,7 @@ import { chromium } from 'playwright';
 import { statusText } from './lib/contact-contract.mjs';
 import { serve } from './lib/static-server.mjs';
 import { carried, redirects } from './lib/live-urls.mjs';
+import { noindexPages } from './lib/cutover-verify.mjs';
 
 const root = fileURLToPath(new URL('..', import.meta.url));
 const shotsAt = process.argv.includes('--shots') ? process.argv[process.argv.indexOf('--shots') + 1] : null;
@@ -107,6 +108,38 @@ for (const url of carried.filter((u) => u.endsWith('.html') || u.endsWith('/')))
   }
   await context.close();
 }
+// ---------------------------------------------------------------- the investor pages and the cards are noindex in the DOM
+// The DOM holds only active tags: a robots tag inside an HTML comment is not there, so this fails on it.
+for (const url of noindexPages) {
+  const { page, context } = await open(url);
+  const robots = await page.locator('meta[name="robots"]').evaluateAll((els) => els.map((el) => el.getAttribute('content') ?? ''));
+  check('noindex', `${url}: an active <meta name="robots"> carries noindex`, robots.some((c) => c.toLowerCase().split(',').map((d) => d.trim()).includes('noindex')), robots.join(' | ') || 'no active robots tag');
+  await context.close();
+}
+for (const url of ['/api.html', '/lead-magnet.html', '/privacy.html', '/terms.html', '/connect.html']) {
+  const { page, context } = await open(url);
+  check('noindex', `${url}: indexable, no active noindex`, (await page.locator('meta[name="robots"][content*="noindex"]').count()) === 0);
+  await context.close();
+}
+
+// ---------------------------------------------------------------- the API footers: every link lands where it says, no redirect in between
+for (const url of ['/api.html', '/api-es.html']) {
+  const { page, context } = await open(url);
+  const hrefs = await page.locator('footer a[href]').evaluateAll((as) => as.map((a) => a.getAttribute('href')).filter((h) => h && h.startsWith('/')));
+  const prefix = url.includes('-es') ? '/es' : '';
+  const expected = ['/solutions/athletes/', '/solutions/coaches/', '/about/', '/platform/programs/'].map((p) => `${prefix}${p}`);
+  check('api-footer', `${url}: the footer carries the Aria 12, Aria for Coaches, Mission and Engine links`, expected.every((h) => hrefs.includes(h)), hrefs.join(' '));
+  for (const href of new Set(hrefs)) {
+    const target = new URL(href, server.url);
+    const res = await page.goto(target.href, { waitUntil: 'load' });
+    await sleep(100);
+    const landed = new URL(page.url());
+    const frag = target.hash ? await page.evaluate((id) => !!document.getElementById(id), decodeURIComponent(target.hash.slice(1))) : true;
+    check('api-footer', `${url}: ${href} lands on itself (200), with its section if it names one`, res.status() === 200 && landed.pathname === target.pathname && frag, `${res.status()} ${landed.pathname}${landed.hash}`);
+  }
+  await context.close();
+}
+
 {
   const { page, context } = await open('/connect.html');
   check('carried', 'connect.html: no video element is left pointing at the missing file', (await page.locator('video, [src*="monitors.mp4"], [href*="monitors.mp4"]').count()) === 0);

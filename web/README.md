@@ -11,7 +11,7 @@ npm run dev        # http://localhost:4321
 npm run build      # static output in dist/
 npm run check      # astro check (types and templates)
 npm run verify     # asserts the built pages: SEO tags, hreflang, OG, no placeholders, budgets, Jekyll exclusion
-npm run cutover-checks   # Playwright: redirects without JS, the 404, every carried page loads, the lead form (EN and ES); `-- --shots <dir>` saves screenshots
+npm run cutover-checks   # Playwright: redirects without JS, the 404, every carried page loads, the investor pages and cards carry an active noindex, the API footer links land, the lead form (EN and ES); `-- --shots <dir>` saves screenshots
 npm run evidence   # needs a build; Playwright screenshots, interaction checks and measured budgets in .evidence/
 node scripts/evidence.mjs --coach-only   # just the Platform Coach pages, EN and ES (see below); add --checks-only to skip screenshots
 node scripts/evidence.mjs --nav-only   # just the header checks: geometry 1025 to 1440, panel height, drawer and panel focus
@@ -115,9 +115,16 @@ from `dist/`, when a root file or old sitemap entry is in no group, and checks t
 files are compared while the root `index.html` still exists; delete the legacy root once Pages is on Actions.
 
 - Carried at the same URLs (`public/`): `investors(.es).html` (noindex), `connect.html` (its dead `monitors.mp4` element is
-  removed), `privacy.html`, `terms.html`, `api(-es).html`, `lead-magnet(-es).html`, `anthony/`, `ian/`, `stadioralabs info/`,
+  removed; it has a canonical and an OG image and is in the sitemap, as the public link hub), `privacy.html`, `terms.html`, `api(-es).html`, `lead-magnet(-es).html`, `anthony/`, `ian/`, `stadioralabs info/`,
   `videos/api.mp4`, `CNAME`, `robots.txt` and `sitemap.xml` (a sitemap index pointing at the generated `sitemap-0.xml`).
   Edit them in place; they are static HTML and are not part of the Astro design system.
+- Links on every page: `scripts/lib/link-guard.mjs` (run by `npm run verify`) fails on any link to stadioralabs.com (relative, root-relative
+  or absolute, with or without a `#fragment`) whose page is not in the build, whose fragment has no matching id on the target page, or
+  that points at a redirect stub with a fragment (the meta refresh drops it). The carried pages and stubs get no allowance; built pages
+  may still link to the routes in `pendingRoutes` (`/help/`). The API footers map Aria 12 to `/solutions/athletes/`, Aria for Coaches to
+  `/solutions/coaches/`, Our Mission to `/about/` and The Engine to `/platform/programs/` (each with its `/es/` twin).
+- Markup guards read tags with `scripts/lib/html-scan.mjs`, which skips comments and script/style text: a `<meta name="robots">` inside
+  a comment is not active, so it does not count as noindex.
 - Redirect stubs (meta refresh, canonical, no script): `team.html` to `/about/`, `team-es.html` to `/es/about/`,
   `index-es.html` to `/es/`, `index-preview.html` to `/`. They are out of the sitemap.
 - `src/pages/404.astro`: one bilingual page (GitHub Pages cannot pick a language per path), noindex, no canonical.

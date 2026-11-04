@@ -94,17 +94,30 @@ const meterStop = () => window.__meter?.stop();
 // Hosts that animate once and then stay put: after a pause there is nothing left to resume.
 const ONE_SHOT = ['blockquote.proof-text'];
 
-// Resolves once nothing finite is running inside the host any more (what a step started before the pause may still be
-// finishing), or after `cap` ms. A host that pauses for real settles at once; one that does not keeps its transitions
-// running, stays unsettled until the cap and is measured as moving. No fixed sleep decides the outcome.
-const settled = ({ i, cap }) =>
+// Resolves once the host has been quiet: no finite CSS animation running inside it, and no DOM change (text, attribute,
+// child) for `quiet` ms, or after `cap` ms. That covers what a step started before the pause may still be finishing, and
+// the finite JavaScript work the page does on purpose, which getAnimations() cannot see: the brand scramble steps its
+// letters from timeouts staggered 70 ms apart and requestAnimationFrame, so there can be a gap of one stagger between two
+// writes. `quiet` is longer than that gap. A host that pauses for real goes quiet at once; one that does not keeps writing,
+// is never quiet, stays unsettled until the cap and is then measured as moving. No fixed sleep decides the outcome, and
+// nothing is excluded from the measurement that follows.
+const settled = ({ i, cap, quiet }) =>
   new Promise((resolve) => {
     const host = document.querySelector(`[data-ap-i="${i}"]`);
     const t0 = performance.now();
+    let last = t0;
+    const watch = new MutationObserver(() => {
+      last = performance.now();
+    });
+    watch.observe(host, { subtree: true, childList: true, characterData: true, attributes: true });
     const tick = () => {
+      const now = performance.now();
       const running = host.getAnimations({ subtree: true }).filter((a) => a.playState === 'running' && !(a.effect?.getComputedTiming().iterations === Infinity));
-      if (!running.length || performance.now() - t0 > cap) resolve(running.length);
-      else requestAnimationFrame(tick);
+      if (running.length) last = now;
+      if ((!running.length && now - last >= quiet) || now - t0 > cap) {
+        watch.disconnect();
+        resolve({ waited: Math.round(now - t0), running: running.length });
+      } else requestAnimationFrame(tick);
     };
     tick();
   });
@@ -314,7 +327,7 @@ export async function motionChecks({ open, check, sleep, metrics, on, pathFor, h
         };
         // After a pause has settled, nothing may move for the whole window.
         const still = async (cond) => {
-          if (cond === 'hover' || cond === 'focus') await page.evaluate(settled, { i: h.i, cap: 1500 });
+          if (cond === 'hover' || cond === 'focus') await page.evaluate(settled, { i: h.i, cap: 4000, quiet: 400 });
           else await sleep(settleMs);
           await page.evaluate(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))));
           await page.evaluate(meterStart, { i: h.i, cssLoops: !(cond === 'hover' || cond === 'focus') });

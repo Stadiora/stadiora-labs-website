@@ -5,11 +5,18 @@
 //   - a redirect stub is not a script-free meta refresh with a canonical link to its target;
 //   - a carried page refers to a local file that is not in dist/ (the connect.html video was one);
 //   - the SEO contract is broken: sitemap, robots.txt, canonical and hreflang on every page, one OG card per page type that exists;
+//   - a page links to another page of the site that is not in the build, or to a #fragment that has no id on the target (a link
+//     to a redirect stub with a fragment counts: the refresh drops the fragment);
 //   - the carried pages lost a fix from the cutover PR (noindex, lead form honesty, investors wording, CNAME).
+// Markup is read with scripts/lib/html-scan.mjs, which skips comments and script/style text, so a tag that is only inside a
+// comment is not active and does not count.
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import { join, posix, relative, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { built, carried, liveUrls, notUrls, redirects, retired } from './live-urls.mjs';
+import { isNoindex, scanTags } from './html-scan.mjs';
+import { linkProblems } from './link-guard.mjs';
+import { pendingRoutes } from './engage-links.mjs';
 
 const origin = 'https://stadioralabs.com';
 const repoRoot = fileURLToPath(new URL('../../../', import.meta.url));
@@ -36,9 +43,9 @@ const walk = (dir, out = []) => {
 };
 
 // Pages that must stay out of search results and out of the sitemap.
-const noindexPages = ['/investors.html', '/investors-es.html', '/anthony/index.html', '/ian/index.html'];
+export const noindexPages = ['/investors.html', '/investors-es.html', '/anthony/index.html', '/ian/index.html'];
 // Carried legacy pages that are indexed: canonical, listed in the sitemap.
-const indexableLegacy = ['/api.html', '/api-es.html', '/lead-magnet.html', '/lead-magnet-es.html', '/privacy.html', '/terms.html'];
+const indexableLegacy = ['/connect.html', '/api.html', '/api-es.html', '/lead-magnet.html', '/lead-magnet-es.html', '/privacy.html', '/terms.html'];
 const hreflangPairs = { '/api.html': ['/api.html', '/api-es.html'], '/api-es.html': ['/api.html', '/api-es.html'], '/lead-magnet.html': ['/lead-magnet.html', '/lead-magnet-es.html'], '/lead-magnet-es.html': ['/lead-magnet.html', '/lead-magnet-es.html'] };
 
 const ogTypeFor = (urlPath) => {
@@ -107,7 +114,7 @@ export function verifyCutover({ dist, fail, root = repoRoot }) {
     if (!existsSync(file)) continue;
     const html = read(file);
     const base = posix.dirname(url);
-    const refs = [...html.matchAll(/\s(?:src|href|poster)="([^"]*)"/g)].map((m) => m[1]);
+    const refs = scanTags(html).flatMap((t) => [t.attrs.src, t.attrs.href, t.attrs.poster]).filter((r) => r !== undefined);
     for (const ref of new Set(refs)) {
       if (!ref || /^(#|https?:|mailto:|tel:|data:|javascript:|\/\/)/i.test(ref)) continue;
       const clean = decode(ref.split(/[?#]/)[0]);
@@ -123,7 +130,7 @@ export function verifyCutover({ dist, fail, root = repoRoot }) {
   // ------------------------------------------------------------------ 6. noindex pages
   for (const url of noindexPages) {
     const file = fileFor(dist, url);
-    if (existsSync(file) && !/<meta name="robots" content="[^"]*noindex/.test(read(file))) fail(`cutover: ${url} lost its noindex tag`);
+    if (existsSync(file) && !isNoindex(read(file))) fail(`cutover: ${url} has no active <meta name="robots"> with noindex (a tag inside a comment does not count)`);
   }
 
   // ------------------------------------------------------------------ 7. lead form honesty
@@ -165,7 +172,7 @@ export function verifyCutover({ dist, fail, root = repoRoot }) {
   const twin = (url) => (url.startsWith('/es/') ? url.slice(3) : `/es${url}`);
   for (const { file, url } of pages) {
     const html = read(file);
-    const noindex = /<meta name="robots" content="[^"]*noindex/.test(html);
+    const noindex = isNoindex(html);
     const tag = `${url} (${relative(dist, file)})`;
     if (!noindex) {
       if (!sitemapUrls.has(abs(url))) fail(`cutover: ${tag} is indexable but not in the sitemap`);
@@ -197,8 +204,12 @@ export function verifyCutover({ dist, fail, root = repoRoot }) {
       if (!html.includes(`<link rel="alternate" hreflang="${lang}" href="${abs(alt)}">`)) fail(`cutover: ${url} needs hreflang ${lang} -> ${abs(alt)}`);
     }
     if (!/<meta name="description" content="[^"]{40,}"/.test(html)) fail(`cutover: ${url} needs a meta description`);
+    if (url === '/connect.html') {
+      const og = scanTags(html).find((t) => t.name === 'meta' && t.attrs.property === 'og:image')?.attrs.content;
+      if (og !== abs('/og/company-en.png')) fail(`cutover: ${url} needs og:image ${abs('/og/company-en.png')}, found ${og ?? 'none'}`);
+    }
   }
-  for (const url of [...noindexPages, '/connect.html', ...redirects.map((r) => r.url), '/404.html']) {
+  for (const url of [...noindexPages, ...redirects.map((r) => r.url), '/404.html']) {
     if (sitemapUrls.has(abs(url))) fail(`cutover: ${url} must not be in the sitemap`);
   }
   for (const url of ['/anthony/', '/ian/']) if (sitemapUrls.has(abs(url))) fail(`cutover: ${url} must not be in the sitemap`);
@@ -215,8 +226,24 @@ export function verifyCutover({ dist, fail, root = repoRoot }) {
   const nf = join(dist, '404.html');
   if (existsSync(nf)) {
     const html = read(nf);
-    if (!/<meta name="robots" content="[^"]*noindex/.test(html)) fail('cutover: 404.html must be noindex');
-    if (/<link rel="canonical"/.test(html)) fail('cutover: 404.html must not carry a canonical link');
+        if (!isNoindex(html)) fail('cutover: 404.html must be noindex');
+    if (scanTags(html).some((t) => t.name === 'link' && (t.attrs.rel ?? '').toLowerCase() === 'canonical')) fail('cutover: 404.html must not carry a canonical link');
   }
 
+  // ------------------------------------------------------------------ 10. internal links reach a page, and a #fragment reaches an id
+  // Every built page is read. The carried legacy pages and the redirect stubs get no allowance: after the cutover nothing of
+  // theirs may point at a page or a section that the new build does not have. The built pages may link to a route another open PR
+  // owns (the `pendingRoutes` of the Platform link guard, reported by verify); anything else missing is a failure.
+  const strict = new Set([...carried, ...redirects.map((r) => r.url)]);
+  const pending = new Set();
+  for (const route of pendingRoutes.keys()) pending.add(route).add(`/es${route}`);
+  const everyPage = walk(dist)
+    .filter((f) => f.endsWith('.html') && !f.includes(`${sep}_astro${sep}`))
+    .map((f) => ({ url: `/${relative(dist, f).split(sep).join('/')}`, html: read(f) }));
+  for (const [group, pages, allow] of [
+    ['carried or redirect', everyPage.filter((p) => strict.has(p.url) || strict.has(p.url.replace(/index\.html$/, ''))), new Set()],
+    ['built', everyPage.filter((p) => !strict.has(p.url) && !strict.has(p.url.replace(/index\.html$/, ''))), pending],
+  ]) {
+    for (const problem of linkProblems({ dist, pages, pending: allow })) fail(`cutover: ${problem} (${group} page)`);
+  }
 }
