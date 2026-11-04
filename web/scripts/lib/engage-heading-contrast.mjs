@@ -57,7 +57,7 @@ const analyse = async ({ real, hidden, white, black, large }) => {
   return { pixels: n, min: n ? min : null, at, need: large ? 3 : 4.5 };
 };
 
-/** Pause every infinite CSS loop and every clip at a point derived from `seed` (same seed, same frame). */
+/** Sample infinite CSS animations and visible clips at points derived from `seed`. */
 export async function freezeAt(page, seed) {
   await page.evaluate(async (seed) => {
     let s = seed >>> 0;

@@ -98,6 +98,10 @@ html:not(.js) .eg-stage .rv {
 }
 
 /* ---------- closing links ---------- */
+/* The 120% orbit canvas must not inherit the global SVG max-width clamp, which shifts its centre left. */
+.final .orbits svg {
+  max-width: none;
+}
 .eg-also {
   background: var(--bg);
 }

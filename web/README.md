@@ -147,6 +147,8 @@ the committed head with content comparisons, restoration checks and assertion li
   a small lost glyph is not forgiven as a percentile.
 - `mobile-orbit-rollback`: restoring the closing orbit's old vertical position fails the mobile minimum assertion.
   The phone layout moves the orbit paths down toward the actions; it does not hide or pause the dots.
+- `desktop-orbit-rollback`: restoring the inherited SVG width clamp fails the desktop Messaging minimum assertion.
+  Removing that clamp lets the 120% orbit canvas stay centred instead of shifting its paths across the title.
 - `identity`: unchanged built CSS passes all 12 Teams checks.
 
 **NOT COVERED:** an exhaustive minimum over animation time, other browsers or widths, antialiased glyph edges,
