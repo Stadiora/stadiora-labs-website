@@ -67,7 +67,7 @@ const phones = await Promise.all(cards.map((_, i) => Astro.slots.render(`phone-$
     overflow: hidden;
     scroll-snap-align: start;
     border: 1px solid var(--line);
-    border-radius: var(--radius-card);
+    border-radius: var(--r-lg, var(--radius-card));
     background: var(--bg);
     container-type: inline-size;
   }
@@ -83,8 +83,8 @@ const phones = await Promise.all(cards.map((_, i) => Astro.slots.render(`phone-$
     background: var(--bg);
   }
   .hrc__label {
-    font-size: 19px;
-    line-height: 26px;
+    font: 800 21px/26px var(--f-display, inherit);
+    letter-spacing: -0.01em;
   }
 
   /* Static: the phone's top shows in a band under the label. */
@@ -128,7 +128,8 @@ const phones = await Promise.all(cards.map((_, i) => Astro.slots.render(`phone-$
     }
     :global(html.js) .hrc.is-open {
       transform: translateY(-4px);
-      box-shadow: var(--shadow-lift);
+      border-color: var(--ac, var(--line));
+      box-shadow: 0 28px 60px -26px color-mix(in srgb, var(--ac, var(--ink)) 70%, transparent);
     }
     :global(html.js) .hrc__phone-wrap {
       position: absolute;

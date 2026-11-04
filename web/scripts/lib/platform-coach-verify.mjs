@@ -2,6 +2,7 @@
 // languages. verify-dist.mjs calls verifyCoachPages once with its `fail` collector; evidence reads coachSlugs.
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
+import { verifyCoachFloodlight, verifyCoachStyles } from './platform-coach-floodlight.mjs';
 
 const origin = 'https://stadioralabs.com';
 export const coachSlugs = ['programs', 'nutrition', 'readiness', 'power-lab'];
@@ -126,10 +127,13 @@ export function verifyCoachPages({ dist, fail }) {
       if (!/\brel="[^"]*noopener/.test(m[0])) failHere(`${page.file}: target=_blank link without noopener`);
     }
 
+    verifyCoachFloodlight({ html, file: page.file, slug: page.slug, lang: page.lang, dist, fail: failHere });
+
     // The language switch and the hreflang pair must point at each other.
     if (!html.includes(`href="${page.alt}"`)) failHere(`${page.file}: no link to the ${page.lang === 'en' ? 'Spanish' : 'English'} version`);
     // Every page offers a demo and a free start; the demo link carries its topic.
     if (!/href="[^"]*topic=demo/.test(html)) failHere(`${page.file}: no "Book a demo" link with topic=demo`);
   }
-  if (!problems) console.log(`verify-dist: ${coachPages.length} platform coach pages ok (SEO, hreflang pair, claims guard, alt text)`);
+  verifyCoachStyles({ root: join(dist, '..'), fail: failHere });
+  if (!problems) console.log(`verify-dist: ${coachPages.length} platform coach pages ok (SEO, hreflang pair, claims guard, alt text, Floodlight structure)`);
 }

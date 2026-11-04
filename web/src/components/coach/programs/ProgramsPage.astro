@@ -1,12 +1,12 @@
 ---
 import { programsCopy } from '../../../i18n/pages/programs';
 import { coachCommon } from '../../../i18n/pages/coach-common';
-import { site } from '../../../data/site';
 import type { Locale } from '../../../i18n';
-import FeatureHero from '../FeatureHero.astro';
+import CoachHero from '../CoachHero.astro';
+import CoachFinal from '../CoachFinal.astro';
+import AiProgram from '../../home/AiProgram.astro';
 import Accordion from '../Accordion.astro';
 import AlsoInAria from '../AlsoInAria.astro';
-import CtaBand from '../CtaBand.astro';
 import CoachIcon from '../CoachIcon.astro';
 import BrowserFrame from '../BrowserFrame.astro';
 import FramePhone from './FramePhone.astro';
@@ -27,76 +27,97 @@ const common = coachCommon[locale];
 const items = c.rows.map((r) => ({ title: r.title, body: r.body, ai: r.key === 'ai' }));
 ---
 
-<FeatureHero
-  locale={locale}
-  variant="banner"
-  eyebrow={c.hero.eyebrow}
-  title={c.hero.title}
-  primary={{ label: common.startFree, href: site.signUp }}
-  secondary={{ label: c.hero.secondary, href: '#proof' }}
-  photo={{ slot: 'f1-programs', alt: c.hero.photoAlt, ratio: '1600/612', sizes: '(max-width: 900px) 100vw, 1376px' }}
-  pos="30% 50%"
-  posMobile="14% 50%"
-  mirror
-/>
-
-<section class="section pg-acc" aria-labelledby="pg-acc-title">
-  <div class="container">
-    <h2 id="pg-acc-title" class="sr-only">{c.rowsLabel}</h2>
-    <Accordion id="pg" items={items} open={0} label={c.rowsLabel} wide>
-      <FramePhone slot="screen-0" locale={locale} copy={c} active={2}><TemplatesScreen copy={c.screens.templates} /></FramePhone>
-      <FramePhone slot="screen-1" locale={locale} copy={c} active={2}><AiScreen locale={locale} copy={c.screens.ai} /></FramePhone>
-      <FramePhone slot="screen-2" locale={locale} copy={c} active={2}><SendScreen copy={c.screens.send} /></FramePhone>
-      <FramePhone slot="screen-3" locale={locale} copy={c} active={2}><ImportScreen copy={c.screens.import} /></FramePhone>
-      <div slot="screen-4" class="pg-phones">
-        <AthletePhone copy={c.screens.phone} />
-        <LogPhone copy={c.screens.logPhone} workout={c.screens.phone.workout} />
+<div class="cf-page pg" data-accent="cyan">
+  <CoachHero locale={locale} eyebrow={c.hero.eyebrow} title={c.hero.title} secondary={{ label: c.hero.secondary, href: `#${c.proof.id}` }} clip="coach-programs">
+    <Fragment slot="overlay">
+      <div class="cf-chip glass" style="left:5%;top:8%" data-depth="12">
+        <CoachIcon name="sparkle" size={22} />
+        <span><b>{c.screens.ai.draftTitle}</b><small>{c.screens.ai.draftMeta}</small></span>
       </div>
-    </Accordion>
-    <p class="co-demo">{common.demoNote}</p>
-  </div>
-</section>
+      <div class="cf-chip glass" style="right:5%;bottom:16%;--fd:-3.5s" data-depth="18">
+        <i class="dot-live"></i>
+        <span><b>{c.screens.phone.week}</b><small>{c.screens.phone.workout}</small></span>
+      </div>
+    </Fragment>
+  </CoachHero>
 
-<section id={c.proof.id} class="section section--surface pg-proof" aria-labelledby="pg-proof-title">
-  <div class="container">
-    <div class="section-head" data-reveal>
-      <h2 id="pg-proof-title">{c.proof.title}</h2>
-      <p>{c.proof.sub}</p>
+  <AiProgram locale={locale} />
+
+  <section class="cf-sec pg-acc" aria-labelledby="pg-acc-title">
+    <div class="wrap">
+      <div class="cf-head">
+        <div>
+          <h2 id="pg-acc-title" class="d d3 lines"><span><span>{c.rowsLabel}</span></span></h2>
+        </div>
+      </div>
+      <div class="rv">
+        <Accordion id="pg" items={items} open={0} label={c.rowsLabel} wide backdrop="ai-bg">
+          <FramePhone slot="screen-0" locale={locale} copy={c} active={2}><TemplatesScreen copy={c.screens.templates} /></FramePhone>
+          <FramePhone slot="screen-1" locale={locale} copy={c} active={2}><AiScreen locale={locale} copy={c.screens.ai} /></FramePhone>
+          <FramePhone slot="screen-2" locale={locale} copy={c} active={2}><SendScreen copy={c.screens.send} /></FramePhone>
+          <FramePhone slot="screen-3" locale={locale} copy={c} active={2}><ImportScreen copy={c.screens.import} /></FramePhone>
+          <div slot="screen-4" class="pg-phones">
+            <AthletePhone copy={c.screens.phone} />
+            <LogPhone copy={c.screens.logPhone} workout={c.screens.phone.workout} />
+          </div>
+        </Accordion>
+      </div>
+      <p class="cf-demo">{common.demoNote}</p>
     </div>
-    <div class="pg-proof__grid" data-reveal style="--reveal-i:1">
-      <div class="pg-proof__plan">
-        <p class="pg-proof__label">{c.proof.plan}</p>
-        <BrowserFrame url={c.browserUrl} side={c.screens.sidebar} sideActive={2} decorative={false}>
-          <PlanCalendar locale={locale} title={c.proof.calendar} bare />
-        </BrowserFrame>
-      </div>
-      <div class="pg-proof__see">
-        <p class="pg-proof__label">{c.proof.see}</p>
-        <AthletePhone copy={c.screens.phone} />
-      </div>
-    </div>
-    <p class="co-demo">{common.demoNote}</p>
-    <h3 class="pg-proof__list-title">{c.proof.listTitle}</h3>
-    <ul class="pg-proof__list">
-      {
-        c.proof.list.map((line) => (
-          <li>
-            <CoachIcon name="check" size={18} />
-            <span>{line}</span>
-          </li>
-        ))
-      }
-    </ul>
-  </div>
-</section>
+  </section>
 
-<AlsoInAria locale={locale} ids={c.also} />
-<CtaBand locale={locale} />
+  <section id={c.proof.id} class="cf-stage impact" data-section data-accent="cyan" aria-labelledby="pg-proof-title">
+    <div class="mesh" aria-hidden="true"><i class="b b5"></i><i class="b b1"></i><i class="b b2"></i><i class="b b3"></i><i class="b b4"></i><i class="vig"></i></div>
+    <div class="wrap">
+      <div class="cf-head">
+        <div>
+          <h2 id="pg-proof-title" class="d d2 lines"><span><span>{c.proof.title}</span></span></h2>
+        </div>
+        <p class="lead rv" style="--i:1">{c.proof.sub}</p>
+      </div>
+      <div class="pg-send rv" style="--i:1" data-cf-stage="send">
+        <div class="pg-send__col">
+          <p class="pg-send__label">{c.proof.plan}</p>
+          <div class="cf-panel reading pg-send__panel">
+            <BrowserFrame url={c.browserUrl} side={c.screens.sidebar} sideActive={2} decorative={false}>
+              <PlanCalendar locale={locale} title={c.proof.calendar} bare />
+            </BrowserFrame>
+          </div>
+        </div>
+        <div class="pg-send__link" aria-hidden="true">
+          <svg viewBox="0 0 160 24" preserveAspectRatio="none"><path d="M2 12H158" /></svg>
+          <i></i>
+        </div>
+        <div class="pg-send__col pg-send__col--phone">
+          <p class="pg-send__label">{c.proof.see}</p>
+          <div class="reading pg-send__phone">
+            <AthletePhone copy={c.screens.phone} />
+            <span class="pg-send__ring"></span>
+          </div>
+        </div>
+      </div>
+      <p class="cf-demo">{common.demoNote}</p>
+      <h3 class="t-title pg-list-title rv">{c.proof.listTitle}</h3>
+      <ul class="pg-list">
+        {
+          c.proof.list.map((line, i) => (
+            <li class="rv" style={`--i:${i}`}>
+              <CoachIcon name="check" size={18} />
+              <span>{line}</span>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <AlsoInAria locale={locale} ids={c.also} />
+  <CoachFinal locale={locale} />
+</div>
 
 <style>
   .pg-acc {
-    padding-top: 40px;
-    padding-bottom: 80px;
+    padding-top: clamp(56px, 7vw, 104px);
   }
   .pg-phones {
     display: flex;
@@ -107,50 +128,126 @@ const items = c.rows.map((r) => ({ title: r.title, body: r.body, ai: r.key === '
     padding-bottom: 8px;
     --phone-w: clamp(150px, 42cqw, 240px);
   }
-  .pg-proof__grid {
+
+  /* What you plan -> what they see: a pulse runs along the link, then the phone's card rings once. */
+  .pg-send {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
-    grid-template-rows: auto auto;
-    column-gap: clamp(32px, 6vw, 96px);
-    margin-top: 40px;
+    grid-template-columns: minmax(0, 1fr) clamp(72px, 9vw, 150px) auto;
+    align-items: center;
+    column-gap: clamp(8px, 1.5vw, 24px);
   }
-  .pg-proof__plan,
-  .pg-proof__see {
-    display: grid;
-    grid-template-rows: subgrid;
-    grid-row: span 2;
-    row-gap: 14px;
+  .pg-send__col {
+    min-width: 0;
   }
-  .pg-proof__plan > :global(:not(.pg-proof__label)),
-  .pg-proof__see > :global(:not(.pg-proof__label)) {
-    align-self: center;
-  }
-  .pg-proof__label {
-    align-self: end;
-    margin: 0;
-    color: var(--ink-2);
-    font-size: 15px;
-    font-weight: 600;
-    letter-spacing: 0.04em;
+  .pg-send__label {
+    margin: 0 0 14px;
+    font: 500 12px/1 var(--f-mono);
+    letter-spacing: 0.14em;
     text-transform: uppercase;
+    color: var(--ink-2);
   }
-  .pg-proof__see {
+  .pg-send__panel {
+    padding: 14px;
+  }
+  .pg-send__link {
+    position: relative;
+    height: 24px;
+    margin-top: 28px;
+  }
+  .pg-send__link svg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+  }
+  .pg-send__link path {
+    fill: none;
+    stroke: var(--ac);
+    stroke-width: 2;
+    stroke-dasharray: 3 8;
+    stroke-linecap: round;
+    vector-effect: non-scaling-stroke;
+    animation: pgDash 1.2s linear infinite;
+  }
+  .pg-send__link i {
+    position: absolute;
+    left: 0;
+    top: 50%;
+    width: 12px;
+    height: 12px;
+    margin-top: -6px;
+    border-radius: 50%;
+    background: #fff;
+    box-shadow: 0 0 0 6px color-mix(in srgb, var(--ac) 35%, transparent), 0 0 24px var(--ac);
+    animation: pgSend 4.8s var(--e-inout) infinite;
+  }
+  .pg-send__phone {
+    position: relative;
     --phone-w: 232px;
+    border-radius: 36px;
+    background: none;
   }
-  .pg-proof__list-title {
-    margin-top: 40px;
-    font-size: 22px;
-    line-height: 28px;
+  .pg-send__ring {
+    position: absolute;
+    left: 8%;
+    right: 8%;
+    top: 38%;
+    height: 24%;
+    border-radius: 16px;
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--ac) 70%, transparent);
+    pointer-events: none;
+    animation: pgRing 4.8s ease-out infinite;
   }
-  .pg-proof__list {
+  @keyframes pgDash {
+    to {
+      stroke-dashoffset: -11;
+    }
+  }
+  @keyframes pgSend {
+    0% {
+      transform: translateX(0);
+      opacity: 0;
+    }
+    8% {
+      opacity: 1;
+    }
+    58% {
+      transform: translateX(calc(clamp(72px, 9vw, 150px) - 12px));
+      opacity: 1;
+    }
+    64%,
+    100% {
+      transform: translateX(calc(clamp(72px, 9vw, 150px) - 12px));
+      opacity: 0;
+    }
+  }
+  @keyframes pgRing {
+    0%,
+    58% {
+      box-shadow: 0 0 0 0 color-mix(in srgb, var(--ac) 70%, transparent);
+    }
+    62% {
+      box-shadow: 0 0 0 0 color-mix(in srgb, var(--ac) 70%, transparent);
+    }
+    90%,
+    100% {
+      box-shadow: 0 0 0 22px color-mix(in srgb, var(--ac) 0%, transparent);
+    }
+  }
+
+  .pg-list-title {
+    margin-top: clamp(40px, 5vw, 72px);
+  }
+  .pg-list {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 14px 40px;
-    margin: 20px 0 0;
+    margin: 22px 0 0;
     padding: 0;
     list-style: none;
   }
-  .pg-proof__list li {
+  .pg-list li {
     display: flex;
     gap: 12px;
     align-items: flex-start;
@@ -158,31 +255,29 @@ const items = c.rows.map((r) => ({ title: r.title, body: r.body, ai: r.key === '
     font-size: 18px;
     line-height: 26px;
   }
-  .pg-proof__list :global(svg) {
+  .pg-list :global(svg) {
     flex: none;
     margin-top: 4px;
-    color: var(--mint-ink);
+    color: var(--mint);
   }
   @media (max-width: 900px) {
-    .pg-acc {
-      padding-top: 16px;
-      padding-bottom: 56px;
-    }
-    .pg-proof__grid {
+    .pg-send {
       grid-template-columns: minmax(0, 1fr);
-      grid-template-rows: none;
-      row-gap: 32px;
+      row-gap: 28px;
     }
-    .pg-proof__plan,
-    .pg-proof__see {
-      grid-template-rows: auto auto;
-      grid-row: auto;
+    .pg-send__link {
+      display: none;
     }
-    .pg-proof__see {
+    .pg-send__col--phone {
       justify-self: center;
     }
-    .pg-proof__list {
+    .pg-list {
       grid-template-columns: minmax(0, 1fr);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .pg-send__link i {
+      display: none;
     }
   }
 </style>
