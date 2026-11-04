@@ -5,6 +5,9 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { coachSlugs } from './platform-coach-verify.mjs';
+import { contrastProbe } from './contrast.mjs';
+import { coachAiContrastChecks } from './coach-contrast-checks.mjs';
+import { coachMotionChecks } from './coach-motion-checks.mjs';
 
 const dist = fileURLToPath(new URL('../../dist/', import.meta.url));
 const widths = [
@@ -22,7 +25,8 @@ async function revealAll(page, sleep) {
   for (let pass = 0; pass < 4; pass++) {
     const left = await page.evaluate(async () => {
       for (const n of document.querySelectorAll('[data-reveal]:not(.is-in)')) {
-        n.scrollIntoView({ block: 'center' });
+        // Instant: the page scrolls smoothly, and a smooth scroll that is still running when the wait ends leaves the block unobserved.
+        n.scrollIntoView({ block: 'center', behavior: 'instant' });
         await new Promise((r) => setTimeout(r, 150));
       }
       return document.querySelectorAll('[data-reveal]:not(.is-in)').length;
@@ -44,7 +48,7 @@ const planned = new Set(
 // ---- in-page measurements (each runs in the browser; no closures over node scope) ----
 
 // Horizontal overflow of the document, content clipped sideways inside a box, and overlapping text.
-const layout = () => {
+export const layout = () => {
   const visible = (e) => {
     for (let n = e; n && n !== document.documentElement; n = n.parentElement) {
       const cs = getComputedStyle(n);
@@ -68,6 +72,8 @@ const layout = () => {
       const r = c.getBoundingClientRect();
       return r.right > box.right + 1 || r.left < box.left - 1;
     });
+    // Empty aria-hidden boxes (the Floodlight mesh, glow blobs) are decoration that bleeds on purpose; they hold no content to clip.
+    if (!e.textContent.trim() && e.closest('[aria-hidden="true"]')) continue;
     if (e.children.length === 0 || spill) out.clipped.push(`${label(e)} ${e.scrollWidth}>${e.clientWidth}`);
   }
 
@@ -98,7 +104,9 @@ const layout = () => {
       }
     }
     if (right - left < 1 || bottom - top < 1) continue;
-    boxes.push({ e, left, right, top, bottom, text: node.textContent.trim().slice(0, 24) });
+    // Display type (.d) is set at line-height .88: its text boxes reach past the line box, so allow 20% of the size.
+    const display = e.closest('.d');
+    boxes.push({ e, left, right, top, bottom, text: node.textContent.trim().slice(0, 24), slack: display ? 0.2 * parseFloat(getComputedStyle(display).fontSize) : 0 });
   }
   out.texts = boxes.length;
   for (let i = 0; i < boxes.length; i++) {
@@ -109,7 +117,7 @@ const layout = () => {
       const x = Math.min(a.right, b.right) - Math.max(a.left, b.left);
       const y = Math.min(a.bottom, b.bottom) - Math.max(a.top, b.top);
       // 2px of slack: line boxes of tightly leaded text legitimately touch.
-      if (x > 2 && y > 2) out.overlaps.push(`"${a.text}" x "${b.text}" (${Math.round(x)}x${Math.round(y)})`);
+      if (x > 2 && y > Math.max(2, a.slack, b.slack)) out.overlaps.push(`"${a.text}" x "${b.text}" (${Math.round(x)}x${Math.round(y)})`);
     }
   }
   out.overlaps = out.overlaps.slice(0, 8);
@@ -118,12 +126,12 @@ const layout = () => {
 };
 
 // Alt text, heading order, and focusable elements a screen reader cannot reach.
-const semantics = () => {
+export const semantics = () => {
   const out = { noAlt: [], headingJumps: [], h1: document.querySelectorAll('h1').length, main: document.querySelectorAll('main').length, hiddenFocusable: [], badLabels: [] };
   for (const img of document.images) if (!img.hasAttribute('alt')) out.noAlt.push(img.currentSrc.slice(-40));
   let prev = 0;
   for (const h of document.querySelectorAll('h1, h2, h3, h4, h5, h6')) {
-    if (!h.getClientRects().length) continue;
+    if (!h.getClientRects().length || h.closest('[aria-hidden="true"]')) continue;
     const level = Number(h.tagName[1]);
     if (prev && level > prev + 1) out.headingJumps.push(`h${prev} to h${level}: ${h.textContent.trim().slice(0, 30)}`);
     prev = level;
@@ -141,93 +149,6 @@ const semantics = () => {
     if (!name) out.badLabels.push(`${e.tagName.toLowerCase()}.${String(e.className).slice(0, 30)}`);
   }
   return out;
-};
-
-// Text contrast against the nearest opaque fill. Text over photos or gradients is skipped, as in the home checks.
-const contrast = () => {
-  const canvas = document.createElement('canvas');
-  canvas.width = canvas.height = 1;
-  const ctx = canvas.getContext('2d', { willReadFrequently: true });
-  const cache = new Map();
-  const rgba = (css) => {
-    if (!cache.has(css)) {
-      ctx.clearRect(0, 0, 1, 1);
-      ctx.fillStyle = '#000';
-      ctx.fillStyle = css;
-      ctx.fillRect(0, 0, 1, 1);
-      const [r, g, b, a] = ctx.getImageData(0, 0, 1, 1).data;
-      cache.set(css, [r, g, b, a / 255]);
-    }
-    return cache.get(css);
-  };
-  const over = (top, bottom) => {
-    const a = top[3] + bottom[3] * (1 - top[3]);
-    if (a === 0) return [0, 0, 0, 0];
-    return [0, 1, 2].map((i) => (top[i] * top[3] + bottom[i] * bottom[3] * (1 - top[3])) / a).concat(a);
-  };
-  const lum = ([r, g, b]) => {
-    const f = (v) => ((v /= 255) <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4);
-    return 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(b);
-  };
-  const ratio = (a, b) => {
-    const [hi, lo] = [lum(a), lum(b)].sort((x, y) => y - x);
-    return (hi + 0.05) / (lo + 0.05);
-  };
-  const hidden = (e) => {
-    for (let n = e; n && n !== document.documentElement; n = n.parentElement) {
-      const cs = getComputedStyle(n);
-      if (cs.display === 'none' || cs.visibility === 'hidden' || parseFloat(cs.opacity) === 0 || n.hasAttribute('data-decorative')) return true;
-    }
-    return false;
-  };
-  const bgOf = (e) => {
-    const stack = [];
-    let imageBg = false;
-    const box = e.getBoundingClientRect();
-    for (let n = e; n; n = n.parentElement) {
-      const cs = getComputedStyle(n);
-      const fill = cs.backgroundImage;
-      if (fill !== 'none' && (/url\(/.test(fill) || !/^0(px|%) /.test(cs.backgroundSize))) imageBg = true;
-      // The nav's glass is an absolutely positioned ::before; count it when it spans the whole text box.
-      const pseudo = getComputedStyle(n, '::before');
-      if (pseudo.content !== 'none' && pseudo.position === 'absolute' && pseudo.backgroundImage === 'none' && parseFloat(pseudo.width) >= box.width - 1 && parseFloat(pseudo.height) >= box.height - 1) {
-        const [r, g, b, a] = rgba(pseudo.backgroundColor);
-        stack.push([r, g, b, a * parseFloat(pseudo.opacity)]);
-      }
-      stack.push(rgba(cs.backgroundColor));
-      if (rgba(cs.backgroundColor)[3] >= 0.99) break;
-    }
-    let bg = [255, 255, 255, 1];
-    for (const layer of stack.reverse()) bg = over(layer, bg);
-    return { bg, imageBg };
-  };
-  const rows = [];
-  let skipped = 0;
-  const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
-  const seen = new Set();
-  for (let node = walker.nextNode(); node; node = walker.nextNode()) {
-    if (!node.textContent.trim()) continue;
-    const e = node.parentElement;
-    if (!e || seen.has(e) || ['SCRIPT', 'STYLE', 'NOSCRIPT'].includes(e.tagName)) continue;
-    seen.add(e);
-    const rect = e.getBoundingClientRect();
-    if (rect.width === 0 || rect.height === 0 || hidden(e)) continue;
-    const cs = getComputedStyle(e);
-    const { bg, imageBg } = bgOf(e);
-    if (imageBg) {
-      skipped++;
-      continue;
-    }
-    const fgRaw = rgba(cs.color);
-    const fg = over([fgRaw[0], fgRaw[1], fgRaw[2], fgRaw[3] * parseFloat(cs.opacity)], bg);
-    const size = parseFloat(cs.fontSize);
-    const large = size >= 24 || (size >= 18.66 && parseInt(cs.fontWeight, 10) >= 700);
-    const need = large ? 3 : 4.5;
-    const r = ratio(fg, bg);
-    rows.push({ text: node.textContent.trim().slice(0, 30), ratio: r, need, cls: String(e.className).slice(0, 36) || e.tagName });
-  }
-  const fails = rows.filter((r) => r.ratio < r.need - 0.005);
-  return { checked: rows.length, min: Math.min(...rows.map((r) => r.ratio)), failCount: fails.length, fails: fails.slice(0, 8), skipped };
 };
 
 // Internal links in the page body, header and footer. The language switch points at the other locale on purpose.
@@ -291,8 +212,11 @@ export async function platformCoachChecks({ open, check, shot, el, sleep, settle
         for (const [width, height] of [widths[0], widths[3]]) {
           const page = await open({ width, height, scheme, reduced: true, mobile: width < 500 }, path);
           await settle(page);
-          const c = await page.evaluate(contrast);
-          check('coach-contrast', `${tag} ${scheme} ${width}: text meets WCAG AA (4.5:1, 3:1 large)`, c.failCount === 0, `${c.checked} text nodes, lowest ${c.min.toFixed(2)}:1${c.failCount ? `, failing: ${JSON.stringify(c.fails)}` : ''}; ${c.skipped} over images skipped`);
+          // The shared probe (also used by the home and engage checks) knows the fixed nav over a dark hero, visually hidden text and
+          // [data-decorative]. Aria-hidden demo screens are measured too, since sighted users read them, and so is the whole AI demo
+          // stage: nothing on a page is exempt unless the element itself carries [data-decorative].
+          const c = await page.evaluate(contrastProbe, { includeAriaHidden: true });
+          check('coach-contrast', `${tag} ${scheme} ${width}: text meets WCAG AA (4.5:1, 3:1 large)`, c.failCount === 0, `${c.checked} text nodes, lowest ${c.min.toFixed(2)}:1${c.failCount ? `, failing: ${JSON.stringify(c.fails)}` : ''}; ${c.skippedImage} over images skipped`);
           metrics[`coach-contrast-${slug}-${locale}-${scheme}-${width}`] = { checked: c.checked, lowest: Number(c.min.toFixed(2)) };
           if (scheme === 'light' && width === 1440) {
             const s = await page.evaluate(semantics);
@@ -346,7 +270,12 @@ export async function platformCoachChecks({ open, check, shot, el, sleep, settle
     }
   }
 
+  // The AI demo on the programs page: canary and every frame of its timeline (the rest-state probe above sees only some cards).
+  await coachAiContrastChecks({ open, check, sleep, settle });
+
   // ---- 2. interactions (motion on)
+  // Hover and focus pause, measured on rendered values for every moving stage on every page.
+  await coachMotionChecks({ open, check, sleep, settle, metrics });
   for (const locale of locales) {
     // Accordions: programs and readiness.
     for (const slug of ['programs', 'readiness']) {
@@ -441,6 +370,41 @@ export async function platformCoachChecks({ open, check, shot, el, sleep, settle
         return { gap: Math.round(box.right - cs[cs.length - 1].right), n: cs.length, scroll: r.scrollWidth > r.clientWidth + 1, tab: r.tabIndex, cardTab: [...r.querySelectorAll('[data-hrc]')].filter((c) => c.tabIndex >= 0).length };
       });
       check('coach-hover', `${locale}/readiness 1440 reduced motion: cards fill the row, no scroll, no stray tab stop`, f.n === 3 && f.gap <= 8 && !f.scroll && f.tab < 0 && f.cardTab === 0, JSON.stringify(f));
+      await still.context().close();
+    }
+
+    // Motion contract: endless CSS loops run only for blocks on screen, stop in a hidden tab, and do not exist under reduced motion.
+    for (const slug of coachSlugs) {
+      const loops = () =>
+        document
+          .getAnimations()
+          .filter((a) => a.playState === 'running' && a.effect?.getComputedTiming().iterations === Infinity && a.effect.target?.closest?.('main'))
+          .map((a) => {
+            const t = a.effect.target;
+            const host = t.closest('section, footer');
+            const r = host?.getBoundingClientRect();
+            const near = !r || (r.bottom > -600 && r.top < innerHeight + 600);
+            return { name: a.animationName, near, el: `${t.tagName.toLowerCase()}.${String(t.className).split(/\s+/)[0]}` };
+          });
+      const page = await open({ width: 1440, height: 900 }, pathOf(slug, locale));
+      await settle(page);
+      await sleep(400);
+      const onScreen = await page.evaluate(loops);
+      const far = onScreen.filter((l) => !l.near);
+      check('coach-motion', `${locale}/${slug}: no endless CSS loop runs in a block that is far off screen`, far.length === 0, `${onScreen.length} running, off screen: ${far.slice(0, 4).map((l) => `${l.name} on ${l.el}`).join(', ')}`);
+      await page.evaluate(() => {
+        Object.defineProperty(document, 'hidden', { configurable: true, get: () => true });
+        document.dispatchEvent(new Event('visibilitychange'));
+      });
+      await sleep(300);
+      const hidden = await page.evaluate(loops);
+      check('coach-motion', `${locale}/${slug}: a hidden tab stops every endless CSS loop`, hidden.length === 0, `${hidden.length} still running: ${hidden.slice(0, 4).map((l) => `${l.name} on ${l.el}`).join(', ')}`);
+      await page.context().close();
+      const still = await open({ width: 1440, height: 900, reduced: true }, pathOf(slug, locale));
+      await settle(still);
+      await sleep(300);
+      const rm = await still.evaluate(() => ({ loops: document.getAnimations().filter((a) => a.playState === 'running' && a.effect?.getComputedTiming().iterations === Infinity && a.effect.target?.closest?.('main')).length, playing: [...document.querySelectorAll('video')].filter((v) => !v.paused).length }));
+      check('coach-motion', `${locale}/${slug} reduced motion: no endless CSS loop and no playing video`, rm.loops === 0 && rm.playing === 0, JSON.stringify(rm));
       await still.context().close();
     }
 

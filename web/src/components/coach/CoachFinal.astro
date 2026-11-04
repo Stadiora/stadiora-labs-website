@@ -1,0 +1,43 @@
+---
+import '../../styles/home/final.css';
+import '../../styles/coach/cf.css';
+import type { Locale } from '../../i18n';
+import { site } from '../../data/site';
+import { contactHref } from '../../lib/links';
+import { homeFinal } from '../../i18n/pages/home-final';
+import StoreSheet from '../home/StoreSheet.astro';
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+// Same closing line and buttons as the home page, over the same text-free night-stadium clip.
+const t = homeFinal[locale];
+---
+
+<section class="final cf-final impact media-frame" id="final" data-section aria-labelledby="final-h">
+  <video muted playsinline loop preload="none" data-clip data-poster="/home/media/night-stadium.webp" aria-hidden="true" tabindex="-1">
+    <source src="/home/media/night-stadium.webm" type="video/webm" />
+    <source src="/home/media/night-stadium.mp4" type="video/mp4" />
+  </video>
+  <div class="orbits" aria-hidden="true">
+    <svg viewBox="0 0 1600 800">
+      <ellipse cx="800" cy="400" rx="760" ry="260"></ellipse>
+      <ellipse class="dash" cx="800" cy="400" rx="600" ry="200"></ellipse>
+      <circle class="fdot fdot--a" r="9" fill="#00BEF3"></circle>
+      <circle class="fdot fdot--b" r="7" fill="#8B5CF6"></circle>
+    </svg>
+  </div>
+  <div class="wrap">
+    <h2 class="d d1 lines" id="final-h">
+      <span><span>{t.title[0]}</span></span><span><span class="grad-text" style="--i:1">{t.title[1]}</span></span>
+    </h2>
+    <p class="lead rv">{t.lead}</p>
+    <div class="final-ctas rv" style="--i:2">
+      <a class="btn btn--white btn--lg" href="#get-app" data-open-sheet>{t.download}</a>
+      <a class="btn btn--ghost btn--lg" href={site.signUp}>{t.coach}</a>
+      <a class="btn btn--ghost btn--lg" href={contactHref(locale, 'demo')}>{t.demo}</a>
+    </div>
+  </div>
+</section>
+<StoreSheet locale={locale} />
