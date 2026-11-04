@@ -82,19 +82,19 @@ const coachInitial = (coach: string) => coach.split(' ')[1][0];
         <div class="eg-how__phone">
           <div class="dphone eg-gp" role="group" aria-label={g.seeLabel}>
             <div class="scr">
-              <i class="island"></i>
-              <div class="sb"><span>9:41</span><span>●●● ▮</span></div>
+              <i class="island" aria-hidden="true"></i>
+              <div class="sb" aria-hidden="true"><span>9:41</span><span>●●● ▮</span></div>
               <p class="eg-gp__brand"><span class="eg-gp__logo" aria-hidden="true"></span>{g.appName}</p>
               {
                 g.children.map((ch, i) => (
                   <div class:list={['ph-scn', 'eg-gp__scn', { on: i === 0 }]} data-panel role="tabpanel" id={`kid-panel-${i}`} aria-labelledby={`kid-tab-${i}`} inert={i !== 0}>
-                    <p class="eg-gp__kid" data-el="k"><span class="eg-gp__avatar">{ch.name[0]}</span>{ch.name}</p>
+                    <p class="eg-gp__kid" data-el="k"><span class="eg-gp__avatar" aria-hidden="true">{ch.name[0]}</span>{ch.name}</p>
                     <div class="eg-gp__card" data-el="w">
                       <EIcon name="calendar" size={16} />
                       <div><b>{ch.week}</b><small>{ch.weekDetail}</small></div>
                     </div>
                     <div class="eg-gp__card" data-el="m">
-                      <span class="eg-gp__avatar eg-gp__avatar--coach">{coachInitial(ch.coach)}</span>
+                      <span class="eg-gp__avatar eg-gp__avatar--coach" aria-hidden="true">{coachInitial(ch.coach)}</span>
                       <div><b>{ch.coach} <small>· {ch.day}</small></b><p>{ch.message}</p></div>
                     </div>
                     <div class="eg-gp__card" data-el="f">

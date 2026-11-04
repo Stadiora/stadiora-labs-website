@@ -49,7 +49,13 @@ node scripts/evidence.mjs --engage-motion-only --checks-only # just the Platform
   `evidence`) covers overflow and clipped text (`clip-probe.mjs`) at 390/1024/1280/1440, WCAG AA in both themes, alt text,
   heading order, the live Messaging phone and the Guardian child switcher (tab ARIA, click and arrow keys) and that Teams and
   `/pricing/` show the same schools price for the same visitor (`?region=us|latam`, ten time zones, a missing one). The clip
-  check also sweeps 16 widths from 360 to 1600 px on all five pages.
+  check also sweeps 16 widths from 360 to 1600 px on all five pages. Three more guards read what a browser really produces:
+  `engage-a11y-checks.mjs` (the selected Messaging and Guardian tabpanel is visible and in the accessibility tree with its text,
+  and every standalone link and control in `main` is 44 x 44 or larger at 390 px), `engage-heading-contrast.mjs` (the gradient
+  headings, measured on composited pixels: the glyph interiors against the same page with only that span hidden, reduced motion in
+  both themes at 390 and 1440, and with motion on at five seeded points of the mesh, gradient and clip loops; 3:1 for large text)
+  and `engage-media-guard.mjs` (every `<video>` in the built HTML is judged on its own `src`, every `<source>` and its poster against
+  the text-free list and the clip of its slot; `npm run verify` runs it).
 - Platform page look (Floodlight, R57 VB-3): every page is an `.impact` hero (`EngageHero`, split, overlap or orbit variant) with a
   live HTML stage on the right, at least one dark `.show.impact` stage, the shared `AlsoInAria` links and the `EngageFinal` call to
   action on the `night-stadium` clip. Styles are `src/styles/engage/{base,messaging,guardian,teams,branded,integrations}.css`
@@ -59,7 +65,11 @@ node scripts/evidence.mjs --engage-motion-only --checks-only # just the Platform
   picture is used (`pillar-*` and `planner-demo` stay on the home); the demo UIs are HTML. `scripts/lib/engage-motion-checks.mjs`
   guards all of that: the Floodlight frame, text-free clips, every autoplayer (start, off screen, hover, focus, resume), a hidden tab,
   the live reduced-motion flip, finished stills, the tab sets rotating, the Teams rail and the planner, the Branded morph and the
-  Integrations chips. `.rv-mask` elements never get `.in` (an IntersectionObserver ignores an element whose own clip-path hides it),
+  Integrations chips. `engage-movement-checks.mjs` (called from it) checks real movement, not `data-ap` flags: for every autoplayer it
+  takes the clocks of the animations and transitions in its scope, its text and markup and the time of its clips, and requires that
+  nothing advances for 1.4 s after a pause (pointer, focus, off screen, hidden tab, reduced motion switched on mid-run) and that it
+  moves again afterwards; the Branded morph must also settle on one brand under reduced motion at any point of a swap. The page chrome
+  that is not an autoplayer (`.mesh`, `.orbits`, `.grad-text`) is out of scope, as in the Coach guard. `.rv-mask` elements never get `.in` (an IntersectionObserver ignores an element whose own clip-path hides it),
   so a reveal that clips an element observes a wrapper `.rv` and clips its child.
   Prices on these pages are not typed into the copy: the Teams schools teaser and the Branded add-on line are rendered from
   `src/data/prices.ts` (`education`, `addOns`) with `{tokens}` in `engage.ts`, and the Teams script picks the region with

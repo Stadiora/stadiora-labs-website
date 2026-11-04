@@ -4,6 +4,8 @@
 //   node scripts/evidence.mjs --engage-only --checks-only
 import { clipProbe } from './clip-probe.mjs';
 import { contrastProbe } from './contrast.mjs';
+import { engageA11yChecks } from './engage-a11y-checks.mjs';
+import { engageHeadingContrast } from './engage-heading-contrast.mjs';
 import { engagePages } from './engage-verify.mjs';
 import { EDU, fmt } from './pricing-oracle.mjs';
 
@@ -296,4 +298,9 @@ export async function engageChecks({ open, check, shot, sleep, settle, checksOnl
     check(group, `${lang}: no stylesheet is shared between the home and the engage pages except the global Base`, shared.out.length === 0, shared.out.length ? `shared: ${shared.out.join(', ')}` : `home links ${shared.homeSheets.join(', ')}`);
     await page.context().close();
   }
+
+  // Review round 1 (PR #34): what the accessibility tree exposes, 44 px targets, and the contrast of the gradient headings on the
+  // composited pixels (scripts/lib/engage-a11y-checks.mjs, engage-heading-contrast.mjs).
+  await engageA11yChecks({ open, check, sleep, settle });
+  await engageHeadingContrast({ open, check, settle, metrics });
 }

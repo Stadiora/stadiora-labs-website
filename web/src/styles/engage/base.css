@@ -54,6 +54,32 @@
   padding-bottom: 0.14em;
   margin-bottom: -0.14em;
 }
+/* The lane word is gradient-clipped text over the bright, drifting mesh (hero) or the reel (closing band). A soft scrim darkens
+   what is right behind the title (it sits behind every line of copy, not over it), and the lane word's stops are the lighter
+   tints of the brand gradient, so every glyph pixel clears WCAG AA for large text (3:1) wherever the blobs and the clip are
+   (measured on composited pixels in scripts/lib/engage-heading-contrast.mjs). */
+.eg-hero__copy {
+  isolation: isolate;
+}
+.eg-h1,
+.final .d1 {
+  position: relative;
+}
+.eg-h1::before,
+.final .d1::before {
+  content: '';
+  position: absolute;
+  inset: -0.2em -0.3em -0.08em;
+  z-index: -1;
+  border-radius: 0.3em;
+  background: rgba(2, 6, 15, 0.62);
+  box-shadow: 0 0 0.5em 0.35em rgba(2, 6, 15, 0.62);
+  pointer-events: none;
+}
+.eg-h1 .grad-text,
+.final .grad-text {
+  background-image: linear-gradient(100deg, #3ad6ff 0%, #6ee7c4 48%, #b6a2fb 100%);
+}
 .eg-hero .lead {
   color: #b7c2d4;
 }
@@ -147,6 +173,8 @@ html:not(.js) .eg-stage .rv {
   display: inline-flex;
   align-items: center;
   gap: 8px;
+  min-height: 44px;
+  padding-block: 8px;
   color: var(--cyan-ink);
   font-weight: 700;
   text-decoration: none;

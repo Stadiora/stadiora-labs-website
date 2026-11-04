@@ -4,6 +4,9 @@
 // The helpers mirror home-checks.mjs (kept local so this lane never edits the home lane's file).
 // Called from evidence.mjs with its page opener and recorder.
 
+import { FINAL_CLIP, HERO_CLIP, judgeVideo } from './engage-media-guard.mjs';
+import { engageMovementChecks } from './engage-movement-checks.mjs';
+
 const group = 'engage-motion';
 
 const pages = [
@@ -14,8 +17,28 @@ const pages = [
   { slug: 'integrations', hosts: 2, tabs: 0 },
 ];
 
-// Clips with no text baked into the picture. The pillar and planner clips carry words, so they stay on the home.
-const textFreeClips = ['engage-bg', 'tile-chalk', 'tile-hurdler', 'ai-bg', 'night-stadium'];
+// In page: every <video> with everything the browser can read a clip from (its own src, every <source>, the poster, what it
+// plays now) and the slot it sits in, for judgeVideo in engage-media-guard.mjs.
+const readClips = () =>
+  [...document.querySelectorAll('video')].map((v) => ({
+    slot: v.closest('.eg-hero') ? 'hero' : v.closest('.final') ? 'final' : 'stage',
+    ownSrc: v.getAttribute('src'),
+    sources: [...v.querySelectorAll('source')].map((x) => ({ src: x.getAttribute('src'), type: x.getAttribute('type') })),
+    poster: v.getAttribute('poster') ?? v.dataset.poster ?? '',
+    currentSrc: v.currentSrc,
+    muted: v.muted,
+    preload: v.getAttribute('preload'),
+    loop: v.loop,
+    autoplay: v.hasAttribute('autoplay'),
+    data: v.hasAttribute('data-clip'),
+  }));
+
+/** Problems of every clip against the slot it sits in (the hero's own clip, the closing night-stadium). */
+const judgeClips = (clips, slug) =>
+  clips.flatMap((c) => {
+    const want = c.slot === 'hero' ? HERO_CLIP[slug] : c.slot === 'final' ? FINAL_CLIP : null;
+    return want ? judgeVideo(c, want).map((m) => `${c.slot}: ${m}`) : [`${c.slot} video is not expected on this page`];
+  });
 
 const pathFor = (slug, lang) => `${lang === 'en' ? '' : '/es'}/platform/${slug}/`;
 
@@ -125,22 +148,12 @@ export async function engageMotionChecks({ open, check, sleep, settle, metrics }
       check(group, `${lang}/${label}: Floodlight nav, one h1 in an .impact hero with orbits, at least one dark stage`, s.nav && s.h1 === 1 && s.hero && s.orbits && s.dark >= 1, JSON.stringify(s));
       check(group, `${lang}/${label}: the final call to action runs the night-stadium clip and the footer is dark`, s.finalClip.startsWith('night-stadium') && s.footerLum < 0.1, `${s.finalClip}, footer luminance ${s.footerLum}`);
 
-      // No text baked into any video, and every clip follows the markup contract (muted, preload none, WebM then MP4, poster).
-      const clips = await page.evaluate(() =>
-        [...document.querySelectorAll('video')].map((v) => ({
-          src: v.querySelector('source')?.getAttribute('src') ?? '',
-          types: [...v.querySelectorAll('source')].map((x) => x.type).join(','),
-          muted: v.muted,
-          preload: v.getAttribute('preload'),
-          loop: v.loop,
-          autoplay: v.hasAttribute('autoplay'),
-          data: v.hasAttribute('data-clip'),
-          poster: v.getAttribute('poster') || v.dataset.poster || '',
-        })),
-      );
-      const baked = clips.filter((c) => !textFreeClips.some((n) => c.src.includes(`/${n}.`))).map((c) => c.src);
-      check(group, `${lang}/${label}: only text-free clips play (no words baked into video), ${clips.length} clips`, clips.length >= 1 && baked.length === 0, baked.join(', '));
-      const bad = clips.filter((c) => c.types !== 'video/webm,video/mp4' || !c.muted || c.preload !== 'none' || !c.loop || c.autoplay || !c.data || !c.poster);
+      // No text baked into any video: every <video> is judged in full (own src, every <source>, the poster) against the text-free
+      // list and the clip its slot must play, then follows the markup contract (muted, preload none, WebM then MP4, poster).
+      const clips = await page.evaluate(readClips);
+      const baked = judgeClips(clips, p.slug);
+      check(group, `${lang}/${label}: only the right text-free clip plays in each slot (own src, every source and poster judged, ${clips.length} clips)`, clips.length >= 1 && baked.length === 0, baked.join('; '));
+      const bad = clips.filter((c) => !c.muted || c.preload !== 'none' || !c.loop || c.autoplay || !c.data || !c.poster);
       check(group, `${lang}/${label}: every clip is a muted looping preload=none data-clip with WebM then MP4 and a poster`, bad.length === 0, JSON.stringify(bad));
       await page.context().close();
     }
@@ -222,6 +235,9 @@ export async function engageMotionChecks({ open, check, sleep, settle, metrics }
       check(group, `${label}: no console errors, page errors or failed requests during the autoplayer walk`, page.problems.length === 0, page.problems.join(' | '));
       await page.context().close();
     }
+
+    // ------------------------------------------------------------ 2b. the same pauses, judged by what actually moves (not by data-ap)
+    await engageMovementChecks({ open, check, sleep, settle }, { slug: p.slug, path: pathFor(p.slug, 'en') });
 
     // ------------------------------------------------------------ 3. reduced motion: no autoplay, no loops, finished stills
     for (const lang of ['en', 'es']) {

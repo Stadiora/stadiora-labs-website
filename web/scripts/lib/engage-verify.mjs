@@ -4,6 +4,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { checkLinks } from './engage-links.mjs';
+import { verifyEngageMedia } from './engage-media-guard.mjs';
 import { BRANDED, EDU, fmt } from './pricing-oracle.mjs';
 
 const copySource = fileURLToPath(new URL('../../src/i18n/pages/engage.ts', import.meta.url));
@@ -140,6 +141,9 @@ export function verifyEngagePages({ dist, fail, pending = new Map() }) {
     if (/bookings\.cloud\.microsoft/.test(html)) fail(`${page.file}: links to the external booking page; demo calls to action use the contact page`);
 
     checkLinks({ dist, page, html, fail, pending });
+
+    // No words baked into any clip or poster, and the right clip in every slot (WebM, MP4, poster, no src on the <video>).
+    verifyEngageMedia({ html, file: page.file, slug: page.slug, dist, fail });
 
     // The language switch and the hreflang pair must point at each other.
     if (!html.includes(`href="${page.alt}"`)) fail(`${page.file}: no link to the ${page.lang === 'en' ? 'Spanish' : 'English'} version`);

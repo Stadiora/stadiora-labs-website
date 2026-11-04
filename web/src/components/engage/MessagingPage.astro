@@ -52,26 +52,26 @@ const initials = (name: string) => name.split(' ').map((w) => w[0]).join('').sli
         <source src="/home/media/engage-bg.mp4" type="video/mp4" />
       </video>
       <div class="vid-shade"></div>
-      <div class="dphone" aria-hidden="true">
+      <div class="dphone">
         <div class="scr">
-          <i class="island"></i>
-          <div class="sb"><span>9:41</span><span>●●● ▮</span></div>
+          <i class="island" aria-hidden="true"></i>
+          <div class="sb" aria-hidden="true"><span>9:41</span><span>●●● ▮</span></div>
           <div class="ph-scn on" data-panel data-scn="chat" role="tabpanel" id="eg-p0" aria-labelledby="eg-t0">
-            <div class="ph-top"><span class="av av-violet">{initials(m.chat.name)}</span><div><b>{m.chat.name}</b><small>{m.chat.status}</small></div></div>
+            <div class="ph-top"><span class="av av-violet" aria-hidden="true">{initials(m.chat.name)}</span><div><b>{m.chat.name}</b><small>{m.chat.status}</small></div></div>
             <div class="ph-body">
               <div class="dmsg in" data-el="m1">{m.chat.m1}</div>
-              <div class="typing" data-el="t1"><i></i><i></i><i></i></div>
+              <div class="typing" data-el="t1" aria-hidden="true"><i></i><i></i><i></i></div>
               <div class="dmsg me" data-el="m2">{m.chat.m2}</div>
-              <div class="typing" data-el="t2"><i></i><i></i><i></i></div>
+              <div class="typing" data-el="t2" aria-hidden="true"><i></i><i></i><i></i></div>
               <div class="dmsg in" data-el="m3">{m.chat.m3}</div>
             </div>
-            <div class="ph-input">{m.chat.placeholder}</div>
+            <div class="ph-input" aria-hidden="true">{m.chat.placeholder}</div>
           </div>
           <div class="ph-scn" data-panel data-scn="feed" role="tabpanel" id="eg-p1" aria-labelledby="eg-t1">
-            <div class="ph-top"><span class="av av-cyan">{initials(m.feed.group)}</span><div><b>{m.feed.screenTitle}</b><small>{m.feed.group}</small></div></div>
+            <div class="ph-top"><span class="av av-cyan" aria-hidden="true">{initials(m.feed.group)}</span><div><b>{m.feed.screenTitle}</b><small>{m.feed.group}</small></div></div>
             <div class="ph-body">
               <div class="post" data-el="p1">
-                <div class="ph" style="--img:url(/home/img/night-huddle-800.webp)"></div>
+                <div class="ph" style="--img:url(/home/img/night-huddle-800.webp)" aria-hidden="true"></div>
                 <div class="pb">
                   <b>{m.feed.author} · {m.feed.time}</b>{m.feed.post}
                   <div class="reacts">
@@ -83,7 +83,7 @@ const initials = (name: string) => name.split(' ').map((w) => w[0]).join('').sli
             </div>
           </div>
           <div class="ph-scn" data-panel data-scn="bc" role="tabpanel" id="eg-p2" aria-labelledby="eg-t2">
-            <div class="ph-top"><span class="av av-mint">{initials(m.broadcast.group)}</span><div><b>{m.broadcast.window}</b><small>{m.broadcast.to} {m.broadcast.group}</small></div></div>
+            <div class="ph-top"><span class="av av-mint" aria-hidden="true">{initials(m.broadcast.group)}</span><div><b>{m.broadcast.window}</b><small>{m.broadcast.to} {m.broadcast.group}</small></div></div>
             <div class="ph-body">
               <div class="bc-card" data-el="b1">
                 <div class="to">{m.broadcast.to} {m.broadcast.group}</div>
@@ -91,10 +91,10 @@ const initials = (name: string) => name.split(' ').map((w) => w[0]).join('').sli
                 <div class="bc-prog"><i data-el="bp"></i></div>
               </div>
             </div>
-            <div class="ph-input ph-input-c eg-send">{m.broadcast.send}</div>
+            <div class="ph-input ph-input-c eg-send" aria-hidden="true">{m.broadcast.send}</div>
           </div>
           <div class="ph-scn" data-panel data-scn="ann" role="tabpanel" id="eg-p3" aria-labelledby="eg-t3">
-            <div class="ph-top"><span class="av av-red">{initials(m.announcements.title)}</span><div><b>{m.announcements.title}</b><small>{m.announcements.label}</small></div></div>
+            <div class="ph-top"><span class="av av-red" aria-hidden="true">{initials(m.announcements.title)}</span><div><b>{m.announcements.title}</b><small>{m.announcements.label}</small></div></div>
             <div class="ph-body">
               <div class="ann" data-el="a1">
                 <small>{m.announcements.label}</small>
@@ -103,7 +103,7 @@ const initials = (name: string) => name.split(' ').map((w) => w[0]).join('').sli
                 <small data-el="a2"><b class="tn fnum" style={`--to:${readNum}`}></b>{readRest}</small>
               </div>
               <ul class="eg-readers">
-                {m.announcements.readers.map((r, i) => (<li data-el={`r${i + 1}`}><span class="eg-av">{r.name[0]}</span><b>{r.name}</b><small>{r.when}</small></li>))}
+                {m.announcements.readers.map((r, i) => (<li data-el={`r${i + 1}`}><span class="eg-av" aria-hidden="true">{r.name[0]}</span><b>{r.name}</b><small>{r.when}</small></li>))}
               </ul>
             </div>
           </div>
