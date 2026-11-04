@@ -349,7 +349,8 @@ const park = async (phase) => {
       (v) =>
         new Promise((done) => {
           v.pause();
-          v.addEventListener('seeked', done, { once: true });
+          // 'seeked' fires before the new frame reaches the screen; the five photographs must all show it
+          v.addEventListener('seeked', () => (v.requestVideoFrameCallback ? v.requestVideoFrameCallback(() => done()) : done()), { once: true });
           v.currentTime = Math.min(v.duration - 0.05, phase * v.duration);
           setTimeout(done, 1500);
         }),
@@ -373,7 +374,8 @@ const parkSynced = async (ms) => {
       (v) =>
         new Promise((done) => {
           v.pause();
-          v.addEventListener('seeked', done, { once: true });
+          // 'seeked' fires before the new frame reaches the screen; the five photographs must all show it
+          v.addEventListener('seeked', () => (v.requestVideoFrameCallback ? v.requestVideoFrameCallback(() => done()) : done()), { once: true });
           v.currentTime = Math.min(v.duration - 0.05, (ms / 1000) % v.duration);
           setTimeout(done, 1500);
         }),
