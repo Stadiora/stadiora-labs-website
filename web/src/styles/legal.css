@@ -25,6 +25,7 @@ html{scroll-padding-top:104px}
 .lg-switch{position:relative;display:flex;width:max-content;padding:4px;border-radius:999px;background:rgba(255,255,255,.07);box-shadow:inset 0 0 0 1px rgba(255,255,255,.12);margin-bottom:34px;isolation:isolate}
 .lg-switch a{position:relative;z-index:1;height:38px;padding:0 16px;display:inline-flex;align-items:center;border-radius:999px;font:600 14px/1 var(--f-text);color:#C9D2E0;transition:color 300ms}
 .lg-switch a[aria-current="page"]{color:#08132B}
+.lg-switch a::after{content:"";position:absolute;inset:-3px 0}
 .lg-thumb{position:absolute;z-index:0;top:4px;bottom:4px;left:var(--tl,4px);width:var(--tw,120px);border-radius:999px;background:#fff;transition:left 500ms var(--e-spring),width 500ms var(--e-spring)}
 .lg-h1{font-size:clamp(56px,8vw,140px);margin-top:20px}
 .lg-meta{display:flex;flex-wrap:wrap;gap:8px;margin-top:32px}
@@ -56,13 +57,15 @@ html{scroll-padding-top:104px}
 .toc-list a.is-active .tn{color:var(--violet-ink)}
 .toc-list a.is-active .tp{background:var(--surface2)}
 .toc-tools{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:12px 6px 4px;margin-top:8px;border-top:1px solid var(--line)}
-.toc-theme{display:inline-flex;align-items:center;gap:8px;height:34px;padding:0 12px 0 10px;border-radius:999px;font:600 13px/1 var(--f-text);color:var(--ink);box-shadow:inset 0 0 0 1.5px var(--line)}
+.toc-theme{position:relative;display:inline-flex;align-items:center;gap:8px;height:34px;padding:0 12px 0 10px;border-radius:999px;font:600 13px/1 var(--f-text);color:var(--ink);box-shadow:inset 0 0 0 1.5px var(--line)}
+.toc-theme::after{content:"";position:absolute;inset:-7px -4px}
 .toc-theme:hover{background:var(--surface2)}
 .toc-theme svg{width:16px;height:16px}
 .toc-theme .sun,.toc-theme .l-light{display:none}
 [data-theme="dark"] .toc-theme .sun,[data-theme="dark"] .toc-theme .l-light{display:inline}
 [data-theme="dark"] .toc-theme .moon,[data-theme="dark"] .toc-theme .l-dark{display:none}
-.toc-print{font-size:13px;font-weight:600;color:var(--link);padding:6px 8px}
+.toc-print{position:relative;font-size:13px;font-weight:600;color:var(--link);padding:6px 8px}
+.toc-print::after{content:"";position:absolute;inset:-7px -2px}
 .toc-bar{display:none}
 
 /* ---------- prose: calm long-form reading ---------- */
@@ -81,7 +84,8 @@ html{scroll-padding-top:104px}
 [data-theme="dark"] .section-num{background:#F4F7FB;color:#08132B}
 .doc-section.is-active .section-num{background:#7C3AED}
 [data-theme="dark"] .doc-section.is-active .section-num{background:#7C3AED;color:#fff}
-.anchor{opacity:0;margin-left:2px;font:600 18px/1 var(--f-mono);color:var(--ink3);padding:6px 8px;border-radius:8px;text-decoration:none!important;transition:opacity 200ms,background-color 200ms;align-self:center}
+.anchor{position:relative;opacity:0;margin-left:2px;font:600 18px/1 var(--f-mono);color:var(--ink3);padding:6px 8px;border-radius:8px;text-decoration:none!important;transition:opacity 200ms,background-color 200ms;align-self:center}
+.anchor::after{content:"";position:absolute;inset:-8px -9px}
 .doc-section h2:hover .anchor,.anchor:focus-visible{opacity:1}
 .anchor:hover{background:var(--surface);color:var(--ink)}
 .doc-section h3{margin:1.7em 0 .55em;font:700 19px/1.3 var(--f-text);color:var(--ink);letter-spacing:-.005em}
@@ -145,6 +149,8 @@ html{scroll-padding-top:104px}
   .toc-mob svg{width:18px;height:18px;flex:none;transition:transform 300ms var(--e-out)}
   .toc-mob[aria-expanded="true"] svg{transform:rotate(180deg)}
   .toc-head{display:none}
+  .toc-list a{padding:13px 8px 15px 6px}
+  .toc-list .tp{bottom:7px}
   .toc nav,.toc-tools{display:none}
   .toc.open nav{display:block;max-height:60vh;padding:0 8px 8px 10px}
   .toc.open .toc-tools{display:flex;padding:10px 16px 12px}
@@ -174,7 +180,7 @@ html{scroll-padding-top:104px}
 .rm .lg-thumb{transition:none}
 .rm .lg-orb .orb::before,.rm .lg-orb .halo{animation:none}
 @media print{
-  .nav,.mob-menu,.scrim,.lg-aside,.totop,.toast,.foot,.lg-orbit,.mesh,.lg-switch,.lg-read,.anchor,.lg-end{display:none!important}
+  .nav,.mob-menu,.scrim,.lg-aside,.totop,.toast,.footer,.lg-orbit,.mesh,.lg-switch,.lg-read,.anchor,.lg-end{display:none!important}
   .lg-hero{padding:0;background:#fff!important;color:#000}
   .lg-hero *{color:#000!important}
   .lg-grid{display:block}

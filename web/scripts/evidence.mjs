@@ -14,6 +14,9 @@ import { fileURLToPath } from 'node:url';
 import { chromium } from 'playwright';
 import { contrastProbe } from './lib/contrast.mjs';
 import { apiMotionChecks, apiReducedMotionChecks } from './lib/api-motion-checks.mjs';
+import { apiTapChecks } from './lib/api-tap-checks.mjs';
+import { apiUseCaseA11yChecks } from './lib/api-uc-a11y-checks.mjs';
+import { apiHeroFitChecks } from './lib/api-hero-fit-checks.mjs';
 import { pageContrastChecks } from './lib/page-contrast-checks.mjs';
 import { engageChecks } from './lib/engage-checks.mjs';
 import { engageMotionChecks } from './lib/engage-motion-checks.mjs';
@@ -120,15 +123,29 @@ if (pricingOnly) {
 //   --api-motion-only: just the pause and reduced-motion checks. --api-contrast-only[=tag,width,scheme[,reduced]]: just the contrast scans
 //   (optionally one job), which is what the mutation battery runs.
 const apiMotionOnly = process.argv.includes('--api-motion-only');
+const apiTapOnly = process.argv.includes('--api-tap-only');
+const apiFitOnly = process.argv.includes('--api-fit-only');
+const apiA11yOnly = process.argv.includes('--api-a11y-only');
 const contrastArg = process.argv.find((a) => a.startsWith('--api-contrast-only'));
 const apiRun = async () => {
+  if (apiTapOnly || apiFitOnly || apiA11yOnly) {
+    if (apiA11yOnly) await apiUseCaseA11yChecks({ open, check, sleep, settle });
+    if (apiFitOnly) await apiHeroFitChecks({ open, check, sleep, settle });
+    if (apiTapOnly) await apiTapChecks({ open, check, sleep, settle });
+    return;
+  }
   if (!contrastArg) {
     await apiMotionChecks({ open, check, sleep, settle, metrics });
     await apiReducedMotionChecks({ open, check, sleep, settle });
   }
+  if (!apiMotionOnly && !contrastArg) {
+    await apiHeroFitChecks({ open, check, sleep, settle });
+    await apiTapChecks({ open, check, sleep, settle });
+    await apiUseCaseA11yChecks({ open, check, sleep, settle });
+  }
   if (!apiMotionOnly) await pageContrastChecks({ open, check, sleep, metrics, browser, only: contrastArg?.split('=')[1] });
 };
-if (apiOnly || apiMotionOnly || contrastArg) {
+if (apiOnly || apiMotionOnly || apiTapOnly || apiFitOnly || apiA11yOnly || contrastArg) {
   await apiRun();
   await finish();
 }

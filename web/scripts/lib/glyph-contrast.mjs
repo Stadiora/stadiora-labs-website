@@ -99,12 +99,21 @@ export const collectFn = ({ scope }) => {
     const text = n.textContent.replace(/\s+/g, ' ').trim();
     const e = n.parentElement;
     if (!text || !e || ['SCRIPT', 'STYLE', 'NOSCRIPT', 'TEMPLATE'].includes(e.tagName) || !visible(e)) continue;
-    // Marked decoration (aria-hidden, the footer watermark and the wall of raw numbers) stays painted as backdrop and is not judged.
-    if (e.closest('[data-decorative]')) continue;
-    // A scroll-scrubbed scene is judged at its two ends (q = 0 and q = 1); the frames between are a move, not a state.
-    const scrub = e.closest('[data-scrub]');
-    if (scrub) {
-      const q = parseFloat(scrub.style.getPropertyValue('--q'));
+    // Only the two reviewed decorations stay out of the judgement: the wall of raw numbers and the footer watermark, and only
+    // while they are aria-hidden. Any other data-decorative element is judged like normal text and is flagged as a failure.
+    // (The same selector is in modeFn; both run inside the page, so it cannot be shared.)
+    const deco = e.closest('[data-decorative]');
+    let bad = false;
+    if (deco) {
+      if (deco.matches(':is(.dw-field, .footer__wordmark)[data-decorative][aria-hidden="true"]')) continue;
+      bad = true;
+    }
+    // A scroll-scrubbed scene is judged on every frame. Only the parts that fade or move through the scrub, marked
+    // data-scrub-fade, are judged at its two ends (q = 0 and q = 1); the frames between are a move, not a state.
+    const fade = e.closest('[data-scrub-fade]');
+    if (fade) {
+      const scrub = fade.closest('[data-scrub]');
+      const q = scrub ? parseFloat(scrub.style.getPropertyValue('--q')) : NaN;
       if (q > 0.02 && q < 0.98) continue;
     }
     range.selectNodeContents(n);
@@ -131,7 +140,7 @@ export const collectFn = ({ scope }) => {
     for (let m = e; m && m !== document.documentElement; m = m.parentElement) op *= parseFloat(getComputedStyle(m).opacity);
     const size = parseFloat(cs.fontSize);
     const large = size >= 24 || (size >= 18.66 && parseInt(cs.fontWeight, 10) >= 700);
-    nodes.push({ id: id++, op, text: text.slice(0, 48), sel: label(e), size, large, clip: e.hasAttribute('data-gc-clip') || !!e.closest('[data-gc-clip]'), rects: open.map((r) => [r.left, r.top, r.width, r.height]) });
+    nodes.push({ id: id++, op, text: text.slice(0, 48), sel: label(e), size, large, clip: e.hasAttribute('data-gc-clip') || !!e.closest('[data-gc-clip]'), deco: bad, rects: open.map((r) => [r.left, r.top, r.width, r.height]) });
   }
   return nodes;
 };
@@ -145,11 +154,13 @@ export const modeFn = (mode) => {
     document.head.append(s);
   }
   const fill = { n: 'transparent', k: '#000', w: '#fff' }[mode];
+  // The reviewed decorations only (see collectFn); any other data-decorative text is painted and measured like the rest.
+  const DECO = ':is(.dw-field,.footer__wordmark)[data-decorative][aria-hidden="true"]';
   s.textContent =
     '*,*::before,*::after{transition:none!important;caret-color:transparent!important}' +
     (fill
-      ? `*:not([data-decorative],[data-decorative] *),*:not([data-decorative],[data-decorative] *)::before,*:not([data-decorative],[data-decorative] *)::after{-webkit-text-fill-color:${fill}!important;-webkit-text-stroke:0!important}[data-decorative],[data-decorative] *,[data-decorative]::before,[data-decorative]::after{-webkit-text-fill-color:currentcolor!important}svg text:not([data-decorative] *),svg tspan:not([data-decorative] *){fill:${fill}!important;stroke:none!important}[data-gc-clip]:not([data-decorative],[data-decorative] *){background:none!important}`
-      : '');
+      ? `*:not(DECO,DECO *),*:not(DECO,DECO *)::before,*:not(DECO,DECO *)::after{-webkit-text-fill-color:${fill}!important;-webkit-text-stroke:0!important}DECO,DECO *,DECO::before,DECO::after{-webkit-text-fill-color:currentcolor!important}svg text:not(DECO *),svg tspan:not(DECO *){fill:${fill}!important;stroke:none!important}[data-gc-clip]:not(DECO,DECO *){background:none!important}`
+      : '').replaceAll('DECO', DECO);
 };
 
 // ---- in a plain page: decode the four screenshots and judge the pixels ----------------------------------------------
@@ -208,7 +219,7 @@ export const analyzeFn = async ({ shots, nodes, w, h }) => {
         }
       }
     }
-    out.push({ id: node.id, text: node.text, sel: node.sel, size: node.size, large: node.large, clip: node.clip, painted: core > 0, core, min: core ? min : null, worst });
+    out.push({ id: node.id, text: node.text, sel: node.sel, size: node.size, large: node.large, clip: node.clip, deco: node.deco, painted: core > 0, core, min: core ? min : null, worst });
   }
   return out;
 };
@@ -238,8 +249,9 @@ export async function measure(page, decoder, { scope = null } = {}) {
 export function fold(acc, rows, tag) {
   for (const r of rows) {
     const key = `${r.sel}|${r.text}`;
-    const cur = acc.get(key) ?? { text: r.text, sel: r.sel, need: r.large ? 3 : 4.5, min: Infinity, painted: false, at: '', worst: null, samples: 0 };
+    const cur = acc.get(key) ?? { deco: false, text: r.text, sel: r.sel, need: r.large ? 3 : 4.5, min: Infinity, painted: false, at: '', worst: null, samples: 0 };
     cur.samples++;
+    cur.deco ||= !!r.deco;
     if (r.painted) {
       cur.painted = true;
       if (r.min < cur.min) {
@@ -255,8 +267,10 @@ export function fold(acc, rows, tag) {
 export const verdict = (acc) => {
   const all = [...acc.values()];
   const painted = all.filter((r) => r.painted);
-  const fails = painted.filter((r) => r.min < r.need - 0.005).sort((a, b) => a.min / a.need - b.min / b.need);
+  const low = painted.filter((r) => !r.deco && r.min < r.need - 0.005).sort((a, b) => a.min / a.need - b.min / b.need);
+  // Text under any data-decorative element other than the two reviewed decorations fails whatever its contrast.
+  const fails = [...low, ...all.filter((r) => r.deco)];
   return { nodes: all.length, painted: painted.length, unpainted: all.length - painted.length, fails, lowest: painted.length ? Math.min(...painted.map((r) => r.min / r.need)) : 0 };
 };
 
-export const describe = (r) => `"${r.text}" (${r.sel}) ${r.min.toFixed(2)}:1 < ${r.need}:1 at ${r.at}, letter rgb(${r.worst?.fg}) on rgb(${r.worst?.bg})`;
+export const describe = (r) => r.deco ? `"${r.text}" (${r.sel}) sits under data-decorative but is not one of the two reviewed aria-hidden decorations (.dw-field, .footer__wordmark)` : `"${r.text}" (${r.sel}) ${r.min.toFixed(2)}:1 < ${r.need}:1 at ${r.at}, letter rgb(${r.worst?.fg}) on rgb(${r.worst?.bg})`;

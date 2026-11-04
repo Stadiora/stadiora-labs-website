@@ -7,7 +7,12 @@
 //   running: the fingerprint must change (the positive control, so a stage that never moved cannot pass as "paused");
 //   hovered, focused, off screen, or in a hidden tab: it must not change at all; after that it must change again.
 //   Reading playState instead would pass a loop that something else keeps moving, so only rendered values count.
+//   Finite transitions: a stage's fingerprint also lists every transition or one-shot animation still in flight with the rendered
+//   value of each property it drives (the use-case photo's 7 s scale), so a pause that leaves one running fails whatever its duration.
 //   Reduced motion: no endless loop in the content, every stage parked with data-ap-why="reduced", the settled frames shown.
+//   Coverage of the reduced-motion group. PROVEN by a mutation in scripts/mutation-battery.mjs: the code samples are complete
+//   (every line compared with the expected text). NOT COVERED (asserted, but no mutation has been run against the assertion, so
+//   it is not claimed): every stage parked, the hero's finished frame, and "no stage changes over four seconds".
 const SEL = '[data-api-stage]';
 const pages = [
   ['en', '/api.html', null],
@@ -32,6 +37,21 @@ const fingerprint = (idx) => {
     const r = pseudo ? null : t.getBoundingClientRect();
     out[`loop ${n++} ${t.tagName.toLowerCase()}.${String(t.className?.baseVal ?? t.className).split(/\s+/)[0]}${pseudo ?? ''}`] = `${rendered}${r ? `|${r.x.toFixed(2)},${r.y.toFixed(2)}` : ''}`;
   }
+  // Finite transitions and one-shot animations that are still in flight (the use-case photo's 7 s scale). What is read is the
+  // rendered value of each property they drive, so a transition that keeps going under a paused host changes the value, and one
+  // that finishes underneath it drops out of the list. Nothing is excluded for being finite or for how long it lasts.
+  const all = [...host.querySelectorAll('*')];
+  const flight = [];
+  for (const a of document.getAnimations()) {
+    const e = a.effect;
+    const t = e?.target;
+    if (!t || e.getComputedTiming().iterations === Infinity || !host.contains(t) || a.playState === 'finished' || a.playState === 'idle') continue;
+    const pseudo = e.pseudoElement || null;
+    const cs = getComputedStyle(t, pseudo);
+    const props = new Set(e.getKeyframes().flatMap((k) => Object.keys(k).filter((p) => !skip.has(p))));
+    flight.push(`${all.indexOf(t)} ${t.tagName.toLowerCase()}${pseudo ?? ''} ${[...props].map((p) => `${p}=${p.startsWith('--') ? cs.getPropertyValue(p) : cs[p]}`).join(';')}`);
+  }
+  out.inflight = flight.sort().join(' | ');
   out.markup = host.outerHTML.replace(/\sdata-ap(-why)?="[^"]*"/g, '');
   return out;
 };
@@ -48,7 +68,7 @@ const settled = async (page) => {
   await new Promise((r) => setTimeout(r, 500));
 };
 
-const changed = (a, b) => Object.keys(b).filter((k) => a[k] !== b[k]);
+const changed = (a, b) => [...new Set([...Object.keys(a), ...Object.keys(b)])].filter((k) => a[k] !== b[k]);
 
 export async function apiMotionChecks({ open, check, sleep, settle, metrics }) {
   for (const [lang, path, only] of pages) {
@@ -108,14 +128,26 @@ export async function apiMotionChecks({ open, check, sleep, settle, metrics }) {
           Object.defineProperty(document, 'hidden', { configurable: true, get: () => v });
           document.dispatchEvent(new Event('visibilitychange'));
         }, on);
+      // The use-case photo animates through a 7 s CSS transition that starts when a row opens, so a pause that only stops the
+      // frame loop leaves it moving. Opening the next row just before each scenario puts a transition in flight to be paused.
+      const provoke = async () => {
+        if (st.name !== 'uc') return;
+        await page.evaluate((i) => {
+          const rows = [...document.querySelectorAll('[data-api-stage]')[i].querySelectorAll('[data-uc-row] button')];
+          rows[(rows.findIndex((b) => b.getAttribute('aria-expanded') === 'true') + 1) % rows.length].click();
+        }, st.i);
+        await sleep(300);
+      };
       // The data wall moves with the scroll position, so its own scrub is not time and its loops are what the pause covers.
       await idle();
       await park();
+      await provoke();
       const run = await watch();
       check('api-motion', `${label}: runs while on screen with no pointer or focus (positive control)`, run.length > 0, `moving: ${run.slice(0, 4).join(', ') || 'none'}`);
       const live = new Set(run);
 
       await idle();
+      await provoke();
       const scopeEl = host.locator('xpath=self::*[@data-ap-scope] | .//*[@data-ap-scope]').first();
       const box = await scopeEl.boundingBox();
       await page.mouse.move(box.x + Math.min(box.width / 2, 400), box.y + Math.min(box.height / 2, 200), { steps: 4 });
@@ -123,8 +155,17 @@ export async function apiMotionChecks({ open, check, sleep, settle, metrics }) {
       let still = (await watch()).filter((k) => live.has(k));
       check('api-motion', `${label}: mouse over it stops everything in it`, still.length === 0, still.length ? `still moving: ${still.join(', ')}` : `${live.size} moving parts held still`);
 
+      if (st.name === 'uc') {
+        // A row opened under the pointer starts a new transition while the host is already paused; it must be held as well.
+        await provoke();
+        await sleep(700);
+        still = (await watch()).filter((k) => live.has(k));
+        check('api-motion', `${label}: a row opened while the pointer is over it stays still too`, still.length === 0, still.length ? `still moving: ${still.join(', ')}` : `${live.size} moving parts held still`);
+      }
+
       if (st.focusable) {
         await idle();
+        await provoke();
         await scopeEl.evaluate((e) => (e.matches('button, a[href], input, [tabindex="0"]') ? e : e.querySelector('button, a[href], input, [tabindex="0"]')).focus());
         await sleep(250);
         still = (await watch()).filter((k) => live.has(k));
@@ -132,6 +173,7 @@ export async function apiMotionChecks({ open, check, sleep, settle, metrics }) {
       }
 
       await idle();
+      await provoke();
       await spoofHidden(true);
       await sleep(250);
       still = (await watch()).filter((k) => live.has(k));
@@ -140,6 +182,7 @@ export async function apiMotionChecks({ open, check, sleep, settle, metrics }) {
 
       // Off screen: scroll to the far end of the page and watch the stage from there.
       await idle();
+      await provoke();
       await page.evaluate((i) => {
         const r = document.querySelectorAll('[data-api-stage]')[i].getBoundingClientRect();
         scrollTo({ top: r.top + scrollY > document.documentElement.scrollHeight / 2 ? 0 : document.documentElement.scrollHeight, behavior: 'instant' });
@@ -177,6 +220,40 @@ export async function apiMotionChecks({ open, check, sleep, settle, metrics }) {
   }
 }
 
+// The complete code samples, line by line, as the page must show them settled (the comment line comes from the page's own copy).
+const REQ_LINES = [
+  '{',
+  '  "athlete_id": "ATH_8821",',
+  '  "sport": "track_field",',
+  '  "signals": {',
+  '    "training_load_7d": 84,',
+  '    "recovery_score": 58,',
+  '    "sleep_hours": 6.4,',
+  '    "wellness_score": 6,',
+  '    "hrv_delta": -6.2,',
+  '    "session_rpe_last": 8.5,',
+  '    "days_since_rest": 5',
+  '  }',
+  '}',
+];
+const RES_LINES = [
+  '{',
+  '  "athlete_id": "ATH_8821",',
+  '  "availability": "MODIFIED",',
+  '  "readiness_index": 54,',
+  '  "classification": "Reduced Load Session",',
+  '  "recommendation": "Technical work only. Cap volume at 60%. No max-intensity efforts today.",',
+  '  "flags": [',
+  '    "elevated_cumulative_load",',
+  '    "hrv_below_7d_baseline",',
+  '    "sleep_deficit_detected"',
+  '  ],',
+  '  "coach_attention": true,',
+  '  "confidence": 0.91,',
+  '  "primary_signal": "hrv_delta"',
+  '}',
+];
+
 /** Reduced motion: nothing runs on its own, and the settled frames are what is shown. */
 export async function apiReducedMotionChecks({ open, check, sleep, settle }) {
   for (const [lang, path] of [['en', '/api.html'], ['es', '/api-es.html']]) {
@@ -198,9 +275,14 @@ export async function apiReducedMotionChecks({ open, check, sleep, settle }) {
     const frames = await page.evaluate(() => {
       const q = (s) => document.querySelector(s);
       const op = (s) => (q(s) ? Number(getComputedStyle(q(s)).opacity) : null);
-      const code = q('[data-pane="req"] code')?.textContent.length ?? 0;
-      const res = (document.querySelector('[data-pane="res"] code')?.textContent ?? '').length;
+      const lines = (pane) => [...document.querySelectorAll(`[data-pane="${pane}"] code .ln`)].map((l) => l.textContent);
+      const code = lines('req');
+      const res = lines('res');
+      const strings = JSON.parse(q('[data-code-strings]')?.textContent ?? '{}');
       return {
+        strings,
+        caret: document.querySelectorAll('[data-code] .caret').length,
+        typing: q('[data-code-state]')?.textContent.trim() ?? null,
         card: op('[data-card]'),
         sigs: [...document.querySelectorAll('.sig')].map((s) => Number(getComputedStyle(s).opacity)),
         wall: getComputedStyle(q('.dw-sticky')).getPropertyValue('--q').trim() || q('.dw-sticky').style.getPropertyValue('--q'),
@@ -210,7 +292,19 @@ export async function apiReducedMotionChecks({ open, check, sleep, settle }) {
     });
     check('api-reduced', `${lang}: the hero shows its finished frame (decision card up, every signal read)`, frames.card === 1 && frames.sigs.length > 0 && frames.sigs.every((o) => o >= 0.85), `card ${frames.card}, signals ${frames.sigs.join(',')}`);
     check('api-reduced', `${lang}: the data wall shows the finished frame (q = 1)`, Number(frames.wall) === 1, `--q ${frames.wall}`);
-    check('api-reduced', `${lang}: both code samples are complete with nothing typing`, frames.code > 200 && frames.res > 150, `request ${frames.code} chars, response ${frames.res} chars`);
+    const wantReq = [frames.strings.cReq, ...REQ_LINES];
+    const wantRes = [frames.strings.cRes, ...RES_LINES];
+    const sameLines = (got, want) => got.length === want.length && got.every((l, i) => l === want[i]);
+    const firstDiff = (got, want) => {
+      const i = want.findIndex((l, k) => got[k] !== l);
+      return i < 0 ? `${got.length} lines, expected ${want.length}` : `line ${i + 1}: got ${JSON.stringify(got[i])}, expected ${JSON.stringify(want[i])}`;
+    };
+    check(
+      'api-reduced',
+      `${lang}: both code samples are complete with nothing typing`,
+      !!frames.strings.cReq && sameLines(frames.code, wantReq) && sameLines(frames.res, wantRes) && frames.caret === 0 && frames.typing === '',
+      sameLines(frames.code, wantReq) && sameLines(frames.res, wantRes) ? `request ${frames.code.length} lines, response ${frames.res.length} lines, identical to the expected samples, no caret, no status text` : `request ${firstDiff(frames.code, wantReq)}; response ${firstDiff(frames.res, wantRes)}; carets ${frames.caret}; status ${JSON.stringify(frames.typing)}`,
+    );
 
     // Nothing may change over time either: the same fingerprint of every stage, twice.
     const snap = () => page.evaluate(() => [...document.querySelectorAll('[data-api-stage]')].map((e) => e.outerHTML.replace(/\sdata-ap(-why)?="[^"]*"/g, '')));

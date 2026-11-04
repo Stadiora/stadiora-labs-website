@@ -1,7 +1,9 @@
 // Use cases: rows auto-advance every 6.2 s (a progress bar under the open row) while the photo crossfades.
 // One requestAnimationFrame accumulator owned by the kit's autoplayer: it is cancelled while the block is off screen,
 // hovered, focused, in a hidden tab or under reduced motion. Reduced motion keeps rows manual, the bar full.
-import { $, $$, autoplayer, clamp, isReduced, onMotionChange } from '../motion/kit';
+// The photo's 7 s scale is a CSS transition, not the frame loop, so the autoplayer's freeze holds it in place while paused
+// (and settles the crossfade and the pop-ups, which carry text, to their end state).
+import { $, $$, autoplayer, clamp, type Autoplayer, isReduced, onMotionChange } from '../motion/kit';
 
 export function initUseCases() {
   const root = $('[data-uc]');
@@ -15,6 +17,7 @@ export function initUseCases() {
   let el = 0;
   let last = 0;
   let raf = 0;
+  let ap: Autoplayer | undefined;
 
   const load = (f: HTMLElement) => {
     const im = $<HTMLImageElement>('img[data-src]', f);
@@ -38,6 +41,7 @@ export function initUseCases() {
       if (k === i || k === (i + 1) % figs.length) load(f);
     });
     paint();
+    ap?.hold();
   };
 
   const frame = (t: number) => {
@@ -59,7 +63,7 @@ export function initUseCases() {
   };
 
   btns.forEach((b, k) => b.addEventListener('click', () => sel(k)));
-  autoplayer(root, { threshold: 0.25, play: start, pause: stop });
+  ap = autoplayer(root, { threshold: 0.25, play: start, pause: stop, freeze: { hold: '.uc-fig img', settle: '.uc-fig, .uc-pop' } });
   onMotionChange(() => paint());
   sel(0);
 }

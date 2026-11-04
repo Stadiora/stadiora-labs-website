@@ -28,6 +28,10 @@ const RUNNERS = {
   cutover: { args: ['scripts/cutover-checks.mjs'], failLine: /^FAIL\s+(.+)$/gm },
   motion: { args: ['scripts/evidence.mjs', '--api-motion-only', '--checks-only'], failLine: /^FAIL\s+(.+)$/gm },
   canary: { args: ['scripts/evidence.mjs', '--api-contrast-only=canary', '--checks-only'], failLine: /^FAIL\s+(.+)$/gm },
+  tap: { args: ['scripts/evidence.mjs', '--api-tap-only', '--checks-only'], failLine: /^FAIL\s+(.+)$/gm },
+  fit: { args: ['scripts/evidence.mjs', '--api-fit-only', '--checks-only'], failLine: /^FAIL\s+(.+)$/gm },
+  a11y: { args: ['scripts/evidence.mjs', '--api-a11y-only', '--checks-only'], failLine: /^FAIL\s+(.+)$/gm },
+  'motion-uc': { args: ['scripts/evidence.mjs', '--api-motion-only', '--checks-only'], env: { API_MOTION_STAGE: 'en:uc' }, failLine: /^FAIL\s+(.+)$/gm },
   contrast: { args: ['scripts/evidence.mjs', '--api-contrast-only=api-en,1440,light', '--checks-only'], failLine: /^FAIL\s+(.+)$/gm },
   'contrast-dark': { args: ['scripts/evidence.mjs', '--api-contrast-only=api-en,1440,dark', '--checks-only'], failLine: /^FAIL\s+(.+)$/gm },
 };
@@ -163,7 +167,7 @@ const M = [
   {
     id: 'pause-usecases',
     what: 'The use-case rotation never stops',
-    edits: [{ file: 'src/scripts/api/usecases.ts', find: "autoplayer(root, { threshold: 0.25, play: start, pause: stop });", replace: "autoplayer(root, { threshold: 0.25, play: start, pause: () => {} });" }],
+    edits: [{ file: 'src/scripts/api/usecases.ts', find: "ap = autoplayer(root, { threshold: 0.25, play: start, pause: stop, freeze:", replace: "ap = autoplayer(root, { threshold: 0.25, play: start, pause: () => {}, freeze:" }],
     runner: 'motion',
     env: { API_MOTION_STAGE: 'en:uc' },
     expect: /\[api-motion\] en uc#\d+: .*stops everything in it/,
@@ -229,10 +233,164 @@ const M = [
   {
     id: 'oracle-skip-gradient',
     what: 'The oracle skips gradient-text nodes (a blanket exemption)',
-    edits: [{ file: 'scripts/lib/glyph-contrast.mjs', find: "if (e.closest('[data-decorative]')) continue;", replace: "if (e.closest('[data-decorative], .grad-text')) continue;" }],
+    edits: [{ file: 'scripts/lib/glyph-contrast.mjs', find: "const deco = e.closest('[data-decorative]');", replace: "if (e.closest('.grad-text')) continue;\n    const deco = e.closest('[data-decorative]');" }],
     runner: 'canary',
     expect: /\[page-contrast\] oracle canary: a gradient heading faded into its backdrop is caught/,
     at: { file: 'scripts/lib/page-contrast-checks.mjs', needle: 'a gradient heading faded into its backdrop is caught' },
+  },
+
+  // ---- round 2: fixes for the round-1 review (B1-B5, A1, A2)
+  {
+    id: 'fit-badge-nowrap',
+    what: 'B1: the Spanish demo badge inherits white-space:nowrap again on the phone',
+    edits: [{ file: 'src/styles/api.css', find: 'display:inline-block;margin-top:16px;white-space:normal}', replace: 'display:inline-block;margin-top:16px}' }],
+    runner: 'fit',
+    expect: /\[api-hero-fit\] es 390px: the hero stack and every box in it sit inside their/,
+    at: { file: 'scripts/lib/api-hero-fit-checks.mjs', needle: 'the hero stack and every box in it sit inside their' },
+  },
+  {
+    id: 'pause-uc-freeze-removed',
+    what: 'B2: the use-case photo transition is no longer frozen by the pause (7 s scale keeps running)',
+    edits: [{ file: 'src/scripts/api/usecases.ts', find: ", freeze: { hold: '.uc-fig img', settle: '.uc-fig, .uc-pop' } });", replace: ' });' }],
+    runner: 'motion-uc',
+    expect: /\[api-motion\] en uc#\d+: (mouse over it|focus on a control inside it|a hidden tab|scrolled off screen it) stops everything in it/,
+    at: { file: 'scripts/lib/api-motion-checks.mjs', needle: 'mouse over it stops everything in it' },
+  },
+  {
+    id: 'pause-uc-30s-linear-no-freeze',
+    what: 'B2 (reviewer): .uc-fig img transition 7s -> 30s linear, with the freeze removed (a long finite transition must not escape the check)',
+    edits: [
+      { file: 'src/styles/api.css', find: 'transition:transform 7s var(--e-out)}', replace: 'transition:transform 30s linear}' },
+      { file: 'src/scripts/api/usecases.ts', find: ", freeze: { hold: '.uc-fig img', settle: '.uc-fig, .uc-pop' } });", replace: ' });' },
+    ],
+    runner: 'motion-uc',
+    expect: /\[api-motion\] en uc#\d+: (mouse over it|focus on a control inside it|a hidden tab|scrolled off screen it) stops everything in it/,
+    at: { file: 'scripts/lib/api-motion-checks.mjs', needle: 'mouse over it stops everything in it' },
+  },
+  {
+    id: 'pause-uc-click-under-pointer',
+    what: 'B2: a row opened while the pointer is over the block starts a transition that is not held (the re-freeze on selection is removed)',
+    edits: [{ file: 'src/scripts/api/usecases.ts', find: '    paint();\n    ap?.hold();\n', replace: '    paint();\n' }],
+    runner: 'motion-uc',
+    expect: /\[api-motion\] en uc#\d+: a row opened while the pointer is over it stays still too/,
+    at: { file: 'scripts/lib/api-motion-checks.mjs', needle: 'a row opened while the pointer is over it stays still too' },
+  },
+  {
+    id: 'scrub-backdrop-mid',
+    what: 'B3 (reviewer): the sticky wall gets a backdrop equal to var(--ink) only around the middle of --q (the stationary eyebrow and H2 read 1.00:1)',
+    edits: [{ file: 'src/styles/api.css', find: '.dw-head{padding-top', replace: '.dw-sticky::before{content:"";position:absolute;inset:0;z-index:2;background:var(--ink);opacity:clamp(0,calc(1 - (var(--q) - .5) * (var(--q) - .5) * 400),1)}\n.dw-head{padding-top' }],
+    runner: 'contrast',
+    expect: /\[page-contrast\] api-en 1440 light: every painted text node meets AA over its glyph pixels.*\((h2\.d\.d2|p\.eyebrow)\)/,
+    at: { file: 'scripts/lib/page-contrast-checks.mjs', needle: 'every painted text node meets AA over its glyph pixels' },
+  },
+  {
+    id: 'deco-on-note',
+    what: 'B4 (reviewer): data-decorative on the real .sp-note with its ink set to #5BA9C9',
+    edits: [
+      { file: 'src/components/api/ApiSports.astro', find: '<p class="sp-note">', replace: '<p class="sp-note" data-decorative>' },
+      { file: 'src/styles/api.css', find: '.sp-note{', replace: '.sp-note{color:#5BA9C9!important;' },
+    ],
+    runner: 'contrast',
+    expect: /\[page-contrast\] api-en 1440 light: every painted text node meets AA over its glyph pixels.*\(p\.sp-note\)/,
+    at: { file: 'scripts/lib/page-contrast-checks.mjs', needle: 'every painted text node meets AA over its glyph pixels' },
+  },
+  {
+    id: 'deco-on-note-legible',
+    what: 'B4: data-decorative on the real .sp-note with its normal, legible ink (any other decoration must still fail)',
+    edits: [{ file: 'src/components/api/ApiSports.astro', find: '<p class="sp-note">', replace: '<p class="sp-note" data-decorative>' }],
+    runner: 'contrast',
+    expect: /\[page-contrast\] api-en 1440 light: every painted text node meets AA over its glyph pixels.*sits under data-decorative/,
+    at: { file: 'scripts/lib/page-contrast-checks.mjs', needle: 'every painted text node meets AA over its glyph pixels' },
+  },
+  {
+    id: 'deco-wall-not-hidden',
+    what: 'B4: the wall of raw numbers loses aria-hidden (the exemption requires it)',
+    edits: [{ file: 'src/components/api/ApiDifference.astro', find: '<div class="dw-field" data-dw-field aria-hidden="true" data-decorative>', replace: '<div class="dw-field" data-dw-field data-decorative>' }],
+    runner: 'contrast',
+    expect: /\[page-contrast\] api-en 1440 light: every painted text node meets AA over its glyph pixels.*sits under data-decorative/,
+    at: { file: 'scripts/lib/page-contrast-checks.mjs', needle: 'every painted text node meets AA over its glyph pixels' },
+  },
+  {
+    id: 'oracle-deco-blanket',
+    what: 'B4: the oracle goes back to skipping any data-decorative element (the canary must catch it)',
+    edits: [{ file: 'scripts/lib/glyph-contrast.mjs', find: `deco.matches(':is(.dw-field, .footer__wordmark)[data-decorative][aria-hidden="true"]')`, replace: `deco.matches('[data-decorative]')` }],
+    runner: 'canary',
+    expect: /\[page-contrast\] oracle canary: text under data-decorative outside the two reviewed decorations is flagged/,
+    at: { file: 'scripts/lib/page-contrast-checks.mjs', needle: 'text under data-decorative outside the two reviewed decorations is flagged' },
+  },
+  {
+    id: 'tap-tabs',
+    what: 'B5: the API code tabs lose their hit area (32 px tall)',
+    edits: [{ file: 'src/styles/api.css', find: '.code-tabs button::after{content:"";position:absolute;inset:-6px 0}', replace: '' }],
+    runner: 'tap',
+    expect: /\[api-tap\] api-(en|es) (light|dark) 390px: .*short: button "/,
+    at: { file: 'scripts/lib/api-tap-checks.mjs', needle: 'every standalone control owns a 44x44 hit area' },
+  },
+  {
+    id: 'tap-replay',
+    what: 'B5: the replay button hit area shrinks back to 34x34',
+    edits: [{ file: 'src/styles/api.css', find: '.code-replay::after{content:"";position:absolute;inset:-7px}', replace: '' }],
+    runner: 'tap',
+    expect: /\[api-tap\] api-(en|es) (light|dark) 390px: .*code-replay "/,
+    at: { file: 'scripts/lib/api-tap-checks.mjs', needle: 'every standalone control owns a 44x44 hit area' },
+  },
+  {
+    id: 'tap-legal-switch',
+    what: 'B5: the legal document switches lose their hit area (38 px tall)',
+    edits: [{ file: 'src/styles/legal.css', find: '.lg-switch a::after{content:"";position:absolute;inset:-3px 0}', replace: '' }],
+    runner: 'tap',
+    expect: /\[api-tap\] (privacy|terms) (light|dark) 390px: .*short: a "/,
+    at: { file: 'scripts/lib/api-tap-checks.mjs', needle: 'every standalone control owns a 44x44 hit area' },
+  },
+  {
+    id: 'tap-toc-links',
+    what: 'B5: the expanded phone contents links go back to 36.89 px',
+    edits: [{ file: 'src/styles/legal.css', find: '  .toc-list a{padding:13px 8px 15px 6px}', replace: '  .toc-list a{padding:8px 8px 10px 6px}' }],
+    runner: 'tap',
+    expect: /\[api-tap\] (privacy|terms) (light|dark) 390px: .*short: a(\.[\w-]+)? "/,
+    at: { file: 'scripts/lib/api-tap-checks.mjs', needle: 'every standalone control owns a 44x44 hit area' },
+  },
+  {
+    id: 'tap-theme',
+    what: 'B5: the reading-theme button loses its hit area (34 px)',
+    edits: [{ file: 'src/styles/legal.css', find: '.toc-theme::after{content:"";position:absolute;inset:-7px -4px}', replace: '' }],
+    runner: 'tap',
+    expect: /\[api-tap\] (privacy|terms) (light|dark) 390px: .*button\.toc-theme "/,
+    at: { file: 'scripts/lib/api-tap-checks.mjs', needle: 'every standalone control owns a 44x44 hit area' },
+  },
+  {
+    id: 'tap-anchor',
+    what: 'B5: the copy-link anchors lose their hit area (about 26.6x30)',
+    edits: [{ file: 'src/styles/legal.css', find: '.anchor::after{content:"";position:absolute;inset:-8px -9px}', replace: '' }],
+    runner: 'tap',
+    expect: /\[api-tap\] (privacy|terms) (light|dark) 390px: .*a\.anchor "/,
+    at: { file: 'scripts/lib/api-tap-checks.mjs', needle: 'every standalone control owns a 44x44 hit area' },
+  },
+  {
+    id: 'reduced-code-truncated',
+    what: 'A1: the settled response sample is cut at 200 characters (the old 150-character floor passed this)',
+    edits: [{ file: 'src/scripts/api/code.ts', find: 'panes.res.innerHTML = render(RES, 1e9, false, HL_RES);\n  };\n\n  let manual', replace: 'panes.res.innerHTML = render(RES, 200, false, HL_RES);\n  };\n\n  let manual' }],
+    runner: 'motion',
+    expect: /\[api-reduced\] (en|es): both code samples are complete with nothing typing/,
+    at: { file: 'scripts/lib/api-motion-checks.mjs', needle: 'both code samples are complete with nothing typing' },
+  },
+  {
+    id: 'a11y-collapsed-exposed',
+    what: 'A2: collapsed use-case panels are exposed to screen readers again (visibility:hidden removed)',
+    edits: [{ file: 'src/styles/api.css', find: 'grid-template-rows:0fr;visibility:hidden;transition:grid-template-rows 450ms var(--e-out),visibility 0s 450ms}', replace: 'grid-template-rows:0fr;transition:grid-template-rows 450ms var(--e-out)}' }],
+    runner: 'a11y',
+    expect: /\[api-uc-a11y\] en: the panels exposed to a screen reader follow aria-expanded/,
+    at: { file: 'scripts/lib/api-uc-a11y-checks.mjs', needle: 'the panels exposed to a screen reader follow aria-expanded' },
+  },
+  {
+    id: 'identity-control',
+    what: 'CONTROL: a content-changing but behaviour-neutral edit (a comment appended to a stylesheet and to the oracle) must NOT be caught by any runner',
+    identity: true,
+    edits: [
+      { file: 'src/styles/api.css', find: '/* ---------- 7. Use cases ---------- */', replace: '/* ---------- 7. Use cases ---------- */\n/* identity control: no effect */' },
+      { file: 'scripts/lib/glyph-contrast.mjs', find: '/** Switches how text is filled', replace: '// identity control: no effect\n/** Switches how text is filled' },
+    ],
+    runners: [{ runner: 'fit' }, { runner: 'tap' }, { runner: 'a11y' }, { runner: 'motion-uc' }, { runner: 'canary' }, { runner: 'contrast' }],
   },
 ];
 
@@ -251,7 +409,7 @@ const build = () => {
 };
 
 const run = (runner, env = {}) => {
-  const r = sh('node', RUNNERS[runner].args, { env: { ...process.env, DIST_DIR: scratch, ...env } });
+  const r = sh('node', RUNNERS[runner].args, { env: { ...process.env, DIST_DIR: scratch, ...(RUNNERS[runner].env ?? {}), ...env } });
   const text = `${r.stdout}\n${r.stderr}`;
   const fails = [...text.matchAll(RUNNERS[runner].failLine)].map((m) => m[1].trim());
   return { status: r.status, fails, text };
@@ -307,13 +465,21 @@ for (const r of used) {
 for (const m of selected) {
   const saved = [];
   const t0 = Date.now();
-  let verdict = 'FAIL-AS-EXPECTED';
+  let verdict = m.identity ? 'PASS-AS-EXPECTED' : 'FAIL-AS-EXPECTED';
   const details = [];
   try {
     for (const e of m.edits) saved.push(apply(e));
     build();
     for (const r of m.runners ?? [{ runner: m.runner, expect: m.expect, at: m.at }]) {
       const res = run(r.runner, { ...(m.env ?? {}), ...(r.runner === 'motion' && !m.env ? { API_MOTION_STAGE: 'none' } : {}) });
+      if (m.identity) {
+        if (res.status === 0) details.push({ runner: r.runner, assertion: 'none: the run PASSED with the content changed', line: '-' });
+        else {
+          verdict = 'MISSED';
+          details.push({ runner: r.runner, assertion: `the neutral edit FAILED: ${res.fails.slice(0, 2).join(' | ').slice(0, 160)}`, line: '-' });
+        }
+        continue;
+      }
       const hit = res.fails.find((f) => r.expect.test(f));
       if (res.status === 0 || !hit) {
         verdict = 'MISSED';
@@ -331,7 +497,7 @@ for (const m of selected) {
     console.error('RESTORE FAILED: the tree differs from HEAD after the mutation');
     process.exit(3);
   }
-  if (verdict !== 'FAIL-AS-EXPECTED') bad++;
+  if (verdict !== 'FAIL-AS-EXPECTED' && verdict !== 'PASS-AS-EXPECTED') bad++;
   for (const d of details) rows.push({ id: m.id, what: m.what, ...d, verdict, secs: Math.round((Date.now() - t0) / 1000) });
   console.log(`${verdict.padEnd(17)} ${m.id}  ${details.map((d) => `${d.runner}: ${d.assertion.slice(0, 110)} @ ${d.line}`).join(' ; ')}  (${Math.round((Date.now() - t0) / 1000)}s)`);
 }
@@ -343,7 +509,7 @@ const table = [
   '',
   '| # | Mutation | Runner | Failing assertion | Assertion line | Result |',
   '|---|----------|--------|-------------------|----------------|--------|',
-  ...rows.map((r, i) => `| ${i + 1} | ${esc(r.what)} | ${r.runner} | \`${esc(r.assertion.slice(0, 170))}\` | ${r.line} | ${r.verdict === 'FAIL-AS-EXPECTED' ? 'caught' : r.verdict} |`),
+  ...rows.map((r, i) => `| ${i + 1} | ${esc(r.what)} | ${r.runner} | \`${esc(r.assertion.slice(0, 170))}\` | ${r.line} | ${r.verdict === 'FAIL-AS-EXPECTED' ? 'caught' : r.verdict === 'PASS-AS-EXPECTED' ? 'control: not caught, as required' : r.verdict} |`),
   '',
   `Controls (unmutated head): ${Object.entries(controls).map(([k, v]) => `${k} ${v ? 'PASS' : 'FAIL'}`).join(', ')}`,
 ].join('\n');

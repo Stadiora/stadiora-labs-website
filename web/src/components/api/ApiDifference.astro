@@ -15,12 +15,12 @@ const t = Astro.props.copy.difference;
         <h2 class="d d2" id="dw-h">{t.h2[0]}<br /><span class="grad-text">{t.h2[1]}</span></h2>
       </div>
       <div class="dw-field" data-dw-field aria-hidden="true" data-decorative></div>
-      <div class="dw-card" aria-hidden="true">
+      <div class="dw-card" aria-hidden="true" data-scrub-fade>
         <span class="tier">{t.tier}</span>
         <p><b>{t.cardTitle}</b>{t.cardText}</p>
         <i class="dw-ring"><b>54</b></i>
       </div>
-      <p class="dw-caption" aria-hidden="true"><span data-dw-n>64</span> {t.caption[0]} · <b>{t.caption[1]}</b></p>
+      <p class="dw-caption" aria-hidden="true" data-scrub-fade><span data-dw-n>64</span> {t.caption[0]} · <b>{t.caption[1]}</b></p>
       <div class="wrap dw-scale" aria-hidden="true"><span>{t.scale[0]}</span><i><b></b></i><span>{t.scale[1]}</span></div>
     </div>
   </div>

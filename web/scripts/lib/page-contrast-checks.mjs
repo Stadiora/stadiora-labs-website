@@ -3,9 +3,10 @@
 //     (hidden tab, finite moves finished, endless loops paused) and every painted text node is judged over its glyph pixels.
 //     Where a loop, a gradient heading, a video or the hero's script timeline is in view, it is seeked to four phases first.
 //   - A node's verdict is the minimum over all its samples. Nothing is skipped for sitting on an image, a video or a gradient.
-//     Only two kinds of text are not judged: text inside an element marked data-decorative (aria-hidden decoration: the footer
-//     watermark, the wall of raw numbers), and text inside a scroll-scrubbed scene (data-scrub) between its two ends, because
-//     that is a move; the scene is scanned at both ends (data-scrub-pin).
+//     Only two kinds of text are not judged: the two reviewed aria-hidden decorations (the footer watermark and the wall of raw
+//     numbers; any other data-decorative text is judged and fails), and the parts of the scroll-scrubbed wall that fade or move
+//     through the scrub (marked data-scrub-fade) between its two ends. Its stationary eyebrow and heading are judged on every
+//     frame, and the scene is scanned at a stop for every 0.05 of the wall's --q (data-scrub-pin), so a state lasting 0.1 of --q or more cannot be stepped over.
 //   - Canaries: a word over a band that is ~1:1 for a few glyph pixels, a gradient heading faded into its backdrop and small grey
 //     text must all FAIL, and a legible control must pass. This is what stops the oracle from being quietly loosened.
 import { collectFn, describe, fold, freezeFn, measure, seekFn, thawFn, verdict } from './glyph-contrast.mjs';
@@ -35,11 +36,20 @@ const inView = () => {
   return loops || [...document.querySelectorAll('[data-gc-clip], video')].some(vis);
 };
 
-/** Scroll positions where a scroll-scrubbed pin sits at the two ends of its move. */
+/**
+ * Scroll positions through a scroll-scrubbed pin, chosen in --q space. datawall.ts sets --q = ease(clamp(p * 1.18)) with a cubic
+ * ease that is steep in the middle (dq/dp is about 7 at q = 0.5), so stops evenly spaced in scroll progress jump over whole bands of
+ * q. One stop at every 0.05 of --q (and one past the end) cannot be stepped over by a state that lasts 0.1 of --q or longer.
+ * A state narrower than 0.05 of --q is NOT covered.
+ */
 const scrubStops = () =>
   [...document.querySelectorAll('[data-scrub-pin]')].flatMap((pin) => {
     const top = pin.getBoundingClientRect().top + scrollY;
-    return [Math.round(top), Math.round(top + (pin.offsetHeight - innerHeight) * 0.96)];
+    const run = pin.offsetHeight - innerHeight;
+    // inverse of the pin's cubic ease: the k (0..1) whose eased value is q
+    const unease = (q) => (q < 0.5 ? Math.cbrt(q / 4) : 1 - Math.cbrt(2 * (1 - q)) / 2);
+    const fracs = Array.from({ length: 20 }, (_, i) => unease(i * 0.05) / 1.18);
+    return [...fracs, 0.96].map((f) => Math.round(top + run * f));
   });
 
 /** Scrolls through the page and folds every sample into `acc`. */
@@ -85,7 +95,8 @@ async function oracleCanaries({ open, check, sleep, decoder }) {
       '<p id="c-band" style="margin:0 0 30px;width:420px;padding:10px 0;font:800 64px/1 Inter,sans-serif;color:#808080;background:linear-gradient(90deg,#fff 0,#fff 205px,#000 215px,#000 100%)">BANDED</p>' +
       '<h2 id="c-fade" class="grad-text" style="margin:0 0 30px;font-size:64px;line-height:1;opacity:.32">Faded heading</h2>' +
       '<p id="c-grey" style="margin:0 0 30px;font-size:16px;color:#9AA3B2">Small grey body text that is too light</p>' +
-      '<p id="c-ok" style="margin:0;font-size:16px;color:#0B1220">A control that is plainly legible</p>';
+      '<p id="c-ok" style="margin:0 0 30px;font-size:16px;color:#0B1220">A control that is plainly legible</p>' +
+      '<p id="c-deco" data-decorative style="margin:0;font-size:16px;color:#0B1220">Legible text under a stray data-decorative</p>';
     document.body.append(o);
   });
   await sleep(200);
@@ -97,10 +108,12 @@ async function oracleCanaries({ open, check, sleep, decoder }) {
   const fade = by('Faded');
   const grey = by('Small grey');
   const ok = by('A control');
+  const stray = by('Legible text under');
   check('page-contrast', 'oracle canary: a word over a band that is ~1:1 for a few glyph pixels is caught (no percentile)', !!band?.painted && band.min < 1.3, `min ${band?.min?.toFixed(2)}:1`);
   check('page-contrast', 'oracle canary: a gradient heading faded into its backdrop is caught', !!fade?.painted && fade.min < 3, `min ${fade?.min?.toFixed(2)}:1`);
   check('page-contrast', 'oracle canary: small grey body text under 4.5:1 is caught', !!grey?.painted && grey.min < 4.5, `min ${grey?.min?.toFixed(2)}:1`);
   check('page-contrast', 'oracle canary: the legible control passes', !!ok?.painted && ok.min >= 4.5, `min ${ok?.min?.toFixed(2)}:1`);
+  check('page-contrast', 'oracle canary: text under data-decorative outside the two reviewed decorations is flagged, even when legible', !!stray?.deco, stray ? `flagged ${stray.deco}` : 'the element was skipped');
   await page.context().close();
 }
 
