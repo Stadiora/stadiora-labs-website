@@ -13,7 +13,7 @@ const img = (id: string) => `url(/home/img/${id}.webp)`;
 const brands = copy.apps.map((a) => {
   const b = athleteBrands[a.id];
   const first = a.items[0];
-  return { n: a.name, m: b.m, c: b.c, i: img(b.img), k: a.today, t: first.title, s: 'meta' in first && first.meta ? `${first.sub} · ${first.meta}` : first.sub, st: a.status };
+  return { n: a.name, m: b.m, c: b.c, f: b.f, i: img(b.img), k: a.today, t: first.title, s: 'meta' in first && first.meta ? `${first.sub} · ${first.meta}` : first.sub, st: a.status };
 });
 const first = brands[0];
 const left = brands[brands.length - 1];
@@ -28,7 +28,7 @@ const right = brands[1];
     ].map(({ cls, b }) => (
       <div class={`sx-ms ${cls}`}>
         <div class="s">
-          <div class="sx-scr" style={`--bc:${b.c}`}>
+          <div class="sx-scr" style={`--bc:${b.c};--fg:${b.f}`}>
             <div class="mk">{b.m}</div>
             <div class="an">{b.n}</div>
             <div class="hl" style={`--img:${b.i}`}></div>
@@ -40,7 +40,7 @@ const right = brands[1];
   <div class="dphone" data-morph>
     <div class="scr">
       <i class="island"></i>
-      <div class="sx-scr" data-app style={`--bc:${first.c}`}>
+      <div class="sx-scr" data-app style={`--bc:${first.c};--fg:${first.f}`}>
         <div class="mk" data-app-mk>{first.m}</div>
         <div class="an" data-app-name>{first.n}</div>
         <div class="hl" data-app-img style={`--img:${first.i}`}></div>

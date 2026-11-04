@@ -43,16 +43,32 @@ document.addEventListener('visibilitychange', syncHidden);
 
 /* ---------- autoplayer: one rule for everything that moves on its own ---------- */
 export interface AutoplayerOptions {
-  play: () => void;
-  pause: () => void;
+  play: (ap: Autoplayer) => void;
+  pause: (ap: Autoplayer) => void;
   /** Share of the host that must be visible before it runs. */
   threshold?: number;
   /** Element whose hover and focus pause the host (defaults to the host). */
   within?: HTMLElement;
+  /**
+   * Stops a scene that animates through transitions and WAAPI as well as timers. While the host is paused the elements
+   * matching `hold` keep their in-flight transitions and one-shot animations where they are and carry on from there;
+   * those matching `settle` jump to their end state (text that has to stay readable under the pointer). CSS loops
+   * (animation-iteration-count: infinite) are not touched: they stop through their own [data-ap="off"] rules.
+   */
+  freeze?: { hold?: string; settle?: string; scope?: HTMLElement };
 }
 export interface Autoplayer {
   readonly running: boolean;
   refresh: () => void;
+  /** setTimeout on the host's clock: pausing keeps the time left, resuming carries on. `flush` runs it at once on pause instead. */
+  later: (fn: () => void, ms: number, flush?: boolean) => void;
+}
+interface Pending {
+  fn: () => void;
+  left: number;
+  at: number;
+  id: number;
+  flush: boolean;
 }
 
 export function autoplayer(host: HTMLElement, opts: AutoplayerOptions): Autoplayer {
@@ -62,6 +78,52 @@ export function autoplayer(host: HTMLElement, opts: AutoplayerOptions): Autoplay
   const seen = { visible: false, hover: false, focus: false };
   let running = false;
   let first = true;
+  const pending = new Set<Pending>();
+  const held = new Set<Animation>();
+
+  const arm = (t: Pending) => {
+    t.at = performance.now();
+    t.id = window.setTimeout(() => {
+      pending.delete(t);
+      t.id = 0;
+      t.fn();
+    }, t.left);
+  };
+  // Pausing keeps the timers' remaining time and stops the matching in-flight animations where they are.
+  const hold = () => {
+    const now = performance.now();
+    for (const t of pending) {
+      if (!t.id) continue;
+      window.clearTimeout(t.id);
+      t.id = 0;
+      t.left = Math.max(0, t.left - (now - t.at));
+    }
+    for (let more = true; more; ) {
+      more = false;
+      for (const t of [...pending]) {
+        if (!t.flush) continue;
+        pending.delete(t);
+        t.fn();
+        more = true;
+      }
+    }
+    const f = opts.freeze;
+    if (!f) return;
+    for (const a of (f.scope ?? host).getAnimations({ subtree: true })) {
+      const el = (a.effect as KeyframeEffect | null)?.target;
+      if (!(el instanceof Element) || a.playState !== 'running' || a.effect?.getComputedTiming().iterations === Infinity) continue;
+      if (f.settle && el.matches(f.settle)) a.finish();
+      else if (f.hold && el.matches(f.hold)) {
+        a.pause();
+        held.add(a);
+      }
+    }
+  };
+  const release = () => {
+    for (const a of held) if (a.playState === 'paused') a.play();
+    held.clear();
+    for (const t of pending) if (!t.id) arm(t);
+  };
 
   const refresh = () => {
     const why = RMQ.matches ? 'reduced' : document.hidden ? 'hidden' : !seen.visible ? 'offscreen' : seen.hover ? 'hover' : seen.focus ? 'focus' : '';
@@ -71,10 +133,26 @@ export function autoplayer(host: HTMLElement, opts: AutoplayerOptions): Autoplay
     else delete host.dataset.apWhy;
     if (want !== running || (first && !want)) {
       running = want;
-      if (want) opts.play();
-      else opts.pause();
+      if (want) {
+        release();
+        opts.play(self);
+      } else {
+        opts.pause(self);
+        hold();
+      }
     }
     first = false;
+  };
+  const self: Autoplayer = {
+    get running() {
+      return running;
+    },
+    refresh,
+    later(fn, ms, flush = false) {
+      const t: Pending = { fn, left: ms, at: 0, id: 0, flush };
+      pending.add(t);
+      if (running) arm(t);
+    },
   };
 
   new IntersectionObserver(
@@ -105,12 +183,7 @@ export function autoplayer(host: HTMLElement, opts: AutoplayerOptions): Autoplay
   document.addEventListener('visibilitychange', refresh);
   document.addEventListener('kit:motion-change', refresh);
   refresh();
-  return {
-    get running() {
-      return running;
-    },
-    refresh,
-  };
+  return self;
 }
 
 /* ---------- video clips: WebM + MP4 + poster, preload="none", start on visibility ---------- */

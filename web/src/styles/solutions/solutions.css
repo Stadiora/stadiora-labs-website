@@ -24,11 +24,24 @@ html:not(.js) .sx-page .rv-mask {
 .sx-page .lines:not(.in) > span > span {
   transform: translateY(125%);
 }
+/* Gradient lettering is painted by background-clip:text, which only paints inside the line box: an accent (Á) or a tail (Q)
+   outside it showed the backdrop instead of ink. The padding gives the paint room; the margins take it back. */
+.sx-page .lines > span > .grad-text {
+  padding: 0.14em 0 0.1em;
+  margin: -0.14em 0 -0.1em;
+}
 
 /* a reading section between the dark stages */
 .sx-sec {
   position: relative;
   padding-block: clamp(64px, 8vw, 112px);
+}
+
+/* The cyan ink of the reading theme is 4.46:1 to 4.49:1 on the cyan tint and the grey surface (avatars, tags, links), just under AA.
+   One step darker for the pages of this lane; the dark theme value is the shared one. --link is computed at :root, so it is redeclared. */
+.sx-page {
+  --cyan-ink: light-dark(#00709f, #33cfff);
+  --link: var(--cyan-ink);
 }
 
 /* ---------- hero (impact, mesh and orbits) ---------- */
@@ -63,10 +76,39 @@ html:not(.js) .sx-page .rv-mask {
 }
 .sx-hero__copy {
   position: relative;
+  isolation: isolate;
   min-width: 0;
 }
-.sx-hero__copy .eyebrow {
-  color: #b7c2d4;
+/* The mesh drifts under the copy and its cyan and violet blobs are bright (at 390 px they cover the whole column). A scrim between
+   the mesh and the words keeps every eyebrow, line and lead above AA wherever the drift puts a blob. */
+.sx-hero__copy::before,
+.sx-page .sq-head::before {
+  content: '';
+  position: absolute;
+  inset: -40px -48px;
+  z-index: -1;
+  pointer-events: none;
+  border-radius: 40px;
+  background: rgba(2, 6, 15, 0.74);
+  filter: blur(26px);
+}
+.sx-page .sq-head {
+  position: relative;
+  isolation: isolate;
+}
+.sx-hero__copy .eyebrow,
+.sx-page .sq-head .eyebrow {
+  color: #dbe3ef;
+}
+/* The fixed header floats over the top of the hero and its cyan blob: a shade under it keeps the nav above AA. */
+.sx-hero::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto;
+  height: 130px;
+  z-index: 2;
+  pointer-events: none;
+  background: linear-gradient(180deg, rgba(2, 6, 15, 0.7), rgba(2, 6, 15, 0));
 }
 .sx-hero .sx-h1 {
   margin: 26px 0 0;
@@ -83,7 +125,7 @@ html:not(.js) .sx-page .rv-mask {
 }
 .sx-hero .lead {
   margin-top: 28px;
-  color: #c4cedd;
+  color: #d3dbe8;
   max-width: 40ch;
 }
 .sx-hero__cta {
@@ -149,7 +191,7 @@ html:not(.js) .sx-page .rv-mask {
 .sx-ch {
   --t: calc(var(--k) / var(--m));
   color: #34d399;
-  color: color-mix(in srgb, #8b5cf6 calc(clamp(0, (var(--t) - 0.5) * 2, 1) * 100%), color-mix(in srgb, #34d399 calc(clamp(0, var(--t) * 2, 1) * 100%), #00bef3));
+  color: color-mix(in srgb, #a78bfa calc(clamp(0, (var(--t) - 0.5) * 2, 1) * 100%), color-mix(in srgb, #34d399 calc(clamp(0, var(--t) * 2, 1) * 100%), #00bef3));
 }
 .sx-w.out .sx-ch,
 .sx-w.out .sx-sp {
@@ -223,6 +265,11 @@ html:not(.js) .sx-page .rv-mask {
 }
 [data-section][data-ap='off'] .sx-run,
 [data-section].is-off .sx-run {
+  animation-play-state: paused;
+}
+/* the Coaches live dot pings with the hero and rests with it, or with the clip frame it sits in */
+.sx-hero[data-ap='off'] .dot-live,
+.sx-clip:has(video[data-ap='off']) .dot-live {
   animation-play-state: paused;
 }
 .sx-tile {
@@ -468,8 +515,12 @@ html:not(.js) .sx-page .rv-mask {
   color: #0f7a55;
 }
 .sx-pop--session span.meta {
-  color: #46536a;
+  color: #cfd8e6;
   font-size: 13px;
+}
+/* The card sits on a bright photo, so its glass has to be dense enough for the white name and the label under it */
+.sx-pop--session.glass {
+  background: rgba(6, 13, 30, 0.88);
 }
 .sx-demo {
   position: absolute;
@@ -573,7 +624,7 @@ html:not(.js) .sx-page .rv-mask {
   position: absolute;
   inset: 0;
   padding: 54px 16px 16px;
-  color: #fff;
+  color: var(--fg, #fff);
   background: var(--bc);
   transition: background-color 700ms var(--e-out);
 }
@@ -592,7 +643,8 @@ html:not(.js) .sx-page .rv-mask {
   margin-bottom: 14px;
   border-radius: 14px;
   background: rgba(255, 255, 255, 0.95);
-  color: var(--bc);
+  /* the brand colour itself is 1.9:1 to 3.3:1 on this white tile; the letter wears it at the strength that reads */
+  color: color-mix(in srgb, var(--bc) 30%, #02060f);
   font: 800 18px/1 var(--f-display);
 }
 .sx-scr .hl {
@@ -948,6 +1000,13 @@ html:not(.js) .sx-page .rv-mask {
 .sx-final.final.media-frame {
   border-radius: 0;
 }
+/* The shared overlay is lightest at the centre, where the headline sits: the violet end of the gradient lettering fell to 2.9:1
+   over a bright frame of the night clip. A deeper centre keeps the large lettering above 3:1 on any frame. */
+.sx-final.final::before {
+  background:
+    radial-gradient(80% 70% at 50% 46%, rgba(4, 10, 26, 0.74), rgba(4, 10, 26, 0.85) 85%),
+    linear-gradient(180deg, #040a1a 0%, transparent 25%, transparent 70%, #02060f 100%);
+}
 .sx-final .fdot--a {
   offset-path: path('M40,400 a760,260 0 1,0 1520,0 a760,260 0 1,0 -1520,0');
   --d: 22s;
@@ -962,6 +1021,11 @@ html:not(.js) .sx-page .rv-mask {
 }
 .sx-final .final-ctas .btn--ghost {
   color: #fff;
+}
+/* The orbit dots travel behind the headline and the ghost button: a cyan dot under white lettering is 2.2:1. At half strength a dot
+   stays visible and stays dark enough for white text on top of it. */
+.sx-final .orbits .fdot {
+  opacity: 0.5;
 }
 @media (max-width: 640px) {
   .sx-final .final-ctas .btn {

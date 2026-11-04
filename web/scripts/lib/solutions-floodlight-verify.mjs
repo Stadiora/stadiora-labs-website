@@ -7,6 +7,7 @@
 //   - decoration is hidden from assistive tech, and the contact burst can never carry a message.
 import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import { join } from 'node:path';
+import { TEXT_FREE_CLIPS, verifySolutionsMedia } from './solutions-media-guard.mjs';
 
 const routes = [
   { name: 'schools', path: '/solutions/schools/', swap: true, stage: true },
@@ -22,10 +23,6 @@ const routes = [
 const CLIP_BUDGET_BYTES = 1.6 * 1024 * 1024;
 const POSTER_BUDGET_BYTES = 120 * 1024;
 
-// Clips that carry no words. A clip is added here only after someone has watched it end to end; the pillar-* clips have
-// their titles baked into the picture, so a page that uses one cannot translate it.
-export const TEXT_FREE_CLIPS = new Set(['night-stadium', 'ai-bg', 'engage-bg', 'tile-chalk', 'tile-hurdler', 'reel', 'sx-coaches']);
-
 const decode = (s) => s.replaceAll('&quot;', '"').replaceAll('&#39;', "'").replaceAll('&amp;', '&');
 const textOf = (s) => s.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
 
@@ -37,7 +34,7 @@ export function verifySolutionsFloodlight({ dist, fail }) {
     const files = readdirSync(mediaDir);
     for (const stem of new Set(files.map((f) => f.replace(/\.(webm|mp4|webp)$/, '')))) {
       if (!stem.startsWith('sx-')) fail(`solutions/media/${stem}: lane clips are named sx-*`);
-      if (!TEXT_FREE_CLIPS.has(stem)) fail(`solutions/media/${stem}: not on the text-free list in solutions-floodlight-verify.mjs`);
+      if (!TEXT_FREE_CLIPS.has(stem)) fail(`solutions/media/${stem}: not on the text-free list in solutions-media-guard.mjs`);
       for (const ext of ['webm', 'mp4', 'webp']) if (!files.includes(`${stem}.${ext}`)) fail(`solutions/media/${stem}: missing ${ext}`);
     }
     for (const f of files) {
@@ -68,13 +65,12 @@ export function verifySolutionsFloodlight({ dist, fail }) {
       need(/<h2 class="d d1 lines"/.test(final), 'the final CTA title must be an h2 at D1');
       need(final !== '' && html.indexOf(final) < html.indexOf('<footer'), 'the final CTA must come before the footer');
 
-      // ---- clips: markup, text-free list, files in dist
+      // ---- clips: markup here; every file of every <video> against the text-free list and the slot's clip in the media guard
+      verifySolutionsMedia({ html, file: rel, path: route.path, dist, fail });
+      let nth = 0;
       for (const m of html.matchAll(/<video\b[\s\S]*?<\/video>/g)) {
         const tag = /<video\b[^>]*>/.exec(m[0])[0];
-        const stem = /\/(?:home|solutions)\/media\/([\w-]+)\./.exec(m[0])?.[1] ?? '?';
-        const at = `<video ${stem}>`;
-        need(TEXT_FREE_CLIPS.has(stem), `${at} is not on the text-free clip list (words belong in HTML, never in a clip)`);
-        need(!/^pillar-/.test(stem), `${at}: the pillar clips have their titles baked in`);
+        const at = `<video #${++nth}>`;
         need(/\sdata-clip(\s|=|>)/.test(tag), `${at} has no data-clip`);
         need(!/\sautoplay(\s|=|>)/.test(tag), `${at} has autoplay`);
         for (const attr of ['muted', 'playsinline', 'loop']) need(new RegExp(`\\s${attr}(\\s|=|>)`).test(tag), `${at} is missing ${attr}`);

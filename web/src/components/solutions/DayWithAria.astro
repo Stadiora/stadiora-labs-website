@@ -13,7 +13,7 @@ const caption = common[locale].demoCaption;
 const initials = (name: string) => name.charAt(0);
 ---
 
-<section class="day sx-stage impact" data-section aria-labelledby="day-title">
+<section class="day sx-stage impact" data-section data-sx-stage aria-labelledby="day-title">
   <div class="mesh" aria-hidden="true">
     <i class="b b5"></i><i class="b b1"></i><i class="b b2"></i><i class="b b3"></i><i class="b b4"></i><i class="vig"></i>
   </div>
@@ -145,6 +145,10 @@ const initials = (name: string) => name.charAt(0);
     opacity: 0;
     animation: dayPing 6s var(--e-out) infinite;
     animation-delay: calc(var(--i, 0) * 1.6s);
+  }
+  /* the stage's autoplayer (scripts/solutions/stages.ts) rests the rings on hover, focus, offscreen and in a hidden tab */
+  .day[data-ap='off'] .day__dot::after {
+    animation-play-state: paused;
   }
   @keyframes dayPing {
     0% {

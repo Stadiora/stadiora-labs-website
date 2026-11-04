@@ -3,11 +3,14 @@
 // This file proves the motion contract and the Floodlight anatomy in Chromium:
 //   - the hero, the stage and the final are on the dark stage with the display face, in both locales;
 //   - nothing that moves keeps moving under reduced motion, and the hero loops stop on hover;
+//   - solutions-motion-checks.mjs measures the rendered movement of every autoplayer unit under hover, focus, offscreen and a hidden tab;
 //   - the About "A" window, the clubs feed, the athletes morph and the coaches clip move, and rest on their still frame;
 //   - the contact topic thumb glides, the submit burst is decoration and the status text stays the approved one;
 //   - no text is cut off by a clipping ancestor.
 import { clipProbe } from './clip-probe.mjs';
 import { statusText } from './contact-contract.mjs';
+import { solutionsMotionChecks } from './solutions-motion-checks.mjs';
+import { solutionsPixelContrastChecks } from './solutions-pixel-contrast.mjs';
 
 const pages = [
   ['schools', '/solutions/schools/'],
@@ -308,4 +311,10 @@ export async function solutionsFloodlightChecks({ open, settle: settleRaw, check
     check('solutions-floodlight', `${locale} contact: an invalid submit does not burst and shows no status`, !badBurst.go && badBurst.status === '', JSON.stringify(badBurst));
     await bad.context().close();
   }
+
+  // ---------------------------------------------------------- rendered motion under hover, focus, offscreen and a hidden tab
+  await solutionsMotionChecks({ open, settle, check, sleep });
+
+  // ---------------------------------------------------------- contrast measured on the composited pixels, at rest and in motion
+  await solutionsPixelContrastChecks({ open, settle, check, sleep });
 }

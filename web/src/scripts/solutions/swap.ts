@@ -1,10 +1,15 @@
 // Hero word swap (M3) and the conveyor step it drives (M4) on the Solutions pages. Re-implements the home hero
 // pattern under the sx- prefix: the swap line cycles its words, and where a centre conveyor lane exists it steps
 // one block per word. The server-rendered state is word 1 (the still frame); nothing here runs under reduced motion.
-import { $, $$, autoplayer, isReduced } from '../motion/kit';
+// Every timer runs on the kit autoplayer's clock (ap.later) and the conveyor's transitions are held by it, so one pause
+// (hover, focus, offscreen, hidden tab) stops the words, the lanes and the photos together.
+import { $, $$, autoplayer, isReduced, type Autoplayer } from '../motion/kit';
 
 const CYCLE_MS = 2800;
 const EASE = 'cubic-bezier(0.2, 0.7, 0.2, 1)';
+// What a pause holds: the centre conveyor's transitions (step, Ken Burns, tile fades, parallax). What it settles: the
+// word slot and its letters, so a headline the pointer rests on is never left half blurred.
+const FREEZE = { hold: '.sx-cv, .sx-cv *', settle: '.sx-slot, .sx-slot *' };
 
 function buildWord(word: string, index: number): HTMLElement {
   const w = document.createElement('span');
@@ -43,12 +48,12 @@ function initHeroSwap(hero: HTMLElement) {
   if (!copy) return;
   if (!swap && $('[data-sx-loop]', hero)) {
     // a CSS-only loop (the About "A" window) is paused by the autoplayer like every other loop
-    autoplayer(hero, { play: () => {}, pause: () => {} });
+    autoplayer(hero, { play: () => {}, pause: () => {}, freeze: FREEZE });
     return;
   }
   if (!swap || !slot) {
     // a conveyor without a swap (clubs) only loops in CSS; the autoplayer still pauses it on hover, focus, offscreen and hidden tabs
-    if (cv) autoplayer(hero, { within: copy, play: () => {}, pause: () => {} });
+    if (cv) autoplayer(hero, { within: copy, play: () => {}, pause: () => {}, freeze: FREEZE });
     return;
   }
   const words: string[] = JSON.parse(swap.dataset.words ?? '[]');
@@ -60,7 +65,10 @@ function initHeroSwap(hero: HTMLElement) {
   const bigs = col ? $$('[data-big]', col) : [];
   let pos = 1; // block 0 is a clone of the last photo, block 1 is the first word's
   let wi = 0;
-  let timer = 0;
+  let ap: Autoplayer;
+  let armed = false;
+  // `flush` timers finish at once on a pause (a word half-way out must not leave the line blank); the rest wait with it.
+  const later = (fn: () => void, ms: number, flush = false) => ap.later(fn, ms, flush);
 
   /** Centres the big tile of block `p` in the lane. */
   function place(p: number, animate: boolean) {
@@ -111,8 +119,8 @@ function initHeroSwap(hero: HTMLElement) {
     delete old.dataset.active;
     next.dataset.active = '';
     next.classList.add('in');
-    setTimeout(() => next.classList.remove('in'), 1500);
-    setTimeout(() => old.remove(), 600);
+    later(() => next.classList.remove('in'), 1500, true);
+    later(() => old.remove(), 600, true);
   }
 
   function step() {
@@ -121,14 +129,14 @@ function initHeroSwap(hero: HTMLElement) {
     wi = (wi + 1) % words.length;
     old.classList.add('out');
     if (col) {
-      setTimeout(() => {
+      later(() => {
         pos++;
         place(pos, true);
         warm(pos);
         sweep(bigs[pos]);
         if (pos === words.length + 1) {
           // the clone of the first photo is on screen: jump back to the real one without a transition
-          setTimeout(() => {
+          later(() => {
             col.classList.add('snap');
             pos = 1;
             place(pos, false);
@@ -137,16 +145,27 @@ function initHeroSwap(hero: HTMLElement) {
         }
       }, 120);
     }
-    setTimeout(() => swapWord(old), 300);
+    later(() => swapWord(old), 300, true);
   }
 
-  autoplayer(hero, {
+  const cycle = () => {
+    armed = false;
+    arm();
+    step();
+  };
+  const arm = () => {
+    if (armed) return;
+    armed = true;
+    later(cycle, CYCLE_MS);
+  };
+  ap = autoplayer(hero, {
     within: copy,
-    play: () => {
-      window.clearInterval(timer);
-      timer = window.setInterval(step, CYCLE_MS);
+    play: (a) => {
+      ap = a;
+      arm();
     },
-    pause: () => window.clearInterval(timer),
+    pause: () => {},
+    freeze: FREEZE,
   });
 
   // pointer parallax on the conveyor: mouse only, one frame at a time
@@ -155,7 +174,7 @@ function initHeroSwap(hero: HTMLElement) {
     window.addEventListener(
       'pointermove',
       (e) => {
-        if (e.pointerType !== 'mouse' || isReduced() || raf || hero.classList.contains('is-off')) return;
+        if (e.pointerType !== 'mouse' || isReduced() || raf || hero.dataset.ap !== 'on') return;
         raf = requestAnimationFrame(() => {
           raf = 0;
           cv.style.setProperty('--cvx', `${(e.clientX / innerWidth - 0.5) * -14}px`);

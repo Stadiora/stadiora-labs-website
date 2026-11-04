@@ -51,12 +51,24 @@ node scripts/evidence.mjs --engage-only # just the Platform page checks, EN and 
   and `reel` are the only other text-free clips, and the `pillar-*` clips have titles baked in, so a page may not use them).
   `scripts/lib/solutions-floodlight-verify.mjs` (run by `npm run verify`) fails the build on a missing mesh or orbits, an H1
   that is not the display face, too few dark surfaces, a final that is not on the night-stadium clip or sits after the footer,
-  a clip off the text-free list or with wrong markup or over budget, a swap line a screen reader cannot read as one sentence,
+  a swap line a screen reader cannot read as one sentence,
   decoration that is neither `aria-hidden` nor a labelled image, a burst that carries text, a pre-rendered status or a topic
-  control that is not two radios. `scripts/lib/solutions-floodlight-checks.mjs` (run by `evidence`) drives Chromium: the
+  control that is not two radios. Its media part is `solutions-media-guard.mjs`: every `<video>` has its WebM source, its MP4
+  source and its poster checked one by one against the text-free list and against the clip that slot is meant to play (the hero,
+  the stage or the final band), and a `src` on the `<video>` itself, a missing source or an unlisted file fails; the mutation
+  proofs are a `src` of `pillar-training.mp4` on the opening tag, both sources swapped for the `pillar-training` pair with the
+  poster kept, and the final MP4 swapped for `ai-bg`, each of which must make `npm run verify` exit 1.
+  `scripts/lib/solutions-floodlight-checks.mjs` (run by `evidence`) drives Chromium: the
   Floodlight anatomy in the light theme, text cut off by a clipping ancestor at 390 and 1440 (`clip-probe.mjs`), the swap line
   moving, resting under reduced motion and pausing on hover, the coaches clip, the clubs feed, the athletes morph, the About "A"
-  window and the contact thumb, burst and approved status text. `solutions-checks.mjs` still owns overflow, overlap, contrast,
+  window and the contact thumb, burst and approved status text. It also runs two measuring modules, both on rendered pixels:
+  `solutions-motion-checks.mjs` samples the transforms, boxes and clip times of every hover scope (the hero, conveyors, stages,
+  morph, feed) while it runs, while the pointer is over it, while focus is inside it, offscreen and in a hidden tab (a flag is
+  never read, so a CSS override that keeps a conveyor moving fails), and `solutions-pixel-contrast.mjs` photographs each page
+  four times (as it is, text hidden, text black, text white) and scores the glyph interior of every text node against the real
+  backdrop (4.5:1, 3:1 for large text) at 390 and 1440, EN and ES, light and dark, then repeats it in the moving page (the
+  gradient lettering and the mesh at five phases, video frames included) and on every app of the athletes morph. A canary
+  overlay proves the measurement can fail. `solutions-checks.mjs` still owns overflow, overlap, contrast,
   target size, forms and prices; its overlap probe now reads a tight display line by its line box, and ignores `.sr` text.
 - Platform pages (`src/pages/{,es/}platform/{messaging,guardian-portal,teams,custom-branded-apps,integrations}/`): thin
   wrappers around `src/components/engage/*Page.astro`; all copy is in `src/i18n/pages/engage.ts` (EN and ES, ES typed against EN).
