@@ -1,0 +1,294 @@
+/* Messaging page (VB-3). The phone, bubbles and tilt bento come from styles/home/{phone,showcase}.css; this
+   only places them in the hero and styles the tab rail and the "four ways" tiles. */
+
+.eg-live {
+  position: relative;
+  display: grid;
+  gap: 18px;
+}
+.eg-live__frame {
+  position: relative;
+  min-height: 660px;
+  border-radius: var(--r-xl);
+}
+.eg-live__frame .dphone {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+.eg-live__frame .badge-demo {
+  position: absolute;
+  left: 16px;
+  top: 16px;
+  bottom: auto;
+  z-index: 7;
+}
+.eg-time {
+  display: block;
+  margin-top: 2px;
+  font: 500 10px/1 var(--f-mono);
+  opacity: 0.6;
+}
+.eg-send {
+  background: #08132b;
+  color: #fff;
+  border-color: #08132b;
+  font-weight: 700;
+}
+.eg-readers {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.eg-readers li {
+  display: grid;
+  grid-template-columns: 26px 1fr auto;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 10px;
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 2px 6px rgba(8, 19, 43, 0.06);
+  font-size: 12.5px;
+}
+.eg-readers small {
+  color: #5b6678;
+  font-size: 10.5px;
+}
+.eg-av {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: #00bef3;
+  color: #04101f;
+  font-weight: 700;
+  font-size: 11px;
+}
+.eg-prog {
+  margin-bottom: 8px;
+}
+
+/* tab rail under the phone */
+.eg-tabs {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 18px;
+}
+.eg-tab {
+  appearance: none;
+  display: block;
+  margin: 0;
+  padding: 10px 0 8px;
+  border: 0;
+  background: transparent;
+  color: #fff;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.eg-tab .hd {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.eg-tab strong {
+  font: 800 clamp(15px, 1.5vw, 20px) / 1.05 var(--f-display);
+  font-variation-settings: 'wdth' 80;
+  transition: color 300ms;
+}
+.eg-tab[aria-selected='false'] strong {
+  color: #98a5ba;
+}
+.eg-tab em {
+  font: 500 12px/1 var(--f-mono);
+  font-style: normal;
+  color: #8d99ae;
+}
+.eg-tab .at-bar {
+  display: block;
+}
+.eg-tab:focus-visible {
+  outline: 2px solid #00bef3;
+  outline-offset: 4px;
+  border-radius: 4px;
+}
+.eg-live .at-bar i {
+  animation: none;
+}
+.eg-live[data-ap='off'] .typing i {
+  animation-play-state: paused;
+}
+
+/* four ways: tilt tiles with flat mini demos */
+.eg-bento {
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  grid-auto-rows: auto;
+  margin-top: clamp(24px, 3vw, 40px);
+}
+.eg-bento .bt {
+  display: flex;
+  flex-direction: column;
+  min-height: 330px;
+}
+.eg-a,
+.eg-d {
+  grid-column: span 7;
+}
+.eg-b,
+.eg-c {
+  grid-column: span 5;
+}
+.eg-bento h3 {
+  font: 700 19px/1.2 var(--f-text);
+  color: var(--ink);
+}
+.eg-bento .bt p {
+  font-size: 14.5px;
+  max-width: 34ch;
+}
+.eg-bento .bt .shot {
+  position: relative;
+  left: auto;
+  right: auto;
+  bottom: auto;
+  margin: auto 0 -22px;
+  padding-top: 18px;
+}
+.eg-bento .org-rows {
+  display: grid;
+  gap: 6px;
+}
+.eg-bub {
+  max-width: 78%;
+  padding: 8px 11px;
+  border-radius: 16px;
+  font-size: 13px;
+  line-height: 1.35;
+}
+.eg-bub span {
+  display: block;
+  margin-top: 2px;
+  font: 500 10px/1 var(--f-mono);
+  opacity: 0.6;
+}
+.eg-bub.in {
+  justify-self: start;
+  background: #eef2f7;
+  border-bottom-left-radius: 5px;
+}
+.eg-bub.me {
+  justify-self: end;
+  background: #08132b;
+  color: #fff;
+  border-bottom-right-radius: 5px;
+}
+.eg-photo {
+  height: 96px;
+  border-radius: 12px;
+  background: #c9d6e6 var(--img) center / cover;
+}
+.eg-line {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.4;
+}
+.eg-bento .bt .eg-line {
+  margin: 0;
+  max-width: none;
+  color: #08132b;
+  font-size: 13px;
+}
+.eg-react {
+  display: flex;
+  gap: 8px;
+  margin: 0;
+  font-size: 12px;
+  color: #5b6678;
+}
+.eg-bento .bt .eg-react {
+  max-width: none;
+  margin: 0;
+  color: #5b6678;
+  font-size: 12px;
+}
+.eg-react span {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: #f3f6fa;
+}
+.eg-foot {
+  display: flex;
+  justify-content: flex-end;
+  margin: 0;
+}
+.eg-bento .bt .eg-foot {
+  max-width: none;
+  margin: 0;
+}
+.eg-pill {
+  padding: 8px 18px;
+  border-radius: 999px;
+  background: #08132b;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+}
+.eg-d .bc-prog {
+  margin: 0 0 6px;
+}
+
+.eg-fam {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px 32px;
+  margin-top: 28px;
+  padding: 24px clamp(20px, 3vw, 36px);
+  border-radius: var(--r-lg);
+  color: #e6ecf6;
+}
+.eg-fam .eg-link {
+  color: #7fdcff;
+}
+.eg-fam p {
+  margin: 0;
+  max-width: 52ch;
+  font-size: 17px;
+  line-height: 1.5;
+}
+@media (max-width: 1080px) {
+  .eg-live__frame {
+    min-height: 640px;
+  }
+}
+@media (max-width: 860px) {
+  .eg-a,
+  .eg-b,
+  .eg-c,
+  .eg-d {
+    grid-column: 1 / -1;
+  }
+  .eg-bento .bt {
+    min-height: 0;
+  }
+}
+@media (max-width: 640px) {
+  .eg-tabs {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px 18px;
+  }
+  .eg-bento {
+    gap: 14px;
+  }
+}

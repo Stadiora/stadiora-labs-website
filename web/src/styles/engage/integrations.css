@@ -1,0 +1,315 @@
+/* Integrations (VB-3). The orbit hub reuses the home `.int-orbit` rules from styles/home/showcase.css; this
+   places it in the hero and styles the source cards. */
+
+.eg-ih {
+  min-height: 640px;
+  border-radius: var(--r-xl);
+  background: #07101f;
+}
+.eg-ih__bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 40%;
+  opacity: 0.6;
+}
+.eg-ih .vid-shade {
+  background: linear-gradient(180deg, rgba(4, 10, 26, 0.5), rgba(4, 10, 26, 0.8));
+}
+.eg-ih__live {
+  position: absolute;
+  left: 18px;
+  top: 18px;
+  z-index: 7;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: rgba(8, 19, 43, 0.7);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.16);
+  color: #fff;
+  font: 600 13px/1 var(--f-text);
+}
+/* The home orbit sizes itself from the frame (width min(420px, 100%), satellites pinned 12px in and 6% down), so on a
+   phone nothing needs scaling. --ax and --ay are where the first satellite's centre sits from the orbit centre; the
+   second is the mirror image. The chips fly between them and the hub (scripts/engage/integrations.ts). */
+.eg-ih__orbit {
+  z-index: 3;
+  container-type: inline-size;
+  --ax: calc(12px + min(110px, 35cqw) - 50cqw);
+  --ay: calc(34px - 44cqw);
+}
+/* The CSS loops of the stage (the live dot's pulse and the orbit ring) stop with the chips: hover, focus, offscreen and a
+   hidden tab all set data-ap="off" on the stage (scripts/engage/integrations.ts); reduced motion removes them. */
+.eg-ih[data-ap='off'] .dot-live,
+.eg-ih[data-ap='off'] .ring-path {
+  animation-play-state: paused;
+}
+.eg-ih__orbit .sat {
+  z-index: 2;
+}
+.eg-ih__orbit .hub {
+  z-index: 3;
+}
+.eg-dchip {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: 4;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: -18px 0 0 -52px;
+  padding: 9px 14px;
+  border-radius: 999px;
+  background: #00bef3;
+  color: #04101f;
+  box-shadow: 0 14px 30px -10px rgba(0, 190, 243, 0.7);
+  font: 700 13px/1 var(--f-text);
+  opacity: 0;
+  white-space: nowrap;
+}
+.live__coming {
+  margin: 22px 0 0;
+  color: #b7c2d4;
+  font-size: 18px;
+  line-height: 26px;
+}
+
+/* source cards */
+.eg-int__grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 20px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.eg-src {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.eg-src__head {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.eg-src__tile {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  background: #00bef3;
+  color: #04101f;
+}
+.eg-src__name {
+  flex: 1;
+  min-width: 0;
+}
+.eg-src__name h3 {
+  margin: 0;
+  font: 700 19px/1.2 var(--f-text);
+  color: #fff;
+}
+.eg-src__name p {
+  margin: 2px 0 0;
+  font-size: 14px;
+  color: #b7c2d4;
+}
+.eg-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: rgba(52, 211, 153, 0.16);
+  color: #6ee7b7;
+  font: 700 13px/1 var(--f-text);
+}
+.eg-src__rows {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.eg-src__rows li {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 4px 12px;
+  padding: 12px 14px 16px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.06);
+  color: #fff;
+  font-size: 16px;
+  font-weight: 600;
+}
+.eg-src__rows li svg {
+  color: #33cfff;
+}
+.eg-src__rows li i {
+  position: absolute;
+  left: 14px;
+  bottom: 8px;
+  height: 3px;
+  width: var(--w, 70%);
+  max-width: calc(100% - 28px);
+  border-radius: 2px;
+  background: linear-gradient(90deg, #00bef3, #8b5cf6);
+  transform-origin: 0 50%;
+}
+.eg-src.in .eg-src__rows li {
+  animation: eg-rowin 600ms var(--e-out) both;
+  animation-delay: calc(var(--k, 0) * 120ms + 350ms);
+}
+.eg-src.in .eg-src__rows li i {
+  animation: eg-bar 1200ms var(--e-out) both;
+  animation-delay: calc(var(--k, 0) * 120ms + 700ms);
+}
+@keyframes eg-rowin {
+  from {
+    opacity: 0;
+    transform: translateX(-14px);
+  }
+}
+@keyframes eg-bar {
+  from {
+    transform: scaleX(0);
+  }
+}
+.eg-drop {
+  display: grid;
+  flex: 1;
+  align-content: center;
+  gap: 16px;
+  padding: 18px;
+  border: 2px dashed rgba(255, 255, 255, 0.28);
+  border-radius: 16px;
+  color: #d5deec;
+  font-size: 15px;
+}
+.eg-drop p {
+  margin: 0;
+}
+.eg-drop__files {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.eg-drop__files li {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 14px;
+  border-radius: 12px;
+  background: #fff;
+  color: #08132b;
+  font-size: 14px;
+  font-weight: 800;
+}
+.eg-src.in .eg-drop__files li {
+  animation: eg-drop 800ms var(--e-out) both;
+  animation-delay: calc(var(--k, 0) * 160ms + 450ms);
+}
+@keyframes eg-drop {
+  from {
+    opacity: 0;
+    transform: translateY(-26px) rotate(-6deg);
+  }
+}
+
+/* your data, your call */
+.eg-mine {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  align-items: center;
+  gap: clamp(24px, 4vw, 64px);
+  margin-top: clamp(40px, 5vw, 72px);
+}
+.eg-mine__list {
+  display: grid;
+  gap: 14px;
+  margin: 28px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.eg-mine__list li {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 18px;
+  border-radius: 18px;
+  background: var(--surface);
+  color: var(--ink);
+  font-size: 18px;
+  line-height: 1.35;
+}
+.eg-mine__list li span {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  background: #00bef3;
+  color: #04101f;
+}
+.eg-mine__photo {
+  border-radius: 24px;
+}
+.eg-mine__clip {
+  overflow: hidden;
+  border-radius: 24px;
+  clip-path: inset(0 0 100% 0);
+  transition: clip-path 1000ms var(--e-inout) 200ms;
+}
+.eg-mine__photo.in .eg-mine__clip {
+  clip-path: inset(0);
+}
+html:not(.js) .eg-mine__clip {
+  clip-path: none;
+}
+.eg-mine__photo img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+@media (max-width: 1080px) {
+  .eg-ih {
+    min-height: 560px;
+  }
+  .eg-int__grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .eg-mine {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+@media (max-width: 640px) {
+  .eg-ih {
+    min-height: 520px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .eg-mine__clip {
+    clip-path: none;
+    transition: none;
+  }
+  .eg-src.in .eg-src__rows li,
+  .eg-src.in .eg-src__rows li i,
+  .eg-src.in .eg-drop__files li {
+    animation: none;
+  }
+}

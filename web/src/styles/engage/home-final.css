@@ -1,0 +1,3 @@
+/* The home final reel, pulled in with a CSS @import on purpose, so the home bundle is left exactly as it was
+   (see home-showcase.css). */
+@import '../home/final.css';

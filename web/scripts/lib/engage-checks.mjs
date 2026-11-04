@@ -4,14 +4,16 @@
 //   node scripts/evidence.mjs --engage-only --checks-only
 import { clipProbe } from './clip-probe.mjs';
 import { contrastProbe } from './contrast.mjs';
+import { engageA11yChecks } from './engage-a11y-checks.mjs';
+import { engageHeadingContrast } from './engage-heading-contrast.mjs';
 import { engagePages } from './engage-verify.mjs';
 import { EDU, fmt } from './pricing-oracle.mjs';
 
 const widths = [390, 1024, 1280, 1440];
-// Messaging (four narrow columns) and Teams (a table and tab strip in a panel) lose their minimum width between
-// the four required widths, so the clipping check also sweeps these.
+// Every page carries a live demo (a phone, a panel, an orbit) that loses its minimum width between the four
+// required widths, so the clipping check also sweeps all five.
 const sweepWidths = [360, 414, 480, 600, 720, 900, 1100, 1180, 1181, 1240, 1280, 1320, 1360, 1400, 1440, 1600];
-const sweepPages = ['messaging', 'teams'];
+const sweepPages = ['messaging', 'guardian', 'teams', 'branded', 'integrations'];
 
 const names = {
   messaging: 'messaging',
@@ -62,8 +64,11 @@ const a11yProbe = () => {
 
 export async function engageChecks({ open, check, shot, sleep, settle, checksOnly, metrics }) {
   const group = 'engage';
+  // ENGAGE_ONLY=messaging,teams runs just those pages (used to mutation-prove one guard quickly); unset runs all.
+  const only = process.env.ENGAGE_ONLY?.split(',');
+  const on = (slug) => !only || only.includes(slug);
 
-  for (const p of engagePages) {
+  for (const p of engagePages.filter((x) => on(x.slug))) {
     const label = `${p.lang}/${names[p.slug]}`;
 
     // 1. No horizontal overflow at the four widths the brief names.
@@ -84,7 +89,7 @@ export async function engageChecks({ open, check, shot, sleep, settle, checksOnl
       await page.context().close();
     }
 
-    // 1b. The same clipping check at in-between widths for the two pages that wrap their demo content.
+    // 1b. The same clipping check at in-between widths for the pages that wrap their demo content.
     if (sweepPages.includes(names[p.slug])) {
       const failures = [];
       for (const width of sweepWidths) {
@@ -112,27 +117,53 @@ export async function engageChecks({ open, check, shot, sleep, settle, checksOnl
   for (const lang of ['en', 'es']) {
     const base = lang === 'en' ? '' : '/es';
 
-    // Messaging: the three chat bubbles arrive in order and all end visible.
-    {
-      const page = await open({ width: 1440, height: 900 }, `${base}/platform/messaging/`);
-      await page.locator('[data-chat]').scrollIntoViewIfNeeded();
-      await sleep(1700);
-      const state = await page.evaluate(() => {
-        const bubbles = [...document.querySelectorAll('[data-chat] .bubble')];
-        return { total: bubbles.length, shown: bubbles.filter((b) => b.classList.contains('is-in') && getComputedStyle(b).opacity === '1').length };
-      });
-      check(group, `${lang}/messaging: chat bubbles play in and all ${state.total} end visible`, state.total === 3 && state.shown === 3, `${state.shown}/${state.total}`);
-      if (!checksOnly) await shot(page, `engage-${lang}-messaging-chat-played`, { fullPage: false });
-      await page.context().close();
-
+    // Messaging: the live phone is one autotabs set of four scenes. Reduced motion shows the first scene finished;
+    // by hand a click and the arrow keys switch scenes, and the tab ARIA follows.
+    if (on('messaging')) {
       const reduced = await open({ width: 1440, height: 900, reduced: true }, `${base}/platform/messaging/`);
-      const all = await reduced.evaluate(() => [...document.querySelectorAll('[data-chat] .bubble')].every((b) => getComputedStyle(b).opacity === '1'));
-      check(group, `${lang}/messaging: with reduced motion every bubble is visible at once`, all);
+      await settle(reduced);
+      const fin = await reduced.evaluate(() => {
+        const msgs = [...document.querySelectorAll('#eg-p0 .dmsg')];
+        return { total: msgs.length, shown: msgs.filter((m) => getComputedStyle(m).opacity === '1').length, why: document.querySelector('.eg-live')?.getAttribute('data-ap-why') };
+      });
+      check(group, `${lang}/messaging: with reduced motion the first scene shows every message at once`, fin.total >= 3 && fin.shown === fin.total && fin.why === 'reduced', JSON.stringify(fin));
       await reduced.context().close();
+
+      const page = await open({ width: 1440, height: 900 }, `${base}/platform/messaging/`);
+      await settle(page);
+      const read = () =>
+        page.evaluate(() =>
+          [...document.querySelectorAll('.eg-live [role="tab"]')].map((t) => {
+            const panel = document.getElementById(t.getAttribute('aria-controls'));
+            return { sel: t.getAttribute('aria-selected'), tab: t.tabIndex, on: panel?.classList.contains('on'), role: panel?.getAttribute('role'), by: panel?.getAttribute('aria-labelledby') === t.id };
+          }),
+        );
+      let s = await read();
+      check(group, `${lang}/messaging: the live phone has four tabs, each controlling a labelled tabpanel`, s.length === 4 && s.every((x) => x.role === 'tabpanel' && x.by), JSON.stringify(s));
+      check(group, `${lang}/messaging: the first scene is selected and visible at load`, s[0]?.sel === 'true' && s[0].on && s.slice(1).every((x) => x.sel === 'false' && !x.on && x.tab === -1), JSON.stringify(s));
+      await page.locator('.eg-live [role="tab"]').nth(2).click();
+      await sleep(500);
+      s = await read();
+      check(group, `${lang}/messaging: a click on the third tab swaps the scene`, s[2].sel === 'true' && s[2].on && !s[0].on, JSON.stringify(s));
+      if (!checksOnly) {
+        await page.locator('.eg-live').scrollIntoViewIfNeeded();
+        await sleep(2200);
+        await shot(page, `engage-${lang}-messaging-broadcast`, { fullPage: false });
+      }
+      await page.locator('.eg-live [role="tab"]').nth(2).focus();
+      await page.keyboard.press('ArrowRight');
+      await sleep(400);
+      s = await read();
+      check(group, `${lang}/messaging: ArrowRight moves to the fourth scene`, s[3].sel === 'true' && s[3].on && !s[2].on, JSON.stringify(s));
+      await page.keyboard.press('Home');
+      await sleep(400);
+      s = await read();
+      check(group, `${lang}/messaging: Home returns to the first scene`, s[0].sel === 'true' && s[0].on, JSON.stringify(s));
+      await page.context().close();
     }
 
     // Guardian: child switcher Sofia/Mateo, by click and by arrow keys; inactive panel is inert.
-    {
+    if (on('guardian-portal')) {
       const page = await open({ width: 1440, height: 900 }, `${base}/platform/guardian-portal/`);
       await settle(page);
       const tabs = page.locator('[role="tab"]');
@@ -165,7 +196,7 @@ export async function engageChecks({ open, check, shot, sleep, settle, checksOnl
 
     // Teams and Pricing read the same price table and region code (src/data/prices.ts, src/lib/region.ts), so for the
     // same visitor they must show the same schools price. Expected values come from the hand-typed oracle, not the table.
-    {
+    if (on('teams')) {
       const read = async (path, { timezoneId, init } = {}) => {
         const page = await open({ width: 1440, height: 900, timezoneId, init }, path);
         const teams = path.includes('/platform/teams/');
@@ -214,7 +245,7 @@ export async function engageChecks({ open, check, shot, sleep, settle, checksOnl
     }
 
     // Teams: the reports anchor exists, so the shared reports route lands on the right tile.
-    {
+    if (on('teams')) {
       const page = await open({ width: 1440, height: 900 }, `${base}/platform/teams/#reports`);
       await settle(page);
       const exists = await page.evaluate(() => Boolean(document.getElementById('reports')));
@@ -223,7 +254,7 @@ export async function engageChecks({ open, check, shot, sleep, settle, checksOnl
     }
 
     // Integrations: Coming line has no links and no logos.
-    {
+    if (on('integrations')) {
       const page = await open({ width: 1440, height: 900 }, `${base}/platform/integrations/`);
       const coming = await page.evaluate(() => {
         const p = [...document.querySelectorAll('p')].find((x) => /garmin/i.test(x.textContent));
@@ -234,11 +265,42 @@ export async function engageChecks({ open, check, shot, sleep, settle, checksOnl
     }
 
     // Branded: the fan shows the four apps.
-    {
+    if (on('custom-branded-apps')) {
       const page = await open({ width: 1440, height: 900 }, `${base}/platform/custom-branded-apps/`);
       const apps = await page.evaluate(() => [...document.querySelectorAll('.fan__item')].map((li) => li.querySelector('.bp__name')?.textContent?.trim()));
       check(group, `${lang}/branded: four named example apps in the fan`, apps.length === 4 && apps.every(Boolean), apps.join(' | '));
       await page.context().close();
     }
   }
+
+  // The home bundle stays as the home lane built it. An engage component that imports a styles/home/*.css sheet makes
+  // the bundler split it out of Home.css into a stylesheet both pages link: one more render-blocking request on the
+  // home and a layout shift in the mobile CLS guard (0.12). Engage pages pull those sheets in through
+  // styles/engage/home-*.css (CSS @import), so no stylesheet other than the global Base is shared with the home.
+  for (const lang of ['en', 'es']) {
+    const base = lang === 'en' ? '' : '/es';
+    const page = await open({ width: 1440, height: 900, reduced: true }, `${base}/`);
+    const shared = await page.evaluate(
+      async ({ home, others }) => {
+        const sheets = async (path) => {
+          const doc = new DOMParser().parseFromString(await (await fetch(path)).text(), 'text/html');
+          return [...doc.querySelectorAll('link[rel="stylesheet"]')].map((l) => l.getAttribute('href').split('/').pop());
+        };
+        const homeSheets = await sheets(home);
+        const out = [];
+        for (const path of others) {
+          for (const s of await sheets(path)) if (homeSheets.includes(s) && !s.startsWith('Base.')) out.push(`${s} (${path})`);
+        }
+        return { homeSheets, out };
+      },
+      { home: `${base}/`, others: engagePages.filter((x) => x.lang === lang).map((x) => x.path) },
+    );
+    check(group, `${lang}: no stylesheet is shared between the home and the engage pages except the global Base`, shared.out.length === 0, shared.out.length ? `shared: ${shared.out.join(', ')}` : `home links ${shared.homeSheets.join(', ')}`);
+    await page.context().close();
+  }
+
+  // Review round 1 (PR #34): what the accessibility tree exposes, 44 px targets, and the contrast of the gradient headings on the
+  // composited pixels (scripts/lib/engage-a11y-checks.mjs, engage-heading-contrast.mjs).
+  await engageA11yChecks({ open, check, sleep, settle });
+  await engageHeadingContrast({ open, check, settle, metrics });
 }
