@@ -1,0 +1,38 @@
+---
+import type { Locale } from '../../i18n';
+import { addOns, bandFor, defaultBand, usd } from '../../data/prices';
+import { fill } from '../../lib/template';
+import type { PricingCopy } from '../../i18n/pages/pricing';
+import { pricingLinks } from './links';
+
+interface Props {
+  locale: Locale;
+  copy: PricingCopy;
+}
+const { locale, copy } = Astro.props;
+const e = copy.estimate;
+const links = pricingLinks(locale);
+
+// The no-JS default: Core at 100 athletes, US, monthly, no add-ons. The panel is hidden without JavaScript.
+const band = bandFor('us', defaultBand);
+const row = fill(e.planRow, { plan: copy.plans.core.name, athletes: band.athletes.toLocaleString('en-US') });
+const monthly = usd(band.core.monthly);
+---
+
+<aside class="est impact" aria-labelledby="est-title" data-est>
+  <h3 class="est__title" id="est-title">{e.title}</h3>
+  <div class="est__lines" data-lines>
+    <div class="el" data-k="plan"><div><div class="r"><span>{row}</span><span>{monthly}{copy.price.unit}</span></div></div></div>
+  </div>
+  <div class="est__total">
+    <small data-total-lbl>{e.perMonth}</small>
+    <span class="amt num" data-total>{monthly}</span>
+  </div>
+  <div class="est__setup" data-setup hidden>
+    <span>{e.setup}</span>
+    <b class="num" data-setup-amt>{usd(addOns.brandedApp.setup)}</b>
+  </div>
+  <a class="btn btn--white" href={links.core} data-est-cta>{copy.plans.core.cta}</a>
+  <p class="est__fine">{e.fine}</p>
+  <p class="sr-only" role="status" aria-live="polite" data-est-live></p>
+</aside>

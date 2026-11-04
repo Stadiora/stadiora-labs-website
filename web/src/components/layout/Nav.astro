@@ -253,7 +253,8 @@ const appStores: Record<string, { label: string; href: string }[]> = {
       height 0.45s var(--e-out);
   }
   /* The glass lives on a pseudo-element so backdrop-filter does not become the containing block of the
-     fixed mobile drawer. Over the home hero it is invisible until the page scrolls. */
+     fixed mobile drawer. Over the home hero it is invisible until the page scrolls. The shadow stays light:
+     text resting just below the bar sits in it, and a heavier one pulls small copy under 4.5:1. */
   .nav__bar::before {
     content: '';
     position: absolute;
@@ -265,7 +266,7 @@ const appStores: Record<string, { label: string; href: string }[]> = {
     backdrop-filter: blur(18px) saturate(1.6);
     box-shadow:
       0 0 0 1px rgb(255 255 255 / 0.08),
-      0 20px 50px -18px rgb(0 0 0 / 0.6);
+      0 10px 30px -16px rgb(0 0 0 / 0.35);
     transition:
       opacity 0.45s,
       border-radius 0.45s var(--e-out);
