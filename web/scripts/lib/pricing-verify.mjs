@@ -7,7 +7,7 @@ import { join } from 'node:path';
 import * as prices from '../../src/data/prices.ts';
 import { fill } from '../../src/lib/template.ts';
 import { en, es } from '../../src/i18n/pages/pricing.ts';
-import { BRANDED, EXTRA_COACH, FREE, ANNUAL_PERCENT, DEFAULT_BAND, brandedFromText, copyProblems, fmt, tableProblems } from './pricing-oracle.mjs';
+import { BRANDED, EXTRA_COACH, FREE, ANNUAL_PERCENT, DEFAULT_BAND, brandedFromText, copyProblems, estimateOracle, fmt, tableProblems } from './pricing-oracle.mjs';
 
 const { addOns, bands, education } = prices;
 const copyFor = { en, es };
@@ -112,7 +112,8 @@ export function verifyPricing(dist, report) {
     if (count(html, /<h1[\s>]/g) !== 1) fail(`${page.file}: expected exactly one h1`);
     if (count(html, /<main[\s>]/g) !== 1) fail(`${page.file}: expected exactly one main`);
     if (count(html, /<li class="pcard /g) !== 5) fail(`${page.file}: expected five plan cards`);
-    if (count(html, /<details\b/g) !== 7) fail(`${page.file}: expected seven FAQ items`);
+    if (count(html, /<div class="faq__item"/g) !== 7) fail(`${page.file}: expected seven FAQ items`);
+    if (/<details\b|<dialog\b/.test(html)) fail(`${page.file}: a <details> or <dialog> is on the page; the FAQ and "More info" are button-driven reveals`);
 
     // Prices: the server HTML is the no-JS state (US, monthly, 100 athletes) and carries no other region's number.
     tag(/data-amount="core"[^>]*>\$199</, 'Core $199 in the no-JS state');
@@ -127,12 +128,12 @@ export function verifyPricing(dist, report) {
     // it, and compare with the oracle: a wrong monthly fee fails even if the setup fee is right.
     const copy = copyFor[page.lang];
     const brandedStrip = inner(html, 'data-addon="branded-app"', '</li>');
-    const brandedDialog = inner(html, 'id="addon-branded-app"', '</dialog>');
+    const brandedPanel = inner(html, 'id="addon-branded-app"', '</li>');
     const extraStrip = inner(html, 'data-addon="extra-coach"', '</li>');
-    const extraDialog = inner(html, 'id="addon-extra-coach"', '</dialog>');
+    const extraPanel = inner(html, 'id="addon-extra-coach"', '</li>');
     for (const [where, fragment, line] of [
       ['add-ons strip', brandedStrip, inner(brandedStrip ?? '', 'class="addon__price num"', '</p>')],
-      ['branded-app dialog', brandedDialog, inner(brandedDialog ?? '', 'class="modal__fact num"', '</p>')],
+      ['branded-app panel', brandedPanel, inner(brandedPanel ?? '', 'class="addon__fact num"', '</p>')],
     ]) {
       if (fragment === null || line === null) {
         fail(`${page.file}: cannot find the custom-branded app fee in the ${where}`);
@@ -145,7 +146,7 @@ export function verifyPricing(dist, report) {
       if (read.monthly !== fmt(BRANDED.monthly)) fail(`${page.file}: the amount shown per month for the branded app in the ${where} is ${read.monthly}, want ${fmt(BRANDED.monthly)} ("${textOf(line)}")`);
       if (read.setup !== fmt(BRANDED.setup)) fail(`${page.file}: the amount shown as setup for the branded app in the ${where} is ${read.setup}, want ${fmt(BRANDED.setup)} ("${textOf(line)}")`);
     }
-    for (const [where, fragment] of [['add-ons strip', extraStrip], ['extra-coach dialog', extraDialog]]) {
+    for (const [where, fragment] of [['add-ons strip', extraStrip], ['extra-coach panel', extraPanel]]) {
       const got = fragment === null ? null : /data-extra-coach[^>]*>([^<]*)</.exec(fragment)?.[1];
       if (got !== fmt(EXTRA_COACH.us)) fail(`${page.file}: extra coach in the ${where} is ${got}, want ${fmt(EXTRA_COACH.us)} (US server render)`);
     }
@@ -158,12 +159,29 @@ export function verifyPricing(dist, report) {
     // The script's templates sit in an attribute (data-strings) and are meant to hold tokens; visible text must not.
     if (/\{(?:percent|athletes|coaches|monthly|setup|amount|total|plan)\}/.test(textOf(text))) fail(`${page.file}: an unfilled {token} is in the HTML`);
 
-    // Every "more info" button points at a dialog that exists and has a name.
-    for (const m of html.matchAll(/data-open-modal="([^"]+)"/g)) {
-      if (!new RegExp(`<dialog[^>]*\\bid="${m[1]}"`).test(html)) fail(`${page.file}: data-open-modal="${m[1]}" has no dialog`);
+    // Every "More info" button and FAQ question is a disclosure: it starts collapsed and points at a reveal panel that
+    // exists. Seven FAQ questions, three add-ons and the education rates make eleven.
+    const disclosures = html.match(/<button\b[^>]*\bdata-reveal-btn\b[^>]*>/g) ?? [];
+    if (disclosures.length !== 11) fail(`${page.file}: expected 11 disclosure buttons (7 FAQ, 3 add-ons, 1 education rates), found ${disclosures.length}`);
+    for (const button of disclosures) {
+      const target = /aria-controls="([^"]+)"/.exec(button)?.[1] ?? '';
+      const panel = target ? new RegExp(`<div\\b[^>]*\\bid="${target}"[^>]*>`).exec(html)?.[0] : undefined;
+      if (!panel || !/\bclass="reveal[\s"]/.test(panel)) fail(`${page.file}: a disclosure button points at "${target}", which is not a reveal panel`);
+      if (!/aria-expanded="false"/.test(button)) fail(`${page.file}: a disclosure button does not start collapsed`);
     }
-    for (const m of html.matchAll(/<dialog\b[^>]*>/g)) {
-      if (!/aria-labelledby="[^"]+"/.test(m[0])) fail(`${page.file}: dialog without aria-labelledby`);
+
+    // The add-on switches are real switches with a name, all off until the visitor turns one on, and the estimate
+    // starts at Core for the default roster with nothing added.
+    const switches = html.match(/<button\b[^>]*\brole="switch"[^>]*>/g) ?? [];
+    if (switches.length !== 3 || switches.some((s) => !/aria-checked="false"/.test(s) || !/aria-label="[^"]+"/.test(s))) {
+      fail(`${page.file}: expected three named add-on switches, all off`);
+    }
+    const startTotal = /data-total(?![-\w])[^>]*>([^<]*)</.exec(html)?.[1];
+    const wantTotal = fmt(estimateOracle({}).monthly);
+    if (startTotal !== wantTotal) fail(`${page.file}: the estimate starts at ${startTotal}, want ${wantTotal}`);
+    const rangeTag = /<input\b[^>]*\btype="range"[^>]*>/.exec(html)?.[0] ?? '';
+    if (!/\bmin="0"/.test(rangeTag) || !/\bmax="5"/.test(rangeTag) || !/aria-valuetext="[^"]+"/.test(rangeTag)) {
+      fail(`${page.file}: the roster slider is missing, does not have six stops or has no spoken value`);
     }
     if (!/aria-current="page"[^>]*href="[^"]*pricing\/"|href="[^"]*pricing\/"[^>]*aria-current="page"/.test(html)) {
       fail(`${page.file}: the Pricing nav link is not marked aria-current`);
@@ -196,5 +214,5 @@ export function verifyPricing(dist, report) {
     }
   }
 
-  if (problems === 0) console.log('verify-pricing: ok (/pricing/ and /es/pricing/: SEO, hreflang, no other-region prices in the HTML, dialogs named)');
+  if (problems === 0) console.log('verify-pricing: ok (/pricing/ and /es/pricing/: SEO, hreflang, no other-region prices in the HTML, reveals wired, switches named)');
 }
