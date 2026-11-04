@@ -85,9 +85,13 @@ export async function logoMarqueeChecks({ open, settle, check, sleep, pauses = t
           check(group, `${tag}: no horizontal scroll`, p.overflowX <= 0, `${p.overflowX}px`);
 
           const x0 = await left(page, t.sel);
-          await sleep(1200);
-          const x1 = await left(page, t.sel);
-          check(group, `${tag}: the strip moves on its own`, Math.abs(x1 - x0) >= 4, `${(x1 - x0).toFixed(1)}px in 1.2 s`);
+          // A strip that is paused never moves; a busy machine only delays the first frame, so allow up to 6 s.
+          let moved = 0;
+          for (let waited = 0; waited < 6000 && Math.abs(moved) < 4; waited += 400) {
+            await sleep(400);
+            moved = (await left(page, t.sel)) - x0;
+          }
+          check(group, `${tag}: the strip moves on its own`, Math.abs(moved) >= 4, `${moved.toFixed(1)}px within 6 s`);
           if (width === 1440 && scheme === 'light') {
             const bx = await page.evaluate((s) => {
               const r = document.querySelector(s).getBoundingClientRect();
