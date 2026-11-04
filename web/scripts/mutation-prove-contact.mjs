@@ -31,6 +31,7 @@ const distFor = (name) => resolve(web, `dist-mut-${name}`);
 const gates = {
   contact: { label: 'evidence --contact-only', cmd: ['node', ['scripts/evidence.mjs', '--contact-only', '--checks-only']], fails: (out) => out.split('\n').filter((l) => l.startsWith('FAIL')), source: 'scripts/lib/contact-checks.mjs' },
   lead: { label: 'cutover-checks', cmd: ['node', ['scripts/cutover-checks.mjs']], fails: (out) => out.split('\n').filter((l) => l.startsWith('FAIL')), source: 'scripts/cutover-checks.mjs' },
+  logos: { label: 'evidence --logos-only', cmd: ['node', ['scripts/evidence.mjs', '--logos-only', '--checks-only']], fails: (out) => out.split('\n').filter((l) => l.startsWith('FAIL')), source: 'scripts/lib/logo-marquee-checks.mjs' },
   verify: { label: 'verify', cmd: ['node', ['scripts/verify-dist.mjs']], fails: (out) => out.split('\n').filter((l) => /^ {2}- /.test(l)), source: null },
 };
 // verify-dist keeps its assertions in two files; the line is looked up in both.
@@ -77,6 +78,10 @@ const mutations = [
   { id: 'M29', rule: 'US phone link in the footer and contact page', file: 'src/data/site.ts', find: "tel: '+18592859529'", put: "tel: '+18592859520'", gate: 'verify', expect: 'is missing the contact link tel:+18592859529', at: 'the footer is missing the contact link' },
   { id: 'M30', rule: 'LatAm WhatsApp link in the footer and contact page', file: 'src/data/site.ts', find: "whatsapp: 'https://wa.me/50660419069' }", put: "whatsapp: 'https://wa.me/50660419060' }", gate: 'verify', expect: 'is missing the contact link https://wa.me/50660419069', at: 'the footer is missing the contact link' },
   { id: 'M31', rule: 'US email on connect.html', file: 'public/connect.html', find: 'href="mailto:ian@stadioralabs.com"', put: 'href="mailto:ian@stadioralabs.co"', gate: 'verify', expect: '/connect.html is missing the contact link mailto:ian@stadioralabs.com', at: '/connect.html is missing the contact link' },
+  // ---- the About partners strip is the shared, moving logo marquee
+  { id: 'M32', rule: 'About marquee loops seamlessly (second set present)', file: 'src/components/ui/LogoMarquee.astro', find: '[false, true].map((copy) => (', put: '(host ? [false] : [false, true]).map((copy) => (', gate: 'logos', expect: 'about partners @1440 light: two sets, the second aria-hidden', at: 'two sets, the second aria-hidden, inert and without alt text' },
+  { id: 'M33', rule: 'About marquee pauses offscreen', file: 'src/styles/logo-marquee.css', find: ".logo-marquee[data-ap='off'] .marquee-track {", put: ".logo-marquee[data-ap='off-never'] .marquee-track {", gate: 'logos', expect: 'scrolling the unit out of view stops everything in it', src: 'scripts/lib/solutions-motion-checks.mjs', at: 'stops everything in it (loops' },
+  { id: 'M34', rule: 'About marquee uses the theme-correct logo variant', file: 'src/components/ui/LogoMarquee.astro', find: 'class="only-light" src={`/logos/${l.slug}-mono-dark.${l.ext}`}', put: 'class="only-light" src={`/logos/${l.slug}-mono-light.${l.ext}`}', gate: 'logos', expect: 'about partners @1440 light: every visible mark is the dark variant', at: 'every visible mark is the' },
 ];
 
 const only = process.argv.slice(2);
@@ -141,7 +146,7 @@ for (const m of todo) {
     row.changed = true;
     row.caught = g.status !== 0 && Boolean(hit);
     row.assertion = (hit ?? fails[0] ?? '(the gate passed)').replace(/^FAIL\s+|^ {2}- /, '').replace(/\s+/g, ' ').slice(0, 150);
-    row.line = hit ? lineOf(gates[m.gate].source ? [gates[m.gate].source] : verifySources, m.at ?? m.expect) : '-';
+    row.line = hit ? lineOf(m.src ? [m.src] : gates[m.gate].source ? [gates[m.gate].source] : verifySources, m.at ?? m.expect) : '-';
   } catch (e) {
     row.changed = false;
     row.caught = false;
@@ -161,7 +166,7 @@ if (git('status', '--porcelain')) throw new Error('the tree is dirty after the b
 rmSync(work, { recursive: true, force: true });
 rmSync(baselineDist, { recursive: true, force: true });
 
-const esc = (s) => s.replace(/\|/g, '\\|');
+const esc = (s) => s.replace(/\\/g, '\\\\').replace(/\|/g, '\\|');
 const table = [
   `Mutation battery on head \`${sha}\` (clean tree, every payload verified to change its file and restored afterwards).`,
   '',

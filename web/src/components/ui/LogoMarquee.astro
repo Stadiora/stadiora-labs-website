@@ -1,0 +1,37 @@
+---
+import '../../styles/logo-marquee.css';
+import { clientLogos } from '../../data/logos';
+
+interface Props {
+  label: string;
+  /** `dark`: the surface is always dark (home hero band), light marks only. `theme`: follows the page theme. */
+  surface?: 'dark' | 'theme';
+  /** Own pause host (hover, focus, offscreen, hidden tab) for a marquee that is not inside another autoplayer. */
+  host?: boolean;
+  class?: string;
+}
+const { label, surface = 'dark', host = false, class: className } = Astro.props;
+
+const size = (l: (typeof clientLogos)[number]) => Math.round((l.h * l.width) / l.height);
+---
+
+<div class:list={['marquee', 'logo-marquee', className]} role="group" aria-label={label} tabindex="0" data-logo-marquee={host ? '' : undefined}>
+  <div class="marquee-track">
+    {
+      [false, true].map((copy) => (
+        <div class="logo-marquee-set" aria-hidden={copy ? 'true' : undefined} inert={copy}>
+          {clientLogos.map((l) =>
+            surface === 'theme' ? (
+              <>
+                <img class="only-light" src={`/logos/${l.slug}-mono-dark.${l.ext}`} alt={copy ? '' : l.name} width={size(l)} height={l.h} style={`--lh:${l.h}px`} decoding="async" />
+                <img class="only-dark" src={`/logos/${l.slug}-mono-light.${l.ext}`} alt={copy ? '' : l.name} width={size(l)} height={l.h} style={`--lh:${l.h}px`} decoding="async" />
+              </>
+            ) : (
+              <img src={`/logos/${l.slug}-mono-light.${l.ext}`} alt={copy ? '' : l.name} width={size(l)} height={l.h} style={`--lh:${l.h}px`} decoding="async" />
+            ),
+          )}
+        </div>
+      ))
+    }
+  </div>
+</div>

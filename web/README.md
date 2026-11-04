@@ -47,6 +47,10 @@ node scripts/evidence.mjs --engage-motion-only --checks-only # just the Platform
   in `src/data/site.ts` (`contacts`).
 - `node scripts/mutation-prove-contact.mjs` (clean tree only) breaks each contact rule in the source, rebuilds, and proves the gate that
   protects it fails on the intended assertion; it prints the table with the head SHA.
+- The customers and partners marks move in one shared marquee, `src/components/ui/LogoMarquee.astro` (`src/styles/logo-marquee.css`): the
+  home hero band (always on the dark stage) and the About partners strip (`surface="theme"`, own pause host through
+  `src/scripts/logo-marquee.ts`). `node scripts/evidence.mjs --logos-only` guards both (two seamless sets, theme variants, no clipped
+  mark, movement, reduced motion) and the About pause scopes; the mutation battery covers it as M32 to M34.
 - Solutions, Resources, About and Contact in Floodlight (DESIGN-4 section 6): every page runs on `src/layouts/SolutionsPage.astro`
   (the foundation, the motion kit and `src/styles/solutions/solutions.css`; everything in the lane is prefixed `sx-`). The hero is
   `src/components/solutions/SxHero.astro` (impact, mesh, orbits, display H1; the Schools and Coaches swap line is one sentence for a

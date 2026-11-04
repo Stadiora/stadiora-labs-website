@@ -2,7 +2,7 @@
 import '../../styles/home/hero.css';
 import type { Locale } from '../../i18n';
 import { site } from '../../data/site';
-import { clientLogos } from '../../data/logos';
+import LogoMarquee from '../ui/LogoMarquee.astro';
 import { contactHref } from '../../lib/links';
 import { homeHero } from '../../i18n/pages/home-hero';
 
@@ -193,24 +193,7 @@ const first = split(t.words[0]);
   <div class="hero-band">
     <div class="wrap hero-band-in">
       <div class="hero-cp"><span class="hero-cp-n grad-text">{t.customers.count}</span><small>{t.customers.label}</small></div>
-      <div class="marquee hero-logos" role="group" aria-label={t.customers.listLabel} tabindex="0">
-        <div class="marquee-track">
-          <div class="hero-logos-set">
-            {
-              clientLogos.map((l) => (
-                <img src={`/logos/${l.slug}-mono-light.${l.ext}`} alt={l.name} width={Math.round((l.h * l.width) / l.height)} height={l.h} style={`--lh:${l.h}px`} decoding="async" />
-              ))
-            }
-          </div>
-          <div class="hero-logos-set" aria-hidden="true" inert>
-            {
-              clientLogos.map((l) => (
-                <img src={`/logos/${l.slug}-mono-light.${l.ext}`} alt="" width={Math.round((l.h * l.width) / l.height)} height={l.h} style={`--lh:${l.h}px`} decoding="async" />
-              ))
-            }
-          </div>
-        </div>
-      </div>
+      <LogoMarquee class="hero-logos" label={t.customers.listLabel} />
     </div>
   </div>
 </section>

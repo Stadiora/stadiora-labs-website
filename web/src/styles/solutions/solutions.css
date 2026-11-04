@@ -918,7 +918,8 @@ html:not(.js) .sx-page .rv-mask {
 .sx-partners {
   padding-block: 0 clamp(64px, 8vw, 112px);
 }
-.sx-partners__inner {
+/* two classes: .wrap (floodlight.css) sets padding: 0 gutter and would otherwise cancel the top padding, leaving the marks on the divider */
+.sx-partners .sx-partners__inner {
   display: flex;
   align-items: center;
   gap: 40px;
@@ -938,18 +939,10 @@ html:not(.js) .sx-page .rv-mask {
   margin-top: 6px;
   font-size: clamp(56px, 6vw, 88px);
 }
+/* the marks move in the shared LogoMarquee; this only sizes its slot next to the count */
 .sx-partners__list {
-  display: flex;
   flex: 1;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 24px 40px;
-}
-.sx-partners__list img {
-  display: block;
-  width: auto;
-  height: var(--lh);
-  max-width: none;
+  min-width: 0;
 }
 
 /* ---------- contact: orbit-dot burst on the submit button (decoration only; the words come from the status line) ---------- */
@@ -1057,7 +1050,7 @@ html:not(.js) .sx-page .rv-mask {
   .sx-team__grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
-  .sx-partners__inner {
+  .sx-partners .sx-partners__inner {
     flex-direction: column;
     align-items: flex-start;
     gap: 24px;
@@ -1065,6 +1058,10 @@ html:not(.js) .sx-page .rv-mask {
   .sx-partners__count {
     padding-right: 0;
     border-right: 0;
+  }
+  .sx-partners__list {
+    align-self: stretch;
+    flex: none;
   }
 }
 @media (max-width: 1280px) and (min-width: 1101px) {
@@ -1082,9 +1079,6 @@ html:not(.js) .sx-page .rv-mask {
   .sx-apps__grid,
   .sx-team__grid {
     grid-template-columns: minmax(0, 1fr);
-  }
-  .sx-partners__list img {
-    height: calc(var(--lh) * 0.75);
   }
   .sx-every li {
     min-height: 0;
