@@ -9,16 +9,10 @@
 import { existsSync, readFileSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 
-const pr31 = 'PR #31 (platform coach pages)';
-const unowned = 'no open PR (linked by the foundation nav and footer, status "planned" in data/site.ts)';
 
-export const pendingRoutes = new Map([
-  ['/platform/programs/', pr31],
-  ['/platform/nutrition/', pr31],
-  ['/platform/readiness/', pr31],
-  ['/platform/power-lab/', pr31],
-  ['/help/', unowned],
-]);
+// Routes owned by an open PR and allowed to be missing for now. Empty: every linked route is built (the coach pages landed in #31/#33,
+// and the unowned /help/ link was removed from the nav and footer).
+export const pendingRoutes = new Map([]);
 
 const contactTopics = new Set(['demo', 'question']);
 const unescape = (s) => s.replace(/&#39;|&#x27;/g, "'").replace(/&quot;/g, '"').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&');

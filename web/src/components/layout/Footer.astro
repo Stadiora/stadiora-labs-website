@@ -32,7 +32,7 @@ const columns: { title: string; links: { label: string; href: string }[] }[] = [
   },
   {
     title: f.columns.resources,
-    links: (['caseStudies', 'help', 'api'] as ItemId[]).map((id) => ({
+    links: (['caseStudies', 'api'] as ItemId[]).map((id) => ({
       label: f.links[id as 'api'],
       href: hrefFor(id, locale),
     })),
