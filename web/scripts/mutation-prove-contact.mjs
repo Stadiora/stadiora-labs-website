@@ -7,6 +7,7 @@
 // The table goes to stdout (Markdown) and to MUTATION_TABLE_OUT when set. Exit code 1 when any payload survives.
 import { execFileSync, spawnSync } from 'node:child_process';
 import { copyFileSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -20,9 +21,11 @@ if (git('status', '--porcelain')) {
   process.exit(2);
 }
 
-const work = resolve(process.env.MUTATION_WORK ?? `${web}../../tmp-mutation`);
+
+const work = resolve(process.env.MUTATION_WORK ?? `${tmpdir()}/contact-mutation-${process.pid}`);
 mkdirSync(work, { recursive: true });
 const keep = resolve(work, 'originals');
+const distFor = (name) => resolve(web, `dist-mut-${name}`);
 
 // gate -> how to run it and how to read a failure from it.
 const gates = {
@@ -102,12 +105,13 @@ const rows = [];
 let survived = 0;
 
 // A clean build must pass every gate, or a "failure" below proves nothing.
-const baselineDist = resolve(work, 'baseline');
+const baselineDist = distFor('baseline');
 console.error(`baseline build at ${sha.slice(0, 9)}`);
 build(baselineDist);
 for (const name of [...new Set(todo.map((m) => m.gate))]) {
   const g = runGate(name, baselineDist);
   if (g.status !== 0) {
+    rmSync(baselineDist, { recursive: true, force: true });
     console.error(`the unmutated head fails ${gates[name].label}; nothing is proven.\n${gates[name].fails(g.out).join('\n')}`);
     process.exit(2);
   }
@@ -129,7 +133,7 @@ for (const m of todo) {
     writeFileSync(path, after);
     if (readFileSync(path, 'utf8') === before) throw new Error('the file on disk is unchanged after the payload');
 
-    const dist = resolve(work, m.id);
+    const dist = distFor(m.id);
     build(dist);
     const g = runGate(m.gate, dist);
     const fails = gates[m.gate].fails(g.out);
@@ -138,13 +142,13 @@ for (const m of todo) {
     row.caught = g.status !== 0 && Boolean(hit);
     row.assertion = (hit ?? fails[0] ?? '(the gate passed)').replace(/^FAIL\s+|^ {2}- /, '').replace(/\s+/g, ' ').slice(0, 150);
     row.line = hit ? lineOf(gates[m.gate].source ? [gates[m.gate].source] : verifySources, m.expect) : '-';
-    rmSync(dist, { recursive: true, force: true });
   } catch (e) {
     row.changed = false;
     row.caught = false;
     row.assertion = `ERROR: ${e.message.split('\n')[0]}`;
     row.line = '-';
   } finally {
+    rmSync(distFor(m.id), { recursive: true, force: true });
     copyFileSync(backup, path);
   }
   if (readFileSync(path, 'utf8') !== before) throw new Error(`could not restore ${m.file}`);
@@ -155,6 +159,7 @@ for (const m of todo) {
 
 if (git('status', '--porcelain')) throw new Error('the tree is dirty after the battery; a file was not restored');
 rmSync(work, { recursive: true, force: true });
+rmSync(baselineDist, { recursive: true, force: true });
 
 const esc = (s) => s.replace(/\|/g, '\\|');
 const table = [
