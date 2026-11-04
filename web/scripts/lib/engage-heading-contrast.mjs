@@ -7,8 +7,9 @@
 // A pixel counts when its coverage is full and so are its four neighbours' (anti-aliased edges are left out). Its contrast
 // is the ratio of the real pixel to the hidden-span pixel at the same place. The lowest ratio over the glyph interiors must
 // meet WCAG AA: 3:1 for large text (24px, or 18.66px bold), 4.5:1 otherwise.
-// With motion on, the mesh blobs, the gradient's own shift and the closing band's clip are frozen at seeded points of their
-// loops first (`freezeAt`), so the worst moments of the loops are measured as well, not only the first frame.
+// Only the named decorative orbit dots (.orbits .fdot in the hero and closing band) are hidden during the four captures.
+// With motion on, the mesh blobs, the gradient's own shift and the closing band's clip are frozen at five seeded points
+// of their loops first (`freezeAt`). These are sampled frames, not an exhaustive minimum over time.
 
 const group = 'engage-heading-contrast';
 
@@ -38,7 +39,6 @@ const analyse = async ({ real, hidden, white, black, large }) => {
   let min = Infinity;
   let at = null;
   let n = 0;
-  const ratios = [];
   for (let y = 1; y < h - 1; y++) {
     for (let x = 1; x < w - 1; x++) {
       const i = y * w + x;
@@ -48,15 +48,13 @@ const analyse = async ({ real, hidden, white, black, large }) => {
       const b = lum(H.data[o], H.data[o + 1], H.data[o + 2]);
       const r = (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05);
       n++;
-      ratios.push(r);
       if (r < min) {
         min = r;
         at = { x, y, text: [R.data[o], R.data[o + 1], R.data[o + 2]], backdrop: [H.data[o], H.data[o + 1], H.data[o + 2]] };
       }
     }
   }
-  ratios.sort((p, q) => p - q);
-  return { pixels: n, min: n ? min : null, p1: n ? ratios[Math.floor(n * 0.01)] : null, at, need: large ? 3 : 4.5 };
+  return { pixels: n, min: n ? min : null, at, need: large ? 3 : 4.5 };
 };
 
 /** Pause every infinite CSS loop and every clip at a point derived from `seed` (same seed, same frame). */
@@ -117,13 +115,18 @@ export async function measureGradHeadings(page, seed = null) {
       return (await page.screenshot({ clip, type: 'png' })).toString('base64');
     };
     const solid = (c) => `background-image:none !important;color:${c} !important;-webkit-text-fill-color:${c} !important`;
-    const real = await shot('');
-    const hidden = await shot('visibility:hidden');
-    const white = await shot(solid('#fff'));
-    const black = await shot(solid('#000'));
-    await style('');
-    const r = await page.evaluate(analyse, { real, hidden, white, black, large: g.large });
-    out.push({ ...g, ...r });
+    const decoration = await page.addStyleTag({ content: '.eg-hero .orbits .fdot, .final .orbits .fdot { visibility:hidden !important; }' });
+    try {
+      const real = await shot('');
+      const hidden = await shot('visibility:hidden');
+      const white = await shot(solid('#fff'));
+      const black = await shot(solid('#000'));
+      const r = await page.evaluate(analyse, { real, hidden, white, black, large: g.large });
+      out.push({ ...g, ...r });
+    } finally {
+      await style('');
+      await decoration.evaluate((el) => el.remove());
+    }
   }
   return out;
 }
@@ -133,10 +136,9 @@ const seeds = [1, 2, 3, 4, 5];
 export async function engageHeadingContrast({ open, check, settle, metrics }) {
   const only = process.env.ENGAGE_ONLY?.split(',');
   const selected = pages.filter((slug) => !only || only.includes(slug));
-  const lowest = (rows, key = 'min') => (rows.length ? Math.min(...rows.map((r) => r[key] ?? 0)).toFixed(2) : 'none');
-  // key 'min' judges every glyph pixel; 'p1' lets the lowest 1 % through (see the motion pass below).
-  const bad = (rows, key = 'min') => rows.filter((r) => r.pixels === 0 || r[key] < r.need);
-  const why = (rows, key = 'min') => bad(rows, key).map((r) => `"${r.text}" ${r[key]?.toFixed(2) ?? 'no glyph pixels'}:1 < ${r.need}:1 at ${JSON.stringify(r.at)}`).join(' | ');
+  const lowest = (rows) => (rows.length ? Math.min(...rows.map((r) => r.min ?? 0)).toFixed(2) : 'none');
+  const bad = (rows) => rows.filter((r) => r.pixels === 0 || r.min < r.need);
+  const why = (rows) => bad(rows).map((r) => `"${r.text}" ${r.min?.toFixed(2) ?? 'no glyph pixels'}:1 < ${r.need}:1 at ${JSON.stringify(r.at)}`).join(' | ');
   for (const lang of ['en', 'es']) {
     for (const slug of selected) {
       const path = `${lang === 'en' ? '' : '/es'}/platform/${slug}/`;
@@ -147,18 +149,15 @@ export async function engageHeadingContrast({ open, check, settle, metrics }) {
           await settle(page);
           const rows = await measureGradHeadings(page);
           check(group, `${lang}/${slug} ${scheme} at ${width}: gradient headings meet AA on composited pixels, reduced motion (${rows.length} headings, lowest ${lowest(rows)}:1)`, rows.length >= 2 && bad(rows).length === 0, why(rows));
-          metrics[`heading-contrast-${lang}-${slug}-${scheme}-${width}`] = rows.map((r) => ({ text: r.text, min: r.min && Number(r.min.toFixed(2)), p1: r.p1 && Number(r.p1.toFixed(2)), pixels: r.pixels }));
+          metrics[`heading-contrast-${lang}-${slug}-${scheme}-${width}`] = rows.map((r) => ({ text: r.text, min: r.min && Number(r.min.toFixed(2)), pixels: r.pixels }));
           await page.context().close();
         }
-        // Motion on: the same headings with the loops frozen at five seeded points. The closing band's 6 px orbit dots
-        // (decorative, drawn above the scrim) can cross a glyph for a moment and sit on a few of its pixels, which is not a
-        // legibility fault, so this pass judges the 1st percentile of glyph pixels: a mesh or video patch bright enough to
-        // matter covers far more than 1 %, as the baseline did.
+        // Motion on: the same minimum requirement, with the loops frozen at five seeded points.
         const page = await open({ ...view, scheme: 'dark' }, path);
         await settle(page);
         const all = [];
         for (const seed of seeds) all.push(...(await measureGradHeadings(page, seed)));
-        check(group, `${lang}/${slug} at ${width}: 99 % of gradient-heading glyph pixels meet AA at ${seeds.length} points of the mesh, gradient and clip loops (${all.length} samples, lowest 1st percentile ${lowest(all, 'p1')}:1, lowest pixel ${lowest(all)}:1)`, all.length >= seeds.length * 2 && bad(all, 'p1').length === 0, why(all, 'p1'));
+        check(group, `${lang}/${slug} at ${width}: minimum gradient-heading glyph-interior contrast meets AA at ${seeds.length} points of the mesh, gradient and clip loops (${all.length} samples, lowest pixel ${lowest(all)}:1)`, all.length >= seeds.length * 2 && bad(all).length === 0, why(all));
         await page.context().close();
       }
     }

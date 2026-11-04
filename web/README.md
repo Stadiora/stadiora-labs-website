@@ -54,8 +54,11 @@ node scripts/evidence.mjs --engage-motion-only --checks-only # just the Platform
   check also sweeps 16 widths from 360 to 1600 px on all five pages. Three more guards read what a browser really produces:
   `engage-a11y-checks.mjs` (the selected Messaging and Guardian tabpanel is visible and in the accessibility tree with its text,
   and every standalone link and control in `main` is 44 x 44 or larger at 390 px), `engage-heading-contrast.mjs` (the gradient
-  headings, measured on composited pixels: the glyph interiors against the same page with only that span hidden, reduced motion in
-  both themes at 390 and 1440, and with motion on at five seeded points of the mesh, gradient and clip loops; 3:1 for large text)
+  headings, measured on composited pixels: every eroded glyph-interior pixel against the same page with only that span hidden,
+  reduced motion in both themes at 390 and 1440, and motion on at five seeded points of the mesh, gradient and clip loops;
+  minimum 3:1 for large text, 4.5:1 otherwise, with no percentile forgiveness. Only the decorative orbit dots
+  `.eg-hero .orbits .fdot` and `.final .orbits .fdot` are hidden for all four captures and restored afterwards; the mesh, video and
+  scrims remain. The five motion samples do not prove an exhaustive minimum over time)
   and `engage-media-guard.mjs` (every `<video>` in the built HTML is judged on its own `src`, every `<source>` and its poster against
   the text-free list and the clip of its slot; `npm run verify` runs it).
 - Platform page look (Floodlight, R57 VB-3): every page is an `.impact` hero (`EngageHero`, split, overlap or orbit variant) with a
