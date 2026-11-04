@@ -189,6 +189,22 @@ for (const [path, { locale, again }] of Object.entries(copy)) {
     ['a dropped connection', 'abort'],
   ];
 
+  // A fresh page, jumped straight to the results: the post goes out within a second of opening and must still be held back to 3 s.
+  {
+    const { page, context } = await open(path);
+    const posts = await interceptContact(page, server.url, () => 202);
+    await page.locator('.screen.active .btn-primary').first().click();
+    await page.locator('#s-role .big-opt[data-value="athlete"]').click();
+    await page.locator('#s-sport .big-opt[data-value="tf"]').click();
+    await sleep(450);
+    await page.evaluate(() => showResults());
+    await page.locator('#cta-email').fill(`athlete-${locale}@example.com`);
+    await page.locator('.email-row button').click();
+    await page.locator('#email-success').waitFor({ state: 'visible', timeout: 8000 }).catch(() => {});
+    check('lead-form', t('a post made right after the page opens still waits out the 3 s fill time'), posts.length === 1 && postProblems(posts[0]).length === 0, posts[0] ? postProblems(posts[0]).join('; ') : 'no post');
+    await context.close();
+  }
+
   // One page per language: the first post waits out the 3 s fill time, and every later one on the page goes out at once.
   {
     const { page, context } = await open(path);

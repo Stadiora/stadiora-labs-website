@@ -70,13 +70,13 @@ const mutations = [
   { id: 'M23', rule: 'quiz: success only on 202 (ES)', file: LMES, find: 'if (code === 202) {', put: 'if (code >= 200 && code < 300) {', gate: 'lead', expect: 'a plain message with the direct contacts, no success' },
   { id: 'M24', rule: 'quiz: honeypot always sent (EN)', file: LM, find: '    website: honeypot.value,\n', put: '', gate: 'lead', expect: 'every post carries the honeypot' },
   { id: 'M25', rule: 'quiz: startedAt always sent (ES)', file: LMES, find: ',\n    startedAt: OPENED_AT', put: '', gate: 'lead', expect: 'every post carries the honeypot' },
-  { id: 'M26', rule: 'quiz: 3 s minimum fill time (EN)', file: LM, find: 'const wait = MIN_FILL_MS + 250 - (Date.now() - OPENED_AT);', put: 'const wait = 0;', gate: 'lead', expect: 'every post carries the honeypot' },
-  { id: 'M27', rule: 'quiz: 3 s minimum fill time (ES)', file: LMES, find: 'const wait = MIN_FILL_MS + 250 - (Date.now() - OPENED_AT);', put: 'const wait = 0;', gate: 'lead', expect: 'every post carries the honeypot' },
+  { id: 'M26', rule: 'quiz: 3 s minimum fill time (EN)', file: LM, find: 'const wait = MIN_FILL_MS + 250 - (Date.now() - OPENED_AT);', put: 'const wait = 0;', gate: 'lead', expect: 'a post made right after the page opens' },
+  { id: 'M27', rule: 'quiz: 3 s minimum fill time (ES)', file: LMES, find: 'const wait = MIN_FILL_MS + 250 - (Date.now() - OPENED_AT);', put: 'const wait = 0;', gate: 'lead', expect: 'a post made right after the page opens' },
   { id: 'M28', rule: 'quiz: distinct 400/429/503 messages (EN)', file: LM, find: "code === 429 ? MSG.limited : MSG.unavailable", put: "code === 429 ? MSG.invalid : MSG.unavailable", gate: 'lead', expect: 'each get their own message' },
   // ---- both regions, with tel:, mailto: and wa.me links
-  { id: 'M29', rule: 'US phone link in the footer and contact page', file: 'src/data/site.ts', find: "tel: '+18592859529'", put: "tel: '+18592859520'", gate: 'verify', expect: 'is missing the contact link tel:+18592859529' },
-  { id: 'M30', rule: 'LatAm WhatsApp link in the footer and contact page', file: 'src/data/site.ts', find: "whatsapp: 'https://wa.me/50660419069' }", put: "whatsapp: 'https://wa.me/50660419060' }", gate: 'verify', expect: 'is missing the contact link https://wa.me/50660419069' },
-  { id: 'M31', rule: 'US email on connect.html', file: 'public/connect.html', find: 'href="mailto:ian@stadioralabs.com"', put: 'href="mailto:ian@stadioralabs.co"', gate: 'verify', expect: '/connect.html is missing the contact link mailto:ian@stadioralabs.com' },
+  { id: 'M29', rule: 'US phone link in the footer and contact page', file: 'src/data/site.ts', find: "tel: '+18592859529'", put: "tel: '+18592859520'", gate: 'verify', expect: 'is missing the contact link tel:+18592859529', at: 'the footer is missing the contact link' },
+  { id: 'M30', rule: 'LatAm WhatsApp link in the footer and contact page', file: 'src/data/site.ts', find: "whatsapp: 'https://wa.me/50660419069' }", put: "whatsapp: 'https://wa.me/50660419060' }", gate: 'verify', expect: 'is missing the contact link https://wa.me/50660419069', at: 'the footer is missing the contact link' },
+  { id: 'M31', rule: 'US email on connect.html', file: 'public/connect.html', find: 'href="mailto:ian@stadioralabs.com"', put: 'href="mailto:ian@stadioralabs.co"', gate: 'verify', expect: '/connect.html is missing the contact link mailto:ian@stadioralabs.com', at: '/connect.html is missing the contact link' },
 ];
 
 const only = process.argv.slice(2);
@@ -141,7 +141,7 @@ for (const m of todo) {
     row.changed = true;
     row.caught = g.status !== 0 && Boolean(hit);
     row.assertion = (hit ?? fails[0] ?? '(the gate passed)').replace(/^FAIL\s+|^ {2}- /, '').replace(/\s+/g, ' ').slice(0, 150);
-    row.line = hit ? lineOf(gates[m.gate].source ? [gates[m.gate].source] : verifySources, m.expect) : '-';
+    row.line = hit ? lineOf(gates[m.gate].source ? [gates[m.gate].source] : verifySources, m.at ?? m.expect) : '-';
   } catch (e) {
     row.changed = false;
     row.caught = false;
