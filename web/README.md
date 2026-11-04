@@ -67,10 +67,13 @@ node scripts/evidence.mjs --engage-only # just the Platform page checks, EN and 
   `solutions-motion-checks.mjs` samples the transforms, boxes and clip times of every hover scope (the hero, conveyors, stages,
   morph, feed) while it runs, while the pointer is over it, while focus is inside it, offscreen and in a hidden tab (a flag is
   never read, so a CSS override that keeps a conveyor moving fails), and `solutions-pixel-contrast.mjs` photographs each page
-  four times (as it is, text hidden, text black, text white) and scores the glyph interior of every text node against the real
-  backdrop (4.5:1, 3:1 for large text) at 390 and 1440, EN and ES, light and dark, then repeats it in the moving page (the
-  gradient lettering and the mesh at five phases, video frames included) and on every app of the athletes morph. A canary
-  overlay proves the measurement can fail. `solutions-checks.mjs` still owns overflow, overlap, contrast,
+  five times (as it is, text hidden, text black, text white, and the text alone on a blank page) and scores the glyph interior of
+  every text node against the real backdrop (4.5:1, 3:1 for large text) at 390 and 1440, EN and ES, light and dark. The blank-page
+  mask keeps a stroke in the measurement when a layer paints over it (an orbit dot over the closing call), so an erased stroke
+  reads 1:1 and fails instead of being dropped as an edge. It then repeats it in the moving page (the gradient lettering and the
+  mesh at five phases, video frames included, and the sections with orbit dots on the shared clock at six elapsed times) and on
+  every app of the athletes morph. A canary overlay proves the measurement can fail, and a mutation check re-applies the reviewed
+  z-order (dots over the lettering) to Coaches and requires 21,500 ms and 5,500 ms frames to fail while the shipped one passes. `solutions-checks.mjs` still owns overflow, overlap, contrast,
   target size, forms and prices; its overlap probe now reads a tight display line by its line box, and ignores `.sr` text.
 - Platform pages (`src/pages/{,es/}platform/{messaging,guardian-portal,teams,custom-branded-apps,integrations}/`): thin
   wrappers around `src/components/engage/*Page.astro`; all copy is in `src/i18n/pages/engage.ts` (EN and ES, ES typed against EN).

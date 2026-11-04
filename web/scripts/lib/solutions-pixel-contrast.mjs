@@ -2,18 +2,23 @@
 //
 // The DOM probe in contrast.mjs cannot score text over an image or a gradient, so a heading painted in gradient lettering
 // on the mesh, or a label on glass, was skipped. This measures what is actually composited:
-//   1. the page is photographed four times with only the text changed: as it is, with the text invisible (the real backdrop
-//      under every glyph, text-shadow and glass included), with the text forced black and with it forced white;
-//   2. black and white differ by exactly the glyph coverage, so a pixel is "glyph interior" when both agree that the glyph
-//      covers it completely (anti-aliased edges are not scored);
-//   3. for every interior pixel the colour that really reached the screen (gradient stops included) is compared with the
-//      backdrop that pixel has without the text, as a WCAG contrast ratio. The lowest pixel of a text node is its score:
-//      4.5:1, or 3:1 for large text (24 px, or 18.66 px at weight 700).
+//   1. the page is photographed five times with only the text changed: as it is, with the text invisible (the real backdrop
+//      under every glyph, text-shadow and glass included), with the text forced black and with it forced white, and as a glyph
+//      mask (only the text, black on a blank white page, same layout and same animation frame);
+//   2. black and white differ by the glyph coverage over the real backdrop, and the mask gives the coverage of the text alone. A
+//      pixel is "glyph interior" when either says the glyph covers it completely (anti-aliased edges are not scored). The mask is
+//      what keeps a glyph in the measurement when something paints OVER it in the real photograph (an orbit dot, a badge, a
+//      scrim): that layer lowers the black/white difference, but not the mask, so the obstructed stroke is still scored, and it
+//      reads as the failure it is;
+//   3. for every glyph sample the colour that really reached the screen (gradient stops and anything painted over the text
+//      included) is compared with the backdrop that pixel has without the text, as a WCAG contrast ratio. A stroke that a
+//      foreground layer erases reads 1:1 and fails; no partly covered sample is dropped. The lowest sample of a text node is
+//      its score: 4.5:1, or 3:1 for large text (24 px, or 18.66 px at weight 700).
 // A node that is faded by `opacity` is scored with its fade in the real photograph, and aria-hidden or decorative text is
 // scored like any other: a reader who sees it has to be able to read it. Screen-reader-only text (a clipped 1px box) paints
 // nothing and is skipped. The one exception is PURE_DECORATION below: a
 // single letterform filled with a photograph, and a watermark. Those are backdrop (WCAG 1.4.3 exempts pure decoration), so
-// they stay as they are in all four photographs and sit behind the text that is scored. A canary page proves the
+// they stay as they are in all five photographs and sit behind the text that is scored. A canary page proves the
 // measurement can fail. Reduced motion renders one frame, so the moving page is measured too (see "moving backdrops and
 // lettering" below): the mesh, the gradient lettering and the clips are parked at several phases, and the athlete morph is
 // stepped through every app.
@@ -21,6 +26,11 @@ import { inflateSync } from 'node:zlib';
 
 // Each of these is aria-hidden in the markup, which the selector requires, so a copy that a reader could rely on is never skipped.
 export const PURE_DECORATION = '.sx-a__glyph[aria-hidden="true"], .footer__wordmark[aria-hidden="true"]';
+
+// A solid device drawn IN FRONT of neighbouring phones that are fanned out behind it (the athletes hero): the words of a neighbour
+// that this device covers (its bezel and edge anti-aliasing included, 4 px) are not on screen, so those samples are not glyph samples. Nothing else is exempt: a decoration that
+// paints over text it was not designed to cover (an orbit dot) is a failure.
+export const OCCLUDERS = '.dphone';
 
 const pages = [
   ['schools', '/solutions/schools/'],
@@ -35,7 +45,7 @@ const localized = (locale, path) => (locale === 'es' ? `/es${path}` : path);
 const BAND = 3000;
 const AA = 4.5;
 const AA_LARGE = 3;
-// A pixel is glyph interior when black and white both see at least this much coverage.
+// A pixel is glyph interior when the glyph mask covers it at least this much.
 const FULL = 0.97;
 
 // ---------------------------------------------------------------- PNG decoding (8-bit RGB or RGBA, no interlace)
@@ -136,6 +146,7 @@ const enumerate = () => {
     }
     return false;
   };
+  const occluders = window.__pcOcclude ? [...document.querySelectorAll(window.__pcOcclude)].map((o) => [o, o.getBoundingClientRect()]) : [];
   const out = [];
   while (walker.nextNode()) {
     const t = walker.currentNode;
@@ -152,14 +163,17 @@ const enumerate = () => {
     if (!rects.length) continue;
     const size = parseFloat(cs.fontSize);
     const weight = Number(cs.fontWeight) || 400;
-    out.push({ text: text.slice(0, 40), path: path(el), size, weight, large: size >= 24 || (size >= 18.66 && weight >= 700), op: opacityOf(el), rects });
+    const covered = occluders.filter(([o]) => !o.contains(el)).map(([, r]) => [r.left + sx - 4, r.top + sy - 4, r.right + sx + 4, r.bottom + sy + 4]);
+    out.push({ text: text.slice(0, 40), path: path(el), size, weight, large: size >= 24 || (size >= 18.66 && weight >= 700), op: opacityOf(el), rects, covered });
   }
   return out;
 };
 
-// Changes only the text: 'real' (as is), 'hide', 'black' or 'white'.
+// Changes only the text: 'real' (as is), 'hide' (invisible), 'black' or 'white', or 'mask' (the text alone, black on a blank white
+// page: every backdrop, image, clip and decoration removed, so nothing can paint over a glyph).
 export const setInk = (mode) => {
   document.getElementById('pc-ink')?.remove();
+  for (const e of document.querySelectorAll('[data-pc-t]')) e.removeAttribute('data-pc-t');
   if (mode === 'real') return;
   if (!window.__pcClip) {
     window.__pcClip = true;
@@ -168,10 +182,25 @@ export const setInk = (mode) => {
       if ((cs.webkitBackgroundClip || cs.backgroundClip) === 'text') e.setAttribute('data-pc-clip', '');
     }
   }
-  const ink = { hide: 'transparent', black: '#000', white: '#fff' }[mode];
+  const ink = { hide: 'transparent', black: '#000', white: '#fff', mask: '#000' }[mode];
   const keep = window.__pcDecor ? `:not(:is(${window.__pcDecor}, ${window.__pcDecor.split(',').map((s) => `${s.trim()} *`).join(', ')}))` : '';
   const style = document.createElement('style');
   style.id = 'pc-ink';
+  if (mode === 'mask') {
+    // Everything is invisible except the elements that own a text node.
+    const decor = window.__pcDecor ? `:is(${window.__pcDecor}, ${window.__pcDecor.split(',').map((s) => `${s.trim()} *`).join(', ')})` : ':not(*)';
+    for (const e of document.querySelectorAll('body *')) {
+      if (e.matches(decor) || e.closest('script, style, noscript, template, title')) continue;
+      if ([...e.childNodes].some((n) => n.nodeType === 3 && n.nodeValue.trim())) e.setAttribute('data-pc-t', '');
+    }
+    style.textContent = `
+      html { background: #fff !important; }
+      *, *::before, *::after { visibility: hidden !important; background: none !important; box-shadow: none !important; text-shadow: none !important; outline: none !important; border-color: transparent !important; mix-blend-mode: normal !important; text-decoration: none !important; color: ${ink} !important; -webkit-text-fill-color: ${ink} !important; -webkit-text-stroke: 0 !important; }
+      svg text, svg tspan { fill: ${ink} !important; stroke: none !important; }
+      [data-pc-t] { visibility: visible !important; }`;
+    document.head.append(style);
+    return;
+  }
   style.textContent = `
     *${keep}, *${keep}::before, *${keep}::after { color: ${ink} !important; -webkit-text-fill-color: ${ink} !important; ${mode === 'hide' ? '' : 'text-shadow: none !important;'} }
     svg text${keep}, svg tspan${keep} { fill: ${ink} !important; stroke: none !important; }
@@ -201,10 +230,10 @@ async function photograph(page, mode, w, h, clip) {
  */
 export async function scorePage(page, { clip } = {}) {
   const { w, h } = await page.evaluate(docSize);
-  await page.evaluate((decor) => (window.__pcDecor = decor), PURE_DECORATION);
+  await page.evaluate(([decor, occlude]) => ((window.__pcDecor = decor), (window.__pcOcclude = occlude)), [PURE_DECORATION, OCCLUDERS]);
   const nodes = await page.evaluate(enumerate);
   const shots = {};
-  for (const mode of ['real', 'hide', 'black', 'white']) shots[mode] = await photograph(page, mode, w, h, clip);
+  for (const mode of ['real', 'hide', 'black', 'white', 'mask']) shots[mode] = await photograph(page, mode, w, h, clip);
   await page.evaluate(setInk, 'real');
 
   const stat = nodes.map(() => ({ n: 0, min: Infinity, at: null, thin: 0, thinMin: Infinity }));
@@ -218,16 +247,23 @@ export async function scorePage(page, { clip } = {}) {
     const H = img.hide.data;
     const K = img.black.data;
     const W = img.white.data;
-    // Coverage of a glyph at a pixel, 0..1. Black and white differ by coverage times the text's own opacity (a faded text keeps
-    // its fade in all four photographs, so it is scored as faded), which is divided out here.
-    const coverage = (x, y, op) => {
+    const M = img.mask.data;
+    // Coverage of a glyph at a pixel, 0..1, from the text's own opacity divided out (a faded text keeps its fade in all five
+    // photographs, so it is scored as faded). `over` is the coverage as the real backdrop shows it: black and white differ by it, and
+    // whatever paints over the glyph lowers it. `alone` is the coverage of the text on a blank page, which nothing can lower.
+    const over = (x, y, op) => {
       if (x < 0 || y < 0 || x >= iw || y >= ih) return 1;
       const q = (y * iw + x) * 4;
       return Math.min(1, Math.min(W[q] - K[q], W[q + 1] - K[q + 1], W[q + 2] - K[q + 2]) / (255 * op));
     };
-    // Interior means the pixel and its eight neighbours are fully covered: a glyph edge that the four photographs rasterise a
+    const alone = (x, y, op) => {
+      if (x < 0 || y < 0 || x >= iw || y >= ih) return 1;
+      const q = (y * iw + x) * 4;
+      return Math.min(1, (255 - Math.min(M[q], M[q + 1], M[q + 2])) / (255 * op));
+    };
+    // Interior means the pixel and its eight neighbours are fully covered: a glyph edge that the photographs rasterise a
     // sub-pixel apart (a rotated or faded layer) is then not mistaken for ink.
-    const interior = (x, y, op) => {
+    const interiorOf = (coverage, x, y, op) => {
       for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) if (coverage(x + dx, y + dy, op) < FULL) return false;
       return true;
     };
@@ -241,19 +277,22 @@ export async function scorePage(page, { clip } = {}) {
         const yb = Math.min(y0 + ih, Math.ceil(bt)) - y0;
         for (let y = Math.max(0, ya); y < yb; y++) {
           for (let x = xa; x < xb; x++) {
+            if (node.covered.some(([cl, ct, cr, cb]) => x >= cl && x < cr && y + y0 >= ct && y + y0 < cb)) continue;
             const o = (y * iw + x) * 4;
-            const cov = coverage(x, y, op);
-            if (cov < 0.5) continue;
+            const seen = over(x, y, op);
+            const bare = alone(x, y, op);
+            if (seen < 0.5 && bare < FULL) continue;
             const c = ratio(lum(R, o), lum(H, o));
-            if (cov >= FULL && interior(x, y, op)) {
+            // Glyph interior by the real photographs, or by the bare text: a layer painted over the stroke lowers only the first.
+            if ((seen >= FULL && interiorOf(over, x, y, op)) || (bare >= FULL && interiorOf(alone, x, y, op))) {
               s.n++;
               if (c < s.min) {
                 s.min = c;
                 s.at = [x, y + y0];
               }
-            } else {
+            } else if (seen >= 0.5) {
               // Hairline text has no interior: score its best-covered pixels by what they would be at full coverage.
-              const full = ratioAtFull(R, H, o, cov);
+              const full = ratioAtFull(R, H, o, seen);
               s.thin++;
               if (full < s.thinMin) s.thinMin = full;
             }
@@ -265,7 +304,7 @@ export async function scorePage(page, { clip } = {}) {
   return nodes.map((node, k) => {
     const s = stat[k];
     const measured = s.n > 0 ? s.min : s.thin >= 4 ? s.thinMin : null;
-    return { ...node, rects: undefined, score: measured, interior: s.n, at: s.at, estimated: s.n === 0 && s.thin >= 4 };
+    return { ...node, rects: undefined, covered: undefined, score: measured, interior: s.n, at: s.at, estimated: s.n === 0 && s.thin >= 4 };
   });
 }
 
@@ -319,6 +358,33 @@ const park = async (phase) => {
   return { animations: endless.length, clips: clips.length };
 };
 
+// Parks every endless CSS animation (and every clip) at the SAME elapsed time, as a page that has been running for `ms` shows them.
+// `park` spreads the loops out on purpose so mesh blobs do not line up; the orbit dots of one section only meet its lettering at
+// particular times of the shared clock, which spreading never reaches.
+const parkSynced = async (ms) => {
+  const endless = document.getAnimations().filter((a) => a.effect?.getComputedTiming().iterations === Infinity);
+  endless.forEach((a) => {
+    a.pause();
+    a.currentTime = ms;
+  });
+  const clips = [...document.querySelectorAll('video')].filter((v) => v.readyState >= 1 && v.duration > 0);
+  await Promise.all(
+    clips.map(
+      (v) =>
+        new Promise((done) => {
+          v.pause();
+          v.addEventListener('seeked', done, { once: true });
+          v.currentTime = Math.min(v.duration - 0.05, (ms / 1000) % v.duration);
+          setTimeout(done, 1500);
+        }),
+    ),
+  );
+  return { animations: endless.length, clips: clips.length };
+};
+// Elapsed times (ms) of the shared clock, spread over the dots' 16 s and 22 s laps; 5,500 and 21,500 are frames where an opaque dot
+// and the old half-strength dot sat over the closing call's lettering.
+const SYNCED = [3000, 5500, 9000, 13500, 17500, 21500];
+
 // Page-coordinate bands of the sections that hold gradient lettering (the hero, a section head, the closing call), plus the hero.
 const lettering = () => {
   const bands = [];
@@ -327,7 +393,10 @@ const lettering = () => {
     const r = s.getBoundingClientRect();
     const top = Math.max(0, Math.floor(r.top + scrollY));
     const height = Math.min(1400, Math.ceil(r.height));
-    if (!bands.some((b) => b.y === top && b.height === height)) bands.push({ y: top, height });
+    const orbit = !!s.querySelector('.orbits .fdot');
+    const seen = bands.find((b) => b.y === top && b.height === height);
+    if (seen) seen.orbit ||= orbit;
+    else bands.push({ y: top, height, orbit });
   }
   return bands;
 };
@@ -360,11 +429,22 @@ async function sweepLettering(page, tag, scheme, width, { check, sleep, metrics,
       for (const n of scored) if (n.score !== null) worst = Math.min(worst, n.score / (n.large ? AA_LARGE : AA));
       for (const n of failures(scored)) bad.push({ ...n, phase });
     }
+    // Sections with orbit dots are also photographed on the shared clock (every loop at the same elapsed time).
+    if (!clip.orbit) continue;
+    for (const ms of SYNCED) {
+      const parked = await page.evaluate(parkSynced, ms);
+      clips = Math.max(clips, parked.clips);
+      await sleep(60);
+      const scored = (await scorePage(page, { clip })).filter((n) => !n.path.includes('nav__'));
+      frames++;
+      for (const n of scored) if (n.score !== null) worst = Math.min(worst, n.score / (n.large ? AA_LARGE : AA));
+      for (const n of failures(scored)) bad.push({ ...n, phase: `${ms} ms` });
+    }
   }
   metrics[`pixel-contrast-sweep-${tag}-${scheme}-${width}`] = { bands: bands.length, frames, clips, lowestVsNeeded: Number(worst.toFixed(2)) };
   check(
     group,
-    `${tag} ${scheme} ${width}px: gradient lettering and the mesh keep AA at ${PHASES.length} phases of their cycle (${bands.length} bands)`,
+    `${tag} ${scheme} ${width}px: gradient lettering and the mesh keep AA at ${PHASES.length} phases of their cycle and on the shared clock at ${SYNCED.length} times (${bands.length} bands)`,
     bad.length === 0 && frames > 0,
     bad.length ? `${bad.length} failing: ${bad.slice(0, 4).map((n) => `${describe(n)} at phase ${n.phase}`).join('; ')}` : `${frames} frames, lowest ${worst.toFixed(2)}x of the needed ratio`,
   );
@@ -395,6 +475,9 @@ async function stepMorph(page, tag, scheme, width, { check, sleep, metrics, grou
       continue;
     }
     stepped++;
+    // the brand reveal (a clip-path circle) is a finite animation: on a loaded machine it may still be growing after the pause
+    await page.evaluate(() => Promise.all(document.querySelector('[data-sx-morph]').getAnimations({ subtree: true }).filter((a) => Number.isFinite(a.effect.getComputedTiming().endTime)).map((a) => a.finished.catch(() => {})).concat(new Promise((r) => setTimeout(r, 3000)))));
+    await sleep(150);
     const scored = await scorePage(page, { clip: hero });
     for (const n of scored) if (n.score !== null) worst = Math.min(worst, n.score / (n.large ? AA_LARGE : AA));
     for (const n of failures(scored)) bad.push({ ...n, app: k });
@@ -433,6 +516,48 @@ export async function solutionsPixelContrastChecks({ open, check, sleep, settle,
     check(group, 'canary: faded text is scored with its fade and flagged', flagged('canary faded'), JSON.stringify(bad.map((n) => n.text)));
     check(group, 'canary: white on navy passes', !flagged('canary white') && scored.some((n) => n.text.includes('canary white') && n.score > 10), JSON.stringify(scored.filter((n) => n.text.startsWith('canary')).map((n) => [n.text, n.score && +n.score.toFixed(2)])));
     await page.context().close();
+  }
+
+  // ---- mutation canary: the closing call as it was reviewed (dots painted over the lettering) must FAIL at the reviewer's frames
+  {
+    const old = '.sx-final .orbits { z-index: 0 !important; } .sx-final .orbits .fdot { opacity: var(--pc-dot, 0.5) !important; }';
+    const page = await open({ width: 1440, height: 900, scheme: 'light', reduced: false }, '/solutions/coaches/');
+    try {
+      await settle(page);
+      await page.evaluate(() => {
+        Object.defineProperty(document, 'hidden', { configurable: true, get: () => true });
+        Object.defineProperty(document, 'visibilityState', { configurable: true, get: () => 'hidden' });
+        document.dispatchEvent(new Event('visibilitychange'));
+      });
+      const band = await page.evaluate(() => {
+        const r = document.querySelector('.sx-final').getBoundingClientRect();
+        return { y: Math.max(0, Math.floor(r.top + scrollY)), height: Math.ceil(r.height) };
+      });
+      const frame = async (css, dot, ms) => {
+        await page.evaluate(({ css, dot }) => {
+          document.getElementById('pc-old')?.remove();
+          if (!css) return;
+          const st = document.createElement('style');
+          st.id = 'pc-old';
+          st.textContent = `.sx-final { --pc-dot: ${dot}; } ${css}`;
+          document.head.append(st);
+        }, { css, dot });
+        await page.evaluate((y) => scrollTo(0, y), band.y);
+        await sleep(500);
+        await page.evaluate(parkSynced, ms);
+        await sleep(80);
+        const scored = (await scorePage(page, { clip: band })).filter((n) => !n.path.includes('nav__'));
+        return { bad: failures(scored), low: Math.min(...scored.filter((n) => n.score !== null).map((n) => n.score / (n.large ? AA_LARGE : AA))) };
+      };
+      const half = await frame(old, 0.5, 21500);
+      check(group, 'mutation: the reviewed z-order (dots over the lettering, 0.5) fails at 21,500 ms on Coaches', half.bad.length > 0, `${half.bad.length} failing, lowest ${half.low.toFixed(2)}x`);
+      const full = await frame(old, 1, 5500);
+      check(group, 'mutation: opaque dots over the lettering erase strokes and fail at 5,500 ms on Coaches', full.bad.length > 0, `${full.bad.length} failing, lowest ${full.low.toFixed(2)}x`);
+      const fixed = await frame('', 1, 21500);
+      check(group, 'mutation control: the shipped z-order passes the same frame', fixed.bad.length === 0, `lowest ${fixed.low.toFixed(2)}x`);
+    } finally {
+      await page.context().close();
+    }
   }
 
   const cases = pages

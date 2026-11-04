@@ -1022,10 +1022,10 @@ html:not(.js) .sx-page .rv-mask {
 .sx-final .final-ctas .btn--ghost {
   color: #fff;
 }
-/* The orbit dots travel behind the headline and the ghost button: a cyan dot under white lettering is 2.2:1. At half strength a dot
-   stays visible and stays dark enough for white text on top of it. */
-.sx-final .orbits .fdot {
-  opacity: 0.5;
+/* The orbit layer sits between the clip and the shared overlay (z-index -2, after the video in the markup), so the dots are painted
+   under the scrim and under every word, never over a glyph: a dot over gradient or white lettering fell to 1.7:1. */
+.sx-final .orbits {
+  z-index: -2;
 }
 @media (max-width: 640px) {
   .sx-final .final-ctas .btn {
