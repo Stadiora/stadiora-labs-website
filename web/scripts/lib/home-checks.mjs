@@ -108,7 +108,7 @@ export async function homeChecks({ open, check, sleep, settle, metrics }) {
   };
 
   // HOME_ONLY=autoplay,marquee runs just those groups (used to mutation-prove one guard quickly); unset runs all.
-  // Groups: structure autoplay reduced marquee hero clipping contrast a11y integrations nojs pillars-media hidden-tab flip.
+  // Groups: structure autoplay reduced marquee hero clipping contrast a11y integrations nojs pillars-media hidden-tab flip hero-hover iris.
   const only = process.env.HOME_ONLY?.split(',');
   const on = (group) => !only || only.includes(group);
 
