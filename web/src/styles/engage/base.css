@@ -1,0 +1,280 @@
+/* Engage lane (VB-3): the Floodlight chrome the five Platform pages share (hero, closing links).
+   Class names are global, so everything here is prefixed eg-. The tokens, .mesh, .orbits, .rv, .lines, .pop, .glass,
+   .media-frame and the .final section come from floodlight.css and styles/home/final.css. */
+
+/* ---------- hero ---------- */
+.eg-hero {
+  position: relative;
+  isolation: isolate;
+  padding: calc(var(--nav-h) + clamp(32px, 4vw, 64px)) 0 clamp(72px, 8vw, 120px);
+}
+.eg-hero .orbits {
+  z-index: 1;
+  overflow: hidden;
+  opacity: 0.9;
+}
+.eg-hero .orbits svg {
+  width: 130%;
+  left: -15%;
+  top: 54%;
+}
+.eg-hero .eg-fdot-a {
+  offset-path: path('M40,400 a760,250 0 1,0 1520,0 a760,250 0 1,0 -1520,0');
+  --d: 26s;
+}
+.eg-hero .eg-fdot-b {
+  offset-path: path('M180,400 a620,190 0 1,0 1240,0 a620,190 0 1,0 -1240,0');
+  --d: 19s;
+}
+.eg-hero__grid {
+  position: relative;
+  z-index: 3;
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+  gap: clamp(32px, 5vw, 80px);
+  align-items: center;
+}
+.eg-hero__copy {
+  min-width: 0;
+}
+.eg-hero__media {
+  position: relative;
+  min-width: 0;
+}
+.eg-h1 {
+  margin: 22px 0 24px;
+  font-size: clamp(40px, 5.4vw, 88px);
+  line-height: 0.94;
+  color: #fff;
+  text-wrap: balance;
+  overflow-wrap: anywhere;
+}
+/* the reveal mask must not shave the glyph box of the last line */
+.eg-h1.lines > span {
+  padding-bottom: 0.14em;
+  margin-bottom: -0.14em;
+}
+/* Light gradient stops and a soft scrim support heading legibility over the mesh and reel.
+   scripts/lib/engage-heading-contrast.mjs checks sampled frames, not every point of the loops. */
+.eg-hero__copy {
+  isolation: isolate;
+}
+.eg-h1,
+.final .d1 {
+  position: relative;
+}
+.eg-h1::before,
+.final .d1::before {
+  content: '';
+  position: absolute;
+  inset: -0.2em -0.3em -0.08em;
+  z-index: -1;
+  border-radius: 0.3em;
+  background: rgba(2, 6, 15, 0.62);
+  box-shadow: 0 0 0.5em 0.35em rgba(2, 6, 15, 0.62);
+  pointer-events: none;
+}
+.eg-h1 .grad-text,
+.final .grad-text {
+  background-image: linear-gradient(100deg, #3ad6ff 0%, #6ee7c4 48%, #b6a2fb 100%);
+}
+.eg-hero .lead {
+  color: #b7c2d4;
+}
+.eg-ctas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-top: 32px;
+}
+
+/* the reveals wait for a script; without one the page just shows */
+html:not(.js) .eg-hero .rv,
+html:not(.js) .eg-hero .lines > span > span,
+html:not(.js) .eg-also .rv,
+html:not(.js) .eg-stage .rv {
+  opacity: 1;
+  transform: none;
+}
+
+/* ---------- closing links ---------- */
+/* The 120% orbit canvas must not inherit the global SVG max-width clamp, which shifts its centre left. */
+.final .orbits svg {
+  max-width: none;
+}
+.eg-also {
+  background: var(--bg);
+}
+.eg-also__grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 20px;
+  margin: 28px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.eg-also__card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-height: 96px;
+  padding: 20px 24px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--bg);
+  color: var(--ink);
+  text-decoration: none;
+  transition:
+    transform 300ms var(--e-out),
+    box-shadow 300ms var(--e-out),
+    border-color 300ms;
+}
+.eg-also__card:hover,
+.eg-also__card:focus-visible {
+  transform: translateY(-4px);
+  border-color: transparent;
+  box-shadow: var(--shadow-lift);
+}
+.eg-also__icon {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  background: var(--cyan-tint);
+  color: var(--cyan-ink);
+}
+.eg-also__text {
+  display: grid;
+  flex: 1;
+  min-width: 0;
+  gap: 2px;
+}
+.eg-also__name {
+  font-weight: 700;
+  font-size: 17px;
+  line-height: 24px;
+}
+.eg-also__desc {
+  color: var(--ink-2);
+  font-size: 15px;
+  line-height: 22px;
+}
+.eg-also__arrow {
+  flex: none;
+  color: var(--ink-2);
+  transition: transform 300ms var(--e-out);
+}
+.eg-also__card:hover .eg-also__arrow {
+  transform: translateX(4px);
+}
+
+/* ---------- shared stage bits ---------- */
+.eg-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding-block: 8px;
+  color: var(--cyan-ink);
+  font-weight: 700;
+  text-decoration: none;
+  transition: gap 300ms var(--e-out);
+}
+.eg-link:hover,
+.eg-link:focus-visible {
+  gap: 14px;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.eg-stage {
+  padding: var(--sec) 0;
+}
+.eg-stage-title {
+  max-width: 18ch;
+  margin-bottom: clamp(32px, 4.5vw, 56px);
+  font-size: var(--fs-d3);
+  color: #fff;
+}
+.eg-note {
+  margin-top: 22px;
+  text-align: center;
+  color: #8d99ae;
+  font-size: 13px;
+  line-height: 20px;
+}
+
+@media (max-width: 1080px) {
+  .eg-hero__grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .eg-also__grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+@media (max-width: 640px) {
+  /* Let the orbit dots travel around the actions, below the compact heading. */
+  .final .orbits svg {
+    top: 80%;
+  }
+  .eg-ctas .btn {
+    flex: 1 1 100%;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .eg-link,
+  .eg-also__card,
+  .eg-also__arrow {
+    transition: none;
+  }
+}
+
+/* tilt tiles on dark stages */
+.eg-stage .eg-tile {
+  padding: 22px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.06);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.12);
+  color: #fff;
+  transform-style: preserve-3d;
+  transition:
+    opacity 700ms var(--e-out) calc(var(--i, 0) * 70ms),
+    transform 400ms var(--e-out),
+    box-shadow 300ms;
+}
+.eg-stage .eg-tile.in {
+  transform: perspective(900px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
+}
+.eg-stage .eg-tile:hover {
+  box-shadow:
+    0 0 0 1px rgba(0, 190, 243, 0.5),
+    0 30px 60px -30px rgba(0, 190, 243, 0.4);
+}
+.eg-tile__ic {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  margin-bottom: 14px;
+  border-radius: 14px;
+  background: #00bef3;
+  color: #04101f;
+}
+.eg-tile h3 {
+  margin: 0;
+  font: 700 19px/1.2 var(--f-text);
+  color: #fff;
+}
+.eg-tile p {
+  margin: 6px 0 0;
+  font-size: 15px;
+  line-height: 1.5;
+  color: #b7c2d4;
+}
+@media (prefers-reduced-motion: reduce) {
+  .eg-stage .eg-tile {
+    transition: none;
+  }
+}

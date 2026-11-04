@@ -52,8 +52,16 @@ const initials = person.name
     position: relative;
     min-width: 0;
     border: 1px solid var(--line);
-    border-radius: var(--radius-card);
-    background: var(--bg);
+    border-radius: 24px;
+    background: var(--surface, var(--bg));
+    transition:
+      transform 300ms var(--e-out, ease),
+      box-shadow 300ms var(--e-out, ease),
+      border-color 300ms;
+  }
+  .person:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lift, 0 12px 32px rgb(0 0 0 / 0.14));
   }
   .person[open] {
     z-index: 3;
@@ -89,6 +97,9 @@ const initials = person.name
     font-family: var(--font-display);
     font-size: 19px;
     font-weight: 600;
+    box-shadow:
+      0 0 0 2px var(--bg),
+      0 0 0 4px var(--cyan);
   }
   .person__avatar :global(img) {
     width: 100%;
@@ -127,7 +138,7 @@ const initials = person.name
     left: 0;
     padding: 18px 20px;
     border: 1px solid var(--line);
-    border-radius: var(--radius-card);
+    border-radius: 24px;
     background: var(--bg);
     box-shadow: 0 12px 32px rgb(0 0 0 / 0.14);
   }
@@ -163,6 +174,11 @@ const initials = person.name
     align-items: center;
   }
   @media (prefers-reduced-motion: reduce) {
+    .person,
+    .person:hover {
+      transform: none;
+      transition: none;
+    }
     .person :global(.person__chev) {
       transition: none;
     }

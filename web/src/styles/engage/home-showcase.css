@@ -1,0 +1,4 @@
+/* The home showcase panels and bento, pulled in with a CSS @import on purpose. Importing styles/home/showcase.css
+   from a component would make the bundler split it out of Home.css into a shared stylesheet (a second
+   render-blocking request on the home and a layout shift in the mobile CLS guard). */
+@import '../home/showcase.css';

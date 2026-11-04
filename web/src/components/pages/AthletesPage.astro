@@ -1,7 +1,10 @@
 ---
-import Page from '../../layouts/Page.astro';
+import SolutionsPage from '../../layouts/SolutionsPage.astro';
+import SxHero from '../solutions/SxHero.astro';
+import AthleteMorph from '../solutions/AthleteMorph.astro';
+import FinalNight from '../solutions/FinalNight.astro';
 import AppTile from '../solutions/AppTile.astro';
-import CtaBand from '../ui/CtaBand.astro';
+import { athleteBrands } from '../solutions/athlete-brands';
 import { athletes } from '../../i18n/pages/athletes';
 import { site } from '../../data/site';
 import type { Locale } from '../../i18n';
@@ -20,136 +23,60 @@ const glyphs = [
 ];
 ---
 
-<Page locale={locale} path="/solutions/athletes/" title={c.meta.title} description={c.meta.description}>
-  <section class="ahero">
-    <div class="container ahero__inner">
-      <p class="eyebrow">{c.eyebrow}</p>
-      <h1 class="ahero__title">{c.titleBefore}<span class="lane-under">{c.titleUnder}</span></h1>
-      <p class="ahero__sub">{c.sub}</p>
+<SolutionsPage locale={locale} path="/solutions/athletes/" title={c.meta.title} description={c.meta.description}>
+  <SxHero locale={locale} variant="split" eyebrow={c.eyebrow} title={`${c.titleBefore}${c.titleUnder}`} lead={c.sub} primary={{ label: c.cta.download, href: '#apps' }}>
+    <Fragment slot="title">{c.titleBefore}<span class="lane-under">{c.titleUnder}</span></Fragment>
+    <ul slot="copy" class="sx-aplabs" data-sx-ap-labels aria-hidden="true">
+      {
+        c.apps.map((app, i) => (
+          <li class:list={['sx-aplab', { on: i === 0 }]} data-ap-lab style={`--bc:${athleteBrands[app.id].c}`}>
+            <b><i></i>{app.name}</b>
+            <span>{app.status}</span>
+          </li>
+        ))
+      }
+    </ul>
+    <AthleteMorph copy={c} />
+  </SxHero>
+
+  <section id="apps" class="sx-sec" aria-labelledby="apps-h">
+    <div class="wrap">
+      <div class="sec-head">
+        <h2 class="d d2 lines" id="apps-h"><span><span>{c.appsLabel}</span></span></h2>
+      </div>
+      <div class="sx-apps__grid">
+        {c.apps.map((app, i) => <AppTile app={app} copy={c} {locale} index={i} />)}
+      </div>
+      <p class="demo-note">{c.screenNote}</p>
     </div>
   </section>
 
-  <section id="apps" class="apps" aria-label={c.appsLabel}>
-    <div class="container">
-      <div class="apps__grid">
-        {c.apps.map((app) => <AppTile app={app} copy={c} {locale} />)}
+  <section class="sx-stage impact" data-section aria-labelledby="every-h">
+    <div class="mesh" aria-hidden="true">
+      <i class="b b5"></i><i class="b b1"></i><i class="b b2"></i><i class="b b3"></i><i class="b b4"></i><i class="vig"></i>
+    </div>
+    <div class="orbits" aria-hidden="true">
+      <svg viewBox="0 0 1600 800"><ellipse cx="800" cy="400" rx="760" ry="250"></ellipse><ellipse class="dash" cx="800" cy="400" rx="560" ry="170"></ellipse></svg>
+    </div>
+    <div class="wrap">
+      <div class="sec-head">
+        <h2 class="d d2 lines" id="every-h"><span><span>{c.every.title}</span></span></h2>
       </div>
-      <p class="demo-note">{c.screenNote}</p>
-
-      <div class="every strip" data-reveal>
-        <h2 class="every__title">{c.every.title}</h2>
-        <ul class="every__list">
-          {
-            c.every.items.map((label, i) => (
-              <li class="every__item">
-                <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" set:html={glyphs[i]} />
-                <span>{label}</span>
-              </li>
-            ))
-          }
-        </ul>
-      </div>
-
-      <div class="strip coach-strip">
+      <ul class="sx-every">
+        {
+          c.every.items.map((label, i) => (
+            <li class="pcard rv" style={`--i:${i}`}>
+              <svg viewBox="0 0 24 24" width="36" height="36" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" set:html={glyphs[i]} />
+              <span>{label}</span>
+            </li>
+          ))
+        }
+      </ul>
+      <div class="strip rv">
         <p class="strip__text"><strong>{c.coach.title}</strong> {c.coach.text}</p>
       </div>
     </div>
   </section>
 
-  <CtaBand title={c.ctaTitle} actions={[{ label: c.cta.download, href: '#apps' }, { label: c.cta.coach, href: site.signUp }]} />
-</Page>
-
-<style>
-  .ahero {
-    padding-block: 56px 40px;
-    text-align: center;
-  }
-  .ahero__inner {
-    display: grid;
-    justify-items: center;
-  }
-  .ahero__title {
-    margin-top: 12px;
-    font-size: clamp(36px, 4.8vw, 64px);
-    line-height: 1.1;
-    letter-spacing: -0.02em;
-    text-wrap: balance;
-  }
-  .ahero__sub {
-    margin-top: 20px;
-    max-width: 36em;
-    color: var(--ink-2);
-    font-size: clamp(18px, 1.7vw, 24px);
-    line-height: 1.4;
-  }
-  .apps {
-    padding-bottom: 72px;
-  }
-  .apps__grid {
-    display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 20px;
-  }
-  .every {
-    margin-top: 32px;
-    justify-content: flex-start;
-    gap: 16px 40px;
-  }
-  .every__title {
-    font-size: 24px;
-    line-height: 30px;
-  }
-  .every__list {
-    display: flex;
-    flex: 1;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    gap: 16px 32px;
-  }
-  .every__item {
-    display: inline-flex;
-    align-items: center;
-    gap: 12px;
-    font-size: 18px;
-  }
-  .every__item {
-    min-width: 0;
-  }
-  .every__item svg {
-    flex: none;
-    color: var(--cyan-ink);
-  }
-  .coach-strip {
-    margin-top: 16px;
-  }
-  @media (max-width: 1100px) {
-    .apps__grid {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-  }
-  @media (max-width: 720px) {
-    .ahero {
-      padding-block: 36px 24px;
-    }
-    .apps {
-      padding-bottom: 48px;
-    }
-    .apps__grid {
-      grid-template-columns: minmax(0, 1fr);
-    }
-    .every {
-      flex-direction: column;
-      align-items: flex-start;
-    }
-    .every__list {
-      display: grid;
-      width: 100%;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-  }
-  @media (max-width: 480px) {
-    .every__list {
-      grid-template-columns: minmax(0, 1fr);
-    }
-  }
-</style>
+  <FinalNight title={c.ctaTitle} actions={[{ label: c.cta.download, href: '#apps' }, { label: c.cta.coach, href: site.signUp }]} />
+</SolutionsPage>

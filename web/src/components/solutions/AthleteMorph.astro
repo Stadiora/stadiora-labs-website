@@ -1,0 +1,56 @@
+---
+// The athletes hero media: one phone that puts on each of the four athlete apps in turn (colour, mark, name, photo,
+// today's session and status), with the neighbouring two apps on either side. All words are the page's own copy.
+// Decorative: the real app list, links and badges are in the tiles below. scripts/solutions/morph.ts runs it.
+import { athleteBrands } from './athlete-brands';
+import type { AthletesCopy } from '../../i18n/pages/athletes';
+
+interface Props {
+  copy: AthletesCopy;
+}
+const { copy } = Astro.props;
+const img = (id: string) => `url(/home/img/${id}.webp)`;
+const brands = copy.apps.map((a) => {
+  const b = athleteBrands[a.id];
+  const first = a.items[0];
+  return { n: a.name, m: b.m, c: b.c, f: b.f, i: img(b.img), k: a.today, t: first.title, s: 'meta' in first && first.meta ? `${first.sub} · ${first.meta}` : first.sub, st: a.status };
+});
+const first = brands[0];
+const left = brands[brands.length - 1];
+const right = brands[1];
+---
+
+<div class="sx-morph" data-sx-morph data-decorative data-brands={JSON.stringify(brands)} aria-hidden="true">
+  {
+    [
+      { cls: 'l1', b: left },
+      { cls: 'r1', b: right },
+    ].map(({ cls, b }) => (
+      <div class={`sx-ms ${cls}`}>
+        <div class="s">
+          <div class="sx-scr" style={`--bc:${b.c};--fg:${b.f}`}>
+            <div class="mk">{b.m}</div>
+            <div class="an">{b.n}</div>
+            <div class="hl" style={`--img:${b.i}`}></div>
+          </div>
+        </div>
+      </div>
+    ))
+  }
+  <div class="dphone" data-morph>
+    <div class="scr">
+      <i class="island"></i>
+      <div class="sx-scr" data-app style={`--bc:${first.c};--fg:${first.f}`}>
+        <div class="mk" data-app-mk>{first.m}</div>
+        <div class="an" data-app-name>{first.n}</div>
+        <div class="hl" data-app-img style={`--img:${first.i}`}></div>
+        <div class="tc">
+          <span class="tc-k" data-app-k>{first.k}</span>
+          <b data-app-t>{first.t}</b>
+          <span class="tc-s" data-app-s>{first.s}</span>
+        </div>
+        <div class="tc tc-st"><i></i><b data-app-st>{first.st}</b></div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,71 @@
+---
+// The team-feed phone on the clubs stage: what a squad's families and players see for the week. Every line is the
+// squad's own demo data from clubs.ts, so it follows the squad tabs. Decorative (aria-hidden); the same facts are in
+// the squad card beside it. scripts/solutions/feed.ts plays the loop; the markup is the finished frame.
+import type { ClubsCopy } from '../../i18n/pages/clubs';
+import type { SolutionsFxCopy } from '../../i18n/pages/solutions-fx';
+
+interface Props {
+  copy: ClubsCopy;
+  fx: SolutionsFxCopy['clubs'];
+}
+const { copy, fx } = Astro.props;
+const w = copy.week;
+const initials = (label: string) => (label.includes(' ') ? label.split(' ').map((p) => p[0]).join('').slice(0, 2) : label.slice(0, 3)).toUpperCase();
+---
+
+<div class="media-frame sq-phone" data-sx-feed aria-hidden="true">
+  <video muted playsinline loop preload="none" data-clip data-poster="/home/media/engage-bg.webp">
+    <source src="/home/media/engage-bg.webm" type="video/webm" />
+    <source src="/home/media/engage-bg.mp4" type="video/mp4" />
+  </video>
+  <div class="vid-shade"></div>
+  <div class="dphone">
+    <div class="scr">
+      <i class="island"></i>
+      <div class="sb"><span>9:41</span><span>●●● ▮</span></div>
+      {
+        copy.squads.map((s) => (
+          <div class="sqf" data-feed={s.id} data-on={s.id === copy.defaultSquad ? '' : undefined}>
+            <div class="ph-top">
+              <span class="av av-cyan">{initials(s.label)}</span>
+              <div>
+                <b>{fx.feedTitle}</b>
+                <small>
+                  {s.label} · {fx.feedSub}
+                </small>
+              </div>
+            </div>
+            <div class="ph-body">
+              <div class="ann" data-el="a">
+                <small>{w.announcement}</small>
+                <div class="ann-text">{s.note}</div>
+                <div class="bc-prog sqf__prog"><i data-el="ap" style={`width:${Math.round((s.read / s.total) * 100)}%`}></i></div>
+                <div class="sqf__read">
+                  <b class="tn fnum" data-el="rn" style={`--to:${s.read}`}></b> {w.of} <span class="fnum">{s.total}</span> {w.read}
+                </div>
+              </div>
+              <div class="bc-card" data-el="f">
+                <div class="to">{w.fixture}</div>
+                <p class="bc-text">
+                  {s.fixture.day} · vs {s.fixture.opponent}
+                </p>
+                <p class="bc-earlier">
+                  {s.fixture.time} · {s.fixture.venue}
+                </p>
+              </div>
+              <div class="bc-card" data-el="v">
+                <div class="to">{w.availability}</div>
+                <ul class="sqf__avail">
+                  <li><span class="dot" aria-hidden="true"></span><b class="tn fnum" style={`--to:${s.available}`}></b> {w.states.available}</li>
+                  <li><span class="dot dot--amber" aria-hidden="true"></span><b class="tn fnum" style={`--to:${s.doubtful}`}></b> {w.states.doubtful}</li>
+                  <li><span class="dot dot--muted" aria-hidden="true"></span><b class="tn fnum" style={`--to:${s.unavailable}`}></b> {w.states.unavailable}</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        ))
+      }
+    </div>
+  </div>
+</div>

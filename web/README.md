@@ -16,7 +16,8 @@ npm run evidence   # needs a build; Playwright screenshots, interaction checks a
 node scripts/evidence.mjs --coach-only   # just the Platform Coach pages, EN and ES (see below); add --checks-only to skip screenshots
 node scripts/evidence.mjs --nav-only   # just the header checks: geometry 1025 to 1440, panel height, drawer and panel focus
 node scripts/evidence.mjs --pricing-only   # just /pricing/ and /es/pricing/: prices, region, the live estimate, the motion (odometer in the accessibility tree, the estimate loop, the iris ring), reveals, fallback, layout, contrast, tab walk; add --checks-only to skip the screenshots, and --pricing-group=estimate (data, region, prices, behaviour, reveals, estimate, motion, fallback, layout, contrast, links) to run one group, e.g. in a loop to look for flakes
-node scripts/evidence.mjs --engage-only # just the Platform page checks, EN and ES (see below); add --checks-only to skip screenshots
+node scripts/evidence.mjs --engage-only # just the Platform page checks and motion guards, EN and ES (see below); add --checks-only to skip screenshots
+node scripts/evidence.mjs --engage-motion-only --checks-only # just the Platform motion guards; ENGAGE_ONLY=teams,integrations narrows the pages
 ```
 
 - Pages: `/` and `/pricing/` (EN), `/es/` and `/es/pricing/` (ES). Copy lives in `src/i18n/{en,es}.ts`; `es.ts` is typed against `en.ts`, so `astro check` flags a missing key. Page copy lives in `src/i18n/pages/` (`pricing.ts`: EN and ES typed together).
@@ -39,6 +40,56 @@ node scripts/evidence.mjs --engage-only # just the Platform page checks, EN and 
   The approved post-submit status (EN and ES) is written out in `scripts/lib/contact-contract.mjs`, independent of
   `src/i18n/pages/contact.ts`; verify and evidence compare the page with it word for word, so editing that copy means
   editing the contract too.
+- Solutions, Resources, About and Contact in Floodlight (DESIGN-4 section 6): every page runs on `src/layouts/SolutionsPage.astro`
+  (the foundation, the motion kit and `src/styles/solutions/solutions.css`; everything in the lane is prefixed `sx-`). The hero is
+  `src/components/solutions/SxHero.astro` (impact, mesh, orbits, display H1; the Schools and Coaches swap line is one sentence for a
+  screen reader and its visible words are `aria-hidden`), every page ends on `FinalNight.astro` (night-stadium clip, HTML title) and
+  the dark footer. Copy for the added strings is in `src/i18n/pages/solutions-fx.ts` (EN and ES). Page scripts are in
+  `src/scripts/solutions/` (`index.ts` starts them, then the kit): `swap.ts` (hero word swap), `feed.ts` (clubs team feed),
+  `morph.ts` (athletes app morph), `contact.ts` (topic thumb, submit burst). Each one only animates away from the finished still
+  frame, uses `autoplayer()` (so it stops on hover, focus, off screen, in a hidden tab and under reduced motion) and never writes
+  copy: the contact burst is ten decorative dots, and the status text still comes only from `contact-contract.mjs`.
+  The Coaches hero clip is `public/solutions/media/sx-coaches.{webm,mp4,webp}` (lane clips are named `sx-*`, carry no words, and
+  follow the clip markup and budget above; the home clips `night-stadium`, `ai-bg`, `engage-bg`, `tile-chalk`, `tile-hurdler`
+  and `reel` are the only other text-free clips, and the `pillar-*` clips have titles baked in, so a page may not use them).
+  `scripts/lib/solutions-floodlight-verify.mjs` (run by `npm run verify`) fails the build on a missing mesh or orbits, an H1
+  that is not the display face, too few dark surfaces, a final that is not on the night-stadium clip or sits after the footer,
+  a swap line a screen reader cannot read as one sentence,
+  decoration that is neither `aria-hidden` nor a labelled image, a burst that carries text, a pre-rendered status or a topic
+  control that is not two radios. Its media part is `solutions-media-guard.mjs`: every `<video>` has its WebM source, its MP4
+  source and its poster checked one by one against the text-free list and against the clip that slot is meant to play (the hero,
+  the stage or the final band), and a `src` on the `<video>` itself, a missing source or an unlisted file fails; the mutation
+  proofs are a `src` of `pillar-training.mp4` on the opening tag, both sources swapped for the `pillar-training` pair with the
+  poster kept, and the final MP4 swapped for `ai-bg`, each of which must make `npm run verify` exit 1.
+  `scripts/lib/solutions-floodlight-checks.mjs` (run by `evidence`) drives Chromium: the
+  Floodlight anatomy in the light theme, text cut off by a clipping ancestor at 390 and 1440 (`clip-probe.mjs`), the swap line
+  moving, resting under reduced motion and pausing on hover, the coaches clip, the clubs feed, the athletes morph, the About "A"
+  window and the contact thumb, burst and approved status text. It also runs two measuring modules, both on rendered pixels:
+  `solutions-motion-checks.mjs` samples the transforms, boxes and clip times of every hover scope (the hero, conveyors, stages,
+  morph, feed) while it runs, while the pointer is over it, while focus is inside it, offscreen and in a hidden tab (a flag is
+  never read, so a CSS override that keeps a conveyor moving fails), and `solutions-pixel-contrast.mjs` takes five photographs
+  (real ink, hidden, black, white, and isolated black text on white). It compares sampled glyph interiors with the hidden-ink
+  backdrop, using 4.5:1 or 3:1 for large text. The configured cases are 390/1440, EN/ES and light/dark, with reduced-motion stills,
+  five animation phases, six shared-clock times in orbit sections, and the four athlete apps. Transitions are suppressed only
+  during each measurement and restored after real ink has resolved; production button styling is unchanged.
+
+  **Pixel-contrast coverage boundary.** PR #35's committed-head mutation table uses these proof IDs; claims are limited to
+  those payloads and variants, not arbitrary paint-order analysis:
+
+  | Proof ID | Covered regression |
+  | --- | --- |
+  | `front-text-erase` | Athletes EN/light/1440: erase the existing app name after moving it in front of the phone as a z-index 10 sibling; the ordinary exported guard fails. |
+  | `descendant-erase` | Same variant: erase the name inside the front phone; the ordinary exported guard fails. |
+  | `dot-half`, `dot-opaque` | Coaches EN/light/1440: reviewed foreground dots at half/full opacity fail the ordinary exported moving assertion. |
+  | `transition-restored` | Removing measurement transition suppression destabilizes repeated frozen About ES/dark/390 "Inversionistas" ratios; the clean control stays near 18.42:1. |
+  | `identity` | Unchanged guard: the scoped athlete/coaches checks and repeated About measurements pass. |
+
+  **NOT COVERED:** the fanned `.sx-morph > .sx-ms.l1` and `.r1` phone subtrees (even their visible text), the explicit
+  `PURE_DECORATION` selectors, hidden/near-transparent/1px-clipped text, nodes with no qualifying sampled pixels, arbitrary
+  overlays or layouts, and motion between sampled frames. There is no rectangle exemption around the front `.dphone`.
+  The solid/gradient/faded canaries remain checks, not broader mutation-coverage claims.
+  `solutions-checks.mjs` still owns overflow, overlap, contrast,
+  target size, forms and prices; its overlap probe now reads a tight display line by its line box, and ignores `.sr` text.
 - Platform pages (`src/pages/{,es/}platform/{messaging,guardian-portal,teams,custom-branded-apps,integrations}/`): thin
   wrappers around `src/components/engage/*Page.astro`; all copy is in `src/i18n/pages/engage.ts` (EN and ES, ES typed against EN).
   Every claim on them is backed by Aria code, see the PR's claims table. `scripts/lib/engage-verify.mjs` (run by `npm run verify`)
@@ -48,12 +99,34 @@ node scripts/evidence.mjs --engage-only # just the Platform page checks, EN and 
   carried in `public/` (resolved against `dist/`) and the element ids it points at. Routes that other open PRs own (`pendingRoutes`: the coach pages, help) are an explicit list and are printed as `pending` by `npm run verify`, never passed
   silently; a typo of one of them fails. Delete an entry when its PR has merged. A `/contact/` link in the page body must carry `?topic=demo` or `?topic=question`; the footer and nav link to the plain page. `scripts/lib/engage-checks.mjs` (run by
   `evidence`) covers overflow and clipped text (`clip-probe.mjs`) at 390/1024/1280/1440, WCAG AA in both themes, alt text,
-  heading order, the Guardian child switcher and that Teams and `/pricing/` show the same schools price for the same visitor
-  (`?region=us|latam`, ten time zones, a missing one).
+  heading order, the live Messaging phone and the Guardian child switcher (tab ARIA, click and arrow keys) and that Teams and
+  `/pricing/` show the same schools price for the same visitor (`?region=us|latam`, ten time zones, a missing one). The clip
+  check also sweeps 16 widths from 360 to 1600 px on all five pages. Three more guards read what a browser really produces:
+  `engage-a11y-checks.mjs` (the selected Messaging and Guardian tabpanel is visible and in the accessibility tree with its text,
+  and every standalone link and control in `main` is 44 x 44 or larger at 390 px), `engage-heading-contrast.mjs` (sampled
+  `.grad-text` glyph-interior contrast; see "Heading contrast proof" below)
+  and `engage-media-guard.mjs` (every `<video>` in the built HTML is judged on its own `src`, every `<source>` and its poster against
+  the text-free list and the clip of its slot; `npm run verify` runs it).
+- Platform page look (Floodlight, R57 VB-3): every page is an `.impact` hero (`EngageHero`, split, overlap or orbit variant) with a
+  live HTML stage on the right, at least one dark `.show.impact` stage, the shared `AlsoInAria` links and the `EngageFinal` call to
+  action on the `night-stadium` clip. Styles are `src/styles/engage/{base,messaging,guardian,teams,branded,integrations}.css`
+  (`eg-` prefixed classes; the foundation and home CSS stay untouched) and scripts `src/scripts/engage/*.ts`. Everything that moves
+  goes through the motion kit (`src/scripts/motion/kit.ts`: `autoplayer`, `autotabs`, `group`, `tl`), so it starts on screen, pauses
+  on hover, focus, off screen and in a hidden tab, and is a finished still under reduced motion. No clip with words baked into the
+  picture is used (`pillar-*` and `planner-demo` stay on the home); the demo UIs are HTML. `scripts/lib/engage-motion-checks.mjs`
+  guards all of that: the Floodlight frame, text-free clips, every autoplayer (start, off screen, hover, focus, resume), a hidden tab,
+  the live reduced-motion flip, finished stills, the tab sets rotating, the Teams rail and the planner, the Branded morph and the
+  Integrations chips. `engage-movement-checks.mjs` (called from it) checks real movement, not `data-ap` flags: for every autoplayer it
+  takes the clocks of the animations and transitions in its scope, its text and markup and the time of its clips, and requires that
+  nothing advances for 1.4 s after a pause (pointer, focus, off screen, hidden tab, reduced motion switched on mid-run) and that it
+  moves again afterwards; the Branded morph must also settle on one brand under reduced motion at any point of a swap. The page chrome
+  that is not an autoplayer (`.mesh`, `.orbits`, `.grad-text`) is out of scope, as in the Coach guard. `.rv-mask` elements never get `.in` (an IntersectionObserver ignores an element whose own clip-path hides it),
+  so a reveal that clips an element observes a wrapper `.rv` and clips its child.
   Prices on these pages are not typed into the copy: the Teams schools teaser and the Branded add-on line are rendered from
   `src/data/prices.ts` (`education`, `addOns`) with `{tokens}` in `engage.ts`, and the Teams script picks the region with
   `detectRegion` from `src/lib/region.ts`, the same two modules `/pricing/` uses. `npm run verify` fails on a dollar amount in
   `engage.ts`, and on a rendered price that disagrees with the oracle in `scripts/lib/pricing-oracle.mjs`.
+
 - Design tokens (Floodlight, DESIGN-4): `src/styles/tokens.css`. Light is the default and the toggle is kept; the `.impact` sections (hero,
   dark stages, final CTA, footer) are dark in both themes, and `.reading` panels follow the page theme. Text uses the `*-ink` tokens
   (`--cyan-ink` is `#0077A8` on light); the vivid brand colours are fills and decoration only. `floodlight.css` holds the shared
@@ -105,6 +178,32 @@ node scripts/evidence.mjs --engage-only # just the Platform page checks, EN and 
   `public/home/img/` (WebP).
 - Fonts (Archivo variable for display, Inter variable for text, JetBrains Mono variable for labels; SIL OFL, licences in
   `src/assets/fonts/`) are self-hosted woff2 files; Archivo and Inter are preloaded.
+
+## Heading contrast proof
+
+`scripts/lib/engage-heading-contrast.mjs` compares real, hidden-span, white-text and black-text captures with the
+orbit dots still visible. The white/black difference selects fully covered glyph pixels and their four neighbours;
+the assertion uses the minimum real/backdrop ratio, not a percentile. Runner configuration: the five Engage pages,
+EN/ES, 390/1440 px, reduced motion in both themes and five seeded motion-on frames in dark mode. The threshold is
+3:1 for large text, 4.5:1 otherwise.
+
+Mutation-proven claims are deliberately narrow. Proof pointers are the named rows in the
+[PR #34 round-3 author mutation table](https://github.com/Stadiora/stadiora-labs-website/pull/34), recorded against
+the committed head with content comparisons, restoration checks and assertion lines taken from runtime stacks:
+
+- `reviewer-dot`: enlarging the Spanish Teams closing dots to `r: 150px` at desktop with motion on fails the minimum
+  contrast assertion; their rendered backdrop is not exempted.
+- `round2-dark-stop`: the `#081223` stop at 87.40856–89.24949% on that heading fails the same minimum assertion;
+  a small lost glyph is not forgiven as a percentile.
+- `mobile-orbit-rollback`: restoring the closing orbit's old vertical position fails the mobile minimum assertion.
+  The phone layout moves the orbit paths down toward the actions; it does not hide or pause the dots.
+- `desktop-orbit-rollback`: restoring the inherited SVG width clamp fails the desktop Messaging minimum assertion.
+  Removing that clamp lets the 120% orbit canvas stay centred instead of shifting its paths across the title.
+- `identity`: unchanged built CSS passes all 12 Teams checks.
+
+**NOT COVERED:** an exhaustive minimum over animation time, other browsers or widths, antialiased glyph edges,
+non-`.grad-text` text, the small-text 4.5:1 branch, or every possible style/media/stacking regression. Clean checks
+on the other configured pages and themes are samples, not mutation proof for those cases.
 
 ## Cutover (R57 lane C)
 

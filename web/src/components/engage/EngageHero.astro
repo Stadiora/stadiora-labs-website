@@ -1,0 +1,46 @@
+---
+import '../../styles/engage/base.css';
+
+interface Cta {
+  label: string;
+  href: string;
+}
+interface Props {
+  variant?: 'split' | 'overlap' | 'orbit';
+  eyebrow: string;
+  title: { pre: string; lane: string; post: string };
+  sub: string;
+  ctas: Cta[];
+  /** Extra attributes for the section (a page that runs tabs on the hero puts `data-autotabs` here). */
+  attrs?: Record<string, string>;
+}
+const { variant = 'split', eyebrow, title, sub, ctas, attrs = {} } = Astro.props;
+---
+
+<section class:list={['eg-hero', 'impact', `eg-hero--${variant}`]} data-section aria-labelledby="page-title" {...attrs}>
+  <div class="mesh" aria-hidden="true">
+    <i class="b b5"></i><i class="b b1"></i><i class="b b2"></i><i class="b b3"></i><i class="b b4"></i><i class="vig"></i>
+  </div>
+  <div class="orbits" aria-hidden="true">
+    <svg viewBox="0 0 1600 800">
+      <ellipse cx="800" cy="400" rx="760" ry="250"></ellipse>
+      <ellipse class="dash" cx="800" cy="400" rx="620" ry="190"></ellipse>
+      <ellipse cx="800" cy="400" rx="470" ry="140"></ellipse>
+      <circle class="fdot eg-fdot-a" r="8" fill="#00BEF3"></circle>
+      <circle class="fdot eg-fdot-b" r="6" fill="#8B5CF6"></circle>
+    </svg>
+  </div>
+  <div class="wrap eg-hero__grid">
+    <div class="eg-hero__copy">
+      <p class="eyebrow rv">{eyebrow}</p>
+      <h1 id="page-title" class="d eg-h1 lines"><span><span>{title.pre}<span class="grad-text">{title.lane}</span>{title.post}</span></span></h1>
+      <p class="lead rv" style="--i:2">{sub}</p>
+      <div class="eg-ctas rv" style="--i:3">
+        {ctas.map((c, i) => <a class:list={['btn', 'btn--lg', i === 0 ? 'btn--white' : 'btn--ghost']} href={c.href} rel={c.href.startsWith('http') ? 'noopener' : undefined}>{c.label}{i === 0 && <span class="arr" aria-hidden="true">→</span>}</a>)}
+      </div>
+      <slot name="after" />
+    </div>
+    <div class="eg-hero__media"><slot name="media" /></div>
+  </div>
+  <slot name="below" />
+</section>

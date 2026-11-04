@@ -1,0 +1,347 @@
+/* Custom-branded apps (VB-3). The morph stage reuses the home `.ap-*`, `.app-scr` and `.flychip` rules from
+   styles/home/showcase.css; this places it in the hero and styles the dark "make it yours" stage. */
+
+.eg-bh {
+  min-height: 640px;
+  border-radius: var(--r-xl);
+  background: radial-gradient(120% 90% at 50% 0%, #17306b 0%, #0a1634 55%, #060d1f 100%);
+}
+.eg-bh__glow {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(40% 40% at 20% 80%, rgba(0, 190, 243, 0.28), transparent 70%),
+    radial-gradient(40% 40% at 85% 20%, rgba(139, 92, 246, 0.3), transparent 70%);
+}
+.eg-bh__stage {
+  position: absolute;
+  inset: 0;
+  height: auto;
+}
+.eg-bh .badge-demo {
+  left: 16px;
+  top: 16px;
+  bottom: auto;
+  z-index: 7;
+}
+.eg-bh .ap-side {
+  width: 190px;
+  height: 390px;
+}
+.eg-bh .app-scr .an {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+.sk {
+  display: block;
+  height: 8px;
+  margin: 8px 0;
+  border-radius: 4px;
+  background: #d3dbe8;
+}
+.sk--50 {
+  width: 50%;
+}
+.sk--60 {
+  width: 60%;
+}
+.sk--90 {
+  width: 90%;
+}
+.eg-bh__sk {
+  flex: 1;
+}
+.eg-bh__sk .sk {
+  margin: 6px 0;
+}
+
+/* make it yours */
+.eg-make__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+  gap: 24px;
+  align-items: stretch;
+}
+.eg-make__list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.eg-make__list .eg-tile {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.eg-make__list .eg-tile:last-child {
+  grid-column: 1 / -1;
+}
+.eg-make__list .eg-tile h3 {
+  font-size: 20px;
+}
+.eg-dg {
+  display: grid;
+  gap: 22px;
+  padding: 26px;
+  border-radius: 24px;
+  background: #fff;
+  color: #08132b;
+  box-shadow: 0 40px 80px -40px rgba(0, 0, 0, 0.7);
+}
+.eg-dg__top {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+.eg-dg__icon {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 84px;
+  height: 84px;
+  border-radius: 20px;
+  background: #08132b;
+  color: #fff;
+}
+.eg-dg__name {
+  margin: 0 0 10px;
+  font: 700 22px/1.1 var(--f-text);
+}
+.eg-dg__dots {
+  display: flex;
+  gap: 10px;
+}
+.eg-dg__dots i {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  box-shadow: 0 0 0 1px #c3ccd9;
+}
+.eg-dg__scr {
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  padding: 26px 20px;
+  border-radius: 18px;
+  background: linear-gradient(170deg, #1c2f55, #08132b 70%);
+  color: #fff;
+  text-align: center;
+}
+.eg-dg__mark {
+  display: grid;
+  place-items: center;
+  width: 54px;
+  height: 54px;
+  border-radius: 16px;
+  background: #00bef3;
+  color: #04101f;
+}
+.eg-dg__brand {
+  margin: 4px 0 0;
+  font: 800 22px/1 var(--f-display);
+  font-variation-settings: 'wdth' 80;
+  text-transform: uppercase;
+}
+.eg-dg__tag {
+  margin: 0;
+  font-size: 14px;
+  color: #d5deec;
+}
+.eg-dg__cta {
+  margin-top: 8px;
+  padding: 10px 26px;
+  border-radius: 999px;
+  background: #fff;
+  color: #08132b;
+  font-size: 14px;
+  font-weight: 700;
+}
+.eg-make .eg-note {
+  margin: 28px 0 0;
+  text-align: left;
+}
+
+/* how it works */
+.eg-how {
+  margin-top: clamp(56px, 7vw, 104px);
+}
+.eg-steps {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 20px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: step;
+}
+.eg-steps::before {
+  content: '';
+  position: absolute;
+  left: 8%;
+  right: 8%;
+  top: 34px;
+  height: 2px;
+  background: linear-gradient(90deg, #00bef3, #8b5cf6);
+  transform: scaleX(0);
+  transform-origin: 0 50%;
+  transition: transform 1400ms var(--e-out) 300ms;
+}
+.eg-steps.in::before {
+  transform: scaleX(1);
+}
+.eg-steps li {
+  position: relative;
+  counter-increment: step;
+  padding: 88px 24px 26px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.06);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.12);
+  color: #fff;
+  font: 600 20px/1.3 var(--f-text);
+  opacity: 0;
+  transform: translateY(18px);
+  transition:
+    opacity 600ms var(--e-out) calc(var(--n, 0) * 160ms + 200ms),
+    transform 600ms var(--e-out) calc(var(--n, 0) * 160ms + 200ms);
+}
+.eg-steps li:nth-child(2) {
+  --n: 1;
+}
+.eg-steps li:nth-child(3) {
+  --n: 2;
+}
+.eg-steps.in li {
+  opacity: 1;
+  transform: none;
+}
+.eg-steps li::before {
+  content: counter(step);
+  position: absolute;
+  left: 24px;
+  top: 14px;
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #00bef3;
+  color: #04101f;
+  font: 800 20px/1 var(--f-display);
+}
+.eg-addon {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px 32px;
+  margin-top: 24px;
+  padding: 22px 26px;
+  border-radius: 20px;
+  background: rgba(0, 190, 243, 0.1);
+  box-shadow: 0 0 0 1px rgba(0, 190, 243, 0.35);
+}
+.eg-addon .addon__text {
+  margin: 0;
+  color: #fff;
+  font: 700 22px/1.3 var(--f-text);
+}
+
+/* same platform */
+.eg-same {
+  margin-top: clamp(56px, 7vw, 104px);
+}
+.eg-same__hd {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 28px 56px;
+}
+.eg-same__hd .lead {
+  max-width: 38em;
+  margin-top: 12px;
+}
+.eg-same__icons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px 24px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.eg-same__icons li {
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  width: 96px;
+  color: var(--ink-2);
+  font-size: 14px;
+  line-height: 18px;
+  text-align: center;
+}
+.eg-same__icons img {
+  width: 72px;
+  height: 72px;
+  border-radius: 16px;
+  box-shadow: 0 0 0 1px var(--panel-line, rgba(8, 19, 43, 0.12));
+}
+.eg-same__fan {
+  margin-top: clamp(32px, 4vw, 56px);
+}
+
+@media (max-width: 1080px) {
+  .eg-bh {
+    min-height: 560px;
+  }
+  .eg-bh .ap-stage .dphone {
+    transform: translate(-50%, -50%) scale(0.78);
+  }
+  .eg-make__grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .eg-steps {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .eg-steps::before {
+    display: none;
+  }
+  .eg-steps li {
+    padding: 22px 24px 22px 84px;
+  }
+  .eg-steps li::before {
+    top: 50%;
+    margin-top: -20px;
+  }
+}
+@media (max-width: 640px) {
+  .eg-bh {
+    min-height: 560px;
+  }
+  .eg-make__list {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .eg-dg__top {
+    flex-wrap: wrap;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .eg-steps::before {
+    transform: none;
+    transition: none;
+  }
+  .eg-steps li {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}
+html:not(.js) .eg-steps li {
+  opacity: 1;
+  transform: none;
+}
+html:not(.js) .eg-steps::before {
+  transform: none;
+}

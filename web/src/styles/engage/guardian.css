@@ -1,0 +1,397 @@
+/* Guardian page (VB-3). The hero stage floats three cards over the hurdler clip; the "what families see" stage
+   is the family phone with its child switcher, flanked by four reveal tiles. Phone UI is always-light, so its
+   colours are literal; the tiles sit on the dark stage. */
+
+/* ---------- hero stage ---------- */
+.eg-gh {
+  min-height: 620px;
+  border-radius: var(--r-xl);
+}
+.eg-gh .badge-demo {
+  left: 16px;
+  bottom: 16px;
+}
+.eg-gh__cards {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+}
+.eg-gc {
+  position: absolute;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  width: min(78%, 360px);
+  padding: 14px 16px;
+}
+.eg-gc b {
+  display: block;
+  font-size: 14px;
+  line-height: 1.3;
+}
+.eg-gc small {
+  display: block;
+  margin-top: 2px;
+  color: #4b586b;
+  font-size: 12px;
+  font-weight: 500;
+}
+.eg-gc b small {
+  display: inline;
+  font-weight: 500;
+}
+.eg-gc p {
+  margin: 4px 0 0;
+  font-size: 13px;
+  line-height: 1.4;
+  color: #1b2740;
+}
+.eg-gc__ic,
+.eg-gc__av {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 36px;
+  height: 36px;
+  border-radius: 12px;
+  background: #e0f6fe;
+  color: #0b6a94;
+}
+.eg-gc__av {
+  border-radius: 50%;
+  background: #7c4de8;
+  color: #fff;
+  font-weight: 700;
+  font-size: 14px;
+}
+.eg-gc--week {
+  left: 6%;
+  top: 9%;
+}
+.eg-gc--msg {
+  right: 6%;
+  top: 31%;
+}
+.eg-gc--form {
+  left: 9%;
+  bottom: 14%;
+  padding-right: 54px;
+}
+.eg-gc__ok {
+  position: absolute;
+  right: 14px;
+  top: 50%;
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  margin-top: -16px;
+  border-radius: 50%;
+  background: #047857;
+  color: #fff;
+}
+
+/* ---------- how: switcher + phone + tiles ---------- */
+.eg-how .eg-stage-title {
+  max-width: none;
+}
+.eg-kids {
+  display: flex;
+  justify-content: center;
+  gap: clamp(16px, 4vw, 48px);
+  margin-bottom: clamp(24px, 3vw, 40px);
+}
+.eg-kid {
+  appearance: none;
+  min-width: 190px;
+  margin: 0;
+  padding: 8px 0 6px;
+  border: 0;
+  background: transparent;
+  color: #fff;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.eg-kid .hd {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.eg-kid strong {
+  font: 800 clamp(17px, 1.7vw, 22px) / 1.1 var(--f-display);
+  font-variation-settings: 'wdth' 80;
+  transition: color 300ms;
+}
+.eg-kid[aria-selected='false'] strong {
+  color: #98a5ba;
+}
+.eg-kid__av {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: #00bef3;
+  color: #04101f;
+  font-weight: 800;
+  font-size: 14px;
+}
+.eg-kid[aria-selected='false'] .eg-kid__av {
+  background: #5b6a85;
+  color: #fff;
+}
+.eg-kid .at-bar {
+  display: block;
+}
+.eg-kid:focus-visible {
+  outline: 2px solid #00bef3;
+  outline-offset: 4px;
+  border-radius: 4px;
+}
+.how__stage .at-bar i {
+  animation: none;
+}
+
+.eg-how__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  gap: clamp(24px, 4vw, 64px);
+  align-items: center;
+}
+.eg-how__col {
+  display: grid;
+  gap: 20px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.eg-how__col--l {
+  justify-items: end;
+}
+.eg-how__col--r {
+  justify-items: start;
+  margin-top: 56px;
+}
+.eg-how__col > li {
+  width: min(100%, 340px);
+}
+.eg-how__phone {
+  display: flex;
+  justify-content: center;
+}
+/* the phone */
+.eg-gp .eg-gp__brand {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 44px;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 40px;
+  margin: 0;
+  padding: 0 16px;
+  background: #fff;
+  border-bottom: 1px solid #e3e9f1;
+  font-weight: 700;
+  font-size: 13px;
+}
+.eg-gp__logo {
+  width: 18px;
+  height: 18px;
+  border-radius: 6px;
+  background: linear-gradient(135deg, #00bef3, #8b5cf6);
+}
+.eg-gp__scn {
+  inset: 84px 0 56px;
+  gap: 10px;
+  padding: 12px;
+}
+.eg-gp__kid {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  font-weight: 700;
+  font-size: 14px;
+}
+.eg-gp__avatar {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #00bef3;
+  color: #04101f;
+  font-weight: 800;
+  font-size: 12px;
+}
+.eg-gp__avatar--coach {
+  background: #7c4de8;
+  color: #fff;
+}
+.eg-gp__card {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(8, 19, 43, 0.06);
+  font-size: 12.5px;
+  line-height: 1.35;
+}
+.eg-gp__card > svg {
+  flex: none;
+  margin-top: 1px;
+  color: #0b6a94;
+}
+.eg-gp__card b {
+  display: block;
+  font-size: 13px;
+}
+.eg-gp__card small {
+  display: block;
+  color: #4b586b;
+  font-size: 11px;
+}
+.eg-gp__card b small {
+  display: inline;
+}
+.eg-gp__card p {
+  margin: 3px 0 0;
+}
+.eg-gp__st {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 26px;
+  height: 26px;
+  margin-left: auto;
+  border-radius: 50%;
+  background: #fef3c7;
+  color: #92400e;
+}
+.eg-gp__st.ok {
+  background: #d1fae5;
+  color: #047857;
+}
+.eg-gp__bar {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  height: 56px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  background: #fff;
+  border-top: 1px solid #e3e9f1;
+}
+.eg-gp__bar li {
+  display: grid;
+  flex: 1;
+  place-items: center;
+  align-content: center;
+  gap: 2px;
+  color: #4b586b;
+  font-size: 10px;
+}
+.eg-gp__bar li.is-on {
+  color: #0b6a94;
+  font-weight: 700;
+}
+
+/* ---------- consent + pricing ---------- */
+.eg-consent__list {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 20px;
+  margin: 28px 0 0;
+  padding: 0;
+  list-style: none;
+}
+.eg-consent__list li {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 22px 24px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--bg);
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 1.35;
+}
+.eg-consent__ic {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  background: var(--mint-tint, #d1fae5);
+  color: var(--mint-ink);
+}
+.eg-price {
+  padding: clamp(40px, 5vw, 72px) 0;
+  background: var(--surface);
+}
+.eg-price__row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px 48px;
+}
+.eg-price .lead {
+  margin-top: 10px;
+}
+.eg-price__links {
+  display: grid;
+  gap: 14px;
+}
+
+@media (max-width: 1080px) {
+  .eg-gh {
+    min-height: 560px;
+  }
+  .eg-how__grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .eg-how__phone {
+    order: -1;
+  }
+  .eg-how__col {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    justify-items: stretch;
+    margin-top: 0;
+  }
+  .eg-how__col > li {
+    width: 100%;
+  }
+  .eg-consent__list {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+@media (max-width: 640px) {
+  .eg-gh {
+    min-height: 520px;
+  }
+  .eg-gc {
+    width: 88%;
+  }
+  .eg-kid {
+    min-width: 0;
+    flex: 1;
+  }
+  .eg-how__col {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

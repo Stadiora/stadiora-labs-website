@@ -11,6 +11,7 @@ import { verifyCutover } from './lib/cutover-verify.mjs';
 import { verifyLegalVerbatim } from './lib/legal-verbatim.mjs';
 import { verifyApiPages } from './lib/api-verify.mjs';
 import { verifySolutions } from './lib/verify-solutions.mjs';
+import { verifySolutionsFloodlight } from './lib/solutions-floodlight-verify.mjs';
 import { verifyHomeClaims, verifyHomeMedia, verifyHomeSelectors, verifyHomeVideos } from './lib/home-verify.mjs';
 
 // DIST_DIR points the run at another build (a mutation copy), so the real dist/ stays untouched.
@@ -95,6 +96,7 @@ verifyHomeSelectors({ root: fileURLToPath(new URL('../', import.meta.url)), fail
 
 verifyPricing(dist, fail);
 verifySolutions({ dist, fail });
+verifySolutionsFloodlight({ dist, fail });
 const pendingLinks = new Map();
 verifyEngagePages({ dist, fail, pending: pendingLinks });
 

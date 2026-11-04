@@ -1,13 +1,15 @@
 ---
-import Page from '../../layouts/Page.astro';
-import FeatureHero from '../solutions/FeatureHero.astro';
+import SolutionsPage from '../../layouts/SolutionsPage.astro';
+import SxHero from '../solutions/SxHero.astro';
+import Conveyor from '../solutions/Conveyor.astro';
+import FinalNight from '../solutions/FinalNight.astro';
 import SquadWeek from '../solutions/SquadWeek.astro';
-import CtaBand from '../ui/CtaBand.astro';
 import RegionPrice from '../ui/RegionPrice.astro';
 import Icon from '../ui/Icon.astro';
-import Photo from '../ui/Photo.astro';
+import { clubsConveyor } from '../solutions/conveyors';
 import { common } from '../../i18n/pages/common';
 import { clubs } from '../../i18n/pages/clubs';
+import { solutionsFx } from '../../i18n/pages/solutions-fx';
 import { contactHref } from '../../lib/links';
 import { hrefFor } from '../../data/nav';
 import { site } from '../../data/site';
@@ -19,39 +21,32 @@ interface Props {
 const { locale } = Astro.props;
 const c = clubs[locale];
 const k = common[locale];
+const fx = solutionsFx[locale];
 ---
 
-<Page locale={locale} path="/solutions/teams-and-clubs/" title={c.meta.title} description={c.meta.description}>
-  <FeatureHero
+<SolutionsPage locale={locale} path="/solutions/teams-and-clubs/" title={c.meta.title} description={c.meta.description}>
+  <SxHero
+    locale={locale}
+    variant="split"
     eyebrow={c.eyebrow}
     title={c.title}
-    sub={c.sub}
+    lead={c.sub}
     primary={{ label: k.bookDemo, href: contactHref(locale, 'demo') }}
     secondary={{ label: k.seePricing, href: hrefFor('pricing', locale) }}
   >
-    <div class="mosaic">
-      <div class="mosaic__cell mosaic__cell--big">
-        <Photo slot="h2-academies-big" ratio="4/5" sizes="(max-width: 1100px) 60vw, 440px" {locale} eager />
-      </div>
-      <div class="mosaic__cell mosaic__cell--top">
-        <Photo slot="h2-academies-tile-sq" ratio="1/1" sizes="(max-width: 1100px) 40vw, 360px" {locale} eager />
-      </div>
-      <div class="mosaic__cell mosaic__cell--bottom">
-        <Photo slot="h2-academies-tile-45" ratio="4/5" sizes="(max-width: 1100px) 40vw, 360px" {locale} eager />
-      </div>
-    </div>
-  </FeatureHero>
+    <Conveyor variant="grid" {...clubsConveyor} />
+  </SxHero>
 
-  <SquadWeek copy={c} />
+  <SquadWeek copy={c} fx={fx.clubs} />
 
-  <section class="focus" aria-labelledby="focus-title">
-    <div class="container">
-      <p class="focus__line" id="focus-title">{c.focus}</p>
+  <section class="sx-sec focus" aria-labelledby="focus-title">
+    <div class="wrap">
+      <h2 class="d d2 lines" id="focus-title"><span><span>{c.focus}</span></span></h2>
       <ul class="focus__cols">
         {
           c.cols.map((col, i) => (
-            <li class="pcard" data-reveal style={`--reveal-i:${i}`}>
-              <h2 class="pcard__title">{col.title}</h2>
+            <li class="pcard rv" style={`--i:${i}`}>
+              <h3 class="pcard__title">{col.title}</h3>
               <p class="focus__text">{col.text}</p>
               {col.soon && (
                 <p class="focus__soon">
@@ -62,7 +57,7 @@ const k = common[locale];
           ))
         }
       </ul>
-      <div class="strip">
+      <div class="strip rv">
         <p class="strip__text"><RegionPrice price="coreFrom" text={c.price.text} /></p>
         <div class="strip__actions">
           <a class="link link-arrow" href={hrefFor('pricing', locale)}>{c.price.link}<Icon name="arrow-right" /></a>
@@ -72,54 +67,15 @@ const k = common[locale];
     </div>
   </section>
 
-  <CtaBand title={k.ctaTitle} actions={[{ label: c.cta.primary, href: contactHref(locale, 'demo') }, { label: c.cta.secondary, href: site.signUp }]} />
-</Page>
+  <FinalNight title={k.ctaTitle} actions={[{ label: c.cta.primary, href: contactHref(locale, 'demo') }, { label: c.cta.secondary, href: site.signUp }]} />
+</SolutionsPage>
 
 <style>
-  .mosaic {
-    display: grid;
-    grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
-    grid-template-rows: repeat(2, minmax(0, 1fr));
-    gap: 10px;
-    height: clamp(300px, 34vw, 440px);
-  }
-  .mosaic__cell {
-    position: relative;
-    overflow: hidden;
-    border-radius: var(--radius-card);
-    background: var(--surface-2);
-  }
-  .mosaic__cell--big {
-    grid-row: 1 / 3;
-  }
-  .mosaic__cell :global(.photo) {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-  .mosaic__cell--top :global(.photo) {
-    object-position: 50% 72%;
-  }
-  .mosaic__cell--bottom :global(.photo) {
-    object-position: 50% 52%;
-  }
-  .focus {
-    padding-block: 48px 72px;
-  }
-  .focus__line {
-    color: var(--ink);
-    font-family: var(--font-display);
-    font-size: clamp(22px, 2.4vw, 30px);
-    font-weight: 600;
-    line-height: 1.25;
-  }
   .focus__cols {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 24px;
-    margin-block: 28px 32px;
+    margin-block: clamp(32px, 4vw, 56px);
   }
   .focus__text {
     margin-top: 12px;
@@ -144,16 +100,8 @@ const k = common[locale];
     color: var(--ink-2);
   }
   @media (max-width: 1100px) {
-    .mosaic {
-      height: clamp(260px, 56vw, 420px);
-    }
     .focus__cols {
       grid-template-columns: minmax(0, 1fr);
-    }
-  }
-  @media (max-width: 720px) {
-    .focus {
-      padding-block: 40px 56px;
     }
   }
 </style>

@@ -3,7 +3,8 @@
 //   node scripts/evidence.mjs --checks-only    (no screenshots)
 //   node scripts/evidence.mjs --nav-only       (header geometry, mega panel height, drawer and panel focus only)
 //   node scripts/evidence.mjs --pricing-only   (the /pricing/ page only: prices, region, dialogs, layout, contrast; add --checks-only to skip screenshots)
-//   node scripts/evidence.mjs --engage-only    (the five Platform pages, EN and ES: overflow, contrast, a11y, interactions)
+//   node scripts/evidence.mjs --engage-only    (the five Platform pages, EN and ES: overflow, contrast, a11y, interactions, motion guards)
+//   node scripts/evidence.mjs --engage-motion-only   (just the Platform motion guards: autoplayers, reduced motion, clips; ENGAGE_ONLY=teams,integrations narrows the pages)
 //   node scripts/evidence.mjs --home-only      (the home guards only: structure, autoplayers, reduced motion, marquees, hero words, clipping, contrast)
 //   node scripts/evidence.mjs --api-only       (the API page, EN and ES: pause, reduced motion and glyph-pixel contrast of the API and legal pages)
 // Output goes to web/.evidence/ (git-ignored): PNGs plus summary.json. Exit code 1 when a check fails.
@@ -15,11 +16,13 @@ import { contrastProbe } from './lib/contrast.mjs';
 import { apiMotionChecks, apiReducedMotionChecks } from './lib/api-motion-checks.mjs';
 import { pageContrastChecks } from './lib/page-contrast-checks.mjs';
 import { engageChecks } from './lib/engage-checks.mjs';
+import { engageMotionChecks } from './lib/engage-motion-checks.mjs';
 import { homeChecks, homeSections } from './lib/home-checks.mjs';
 import { navChecks } from './lib/nav-checks.mjs';
 import { pricingChecks } from './lib/pricing-checks.mjs';
 import { platformCoachChecks } from './lib/platform-coach-checks.mjs';
 import { solutionsChecks } from './lib/solutions-checks.mjs';
+import { solutionsFloodlightChecks } from './lib/solutions-floodlight-checks.mjs';
 import { serve } from './lib/static-server.mjs';
 
 const root = fileURLToPath(new URL('..', import.meta.url));
@@ -27,6 +30,7 @@ const outDir = `${root}.evidence/`;
 const navOnly = process.argv.includes('--nav-only');
 const pricingOnly = process.argv.includes('--pricing-only');
 const engageOnly = process.argv.includes('--engage-only');
+const engageMotionOnly = process.argv.includes('--engage-motion-only');
 const checksOnly = process.argv.includes('--checks-only');
 const coachOnly = process.argv.includes('--coach-only');
 const homeOnly = process.argv.includes('--home-only');
@@ -166,10 +170,11 @@ if (homeOnly) {
   await homeChecks({ open, check, sleep, settle, metrics });
   await finish();
 }
-if (!engageOnly) await navChecks({ open, check, shot, sleep, checksOnly, metrics });
+if (!engageOnly && !engageMotionOnly) await navChecks({ open, check, shot, sleep, checksOnly, metrics });
 if (navOnly) await finish();
-await engageChecks({ open, check, shot, sleep, settle, checksOnly, metrics });
-if (engageOnly) await finish();
+if (!engageMotionOnly) await engageChecks({ open, check, shot, sleep, settle, checksOnly, metrics });
+await engageMotionChecks({ open, check, sleep, settle, metrics });
+if (engageOnly || engageMotionOnly) await finish();
 
 // ---------------------------------------------------------------- 2. interactions (motion on)
 // The Floodlight home guards (structure, every autoplayer, reduced motion, marquees, hero words, clipping, contrast).
@@ -463,6 +468,7 @@ check('perf', 'no clip is bundled into _astro (clips are public files, loaded on
 await pricingChecks({ browser, server, outDir, check, metrics, sleep, checksOnly });
 // ---------------------------------------------------------------- 6. solutions, resources and company pages
 await solutionsChecks({ open, settle, check, sleep, metrics, measure, outDir, checksOnly });
+await solutionsFloodlightChecks({ open, settle, check, sleep });
 
 await coachRun();
 await apiRun();

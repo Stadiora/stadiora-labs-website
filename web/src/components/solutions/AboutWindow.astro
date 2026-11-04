@@ -1,0 +1,20 @@
+---
+// The About hero's right side: a giant "A" (for Aria) cut out of the track photo, with the photo drifting behind the cut
+// and two orbit dots circling it. The photo's alt text is on the figure; the glyph itself is decoration.
+import trackPhoto from '../../assets/photos/c1-about-track.webp';
+
+interface Props {
+  alt: string;
+}
+const { alt } = Astro.props;
+---
+
+<figure class="sx-a" role="img" aria-label={alt} data-decorative data-sx-loop>
+  <svg class="sx-a__ring" viewBox="0 0 600 640" aria-hidden="true">
+    <ellipse cx="300" cy="320" rx="290" ry="240"></ellipse>
+    <ellipse class="dash" cx="300" cy="320" rx="240" ry="196"></ellipse>
+    <circle class="sx-a__dot sx-a__dot--a" r="9" fill="#00BEF3"></circle>
+    <circle class="sx-a__dot sx-a__dot--b" r="7" fill="#8B5CF6"></circle>
+  </svg>
+  <span class="sx-a__glyph d" aria-hidden="true" style={`--photo:url(${trackPhoto.src})`}>A</span>
+</figure>
