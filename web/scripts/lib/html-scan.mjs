@@ -29,10 +29,16 @@ export function scanTags(html) {
       continue;
     }
     const next = html[lt + 1] ?? '';
-    if (!letter(next)) {
-      // A doctype, a processing instruction or an end tag: skip to its '>'.
+    if (next === '!' || next === '?' || next === '/') {
+      // A doctype or other declaration, a processing instruction or an end tag: skip to its '>'.
       const end = html.indexOf('>', lt + 1);
       i = end === -1 ? html.length : end + 1;
+      continue;
+    }
+    if (!letter(next)) {
+      // A literal '<' in text (as in "Response < 5 ms"): it opens nothing, so step past it alone and keep scanning.
+      // Skipping to the next '>' here would swallow the following real tag.
+      i = lt + 1;
       continue;
     }
     let p = lt + 1;

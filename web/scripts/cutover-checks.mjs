@@ -118,7 +118,10 @@ for (const url of noindexPages) {
 }
 for (const url of ['/api.html', '/lead-magnet.html', '/privacy.html', '/terms.html', '/connect.html']) {
   const { page, context } = await open(url);
-  check('noindex', `${url}: indexable, no active noindex`, (await page.locator('meta[name="robots"][content*="noindex"]').count()) === 0);
+  // Robots directives are case-insensitive ("NOINDEX" counts), so normalise them exactly as the noindex check above does.
+  const robots = await page.locator('meta[name="robots"]').evaluateAll((els) => els.map((el) => el.getAttribute('content') ?? ''));
+  const noindex = robots.some((c) => c.toLowerCase().split(',').map((d) => d.trim()).includes('noindex'));
+  check('noindex', `${url}: indexable, no active noindex`, !noindex, robots.join(' | ') || 'no active robots tag');
   await context.close();
 }
 
