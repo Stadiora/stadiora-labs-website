@@ -21,6 +21,25 @@ export const annual = (monthly) => Math.floor((monthly * (100 - ANNUAL_PERCENT))
 export const fmt = (n) => `$${n.toLocaleString('en-US')}`;
 export const sizes = Object.keys(ORACLE.us).map(Number);
 
+/**
+ * What the estimate panel must show, from this oracle alone. Core and Performance are the table price for the roster
+ * (annual is 10% off, rounded down per month) plus each extra coach; Schools is "from" the lowest education rate;
+ * Federations is custom; Free is zero. The custom-branded app adds its monthly fee to the total and its setup fee is
+ * shown apart, once. Extra coaches only apply to Core and Performance. AI and video credits are never priced.
+ */
+export function estimateOracle({ region = 'us', athletes = DEFAULT_BAND, billing = 'monthly', plan = 'core', extraCoaches = 0, app = false } = {}) {
+  const [, core, perf] = ORACLE[region][athletes];
+  let monthly = 0;
+  if (plan === 'core' || plan === 'performance') {
+    const plain = plan === 'core' ? core : perf;
+    monthly = (billing === 'annual' ? annual(plain) : plain) + extraCoaches * EXTRA_COACH[region];
+  } else if (plan === 'schools') {
+    monthly = Math.min(...EDU[region]);
+  }
+  if (app) monthly += BRANDED.monthly;
+  return { monthly, setup: app ? BRANDED.setup : 0, custom: plan === 'federations', from: plan === 'schools' };
+}
+
 /** Every dollar amount that may show for a region (Core, Performance, education, extra coach). */
 export const everyAmount = (region) => {
   const out = new Set([EXTRA_COACH[region], ...EDU[region]]);
@@ -55,10 +74,12 @@ export function tableProblems({ bands, education, addOns, athleteBands, free, an
 }
 
 // Tokens the page substitutes into copy, by the fields that carry them.
-const ALLOWED_TOKENS = new Set(['percent', 'athletes', 'coaches', 'monthly', 'setup', 'amount', 'total', 'plan']);
+const ALLOWED_TOKENS = new Set(['percent', 'athletes', 'coaches', 'monthly', 'setup', 'amount', 'total', 'plan', 'qty']);
 const REQUIRED_TOKENS = {
   'controls.annualSaves': ['percent'],
   'controls.noScript': ['athletes'],
+  'controls.coaches': ['coaches'],
+  'controls.valueText': ['athletes', 'coaches'],
   'plans.free.line': ['athletes', 'coaches'],
   'addons.extraCoach.priceLine': ['amount'],
   'addons.brandedApp.price': ['monthly', 'setup'],
@@ -67,6 +88,13 @@ const REQUIRED_TOKENS = {
   'price.billedYearly': ['total'],
   'price.live': ['amount', 'plan'],
   'price.liveYearly': ['amount', 'plan'],
+  'estimate.coachRow': ['qty'],
+  'estimate.planRow': ['plan', 'athletes'],
+  'estimate.live': ['amount', 'plan'],
+  'estimate.liveFrom': ['amount', 'plan'],
+  'estimate.liveCustom': ['plan'],
+  'estimate.liveSetup': ['setup'],
+  'final.lead': ['athletes'],
 };
 
 function* strings(value, path = '') {
