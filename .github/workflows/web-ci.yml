@@ -39,3 +39,7 @@ jobs:
         run: npx astro check
       - name: Verify built output
         run: npm run verify
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Cutover browser checks
+        run: npm run cutover-checks

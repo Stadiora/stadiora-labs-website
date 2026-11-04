@@ -1,0 +1,85 @@
+---
+// GitHub Pages serves this file for every unknown URL, whatever the language, so both languages are on the page.
+import Base from '../layouts/Base.astro';
+import { hrefFor } from '../data/nav';
+
+const copy = {
+  en: {
+    lang: 'en',
+    title: 'Page not found',
+    body: 'That page does not exist or has moved. Try the home page, or write to us and we will point you to the right place.',
+    home: 'Go to the home page',
+    contact: 'Contact us',
+  },
+  es: {
+    lang: 'es',
+    title: 'Página no encontrada',
+    body: 'Esa página no existe o se movió. Prueba con la página de inicio, o escríbenos y te indicamos dónde está.',
+    home: 'Ir al inicio',
+    contact: 'Contáctanos',
+  },
+} as const;
+---
+
+<Base locale="en" path="/" title="Page not found | Stadiora Labs" description="This page does not exist or has moved." noindex bare>
+  <section class="nf">
+    <div class="container nf__grid">
+      <div class="nf__col" lang="en">
+        <p class="nf__code" aria-hidden="true">404</p>
+        <h1 class="nf__title">{copy.en.title}</h1>
+        <p class="nf__body">{copy.en.body}</p>
+        <p class="nf__actions">
+          <a class="btn btn--primary" href="/">{copy.en.home}</a>
+          <a class="btn btn--ghost" href={hrefFor('contact', 'en')}>{copy.en.contact}</a>
+        </p>
+      </div>
+      <div class="nf__col" lang="es">
+        <p class="nf__code" aria-hidden="true">404</p>
+        <h2 class="nf__title">{copy.es.title}</h2>
+        <p class="nf__body">{copy.es.body}</p>
+        <p class="nf__actions">
+          <a class="btn btn--primary" href="/es/">{copy.es.home}</a>
+          <a class="btn btn--ghost" href={hrefFor('contact', 'es')}>{copy.es.contact}</a>
+        </p>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .nf {
+    padding-block: clamp(72px, 12vh, 140px) clamp(72px, 12vh, 140px);
+  }
+  .nf__grid {
+    display: grid;
+    gap: 56px 72px;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
+    align-items: start;
+  }
+  .nf__code {
+    margin-bottom: 8px;
+    color: var(--ink-2);
+    font-size: 18px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+  }
+  .nf__title {
+    font-size: clamp(36px, 4.6vw, 60px);
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    text-wrap: balance;
+  }
+  .nf__body {
+    margin-top: 14px;
+    max-width: 44ch;
+    color: var(--ink-2);
+    font-size: 18px;
+    line-height: 1.5;
+  }
+  .nf__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 24px;
+  }
+</style>

@@ -13,8 +13,8 @@ const { addOns, bands, education } = prices;
 const copyFor = { en, es };
 
 const pages = [
-  { file: 'pricing/index.html', lang: 'en', canonical: 'https://stadioralabs.com/pricing/', og: '/og/home-en.png' },
-  { file: 'es/pricing/index.html', lang: 'es', canonical: 'https://stadioralabs.com/es/pricing/', og: '/og/home-es.png' },
+  { file: 'pricing/index.html', lang: 'en', canonical: 'https://stadioralabs.com/pricing/', og: '/og/pricing-en.png' },
+  { file: 'es/pricing/index.html', lang: 'es', canonical: 'https://stadioralabs.com/es/pricing/', og: '/og/pricing-es.png' },
 ];
 
 const count = (html, re) => (html.match(re) ?? []).length;

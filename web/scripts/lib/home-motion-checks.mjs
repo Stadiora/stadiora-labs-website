@@ -8,7 +8,7 @@
 // silent probe cannot pass.
 //
 // Groups (HOME_ONLY): "autoplay" (behaviour meter), "hidden-tab" (CSS loops against a hidden tab), "flip" (reduced
-// motion switched on mid-scene). HOME_HOSTS=hero,pil-grid narrows the meter to hosts whose label contains one of them.
+// motion switched on mid-scene), "hero-hover" (the hero under the pointer, at a fixed phase of its cycle), "iris" (the CTA ring turns, by pixel diff). HOME_HOSTS=hero,pil-grid narrows the meter to hosts whose label contains one of them.
 
 // ---- in-page functions (serialised into the page, so they must stay self-contained)
 
@@ -94,6 +94,34 @@ const meterStop = () => window.__meter?.stop();
 // Hosts that animate once and then stay put: after a pause there is nothing left to resume.
 const ONE_SHOT = ['blockquote.proof-text'];
 
+// Resolves once the host has been quiet: no finite CSS animation running inside it, and no DOM change (text, attribute,
+// child) for `quiet` ms, or after `cap` ms. That covers what a step started before the pause may still be finishing, and
+// the finite JavaScript work the page does on purpose, which getAnimations() cannot see: the brand scramble steps its
+// letters from timeouts staggered 70 ms apart and requestAnimationFrame, so there can be a gap of one stagger between two
+// writes. `quiet` is longer than that gap. A host that pauses for real goes quiet at once; one that does not keeps writing,
+// is never quiet, stays unsettled until the cap and is then measured as moving. No fixed sleep decides the outcome, and
+// nothing is excluded from the measurement that follows.
+const settled = ({ i, cap, quiet }) =>
+  new Promise((resolve) => {
+    const host = document.querySelector(`[data-ap-i="${i}"]`);
+    const t0 = performance.now();
+    let last = t0;
+    const watch = new MutationObserver(() => {
+      last = performance.now();
+    });
+    watch.observe(host, { subtree: true, childList: true, characterData: true, attributes: true });
+    const tick = () => {
+      const now = performance.now();
+      const running = host.getAnimations({ subtree: true }).filter((a) => a.playState === 'running' && !(a.effect?.getComputedTiming().iterations === Infinity));
+      if (running.length) last = now;
+      if ((!running.length && now - last >= quiet) || now - t0 > cap) {
+        watch.disconnect();
+        resolve({ waited: Math.round(now - t0), running: running.length });
+      } else requestAnimationFrame(tick);
+    };
+    tick();
+  });
+
 const hostWindow = (i) => Number(document.querySelector(`[data-ap-i="${i}"]`).dataset.at) || 0;
 
 // Pose of every element a CSS animation is driving inside the scope, plus the animation clocks.
@@ -150,7 +178,79 @@ const fingerprint = () => {
   return out;
 };
 
+// ---- iris ring of the brand strip's CTA: two screenshots apart, diffed in the page on the 2 px ring and on the pixels beyond it.
+const irisAngle = () => getComputedStyle(document.querySelector('.mega-cta'), '::before').getPropertyValue('--a').trim();
+
+const irisBox = () => {
+  const r = document.querySelector('.mega-cta').getBoundingClientRect();
+  return { x: Math.floor(r.left) - 8, y: Math.floor(r.top) - 8, width: Math.ceil(r.width) + 16, height: Math.ceil(r.height) + 16, left: r.left - Math.floor(r.left) + 8, top: r.top - Math.floor(r.top) + 8, w: r.width, h: r.height };
+};
+
+// Counts the pixels that changed (any channel by more than 10) between two PNGs, per zone around the capsule: the 2 px ring just
+// outside the pill, and everything 4 px or more beyond it.
+const irisDiff = async ({ a, b, box }) => {
+  const load = (b64) =>
+    new Promise((resolve) => {
+      const img = new Image();
+      img.onload = () => {
+        const c = document.createElement('canvas');
+        c.width = img.width;
+        c.height = img.height;
+        const x = c.getContext('2d');
+        x.drawImage(img, 0, 0);
+        resolve(x.getImageData(0, 0, c.width, c.height));
+      };
+      img.src = `data:image/png;base64,${b64}`;
+    });
+  const [A, B] = await Promise.all([load(a), load(b)]);
+  const radius = box.h / 2;
+  const cx = box.left + box.w / 2;
+  const cy = box.top + box.h / 2;
+  const half = box.w / 2 - radius;
+  const out = { ring: 0, beyond: 0 };
+  for (let y = 0; y < A.height; y++) {
+    for (let x = 0; x < A.width; x++) {
+      const dx = Math.max(Math.abs(x + 0.5 - cx) - half, 0);
+      const dist = Math.hypot(dx, y + 0.5 - cy) - radius;
+      const k = (y * A.width + x) * 4;
+      const changed = Math.max(Math.abs(A.data[k] - B.data[k]), Math.abs(A.data[k + 1] - B.data[k + 1]), Math.abs(A.data[k + 2] - B.data[k + 2])) > 10;
+      if (!changed) continue;
+      if (dist > 0.3 && dist < 1.9) out.ring++;
+      else if (dist >= 4) out.beyond++;
+    }
+  }
+  return out;
+};
+
 const motionOn = () => document.querySelectorAll('[data-ap="on"]').length;
+
+// ---- hero hover: the pointer is put over the headline in the middle of a step, never at a random phase of the cycle.
+// Resolves the moment the word swap has started (the conveyor, the zoom, the word and the toast are all in flight).
+const heroStepStarted = () =>
+  new Promise((resolve) => {
+    const index = () => document.querySelector('[data-hero-word][data-active]')?.getAttribute('data-word-index');
+    const first = index();
+    const tick = () => (index() !== first ? resolve(true) : requestAnimationFrame(tick));
+    tick();
+  });
+
+// Finite transitions and animations running right now (the keyframe loops are not counted).
+const heroInFlight = () => {
+  const running = document.querySelector('#hero').getAnimations({ subtree: true }).filter((a) => !(a instanceof CSSAnimation && a.effect.getComputedTiming().iterations === Infinity) && a.playState === 'running');
+  return running.map((a) => `${a instanceof CSSTransition ? `transition ${a.transitionProperty}` : a instanceof CSSAnimation ? `animation ${a.animationName}` : 'animate'} on ${a.effect?.target?.className?.toString().split(' ')[0] || a.effect?.target?.tagName}`);
+};
+
+const heroFingerprint = () => {
+  const hero = document.querySelector('#hero');
+  const out = [];
+  for (const e of [hero, ...hero.querySelectorAll('*')]) {
+    const cs = getComputedStyle(e);
+    const own = [...e.childNodes].filter((n) => n.nodeType === 3).map((n) => n.textContent).join('');
+    out.push({ key: `${e.tagName.toLowerCase()}${e.id ? `#${e.id}` : ''}.${String(e.getAttribute('class') ?? '').split(' ')[0]}`, v: [cs.transform, cs.opacity, cs.filter, cs.clipPath, cs.translate, cs.scale, cs.backgroundPosition, cs.boxShadow, own, e.children.length].join('|') });
+  }
+  const clocks = hero.getAnimations({ subtree: true }).map((a) => `${Math.round(Number(a.currentTime ?? 0))}`);
+  return { out, clocks: clocks.join(','), count: clocks.length };
+};
 
 // ---- the guards
 
@@ -227,7 +327,9 @@ export async function motionChecks({ open, check, sleep, metrics, on, pathFor, h
         };
         // After a pause has settled, nothing may move for the whole window.
         const still = async (cond) => {
-          await sleep(settleMs);
+          if (cond === 'hover' || cond === 'focus') await page.evaluate(settled, { i: h.i, cap: 4000, quiet: 400 });
+          else await sleep(settleMs);
+          await page.evaluate(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))));
           await page.evaluate(meterStart, { i: h.i, cssLoops: !(cond === 'hover' || cond === 'focus') });
           await sleep(win);
           const r = await page.evaluate(meterRead);
@@ -309,6 +411,94 @@ export async function motionChecks({ open, check, sleep, metrics, on, pathFor, h
       check('autoplay', `behaviour: nothing inside an autoplayer moves, changes, plays or advances for a full window while ${text}`, problems[cond].length === 0, problems[cond].join('; ') || `${n} hosts${cond === 'focus' ? `, ${n - focusSkipped} with a focusable control` : ''}`);
     }
     metrics['behaviour'] = { hosts: n, secondsMeasuredWhilePaused: Math.round(measuredSeconds), hostsWithoutFocusableControl: focusSkipped, clipsOnUnselectedTabs: notShown.length };
+  }
+
+  // ------------------------------------------------------------ A2. the hero under the pointer, at a fixed phase
+  // A pointer on the headline has to stop everything in the hero, including what a step has already started (the 7 s zoom of
+  // the big photo, the conveyor, the word, the toast, the parallax) and every keyframe loop. The probe waits for the swap
+  // to start, puts the pointer over the headline at once, waits for the hover state and two frames, and then compares the whole
+  // subtree (computed pose, text, animation clocks) over three samples. A control makes sure transitions were really in flight.
+  if (on('hero-hover')) {
+    const page = await open({ width: 1440, height: 900 }, '/');
+    try {
+      await page.mouse.move(2, 2);
+      const point = await page.evaluate(() => {
+        const r = document.querySelector('[data-hero-copy] h1').getBoundingClientRect();
+        return { x: r.left + Math.min(40, r.width / 2), y: r.top + r.height / 2 };
+      });
+      await page.waitForFunction(() => document.querySelector('#hero').dataset.ap === 'on');
+      await page.evaluate(heroStepStarted);
+      const inFlight = await page.evaluate(heroInFlight);
+      await page.mouse.move(point.x, point.y);
+      await page.waitForFunction(() => document.querySelector('#hero').dataset.apWhy === 'hover');
+      await page.evaluate(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))));
+      const word = () => page.evaluate(() => document.querySelector('[data-hero-word][data-active]')?.getAttribute('data-word-index'));
+      const w0 = await word();
+      const samples = [await page.evaluate(heroFingerprint)];
+      await sleep(1500);
+      samples.push(await page.evaluate(heroFingerprint));
+      await page.mouse.move(point.x + 24, point.y + 18, { steps: 6 });
+      await page.mouse.move(point.x - 16, point.y + 40, { steps: 6 });
+      await sleep(1500);
+      samples.push(await page.evaluate(heroFingerprint));
+      await sleep(1400);
+      samples.push(await page.evaluate(heroFingerprint));
+      const moved = [];
+      for (let k = 1; k < samples.length; k++) {
+        const [a, b] = [samples[0], samples[k]];
+        if (a.count !== b.count) moved.push(`sample ${k}: ${a.count} -> ${b.count} animations`);
+        else if (a.clocks !== b.clocks) moved.push(`sample ${k}: animation clocks advanced`);
+        for (let j = 0; j < Math.min(a.out.length, b.out.length); j++) if (a.out[j].v !== b.out[j].v) moved.push(`sample ${k}: ${a.out[j].key} ${a.out[j].v.split('|').slice(0, 3).join(' ')} -> ${b.out[j].v.split('|').slice(0, 3).join(' ')}`);
+      }
+      check('hero-hover', 'the pointer lands in the middle of a step: transitions and animations are in flight at that moment (control)', inFlight.length >= 3, `${inFlight.length} in flight: ${[...new Set(inFlight)].join(', ')}`);
+      check('hero-hover', 'under the pointer nothing in the hero moves, changes or advances for 4.4 s of pointer movement (poses, text, every animation clock, the parallax)', moved.length === 0 && (await word()) === w0, moved.slice(0, 4).join(' ; ') || `${samples[0].out.length} elements, ${samples[0].count} animations held`);
+      await page.mouse.move(2, 2);
+      await page.waitForFunction(() => document.querySelector('#hero').dataset.ap === 'on');
+      const resumed = await page
+        .waitForFunction((before) => {
+          const hero = document.querySelector('#hero');
+          return hero.getAnimations({ subtree: true }).map((a) => `${Math.round(Number(a.currentTime ?? 0))}`).join(',') !== before;
+        }, samples[0].clocks, { timeout: 4000 })
+        .then(() => true, () => false);
+      const w1 = await page.waitForFunction((from) => document.querySelector('[data-hero-word][data-active]')?.getAttribute('data-word-index') !== from, w0, { timeout: 6000 }).then(() => true, () => false);
+      check('hero-hover', 'when the pointer leaves, the held transitions carry on and the word cycle runs again', resumed && w1, `clocks advanced ${resumed}, next word ${w1}`);
+      check('runtime', 'no console errors or page errors during the hero hover probe', page.problems.length === 0, page.problems.join(' | '));
+    } finally {
+      await page.context().close();
+    }
+  }
+
+  // ------------------------------------------------------------ A3. the iris ring of the brand strip's CTA turns
+  // `--grad-iris` once resolved `var(--a)` at :root, so the ring never moved although the animation clock did. The guard
+  // measures pixels, not the clock: the ring has to change between two screenshots 700 ms apart, the pixels beyond it must not,
+  // `--a` has to advance on the pseudo-element, and under reduced motion the ring is still.
+  if (on('iris')) {
+    const turn = async (reduced) => {
+      const page = await open({ width: 1440, height: 900, reduced }, '/');
+      try {
+        await page.mouse.move(2, 2);
+        await page.evaluate(() => document.querySelector('.mega-cta').scrollIntoView({ block: 'center', behavior: 'instant' }));
+        await page.waitForFunction(() => getComputedStyle(document.querySelector('.bs-card')).opacity === '1' && getComputedStyle(document.querySelector('.mega-cta')).visibility !== 'hidden');
+        await sleep(600);
+        const box = await page.evaluate(irisBox);
+        const clip = { x: box.x, y: box.y, width: box.width, height: box.height };
+        const angle0 = await page.evaluate(irisAngle);
+        const a = (await page.screenshot({ clip })).toString('base64');
+        await sleep(700);
+        const b = (await page.screenshot({ clip })).toString('base64');
+        const angle1 = await page.evaluate(irisAngle);
+        const diff = await page.evaluate(irisDiff, { a, b, box });
+        return { diff, angle0, angle1, problems: page.problems };
+      } finally {
+        await page.context().close();
+      }
+    };
+    const live = await turn(false);
+    const still = await turn(true);
+    check('iris', 'the CTA ring is painted by an angle that turns: --a on ::before advances', live.angle0 !== live.angle1, `${live.angle0} -> ${live.angle1}`);
+    check('iris', 'pixel diff: the 2 px ring changes between screenshots 700 ms apart (at least 400 px) and nothing beyond it does', live.diff.ring >= 400 && live.diff.beyond === 0, `${live.diff.ring} ring px changed, ${live.diff.beyond} px beyond the ring`);
+    check('iris', 'reduced motion: the ring does not change (0 px)', still.diff.ring === 0 && still.diff.beyond === 0, `${still.diff.ring} ring px changed`);
+    check('runtime', 'no console errors or page errors during the iris probe', live.problems.length === 0 && still.problems.length === 0, [...live.problems, ...still.problems].join(' | '));
   }
 
   // ------------------------------------------------------------ B. a hidden tab holds every CSS loop in place

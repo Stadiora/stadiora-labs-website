@@ -1,4 +1,5 @@
 // Minimal static server for dist/, used by the evidence script. Resolves directories to index.html.
+// With `{ pagesStyle404: true }` an unknown URL gets dist/404.html with status 404, the way GitHub Pages answers.
 import { createServer } from 'node:http';
 import { readFile, stat } from 'node:fs/promises';
 import { extname, join, normalize, resolve } from 'node:path';
@@ -21,7 +22,7 @@ const types = {
   '.txt': 'text/plain; charset=utf-8',
 };
 
-export async function serve(root, port = 0) {
+export async function serve(root, port = 0, { pagesStyle404 = false } = {}) {
   const base = resolve(root);
   const server = createServer(async (req, res) => {
     try {
@@ -34,8 +35,9 @@ export async function serve(root, port = 0) {
       res.writeHead(200, { 'content-type': types[extname(file)] ?? 'application/octet-stream' });
       res.end(body);
     } catch {
-      res.writeHead(404, { 'content-type': 'text/plain' });
-      res.end('Not found');
+      const page = pagesStyle404 ? await readFile(join(base, '404.html')).catch(() => null) : null;
+      res.writeHead(404, { 'content-type': page ? types['.html'] : 'text/plain' });
+      res.end(page ?? 'Not found');
     }
   });
   await new Promise((ok) => server.listen(port, '127.0.0.1', ok));

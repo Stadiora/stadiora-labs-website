@@ -513,6 +513,10 @@ function initPointerFx() {
     for (const el of depth) {
       const host = el.closest('[data-section]') ?? el.parentElement;
       if (host?.classList.contains('is-off')) continue;
+      // An autoplayer paused by the pointer or by focus holds its floating cards where they are: they must not keep
+      // following the pointer (the offset is read from the card's own, already shifted, box).
+      const why = el.closest<HTMLElement>('[data-ap]')?.dataset.apWhy;
+      if (why === 'hover' || why === 'focus') continue;
       const r = el.getBoundingClientRect();
       if (r.bottom < -200 || r.top > vh + 200) continue;
       const d = Number(el.dataset.depth);

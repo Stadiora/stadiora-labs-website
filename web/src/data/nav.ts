@@ -15,7 +15,7 @@ export const platformColumns: MegaColumn[] = [
 ];
 
 export const solutionItems: ItemId[] = ['coaches', 'clubs', 'schools', 'athletes'];
-export const resourceItems: ItemId[] = ['caseStudies', 'help', 'api'];
+export const resourceItems: ItemId[] = ['caseStudies', 'api'];
 
 export const appLinks = [
   { key: 'run', href: site.stores.runIos, hrefAlt: site.stores.runAndroid, live: true },
