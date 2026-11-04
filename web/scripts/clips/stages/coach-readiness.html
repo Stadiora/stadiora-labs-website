@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>coach-readiness</title>
+<link rel="stylesheet" href="stage.css" />
+<style>
+.ph{background-image:url(../src/cine-readiness.webp);--bp:50% 0%;--kx:-1.2%;--ky:-.8%;--to:62% 50%}
+.vg{position:absolute;inset:0;background:radial-gradient(100% 90% at 58% 52%,transparent 46%,rgba(8,4,26,.72) 100%),linear-gradient(0deg,rgba(8,4,26,.4),transparent 40%)}
+.tw{position:absolute;left:0;right:0;top:0;height:42%}
+</style>
+</head>
+<body>
+<div class="st" id="st">
+<div class="ph kb"></div>
+<div class="layer">
+  <div class="blob" style="left:-8%;top:-10%;width:52%;height:60%;background:rgba(139,92,246,.34);--bx:60px;--by:30px"></div>
+  <div class="blob" style="right:-10%;bottom:-18%;width:44%;height:52%;background:rgba(0,190,243,.24);--bx:-60px;--by:-30px"></div>
+  <div class="breath"></div>
+  <div class="tw" id="tw"></div>
+  <div class="vg"></div>
+</div>
+</div>
+<script>
+// Deterministic particles so every render is identical.
+let s = 37;
+const rnd = () => ((s = (s * 1664525 + 1013904223) >>> 0) / 4294967296);
+const host = document.getElementById('particles');
+for (let i = 0; i < 0; i++) {
+  const d = document.createElement('i');
+  d.className = 'dust';
+  const per = [4, 8, 8, 4][i % 4];
+  d.style.cssText = `left:${(rnd() * 96 + 2).toFixed(1)}%;top:${(rnd() * 70 + 22).toFixed(1)}%;--s:${(2 + rnd() * 4).toFixed(1)}px;--dd:${per}s;--dl:-${(rnd() * per).toFixed(2)}s;--dx:${(rnd() * 60 - 30).toFixed(0)}px;--dy:${(-60 - rnd() * 120).toFixed(0)}px`;
+  host.appendChild(d);
+}
+for (let i = 0; i < 14; i++) {
+  const t = document.createElement('i');
+  t.className = 'twinkle';
+  const per = [2, 4][i % 2];
+  t.style.cssText = `left:${(rnd() * 96 + 2).toFixed(1)}%;top:${(rnd() * 90 + 4).toFixed(1)}%;--dd:${per}s;--dl:-${(rnd() * per).toFixed(2)}s`;
+  document.getElementById('tw').appendChild(t);
+}
+</script>
+</body>
+</html>
