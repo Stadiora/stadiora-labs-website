@@ -1,17 +1,17 @@
 ---
 import { nutritionCopy } from '../../../i18n/pages/nutrition';
 import { coachCommon } from '../../../i18n/pages/coach-common';
-import { site } from '../../../data/site';
 import type { Locale } from '../../../i18n';
-import FeatureHero from '../FeatureHero.astro';
+import CoachHero from '../CoachHero.astro';
+import CoachFinal from '../CoachFinal.astro';
 import StepFlow from '../StepFlow.astro';
 import AlsoInAria from '../AlsoInAria.astro';
-import CtaBand from '../CtaBand.astro';
 import CoachIcon from '../CoachIcon.astro';
 import MealPopCard from './MealPopCard.astro';
 import PlanScreen from './PlanScreen.astro';
 import DiaryPhone from './DiaryPhone.astro';
 import WeekChart from './WeekChart.astro';
+import ScanStage from './ScanStage.astro';
 
 interface Props {
   locale: Locale;
@@ -21,88 +21,107 @@ const c = nutritionCopy[locale];
 const common = coachCommon[locale];
 ---
 
-<FeatureHero
-  locale={locale}
-  variant="split"
-  popAt="inside"
-  eyebrow={c.hero.eyebrow}
-  title={c.hero.title}
-  emphasis={c.hero.emphasis}
-  sub={c.hero.sub}
-  primary={{ label: common.startFree, href: site.signUp }}
-  secondary={{ label: c.hero.secondary, href: `#${c.flow.id}` }}
-  photo={{ slot: 'f2-nutrition', alt: c.hero.photoAlt, ratio: '4/3', sizes: '(max-width: 900px) 100vw, 680px' }}
-  pos="50% 50%"
->
-  <MealPopCard slot="pop" copy={c.hero.meal} />
-</FeatureHero>
-
-<section id={c.flow.id} class="section section--surface nu-flow" aria-labelledby="nu-flow-title">
-  <div class="container">
-    <h2 id="nu-flow-title" class="nu-flow__title" data-reveal>{c.flow.title}</h2>
-    <StepFlow steps={c.flow.steps} stepWord={common.stepWord}>
-      <PlanScreen slot="step-0" copy={c.flow.plan} />
-      <DiaryPhone slot="step-1" copy={c.flow.diary} />
-      <WeekChart slot="step-2" copy={c.flow.week} />
-    </StepFlow>
-    <p class="co-demo">{common.demoNote}</p>
-  </div>
-</section>
-
-<section class="section nu-inside" aria-labelledby="nu-inside-title">
-  <div class="container nu-inside__grid">
-    <h2 id="nu-inside-title" class="nu-inside__title" data-reveal>{c.inside.title}</h2>
-    <div>
-      <ul class="nu-inside__list">
-        {
-          c.inside.items.map((item, i) => (
-            <li data-reveal style={`--reveal-i:${i}`}>
-              <span class="nu-inside__icon">
-                <CoachIcon name={item.icon as any} size={20} />
-              </span>
-              <span>
-                <span class="nu-inside__name">{item.name}</span>
-                <span class="nu-inside__line">{item.line}</span>
-              </span>
-            </li>
-          ))
-        }
-      </ul>
-      <p class="nu-inside__note">{c.inside.note}</p>
+<div class="cf-page nu" data-accent="mint">
+  <CoachHero
+    locale={locale}
+    eyebrow={c.hero.eyebrow}
+    title={c.hero.title}
+    emphasis={c.hero.emphasis}
+    sub={c.hero.sub}
+    secondary={{ label: c.hero.secondary, href: `#${c.flow.id}` }}
+    clip="coach-nutrition"
+  >
+    <div slot="overlay" class="nu-meal reading" data-depth="14">
+      <MealPopCard copy={c.hero.meal} />
     </div>
-  </div>
-</section>
+  </CoachHero>
 
-<AlsoInAria locale={locale} ids={c.also} />
-<CtaBand locale={locale} />
+  <section id={c.flow.id} class="cf-stage impact nu-flow" data-section data-accent="mint" aria-labelledby="nu-flow-title">
+    <div class="mesh" aria-hidden="true"><i class="b b5"></i><i class="b b1"></i><i class="b b2"></i><i class="b b3"></i><i class="b b4"></i><i class="vig"></i></div>
+    <div class="wrap">
+      <div class="cf-head">
+        <div>
+          <h2 id="nu-flow-title" class="d d2 lines"><span><span>{c.flow.title}</span></span></h2>
+        </div>
+      </div>
+      <StepFlow steps={c.flow.steps} stepWord={common.stepWord}>
+        <div slot="step-0" class="reading nu-step"><PlanScreen copy={c.flow.plan} /></div>
+        <div slot="step-1" class="nu-step nu-step--phone"><DiaryPhone copy={c.flow.diary} /></div>
+        <div slot="step-2" class="reading nu-step"><WeekChart copy={c.flow.week} /></div>
+      </StepFlow>
+      <p class="cf-demo">{common.demoNote}</p>
+    </div>
+  </section>
+
+  <section class="cf-stage impact nu-inside" data-section data-accent="mint" aria-labelledby="nu-inside-title">
+    <div class="mesh" aria-hidden="true"><i class="b b5"></i><i class="b b3"></i><i class="b b2"></i><i class="vig"></i></div>
+    <div class="wrap nu-inside__grid">
+      <div class="nu-inside__copy">
+        <h2 id="nu-inside-title" class="d d3 lines"><span><span>{c.inside.title}</span></span></h2>
+        <ul class="nu-inside__list">
+          {
+            c.inside.items.map((item, i) => (
+              <li class="rv" style={`--i:${i}`}>
+                <span class="nu-inside__icon">
+                  <CoachIcon name={item.icon as any} size={20} />
+                </span>
+                <span>
+                  <span class="nu-inside__name">{item.name}</span>
+                  <span class="nu-inside__line">{item.line}</span>
+                </span>
+              </li>
+            ))
+          }
+        </ul>
+        <p class="nu-inside__note rv">{c.inside.note}</p>
+      </div>
+      <ScanStage locale={locale} meal={c.hero.meal} snap={c.flow.diary.snap} />
+    </div>
+  </section>
+
+  <AlsoInAria locale={locale} ids={c.also} />
+  <CoachFinal locale={locale} />
+</div>
 
 <style>
-  .nu-flow {
-    padding-top: 56px;
-    padding-bottom: 64px;
+  .nu-meal {
+    position: absolute;
+    left: 5%;
+    bottom: 15%;
+    width: min(300px, 62%);
+    border-radius: var(--r-md);
+    background: none;
+    animation: cfFloat 7s ease-in-out infinite;
   }
-  .nu-flow__title {
-    margin-bottom: 36px;
-    text-align: center;
-    font-size: clamp(30px, 3.2vw, 44px);
-    line-height: 1.12;
+  .nu-meal :global(.mp) {
+    width: 100%;
+  }
+  .nu-flow :global(.sf__screen) {
+    margin-top: 22px;
+  }
+  .nu-step {
+    width: 100%;
+    border-radius: var(--r-md);
+    background: none;
+  }
+  .nu-step--phone {
+    display: flex;
+    justify-content: center;
+  }
+  .nu-flow :global(.sf__step) {
+    min-width: 0;
   }
   .nu-inside__grid {
     display: grid;
-    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    grid-template-columns: minmax(0, 6fr) minmax(0, 6fr);
     gap: clamp(32px, 6vw, 96px);
-    align-items: start;
-  }
-  .nu-inside__title {
-    font-size: clamp(28px, 3vw, 40px);
-    line-height: 1.15;
-    max-width: 14ch;
+    align-items: center;
   }
   .nu-inside__list {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 28px 40px;
-    margin: 0;
+    gap: 24px 28px;
+    margin: clamp(28px, 3vw, 44px) 0 0;
     padding: 0;
     list-style: none;
   }
@@ -115,46 +134,48 @@ const common = coachCommon[locale];
     display: grid;
     flex: none;
     place-items: center;
-    width: 40px;
-    height: 40px;
-    border-radius: 10px;
-    background: var(--cyan-tint);
-    color: var(--cyan-ink);
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    background: color-mix(in srgb, var(--ac) 22%, transparent);
+    box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--ac) 50%, transparent);
+    color: var(--ink);
   }
   .nu-inside__name {
     display: block;
     color: var(--ink);
-    font-size: 18px;
+    font-size: 17px;
     font-weight: 600;
-    line-height: 26px;
+    line-height: 24px;
   }
   .nu-inside__line {
     display: block;
     color: var(--ink-2);
-    font-size: 16px;
-    line-height: 24px;
+    font-size: 15px;
+    line-height: 22px;
   }
   .nu-inside__note {
     margin-top: 32px;
     padding-top: 20px;
     border-top: 1px solid var(--line);
     color: var(--ink-2);
-    font-size: 14px;
-    line-height: 20px;
+    font-size: 15px;
+    line-height: 22px;
+    max-width: 46ch;
   }
-
   @media (max-width: 960px) {
     .nu-inside__grid {
       grid-template-columns: minmax(0, 1fr);
-    }
-    .nu-inside__title {
-      max-width: none;
     }
   }
   @media (max-width: 560px) {
     .nu-inside__list {
       grid-template-columns: minmax(0, 1fr);
-      gap: 22px;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .nu-meal {
+      animation: none;
     }
   }
 </style>

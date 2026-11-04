@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>coach-nutrition</title>
+<link rel="stylesheet" href="stage.css" />
+<style>
+.ph{background-image:url(../src/cine-nutrition.webp);--bp:42% 55%;--kx:-1.8%;--ky:-2%}
+.vg{position:absolute;inset:0;background:radial-gradient(110% 90% at 46% 52%,transparent 42%,rgba(2,10,12,.7) 100%),linear-gradient(0deg,rgba(2,10,12,.45),transparent 40%)}
+</style>
+</head>
+<body>
+<div class="st" id="st">
+<div class="ph kb"></div>
+<div class="layer">
+  <div class="blob" style="left:8%;top:30%;width:44%;height:52%;background:rgba(52,211,153,.28);--bx:50px;--by:-30px"></div>
+  <div class="blob" style="right:-6%;bottom:-16%;width:40%;height:48%;background:rgba(255,184,77,.26);--bx:-50px;--by:-30px"></div>
+  <div class="steam" style="left:30%;top:44%"></div>
+  <div class="steam" style="left:38%;top:48%;--dl:-1.4s;--dx:-26px"></div>
+  <div class="steam" style="left:24%;top:50%;--dl:-2.7s"></div>
+  <div class="sweep"></div>
+  <div id="particles"></div>
+  <div class="vg"></div>
+</div>
+</div>
+<script>
+// Deterministic particles so every render is identical.
+let s = 23;
+const rnd = () => ((s = (s * 1664525 + 1013904223) >>> 0) / 4294967296);
+const host = document.getElementById('particles');
+for (let i = 0; i < 18; i++) {
+  const d = document.createElement('i');
+  d.className = 'dust';
+  const per = [4, 8, 8, 4][i % 4];
+  d.style.cssText = `left:${(rnd() * 96 + 2).toFixed(1)}%;top:${(rnd() * 70 + 22).toFixed(1)}%;--s:${(2 + rnd() * 4).toFixed(1)}px;--dd:${per}s;--dl:-${(rnd() * per).toFixed(2)}s;--dx:${(rnd() * 60 - 30).toFixed(0)}px;--dy:${(-60 - rnd() * 120).toFixed(0)}px`;
+  host.appendChild(d);
+}
+</script>
+</body>
+</html>

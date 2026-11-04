@@ -79,13 +79,37 @@ node scripts/evidence.mjs --engage-only # just the Platform page checks, EN and 
   Floodlight components (glass pill nav styles, buttons, reveal, mesh and orbit motif, marquee), `motion.css` the reduced-motion rules.
 - Photos: drop a file named after its slot into `src/assets/photos/`; `src/data/photo-alt.json` holds EN and ES alt text.
   A missing slot renders a labelled placeholder and `npm run verify` fails on it.
-- Platform Coach pages (`src/pages/{,es/}platform/{programs,nutrition,readiness,power-lab}/`): thin wrappers around
-  `src/components/coach/{programs,nutrition,readiness,power-lab}/*Page.astro`; all copy is in `src/i18n/pages/` (EN and ES, ES typed
-  against EN) and the shared parts are in `src/components/coach/` and `src/styles/coach.css`. `scripts/lib/platform-coach-verify.mjs`
-  (run by `npm run verify`) fails the build on an unbacked claim, a competitor name, a missing "estimates" or "not a medical check"
-  footnote, a broken hreflang pair or a missing demo link. `scripts/lib/platform-coach-checks.mjs` (run by `evidence`) covers overflow,
-  sideways clipping and overlapping text at 390/1024/1280/1440, WCAG AA in both themes, alt text, heading order, the keyboard walk,
-  the accordion and hover-reveal behaviour, the count-up and a no-JavaScript render.
+- Platform Coach pages (`src/pages/{,es/}platform/{programs,nutrition,readiness,power-lab}/`): thin wrappers (they pass `hero` to `Base`
+  for the transparent nav) around `src/components/coach/{programs,nutrition,readiness,power-lab}/*Page.astro`; all copy is in
+  `src/i18n/pages/` (EN and ES, ES typed against EN). Every page is the Floodlight pattern: `CoachHero` (dark `.impact` hero with mesh,
+  orbits and a moving clip or live HTML stage on the right, with HTML overlay words from i18n), one or more dark `.cf-stage.impact` stages,
+  `AlsoInAria` and `CoachFinal` (the home closing band over the `night-stadium` clip). The product screens (`StepFlow`, `Accordion`,
+  `HoverRevealRow`, `ChartBaseline`, the phone and browser frames) are unchanged in content; `Accordion` has an `overlay` slot for live
+  cards over its stage. Styles: the Floodlight layer is `src/styles/coach/cf.css` (every selector starts `cf-` or `.cf-page`), the
+  product-screen styles stay in `src/styles/coach.css`. Scripts: `src/scripts/coach/index.ts` (imported by `CoachHero`) starts the AI
+  demo and the motion kit, and `stages.ts` runs the kit's `autoplayer()` on every `[data-cf-stage]` host. A hidden tab pauses every loop
+  through the kit's `html.tab-hidden`. Add new coach motion as CSS keyframes inside a `[data-cf-stage]` (hero frame, accordion root,
+  scan stage, programs send stage, open `StepFlow`): `cf.css` pauses everything in it while its `data-ap` is `off` (hover, focus, off
+  screen, reduced motion). An accordion's backdrop clip carries `data-ap-within="#<id>-acc"`, so the accordion buttons pause the clip
+  too. Other coach motion goes through the kit's `.rv`, `.lines`, `.count` and `[data-depth]`/`[data-tilt]`.
+- Coach clips are `public/home/media/coach-{programs,nutrition,readiness,powerlab}.{webm,mp4,webp}`: text-free, rendered by
+  `node scripts/clips/render.mjs` from `scripts/clips/stages/*.html` (stage HTML over the photos in `scripts/clips/src/`; needs
+  Playwright and ffmpeg). Never use the clips with words in the picture (`pillar-*`, `ai-demo`, `planner-demo`) on these pages.
+- Coach guards: `scripts/lib/platform-coach-verify.mjs` (run by `npm run verify`) fails the build on an unbacked claim, a competitor
+  name, a missing "estimates" or "not a medical check" footnote, a broken hreflang pair or a missing demo link;
+  `scripts/lib/platform-coach-floodlight.mjs` (called from it) fails on a page without the dark hero, mesh, orbits, a dark stage, the
+  `night-stadium` closing band, its own moving hero clip, an opening ¿ or ¡ in Spanish, a stage host without `data-cf-stage` or an
+  `data-ap-within` that points nowhere, and on a coach stylesheet without its no-JS, reduced-motion and stage-pause rules.
+  `scripts/lib/coach-media-guard.mjs` (called from it) reads every `<video>`: its WebM, MP4 and poster must be one text-free clip
+  (the shared `TEXT_FREE_MEDIA` list in `home-verify.mjs`; a new clip stem goes there once it is checked) and each slot must play the
+  expected clip (hero `coach-<page>`, final `night-stadium`, stage clips as listed in the module).
+  `scripts/lib/platform-coach-checks.mjs` (run by `evidence`) covers overflow,
+  sideways clipping and overlapping text at 390/1024/1280/1440, WCAG AA in both themes (the shared `contrast.mjs` probe, with no
+  exclusions: the AI demo stage is measured at rest and, by `coach-contrast-checks.mjs`, at 17 frames of its 12 s timeline plus a
+  canary that must be caught), alt text, heading order, the keyboard walk, the accordion and hover-reveal behaviour, the count-up,
+  the motion contract (no endless CSS loop far off screen, none in a hidden tab, none under reduced motion, and, by
+  `coach-motion-checks.mjs`, every moving stage and accordion clip held still under the pointer and under keyboard focus and moving
+  again afterwards) and a no-JavaScript render.
 - Motion library: `src/scripts/motion/kit.ts` (small TypeScript, no dependencies). Anything that moves on its own is an `autoplayer()`
   (or a `group()`, `autotabs()` or a `video[data-clip]`, which use it): it runs only while on screen, with the tab visible, with no
   pointer hovering and no focus inside its scope, and never under `prefers-reduced-motion`. It mirrors its state to `data-ap`
