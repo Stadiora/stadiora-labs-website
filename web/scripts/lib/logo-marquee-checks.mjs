@@ -54,6 +54,9 @@ const probe = (sel) => {
   };
 };
 
+// Stands in for a set that is not in the page, so the assertion on it fails instead of the probe.
+const missing = { width: 0, aria: null, inert: false, shownSet: false, names: [], marks: [], variants: [], broken: 0, outside: [], tooSmall: 0 };
+
 export async function logoMarqueeChecks({ open, settle, check, sleep, pauses = true }) {
   const group = 'logo-marquee';
   const left = (page, sel) => page.evaluate((s) => document.querySelector(`${s} .marquee-track`).getBoundingClientRect().left, sel);
@@ -73,7 +76,7 @@ export async function logoMarqueeChecks({ open, settle, check, sleep, pauses = t
           await park(page);
           await sleep(900);
           const p = await page.evaluate(probe, t.sel);
-          const [a, b] = p.sets;
+          const [a, b = missing] = p.sets;
           check(group, `${tag}: two sets, the second aria-hidden, inert and without alt text`, p.sets.length === 2 && a.aria === null && b.aria === 'true' && b.inert && b.names.every((n) => n === '') && a.names.length >= 9 && a.names.every((n) => n), JSON.stringify({ sets: p.sets.length, a: a.names.length, b: b.names.length }));
           check(group, `${tag}: the second set repeats the first mark for mark, so the loop is seamless (set widths ${a.width.toFixed(1)} and ${b.width.toFixed(1)}, track ${p.track.width.toFixed(1)})`, JSON.stringify(a.marks) === JSON.stringify(b.marks) && Math.abs(a.width - b.width) < 1 && Math.abs(p.track.width - (a.width + b.width)) < 1 && p.track.animation === 'marq' && p.track.count === 'infinite', JSON.stringify({ aw: a.width, bw: b.width, track: p.track }));
           const want = t.themed ? (scheme === 'light' ? 'dark' : 'light') : 'light';
@@ -113,7 +116,7 @@ export async function logoMarqueeChecks({ open, settle, check, sleep, pauses = t
         await page.evaluate((s) => document.querySelector(s).scrollIntoView({ block: 'center', behavior: 'instant' }), t.sel);
         await sleep(400);
         const p = await page.evaluate(probe, t.sel);
-        const [a, b] = p.sets;
+        const [a, b = missing] = p.sets;
         check(group, `${tag}: a static wrapped row, no animation, no repeated copy, nothing clipped or wider than the strip`, p.track.animation === 'none' && p.track.wrap === 'wrap' && p.setWrap === 'wrap' && !b.shownSet && a.names.length >= 9 && a.outside.length === 0 && a.width <= p.box.w + 1 && p.overflowX <= 0, JSON.stringify({ track: p.track, setWrap: p.setWrap, secondShown: b.shownSet, marks: a.names.length, outside: a.outside, setW: a.width, boxW: p.box.w }));
       } catch (e) {
         check(group, `${tag}: the probe ran to the end`, false, String(e.stack ?? e).split('\n').slice(0, 3).join(' | '));
