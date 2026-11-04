@@ -1,0 +1,35 @@
+---
+import '../../styles/api.css';
+import '../../styles/seam.css';
+import type { Locale } from '../../i18n';
+import { en, es, type ApiCopy } from '../../i18n/pages/api';
+import ApiHero from './ApiHero.astro';
+import ApiDifference from './ApiDifference.astro';
+import ApiCaps from './ApiCaps.astro';
+import ApiHow from './ApiHow.astro';
+import ApiOpen from './ApiOpen.astro';
+import ApiSports from './ApiSports.astro';
+import ApiUseCases from './ApiUseCases.astro';
+import ApiFinal from './ApiFinal.astro';
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const copy: ApiCopy = locale === 'es' ? es : en;
+---
+
+<div class="api-page">
+  <ApiHero locale={locale} copy={copy} />
+  <ApiDifference copy={copy} />
+  <ApiCaps copy={copy} />
+  <ApiHow copy={copy} />
+  <ApiOpen copy={copy} />
+  <ApiSports copy={copy} />
+  <ApiUseCases copy={copy} />
+  <ApiFinal locale={locale} copy={copy} />
+</div>
+
+<script>
+  import '../../scripts/api';
+</script>

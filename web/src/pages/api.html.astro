@@ -1,0 +1,9 @@
+---
+import Base from '../layouts/Base.astro';
+import ApiPage from '../components/api/ApiPage.astro';
+import { en } from '../i18n/pages/api';
+---
+
+<Base locale="en" path="/api.html" title={en.meta.title} description={en.meta.description} hero>
+  <ApiPage locale="en" />
+</Base>

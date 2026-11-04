@@ -1,0 +1,90 @@
+---
+import '../../styles/legal.css';
+import '../../styles/seam.css';
+import { legalDocs, type LegalDocId } from '../../legal/docs';
+import privacyBody from '../../legal/privacy.body.html?raw';
+import privacyNotice from '../../legal/privacy.notice.html?raw';
+import termsBody from '../../legal/terms.body.html?raw';
+import termsNotice from '../../legal/terms.notice.html?raw';
+
+interface Props {
+  doc: LegalDocId;
+}
+const { doc } = Astro.props;
+const d = legalDocs[doc];
+const body = doc === 'privacy' ? privacyBody : termsBody;
+const notice = doc === 'privacy' ? privacyNotice : termsNotice;
+const words = body.replace(/<[^>]+>/g, ' ').trim().split(/\s+/).length;
+const minutes = Math.max(1, Math.round(words / 230));
+const toc = d.toc.map(([id, label]) => {
+  const m = label.match(/^(\d+)\.\s+(.*)$/)!;
+  return { id, n: m[1], t: m[2] };
+});
+const docs = [
+  ['privacy', '/privacy.html', 'Privacy Policy'],
+  ['terms', '/terms.html', 'Terms of Use'],
+] as const;
+---
+
+<div class="legal-page lg">
+  <section class="lg-hero impact" data-section aria-labelledby="lg-h">
+    <div class="mesh mesh-calm" aria-hidden="true"><i class="b b5"></i><i class="b b1"></i><i class="b b2"></i><i class="b b3"></i><i class="vig"></i></div>
+    <svg class="lg-orbit" viewBox="0 0 1600 700" aria-hidden="true">
+      <ellipse class="o1" cx="1060" cy="330" rx="640" ry="210" pathLength="1"></ellipse>
+      <ellipse class="o2" cx="1060" cy="330" rx="470" ry="150"></ellipse>
+      <circle class="lg-dot" r="7" fill="#00BEF3" style="offset-path:path('M420,330 a640,210 0 1,0 1280,0 a640,210 0 1,0 -1280,0')"></circle>
+      <circle class="lg-dot b" r="5" fill="#8B5CF6" style="offset-path:path('M590,330 a470,150 0 1,0 940,0 a470,150 0 1,0 -940,0')"></circle>
+    </svg>
+    <div class="lg-orb" aria-hidden="true"><div class="orb" style="--s:clamp(140px,16vw,240px)"><i class="halo"></i></div></div>
+    <div class="wrap lg-hero-in">
+      <nav class="lg-switch rv" aria-label="Legal documents">
+        {docs.map(([id, href, label]) => <a href={href} aria-current={id === doc ? 'page' : undefined}>{label}</a>)}
+        <i class="lg-thumb" aria-hidden="true"></i>
+      </nav>
+      <p class="eyebrow rv" style="color:#B7C2D4" data-v="eyebrow">{d.eyebrow}</p>
+      <h1 class="d lg-h1" id="lg-h" data-v="title">{d.title}</h1>
+      <ul class="lg-meta" data-v="meta">{d.meta.map((m) => <li set:html={m} />)}</ul>
+      <p class="lg-read rv" style="--i:3" aria-hidden="true">{minutes} min read · {toc.length} sections</p>
+    </div>
+  </section>
+
+  <section class="lg-body" aria-label="Document">
+    <div class="wrap lg-grid">
+      <aside class="lg-aside">
+        <div class="toc" data-toc-box>
+          <button class="toc-mob" type="button" aria-expanded="false" aria-controls="toc-list" data-toc-toggle>
+            <span class="toc-mob-k">Contents</span><span class="toc-mob-v" data-toc-current>{toc[0].n}. {toc[0].t}</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 9l6 6 6-6"></path></svg>
+          </button>
+          <div class="toc-head">
+            <p class="toc-title">Contents</p>
+            <div class="toc-ring" aria-hidden="true"><i data-ring></i><b data-pct>0%</b></div>
+          </div>
+          <nav aria-label="Contents" id="toc-list">
+            <ol class="toc-list" data-v="toc">
+              {toc.map((s) => <li><a href={`#${s.id}`} data-toc={s.id}><span class="tn">{s.n}</span><span class="tt">{s.t}</span><i class="tp"><b></b></i></a></li>)}
+            </ol>
+          </nav>
+          <div class="toc-tools">
+            <button class="toc-theme" type="button" data-theme-toggle aria-label="Switch theme" data-label-dark="Switch to dark theme" data-label-light="Switch to light theme"
+              ><svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"></path></svg><svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4.5"></circle><path d="M12 2v2M12 20v2M2 12h2M20 12h2"></path></svg><span class="l-dark">Dark reading</span><span class="l-light">Light reading</span></button
+            >
+            <a class="toc-print" href="#" data-print>Print</a>
+          </div>
+          <i class="toc-bar" aria-hidden="true"><b data-bar></b></i>
+        </div>
+      </aside>
+      <article class="prose" data-article>
+        <div class="lg-notice" data-v="notice" set:html={notice} />
+        <div data-v="content" set:html={body} />
+        <p class="lg-end"><a href="#top" data-top-link>Back to top ↑</a></p>
+      </article>
+    </div>
+  </section>
+
+  <a class="totop" href="#top" data-totop aria-label="Back to top"><svg viewBox="0 0 48 48" aria-hidden="true"><circle class="tt-bg" cx="24" cy="24" r="21"></circle><circle class="tt-fg" cx="24" cy="24" r="21" pathLength="100" data-tt></circle></svg><svg class="tt-ar" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"></path></svg></a>
+  <p class="toast" role="status" aria-live="polite" data-toast></p>
+</div>
+
+<script>
+  import '../../scripts/legal';
+</script>

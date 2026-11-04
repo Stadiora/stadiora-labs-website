@@ -1,0 +1,38 @@
+---
+import type { ApiCopy } from '../../i18n/pages/api';
+
+interface Props {
+  copy: ApiCopy;
+}
+const t = Astro.props.copy.difference;
+---
+
+<section class="dw" id="difference" data-section aria-labelledby="dw-h">
+  <div class="dw-pin" data-dw data-scrub-pin>
+    <div class="dw-sticky" data-api-stage="wall" data-scrub>
+      <div class="wrap dw-head">
+        <p class="eyebrow">{t.eyebrow}</p>
+        <h2 class="d d2" id="dw-h">{t.h2[0]}<br /><span class="grad-text">{t.h2[1]}</span></h2>
+      </div>
+      <div class="dw-field" data-dw-field aria-hidden="true" data-decorative></div>
+      <div class="dw-card" aria-hidden="true">
+        <span class="tier">{t.tier}</span>
+        <p><b>{t.cardTitle}</b>{t.cardText}</p>
+        <i class="dw-ring"><b>54</b></i>
+      </div>
+      <p class="dw-caption" aria-hidden="true"><span data-dw-n>64</span> {t.caption[0]} · <b>{t.caption[1]}</b></p>
+      <div class="wrap dw-scale" aria-hidden="true"><span>{t.scale[0]}</span><i><b></b></i><span>{t.scale[1]}</span></div>
+    </div>
+  </div>
+  <div class="wrap dw-compare">
+    <div class="dw-col dw-them rv">
+      <p class="dw-label">{t.themLabel}</p>
+      <ul>{t.them.map((x) => <li><span>{x}</span></li>)}</ul>
+    </div>
+    <div class="dw-vs rv" style="--i:1" aria-hidden="true">{t.vs}</div>
+    <div class="dw-col dw-us rv" style="--i:2">
+      <p class="dw-label">{t.usLabel}</p>
+      <ul>{t.us.map((x) => <li>{x}</li>)}</ul>
+    </div>
+  </div>
+</section>

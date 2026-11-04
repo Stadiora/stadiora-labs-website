@@ -5,12 +5,15 @@
 //   node scripts/evidence.mjs --pricing-only   (the /pricing/ page only: prices, region, dialogs, layout, contrast; add --checks-only to skip screenshots)
 //   node scripts/evidence.mjs --engage-only    (the five Platform pages, EN and ES: overflow, contrast, a11y, interactions)
 //   node scripts/evidence.mjs --home-only      (the home guards only: structure, autoplayers, reduced motion, marquees, hero words, clipping, contrast)
+//   node scripts/evidence.mjs --api-only       (the API page, EN and ES: pause, reduced motion and glyph-pixel contrast of the API and legal pages)
 // Output goes to web/.evidence/ (git-ignored): PNGs plus summary.json. Exit code 1 when a check fails.
 import { mkdir, readdir, readFile, rm, stat, writeFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { chromium } from 'playwright';
 import { contrastProbe } from './lib/contrast.mjs';
+import { apiMotionChecks, apiReducedMotionChecks } from './lib/api-motion-checks.mjs';
+import { pageContrastChecks } from './lib/page-contrast-checks.mjs';
 import { engageChecks } from './lib/engage-checks.mjs';
 import { homeChecks, homeSections } from './lib/home-checks.mjs';
 import { navChecks } from './lib/nav-checks.mjs';
@@ -27,6 +30,7 @@ const engageOnly = process.argv.includes('--engage-only');
 const checksOnly = process.argv.includes('--checks-only');
 const coachOnly = process.argv.includes('--coach-only');
 const homeOnly = process.argv.includes('--home-only');
+const apiOnly = process.argv.includes('--api-only');
 
 await rm(outDir, { recursive: true, force: true });
 await mkdir(outDir, { recursive: true });
@@ -108,6 +112,23 @@ if (pricingOnly) {
 }
 
 // Platform Coach pages (programs, nutrition, readiness, power lab); `--coach-only` runs just these.
+// API and legal pages: pause, reduced motion and glyph-pixel contrast. `--api-only` runs just these.
+//   --api-motion-only: just the pause and reduced-motion checks. --api-contrast-only[=tag,width,scheme[,reduced]]: just the contrast scans
+//   (optionally one job), which is what the mutation battery runs.
+const apiMotionOnly = process.argv.includes('--api-motion-only');
+const contrastArg = process.argv.find((a) => a.startsWith('--api-contrast-only'));
+const apiRun = async () => {
+  if (!contrastArg) {
+    await apiMotionChecks({ open, check, sleep, settle, metrics });
+    await apiReducedMotionChecks({ open, check, sleep, settle });
+  }
+  if (!apiMotionOnly) await pageContrastChecks({ open, check, sleep, metrics, browser, only: contrastArg?.split('=')[1] });
+};
+if (apiOnly || apiMotionOnly || contrastArg) {
+  await apiRun();
+  await finish();
+}
+
 const coachRun = () => platformCoachChecks({ open, check, shot, el, sleep, settle, checksOnly, metrics, server, browser, outDir });
 if (coachOnly) {
   await coachRun();
@@ -444,4 +465,5 @@ await pricingChecks({ browser, server, outDir, check, metrics, sleep, checksOnly
 await solutionsChecks({ open, settle, check, sleep, metrics, measure, outDir, checksOnly });
 
 await coachRun();
+await apiRun();
 await finish();
