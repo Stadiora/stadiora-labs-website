@@ -625,9 +625,9 @@ export async function pricingChecks({ browser, server, outDir, check, metrics, s
   const settleReveals = (page) => page.evaluate(() => Promise.allSettled(document.getAnimations().filter((a) => a.effect?.getComputedTiming().iterations !== Infinity).map((a) => a.finished)));
   // Pixel contrast over rendered pixels: hide all text, screenshot, and judge every text run against the pixels under it.
   // Full scroll in viewport steps, or one scope (the estimate panel) centred in the viewport.
-  const stagePixels = async (page, scope = null) => {
-    await page.addStyleTag({ content: 'html.px-hide *, html.px-hide *::before, html.px-hide *::after { color: transparent !important; -webkit-text-fill-color: transparent !important; text-shadow: none !important; } html.px-hide [data-px-clip] { background-image: none !important; } html.px-hide .nav, html.px-hide .nav *, html.px-hide .nav *::before, html.px-hide .nav *::after { box-shadow: none !important; }' });
-    // The fixed bar is judged on its own, and the shadow it throws on whatever scrolls under it is not a resting state.
+  // `under` scrolls the scope so its top sits that many px from the viewport top: directly below the fixed bar, in its shadow.
+  const stagePixels = async (page, scope = null, under = null) => {
+    await page.addStyleTag({ content: 'html.px-hide *, html.px-hide *::before, html.px-hide *::after { color: transparent !important; -webkit-text-fill-color: transparent !important; text-shadow: none !important; } html.px-hide [data-px-clip] { background-image: none !important; }' });
     // Posters and lazy images must be painted, or a stage reads as white.
     await page.evaluate(async () => {
       document.querySelectorAll('img[loading="lazy"]').forEach((img) => (img.loading = 'eager'));
@@ -642,7 +642,8 @@ export async function pricingChecks({ browser, server, outDir, check, metrics, s
     const tops = scope ? [0] : Array.from({ length: Math.ceil(total / (height * 0.8)) }, (_, i) => Math.round(i * height * 0.8));
     const sum = { checked: 0, lowest: Infinity, fails: [], failCount: 0 };
     for (const top of tops) {
-      if (scope) await page.evaluate((s) => document.querySelector(s).scrollIntoView({ block: 'center', behavior: 'instant' }), scope);
+      if (scope && under !== null) await page.evaluate(({ s, y }) => window.scrollBy({ top: document.querySelector(s).getBoundingClientRect().top - y, behavior: 'instant' }), { s: scope, y: under });
+      else if (scope) await page.evaluate((s) => document.querySelector(s).scrollIntoView({ block: 'center', behavior: 'instant' }), scope);
       else await page.evaluate((y) => window.scrollTo({ top: y, behavior: 'instant' }), top);
       await page.waitForFunction(() => [...document.querySelectorAll('.pricing .rv')].every((e) => e.getBoundingClientRect().top > innerHeight || parseFloat(getComputedStyle(e).opacity) > 0.99), null, { timeout: 4000 });
       await settleReveals(page);
@@ -913,6 +914,26 @@ export async function pricingChecks({ browser, server, outDir, check, metrics, s
           out[`contrastMin-${scheme}-${locale}-${width}`] = Number(min.toFixed(2));
           await close(page);
         }
+      }
+    }
+
+    // The fixed bar throws a shadow on whatever rests just below it, and that text stays there once scrolling stops. Park a
+    // known text block 70px from the top (the bar ends at 68px or less), screenshot the composited page and judge the text
+    // against those pixels. A shadow restyle that darkens the area below the bar fails this, which the full-page scans may miss.
+    for (const [width, mobile] of [[1440, false], [390, true]]) {
+      for (const scheme of ['light', 'dark']) {
+        const page = await open(`${paths.en}?region=us`, { width, height: mobile ? 844 : 900, scheme, mobile });
+        await page.locator('.pcard__use[data-use="free"]').click();
+        await settleReveals(page);
+        await page.waitForFunction(() => !document.querySelector('[data-coach-note]').hidden && document.querySelector('[data-coach-note]').textContent.trim().length > 0, null, { timeout: 3000 }).catch(() => {});
+        const p = await stagePixels(page, '[data-coach-note]', 70);
+        const geo = await page.evaluate(() => ({
+          top: Math.round(document.querySelector('[data-coach-note]').getBoundingClientRect().top),
+          navBottom: Math.ceil(document.querySelector('.nav__bar').getBoundingClientRect().bottom),
+          scrolled: document.documentElement.hasAttribute('data-scrolled'),
+        }));
+        check('pricing/contrast', `${scheme}/${width}: the coach note parked ${geo.top}px from the top, below the ${geo.navBottom}px bar and in its shadow, keeps AA on composited pixels (${p.checked} runs, lowest ${p.lowest.toFixed(2)}:1)`, geo.scrolled && geo.top === 70 && geo.navBottom <= 70 && p.checked >= 1 && p.failCount === 0 && p.lowest >= 4.5, `${JSON.stringify(geo)} ${p.fails.map((f) => `"${f.text}" ${f.ratio}`).join(', ')}`);
+        await close(page);
       }
     }
 
