@@ -2,7 +2,7 @@
 // Clubs) show what /pricing shows, for every way a region can be chosen: browser time zone and ?region=.
 // Expected amounts come from pricing-oracle.mjs (typed by hand), not from src/data/prices.ts, so the table, the
 // teaser and /pricing are three independent witnesses.
-import { EDU, ORACLE, fmt } from './pricing-oracle.mjs';
+import { EDU, ORACLE, fmt, sizes } from './pricing-oracle.mjs';
 
 const localized = (locale, path) => (locale === 'es' ? `/es${path}` : path);
 
@@ -41,7 +41,7 @@ const readTeaser = () =>
 
 const readPricing = () => ({
   region: document.querySelector('[data-pricing]')?.dataset.region ?? null,
-  coreAthletes: document.querySelector('select[data-athletes]')?.value ?? null,
+  coreAthletes: document.querySelector('[data-pricing]')?.dataset.athletes ?? null,
   core: document.querySelector('[data-amount="core"]')?.textContent.trim() ?? null,
   schoolsFrom: document.querySelector('[data-schools-from]')?.textContent.trim() ?? null,
   highSchool: document.querySelector('[data-edu-rate="highSchool"]')?.textContent.trim() ?? null,
@@ -57,7 +57,7 @@ export async function solutionsPriceChecks({ open, check }) {
       const label = `${timezoneId}${search}`;
       const pricingPage = await open({ width: 1440, height: 900, timezoneId }, `${localized(locale, '/pricing/')}${search}`);
       await pricingPage.waitForSelector('[data-pricing][data-ready]', { state: 'attached', timeout: 4000 });
-      await pricingPage.selectOption('select[data-athletes]', String(CORE_SIZE));
+      await pricingPage.locator('input[data-athletes]').fill(String(sizes.indexOf(CORE_SIZE)));
       const pricing = await pricingPage.evaluate(readPricing);
       await pricingPage.context().close();
       const region = expected ?? pricing.region;

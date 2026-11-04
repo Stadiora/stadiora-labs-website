@@ -1,8 +1,8 @@
 // Evidence checks for /pricing/ and /es/pricing/. Called from evidence.mjs with its browser, server and recorders.
 //   node scripts/evidence.mjs --pricing-only            (checks plus screenshots)
 //   node scripts/evidence.mjs --pricing-only --checks-only
-//   node scripts/evidence.mjs --pricing-only --checks-only --pricing-group=dialogs   (one group: data, region, prices,
-//     behaviour, dialogs, fallback, layout, contrast, links; repeat it to look for flakes)
+//   node scripts/evidence.mjs --pricing-only --checks-only --pricing-group=reveals   (one group: data, region, prices,
+//     behaviour, reveals, estimate, motion, fallback, layout, contrast, links; repeat it to look for flakes)
 // It opens its own Playwright contexts (it needs a time zone per context) and carries its own price oracle
 // (pricing-oracle.mjs): the numbers there are typed in from the epic (Stadiora/Aria#16544) and DECISIONS #3 to #5, not
 // read back from src/data/prices.ts, so a wrong edit to the table fails here.
@@ -12,6 +12,9 @@ import * as table from '../../src/data/prices.ts';
 import { regionFromTimeZone } from '../../src/lib/region.ts';
 import { fill } from '../../src/lib/template.ts';
 import { en, es } from '../../src/i18n/pages/pricing.ts';
+import { contrastProbe } from './contrast.mjs';
+import { estimateChecks } from './pricing-estimate-checks.mjs';
+import { motionChecks } from './pricing-motion-checks.mjs';
 import { ANNUAL_PERCENT, BRANDED, DEFAULT_BAND, EDU, EXTRA_COACH, FREE, ORACLE, annual, brandedFromText, copyProblems, everyAmount, fmt, sharedAmounts, sizes, tableProblems } from './pricing-oracle.mjs';
 
 const { athleteBands } = table;
@@ -72,9 +75,9 @@ const readState = () => {
     fallback: root.hasAttribute('data-fallback'),
     // Each branded-app amount read where it shows: the marked span and the whole line it sits in.
     brandedStrip: { monthly: text('[data-addon="branded-app"] [data-price="branded-monthly"]'), setup: text('[data-addon="branded-app"] [data-price="branded-setup"]'), line: text('[data-addon="branded-app"] .addon__price') },
-    brandedDialog: { monthly: text('#addon-branded-app [data-price="branded-monthly"]'), setup: text('#addon-branded-app [data-price="branded-setup"]'), line: text('#addon-branded-app .modal__fact') },
-    extraStrip: text('[data-addon="extra-coach"] [data-extra-coach]'),
-    extraDialog: text('#addon-extra-coach [data-extra-coach]'),
+    brandedPanel: { monthly: text('#addon-branded-app [data-price="branded-monthly"]'), setup: text('#addon-branded-app [data-price="branded-setup"]'), line: text('#addon-branded-app .addon__fact') },
+    extraStrip: text('[data-addon="extra-coach"] .addon__price [data-extra-coach]'),
+    extraPanel: text('#addon-extra-coach [data-extra-coach]'),
     freePrice: text('.pcard--free .pcard__amount'),
     freeLine: text('.pcard--free .pcard__lines p'),
     saves: text('.saves'),
@@ -101,7 +104,7 @@ const readLayout = () => {
     const walker = document.createTreeWalker(container, NodeFilter.SHOW_TEXT);
     for (let n = walker.nextNode(); n; n = walker.nextNode()) {
       if (!n.textContent.trim() || !n.parentElement || !visible(n.parentElement)) continue;
-      if (n.parentElement.closest('dialog')) continue;
+      if (n.parentElement.closest('[hidden]')) continue;
       const range = document.createRange();
       range.selectNodeContents(n);
       for (const r of range.getClientRects()) {
@@ -111,7 +114,7 @@ const readLayout = () => {
     return out;
   };
   const name = (c) => (c.className ? String(c.className).split(' ')[0] : c.tagName);
-  for (const c of document.querySelectorAll('.pcard, .controls, .addon, .addons__panel')) {
+  for (const c of document.querySelectorAll('.pcard, .controls, .addon, .est')) {
     if (!visible(c)) continue;
     const box = c.getBoundingClientRect();
     const items = lines(c);
@@ -132,17 +135,18 @@ const readLayout = () => {
       }
     }
   }
-  for (const b of document.querySelectorAll('.pcard a.btn, .addon__more')) {
-    const host = b.closest('.pcard, .addon');
+  for (const b of document.querySelectorAll('.pcard a.btn, .pcard__more, .pcard__use, .addon__more, .sw, .step button, .est a.btn')) {
+    if (!visible(b)) continue;
+    const host = b.closest('.pcard, .addon, .est');
     const r = b.getBoundingClientRect();
     const h = host.getBoundingClientRect();
     if (r.left < h.left - 0.5 || r.right > h.right + 0.5) problems.push(`button "${b.textContent.trim().slice(0, 24)}" leaves its ${name(host)}`);
     if (b.scrollWidth > b.clientWidth + 1) problems.push(`button "${b.textContent.trim().slice(0, 24)}" clips its label`);
   }
-  for (const e of document.querySelectorAll('.pcard *, .controls *, .addon *')) {
-    if (!visible(e) || e.closest('dialog')) continue;
+  for (const e of document.querySelectorAll('.pcard *, .controls *, .addon *, .est *')) {
+    if (!visible(e)) continue;
     const cs = getComputedStyle(e);
-    if (cs.overflow !== 'visible' && e.scrollWidth > e.clientWidth + 1 && !/^(INPUT|SELECT)$/.test(e.tagName)) {
+    if (cs.overflow !== 'visible' && e.scrollWidth > e.clientWidth + 1 && !/^(INPUT|SELECT)$/.test(e.tagName) && !e.classList.contains('dg')) {
       problems.push(`${name(e)} clips its content (${e.scrollWidth} > ${e.clientWidth})`);
     }
   }
@@ -164,9 +168,9 @@ const readLayout = () => {
   const misaligned = [];
   for (const row of rows.values()) {
     if (row.length < 2) continue;
-    for (const sel of ['.pcard__name', '.pcard__price', '.pcard__cta']) {
-      const offsets = row.map((c) => c.querySelector(sel).getBoundingClientRect().top - c.getBoundingClientRect().top);
-      if (Math.max(...offsets) - Math.min(...offsets) > 1.5) misaligned.push(sel);
+    for (const sel of ['.pcard__name', '.pcard__price', '.pcard__cta', '.pcard__checks', '.pcard__use']) {
+      const offsets = row.filter((c) => visible(c.querySelector(sel))).map((c) => c.querySelector(sel).getBoundingClientRect().top - c.getBoundingClientRect().top);
+      if (offsets.length > 1 && Math.max(...offsets) - Math.min(...offsets) > 1.5) misaligned.push(sel);
     }
   }
   if (vw > 720 && misaligned.length) problems.push(`rows not aligned: ${[...new Set(misaligned)].join(', ')}`);
@@ -176,92 +180,116 @@ const readLayout = () => {
   return { problems, cards: cards.length, ctaHeights: cta };
 };
 
-// Text contrast for everything visible. Mirrors the foundation's measure in evidence.mjs.
-const readContrast = () => {
-  const canvas = document.createElement('canvas');
-  canvas.width = canvas.height = 1;
-  const ctx = canvas.getContext('2d', { willReadFrequently: true });
-  const cache = new Map();
-  const rgba = (css) => {
-    if (!cache.has(css)) {
-      ctx.clearRect(0, 0, 1, 1);
-      ctx.fillStyle = '#000';
-      ctx.fillStyle = css;
-      ctx.fillRect(0, 0, 1, 1);
-      const [r, g, b, a] = ctx.getImageData(0, 0, 1, 1).data;
-      cache.set(css, [r, g, b, a / 255]);
+// Text contrast comes from the shared foundation probe (./contrast.mjs). It skips text over gradients and images, so
+// everything inside <main> (the light plan cards and add-on cards as much as the dark hero, Performance card, estimate
+// panel and final CTA) is also measured on rendered pixels by `stageRuns` + `worstOverPixels`: every visible text run's
+// box is read, all text is hidden, the page is screenshotted, and the worst contrast between the run's colour and any
+// pixel under its box must still clear AA. A background swapped for a gradient cannot slip past the probe's skip.
+const stageRuns = ({ scope = null } = {}) => {
+  const hidden = (e) => {
+    for (let n = e; n && n !== document.documentElement; n = n.parentElement) {
+      const cs = getComputedStyle(n);
+      if (cs.display === 'none' || cs.visibility === 'hidden' || parseFloat(cs.opacity) < 0.05) return true;
+      if (n.hasAttribute('inert') || n.hasAttribute('data-decorative') || n.tagName === 'TEMPLATE') return true;
     }
-    return cache.get(css);
+    return false;
   };
-  const over = (top, bottom) => {
-    const a = top[3] + bottom[3] * (1 - top[3]);
-    if (a === 0) return [0, 0, 0, 0];
-    return [0, 1, 2].map((i) => (top[i] * top[3] + bottom[i] * bottom[3] * (1 - top[3])) / a).concat(a);
+  const opacityOf = (e) => {
+    let o = 1;
+    for (let n = e; n && n !== document.documentElement; n = n.parentElement) o *= parseFloat(getComputedStyle(n).opacity);
+    return o;
   };
   const lum = ([r, g, b]) => {
     const f = (v) => ((v /= 255) <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4);
     return 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(b);
   };
-  const ratio = (a, b) => {
-    const [hi, lo] = [lum(a), lum(b)].sort((x, y) => y - x);
-    return (hi + 0.05) / (lo + 0.05);
-  };
-  const hidden = (e) => {
-    for (let n = e; n && n !== document.documentElement; n = n.parentElement) {
-      const cs = getComputedStyle(n);
-      if (cs.display === 'none' || cs.visibility === 'hidden' || parseFloat(cs.opacity) === 0) return true;
-      if (n.getAttribute('aria-hidden') === 'true' || n.hasAttribute('inert') || n.tagName === 'TEMPLATE') return true;
-    }
-    return false;
-  };
-  const bgOf = (e) => {
-    const stack = [];
-    let imageBg = false;
-    const box = e.getBoundingClientRect();
-    for (let n = e; n; n = n.parentElement) {
-      const cs = getComputedStyle(n);
-      const fill = cs.backgroundImage;
-      if (fill !== 'none' && (/url\(/.test(fill) || !/^0(px|%) /.test(cs.backgroundSize))) imageBg = true;
-      // The nav's glass is an absolutely positioned ::before; count it when it spans the whole text box.
-      const pseudo = getComputedStyle(n, '::before');
-      if (pseudo.content !== 'none' && pseudo.position === 'absolute' && pseudo.backgroundImage === 'none' && parseFloat(pseudo.width) >= box.width - 1 && parseFloat(pseudo.height) >= box.height - 1) {
-        const [r, g, b, a] = rgba(pseudo.backgroundColor);
-        stack.push([r, g, b, a * parseFloat(pseudo.opacity)]);
-      }
-      stack.push(rgba(cs.backgroundColor));
-      if (rgba(cs.backgroundColor)[3] >= 0.99) break;
-    }
-    let bg = [255, 255, 255, 1];
-    for (const layer of stack.reverse()) bg = over(layer, bg);
-    return { bg, imageBg };
-  };
-  const rows = [];
-  let skippedImage = 0;
+  // The nav is transparent over the hero until the page scrolls; after that it is glass and the shared probe judges it.
+  const stages = scope ? [document.querySelector(scope)] : [document.querySelector('main')].concat(document.documentElement.hasAttribute('data-scrolled') ? [] : [document.querySelector('.nav')]);
+  const runs = [];
+  const navBox = document.documentElement.hasAttribute('data-scrolled') ? document.querySelector('.nav')?.getBoundingClientRect() : null;
   const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
-  const seen = new Set();
   for (let node = walker.nextNode(); node; node = walker.nextNode()) {
-    if (!node.textContent.trim()) continue;
     const e = node.parentElement;
-    if (!e || seen.has(e) || ['SCRIPT', 'STYLE', 'NOSCRIPT'].includes(e.tagName)) continue;
-    seen.add(e);
-    const rect = e.getBoundingClientRect();
-    if (rect.width === 0 || rect.height === 0 || hidden(e)) continue;
+    if (!node.textContent.trim() || !e || ['SCRIPT', 'STYLE', 'NOSCRIPT'].includes(e.tagName) || hidden(e)) continue;
+    if (!stages.some((s) => s?.contains(e))) continue;
+    const range = document.createRange();
+    range.selectNodeContents(node);
     const cs = getComputedStyle(e);
-    const { bg, imageBg } = bgOf(e);
-    if (imageBg) {
-      skippedImage++;
-      continue;
-    }
-    const fgRaw = rgba(cs.color);
-    const fg = over([fgRaw[0], fgRaw[1], fgRaw[2], fgRaw[3] * parseFloat(cs.opacity)], bg);
     const size = parseFloat(cs.fontSize);
     const large = size >= 24 || (size >= 18.66 && parseInt(cs.fontWeight, 10) >= 700);
-    const need = large ? 3 : 4.5;
-    const r = ratio(fg, bg);
-    rows.push({ text: node.textContent.trim().slice(0, 36), ratio: r, need, cls: String(e.className).slice(0, 32) || e.tagName });
+    const box = e.getBoundingClientRect();
+    if (box.width <= 1 && box.height <= 1) continue; // visually-hidden text
+    let color = cs.color;
+    // Gradient text (the h1 and final CTA accent line): judge the darkest stop in the window the box shows.
+    if (cs.webkitBackgroundClip === 'text' || cs.backgroundClip === 'text') {
+      const shown = 100 / (parseFloat(cs.backgroundSize) || 100);
+      const stops = [...cs.backgroundImage.matchAll(/(rgba?\([^)]*\))\s+([\d.]+)%/g)].map((m) => ({ c: m[1], at: parseFloat(m[2]) / 100, l: lum(m[1].match(/\d+(\.\d+)?/g).slice(0, 3).map(Number)) }));
+      const visible = stops.filter((s) => s.at <= shown + 0.001);
+      if (visible.length) color = visible.sort((p, q) => p.l - q.l)[0].c;
+      e.setAttribute('data-px-clip', '');
+    }
+    const opacity = opacityOf(e);
+    for (const r of range.getClientRects()) {
+      if (r.width < 2 || r.height < 2 || r.bottom <= 0 || r.top >= innerHeight || r.right <= 0 || r.left >= innerWidth) continue;
+      // Skip text a fixed bar sits over: the shot would measure the bar, and the bar is judged on its own.
+      const hit = document.elementFromPoint(Math.min(innerWidth - 1, r.left + r.width / 2), Math.min(innerHeight - 1, Math.max(0, r.top + r.height / 2)));
+      if (hit && !e.contains(hit) && !hit.contains(e)) continue;
+      if (navBox && r.top < navBox.bottom && r.bottom > navBox.top && r.left < navBox.right && r.right > navBox.left) continue;
+      // A punctuation-only glyph hidden from assistive tech (the "/" between EN and ES) is decoration, judged as a graphic at 3:1.
+      const glyph = Boolean(e.closest('[aria-hidden="true"]')) && /^[^\p{L}\p{N}]+$/u.test(node.textContent.trim());
+      runs.push({ text: node.textContent.trim().slice(0, 28), cls: String(e.className).slice(0, 28) || e.tagName, l: r.left, t: Math.max(0, r.top), w: r.width, h: Math.min(innerHeight, r.bottom) - Math.max(0, r.top), color, need: glyph ? 3 : large ? 3 : 4.5, opacity });
+    }
   }
-  const fails = rows.filter((r) => r.ratio < r.need - 0.005);
-  return { checked: rows.length, min: Math.min(...rows.map((r) => r.ratio)), fails: fails.slice(0, 8), failCount: fails.length, skippedImage };
+  return runs;
+};
+
+// Runs in the page: the screenshot (png, base64) holds the background with the text hidden.
+const worstOverPixels = async ({ png, runs, scale }) => {
+  const bitmap = await createImageBitmap(await (await fetch(`data:image/png;base64,${png}`)).blob());
+  const canvas = document.createElement('canvas');
+  canvas.width = bitmap.width;
+  canvas.height = bitmap.height;
+  const ctx = canvas.getContext('2d', { willReadFrequently: true });
+  ctx.drawImage(bitmap, 0, 0);
+  const lin = (v) => ((v /= 255) <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4);
+  const probe = document.createElement('canvas');
+  probe.width = probe.height = 1;
+  const pctx = probe.getContext('2d', { willReadFrequently: true });
+  const rgba = (css) => {
+    pctx.clearRect(0, 0, 1, 1);
+    pctx.fillStyle = '#000';
+    pctx.fillStyle = css;
+    pctx.fillRect(0, 0, 1, 1);
+    const [r, g, b, a] = pctx.getImageData(0, 0, 1, 1).data;
+    return [r, g, b, a / 255];
+  };
+  const fails = [];
+  let lowest = Infinity;
+  let checked = 0;
+  for (const run of runs) {
+    const x = Math.max(0, Math.floor(run.l * scale));
+    const y = Math.max(0, Math.floor(run.t * scale));
+    const w = Math.min(bitmap.width - x, Math.ceil(run.w * scale));
+    const h = Math.min(bitmap.height - y, Math.ceil(run.h * scale));
+    if (w < 1 || h < 1) continue;
+    checked++;
+    const [fr, fg, fb, fa] = rgba(run.color);
+    const a = fa * run.opacity;
+    const data = ctx.getImageData(x, y, w, h).data;
+    const ratios = [];
+    for (let i = 0; i < data.length; i += 4) {
+      const bgL = 0.2126 * lin(data[i]) + 0.7152 * lin(data[i + 1]) + 0.0722 * lin(data[i + 2]);
+      const mix = (f, b) => f * a + b * (1 - a);
+      const fgL = 0.2126 * lin(mix(fr, data[i])) + 0.7152 * lin(mix(fg, data[i + 1])) + 0.0722 * lin(mix(fb, data[i + 2]));
+      ratios.push((Math.max(fgL, bgL) + 0.05) / (Math.min(fgL, bgL) + 0.05));
+    }
+    // The page has film grain: a stray speck is not the backdrop, so the 3rd percentile stands for the worst case.
+    ratios.sort((p, q) => p - q);
+    const worst = ratios[Math.floor(ratios.length * 0.03)];
+    lowest = Math.min(lowest, worst);
+    if (worst < run.need - 0.005) fails.push({ text: run.text, ratio: Number(worst.toFixed(2)), need: run.need, cls: run.cls, box: [run.l, run.t, run.w, run.h].map(Math.round).join(',') });
+  }
+  return { checked, lowest, fails: fails.slice(0, 8), failCount: fails.length };
 };
 
 // Touch targets: every real button, summary, control and standalone link is at least 44 by 44.
@@ -275,8 +303,8 @@ const readTargets = () => {
   };
   const small = [];
   let checked = 0;
-  for (const e of document.querySelectorAll('[data-pricing] a.btn, [data-pricing] button, [data-pricing] summary, [data-pricing] .seg__opt, [data-pricing] .athletes select')) {
-    if (hidden(e) || e.closest('dialog:not([open])')) continue;
+  for (const e of document.querySelectorAll('[data-pricing] a.btn, [data-pricing] button, [data-pricing] .seg__opt, [data-pricing] input[type="range"]')) {
+    if (hidden(e)) continue;
     const r = e.getBoundingClientRect();
     if (r.width === 0 || r.height === 0) continue;
     checked++;
@@ -308,7 +336,7 @@ const describeFocus = () => {
   window.__seen ??= new Set();
   if (window.__seen.has(e)) return { end: true, repeat: true };
   window.__seen.add(e);
-  const wrapper = e.matches('input[type="radio"], select') ? e.closest('label') : null;
+  const wrapper = e.matches('input[type="radio"]') ? e.closest('label') : e.matches('input[type="range"]') ? e.closest('.range') : null;
   const target = wrapper ?? e;
   const r = target.getBoundingClientRect();
   const cs = getComputedStyle(target);
@@ -317,6 +345,10 @@ const describeFocus = () => {
   const cy = Math.min(Math.max(r.top + r.height / 2, 1), innerHeight - 1);
   const top = document.elementFromPoint(cx, cy);
   const ring = (c) => (parseFloat(c.outlineWidth) >= 2 && c.outlineStyle !== 'none') || (c.boxShadow && c.boxShadow !== 'none');
+  // The radio and the range input are transparent: their own outline is never seen. The ring that counts is on the label, the
+  // range wrapper, or (range) the knob's opaque spread ring.
+  const knob = e.matches('input[type="range"]') ? wrapper?.querySelector('.range__knob') : null;
+  const knobRing = knob ? /rgb\(\d+, \d+, \d+\) 0px 0px 0px [2-9]px/.test(getComputedStyle(knob).boxShadow) : false;
   return {
     end: false,
     name: (e.getAttribute('aria-label') || e.textContent || e.name || e.tagName).trim().replace(/\s+/g, ' ').slice(0, 40),
@@ -327,7 +359,7 @@ const describeFocus = () => {
     inViewport: r.top >= -2 && r.bottom <= innerHeight + 2,
     obscured: !(top && (target.contains(top) || top.contains(target))),
     ariaHidden: Boolean(e.closest('[aria-hidden="true"], [inert]')),
-    ring: ring(cs) || ring(csFocus),
+    ring: wrapper ? ring(cs) || knobRing : ring(cs) || ring(csFocus),
   };
 };
 
@@ -368,11 +400,11 @@ export async function pricingChecks({ browser, server, outDir, check, metrics, s
   }
 
   const setState = async (page, billing, n) => {
-    await page.selectOption('select[data-athletes]', String(n));
+    await page.locator('input[data-athletes]').fill(String(athleteBands.indexOf(n)));
     await page.locator(`label.seg__opt:has(input[value="${billing}"])`).click();
   };
   const scrollTop = (page) => page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }));
-  // The page uses smooth scrolling and reveal-on-scroll, so step slowly and jump instantly.
+  // The page uses smooth scrolling and reveal-on-scroll, so step slowly and jump instantly, then let the entrances end.
   const settle = async (page) => {
     await page.evaluate(async () => {
       document.querySelectorAll('img[loading="lazy"]').forEach((img) => (img.loading = 'eager'));
@@ -382,7 +414,8 @@ export async function pricingChecks({ browser, server, outDir, check, metrics, s
       }
       window.scrollTo({ top: 0, behavior: 'instant' });
     });
-    await sleep(400);
+    await page.waitForFunction(() => [...document.querySelectorAll('.pricing .rv')].every((e) => parseFloat(getComputedStyle(e).opacity) > 0.99), null, { timeout: 4000 }).catch(() => {});
+    await sleep(300);
   };
   const close = (page) => page.context().close();
   const run = (group) => !onlyGroup || onlyGroup === group;
@@ -476,8 +509,8 @@ export async function pricingChecks({ browser, server, outDir, check, metrics, s
             if (got.edu.join() !== want.edu.join()) wrong.push(`${tag} education ${got.edu}`);
             if (got.extra.length !== 2 || got.extra.some((e) => e !== want.extra)) wrong.push(`${tag} extra coach ${got.extra}`);
             // Add-ons: every amount read where it shows. Monthly and setup are told apart by their marker and by the
-            // words beside them, in the strip and in the dialog, so swapping or editing one of them fails here.
-            for (const where of ['brandedStrip', 'brandedDialog']) {
+            // words beside them, in the strip and in the More info panel, so swapping or editing one of them fails here.
+            for (const where of ['brandedStrip', 'brandedPanel']) {
               const g = got[where];
               const read = brandedFromText(g.line ?? '');
               if (g.monthly !== fmt(BRANDED.monthly)) addonWrong.push(`${tag} ${where} monthly fee is "${g.monthly}", want ${fmt(BRANDED.monthly)}`);
@@ -486,7 +519,7 @@ export async function pricingChecks({ browser, server, outDir, check, metrics, s
               if (read.setup !== fmt(BRANDED.setup)) addonWrong.push(`${tag} ${where} shows "${read.setup}" as setup, want ${fmt(BRANDED.setup)} ("${g.line}")`);
             }
             if (got.extraStrip !== want.extra) addonWrong.push(`${tag} extra coach in the strip is "${got.extraStrip}", want ${want.extra}`);
-            if (got.extraDialog !== want.extra) addonWrong.push(`${tag} extra coach in the dialog is "${got.extraDialog}", want ${want.extra}`);
+            if (got.extraPanel !== want.extra) addonWrong.push(`${tag} extra coach in the More info panel is "${got.extraPanel}", want ${want.extra}`);
             const freeWant = fill(copyFor[locale].plans.free.line, { coaches: String(FREE.coaches), athletes: String(FREE.athletes) });
             if (got.freePrice !== fmt(FREE.monthly) || got.freeLine !== freeWant) freeWrong.push(`${tag} Free card "${got.freePrice}" / "${got.freeLine}", want ${fmt(FREE.monthly)} / "${freeWant}"`);
             if (got.saves !== fill(copyFor[locale].controls.annualSaves, { percent: String(ANNUAL_PERCENT) })) freeWrong.push(`${tag} annual saving reads "${got.saves}"`);
@@ -500,10 +533,10 @@ export async function pricingChecks({ browser, server, outDir, check, metrics, s
       }
     }
     check('pricing/prices', `Core and Performance price, meta, billed line, Schools from, education, extra coach (${n} states: en/es x us/latam x monthly/annual x 6 sizes)`, wrong.length === 0, wrong.slice(0, 4).join('; '));
-    check('pricing/addons', `custom-branded app: ${fmt(BRANDED.monthly)} is the monthly fee and ${fmt(BRANDED.setup)} the setup fee, each at its own place in the strip and the dialog (marker and wording; ${n} states: en/es x us/latam x monthly/annual x 6 sizes)`, addonWrong.length === 0, addonWrong.slice(0, 3).join('; '));
-    check('pricing/addons', `extra coach: the price in the strip and in the dialog is ${fmt(EXTRA_COACH.us)} (US) or ${fmt(EXTRA_COACH.latam)} (LatAm), both places, every state`, addonWrong.every((w) => !/extra coach/.test(w)) && wrong.every((w) => !/extra coach/.test(w)));
+    check('pricing/addons', `custom-branded app: ${fmt(BRANDED.monthly)} is the monthly fee and ${fmt(BRANDED.setup)} the setup fee, each at its own place in the strip and the More info panel (marker and wording; ${n} states: en/es x us/latam x monthly/annual x 6 sizes)`, addonWrong.length === 0, addonWrong.slice(0, 3).join('; '));
+    check('pricing/addons', `extra coach: the price in the strip and in the More info panel is ${fmt(EXTRA_COACH.us)} (US) or ${fmt(EXTRA_COACH.latam)} (LatAm), both places, every state`, addonWrong.every((w) => !/extra coach/.test(w)) && wrong.every((w) => !/extra coach/.test(w)));
     check('pricing/prices', `Free card shows ${fmt(FREE.monthly)} with ${FREE.coaches} coach and ${FREE.athletes} athletes, and the annual saving reads ${ANNUAL_PERCENT}%, from the table in every state`, freeWrong.length === 0, freeWrong.slice(0, 3).join('; '));
-    check('pricing/prices', 'no dollar amount outside the current state is anywhere in the DOM, dialogs included', wrong.every((w) => !/unexpected dollar/.test(w)));
+    check('pricing/prices', 'no dollar amount outside the current state is anywhere in the DOM, closed panels and the estimate included', wrong.every((w) => !/unexpected dollar/.test(w)));
     check('pricing/prices', "the other region's exclusive amounts never appear", isolation === 0, `${isolation} states`);
     const annualBad = ['us', 'latam'].flatMap((r) => table.bands[r].flatMap((b) => [b.core, b.performance].filter((p) => p.annualMonthly !== annual(p.monthly) || p.annualYearly !== annual(p.monthly) * 12).map((p) => `${r} ${b.athletes}: ${p.monthly} -> ${p.annualMonthly}/${p.annualYearly}`)));
     check('pricing/prices', `annual is ${ANNUAL_PERCENT}% off rounded down per month; the yearly total is that times 12 (every band in the table)`, annualBad.length === 0, annualBad.slice(0, 3).join('; '));
@@ -522,155 +555,203 @@ export async function pricingChecks({ browser, server, outDir, check, metrics, s
     const rolling = await page.evaluate(() => document.querySelectorAll('.is-rolling').length);
     check('pricing/behaviour', 'prices roll on a user change (motion on)', rolling >= 2, `${rolling} rolling`);
     check('pricing/behaviour', 'the live region announces both plans after a change', /Core.*179/.test(s.live ?? '') && /Performance.*269/.test(s.live ?? ''), s.live);
-    await sleep(450);
-    check('pricing/behaviour', 'the roll animation clears itself', (await page.evaluate(() => document.querySelectorAll('.is-rolling').length)) === 0);
+    await page.waitForFunction(() => document.querySelectorAll('.is-rolling').length === 0, null, { timeout: 2500 }).catch(() => {});
+    check('pricing/behaviour', 'the roll animation clears itself', (await page.evaluate(() => document.querySelectorAll('.is-rolling, .odo-on').length)) === 0);
+    s = await page.evaluate(readState);
+    check('pricing/behaviour', 'after the roll the price is plain text again (no leftover digit wheels)', s.core === '$179', s.core);
     await page.keyboard.press('ArrowLeft');
     s = await page.evaluate(readState);
     check('pricing/behaviour', 'ArrowLeft returns to monthly', s.billing === 'monthly' && s.core === '$199', `${s.billing} ${s.core}`);
 
-    await page.focus('select[data-athletes]');
-    await page.keyboard.press('ArrowDown');
+    await page.focus('input[data-athletes]');
+    await page.keyboard.press('ArrowRight');
     s = await page.evaluate(readState);
-    check('pricing/behaviour', 'the athlete select works from the keyboard (ArrowDown: 100 to 250)', s.athletes === '250' && s.core === '$349' && s.performance === '$529', `${s.athletes} ${s.core}`);
-    await page.keyboard.press('ArrowUp');
-    await page.keyboard.press('ArrowUp');
+    check('pricing/behaviour', 'the roster slider works from the keyboard (ArrowRight: 100 to 250)', s.athletes === '250' && s.core === '$349' && s.performance === '$529', `${s.athletes} ${s.core}`);
+    await page.keyboard.press('ArrowLeft');
+    await page.keyboard.press('ArrowLeft');
     s = await page.evaluate(readState);
-    check('pricing/behaviour', 'ArrowUp twice goes from 250 to 50', s.athletes === '50' && s.core === '$129', `${s.athletes} ${s.core}`);
+    check('pricing/behaviour', 'ArrowLeft twice goes from 250 to 50', s.athletes === '50' && s.core === '$129', `${s.athletes} ${s.core}`);
+    await page.keyboard.press('End');
+    s = await page.evaluate(readState);
+    check('pricing/behaviour', 'End goes to 1,000 athletes', s.athletes === '1000' && s.core === '$799', `${s.athletes} ${s.core}`);
+    await page.keyboard.press('Home');
+    s = await page.evaluate(readState);
+    check('pricing/behaviour', 'Home goes to 25 athletes', s.athletes === '25' && s.core === '$79', `${s.athletes} ${s.core}`);
+    const spoken = await page.evaluate(() => document.querySelector('input[data-athletes]').getAttribute('aria-valuetext'));
+    check('pricing/behaviour', 'the slider speaks the roster, not just the step number', /25/.test(spoken ?? '') && /2/.test(spoken ?? ''), spoken);
 
     await page.focus('input[data-billing]:checked');
     await page.keyboard.press('Tab');
-    const afterRadio = await page.evaluate(() => document.activeElement.matches('select[data-athletes]'));
-    check('pricing/behaviour', 'Tab goes from the billing radios to the athlete select', afterRadio);
+    const afterRadio = await page.evaluate(() => document.activeElement.matches('input[data-athletes]'));
+    check('pricing/behaviour', 'Tab goes from the billing radios to the roster slider', afterRadio);
     const order = [];
-    for (let i = 0; i < 6; i++) {
+    for (let i = 0; i < 11; i++) {
       await page.keyboard.press('Tab');
-      order.push(await page.evaluate(() => document.activeElement.getAttribute('aria-describedby') ?? document.activeElement.getAttribute('data-open-modal')));
+      order.push(await page.evaluate(() => `${document.activeElement.tagName[0]}:${document.activeElement.getAttribute('aria-describedby') ?? document.activeElement.getAttribute('aria-controls')}`));
     }
-    check('pricing/behaviour', 'Tab then visits the plan buttons in card order, with the education rates button after Schools', order.join() === 'plan-free,plan-core,plan-performance,plan-schools,education-rates,plan-federations', order.join());
+    check('pricing/behaviour', 'Tab then visits each plan card in order: its button, "Use this plan", with the education rates button before Schools "Use this plan"', order.join() === 'A:plan-free,B:plan-free,A:plan-core,B:plan-core,A:plan-performance,B:plan-performance,A:plan-schools,B:education-rates,B:plan-schools,A:plan-federations,B:plan-federations', order.join());
     await close(page);
 
     const calm = await open(paths.en, { reduced: true });
     await setState(calm, 'annual', 250);
-    const anim = await calm.evaluate(() => getComputedStyle(document.querySelector('[data-amount="core"]')).animationDuration);
-    check('pricing/behaviour', 'reduced motion: the price roll has no duration', parseFloat(anim) <= 0.00001, anim);
+    const still = await calm.evaluate(() => ({
+      rolling: document.querySelectorAll('.is-rolling, .odo-on').length,
+      iris: getComputedStyle(document.querySelector('.pcard--performance'), '::before').animationName,
+      spot: getComputedStyle(document.querySelector('.pcard--core'), '::after').display,
+      core: document.querySelector('[data-amount="core"]').textContent.trim(),
+    }));
+    check('pricing/behaviour', 'reduced motion: prices change at once with no digit wheels, the iris border does not spin, the spotlight is off', still.rolling === 0 && still.iris === 'none' && still.spot === 'none' && still.core === '$314', JSON.stringify(still));
     await close(calm);
 
     const reveal = await open(paths.en, { reduced: false });
     await settle(reveal);
-    const revealed = await reveal.evaluate(() => [...document.querySelectorAll('.faq [data-reveal], .addons[data-reveal], .faq__item')].map((e) => parseFloat(getComputedStyle(e).opacity)));
-    check('pricing/behaviour', 'reveal-on-scroll: add-ons and FAQ end fully visible after scrolling through', revealed.length > 0 && revealed.every((o) => o > 0.99), String(revealed.filter((o) => o <= 0.99).length));
+    const revealed = await reveal.evaluate(() => [...document.querySelectorAll('.pricing .rv')].map((e) => parseFloat(getComputedStyle(e).opacity)));
+    check('pricing/behaviour', 'reveal-on-scroll: every entrance ends fully visible after scrolling through', revealed.length >= 10 && revealed.every((o) => o > 0.99), `${revealed.filter((o) => o <= 0.99).length} of ${revealed.length} left hidden`);
     await close(reveal);
   }
 
-  // ------------------------------------------------------------ 5. dialogs: focus, trap, Escape, backdrop, scroll lock
-  if (run('dialogs')) {
+  // ------------------------------------------------------------ 5. "More info" and FAQ reveals: buttons that open a panel in place
+  // Not dialogs: nothing traps focus or locks scroll. Each button owns one panel, toggles it on Enter, Space and click,
+  // keeps focus, and never changes another panel.
+  const reveals = (page) =>
+    page.evaluate(() =>
+      [...document.querySelectorAll('[data-reveal-btn]')].map((b) => {
+        const p = document.getElementById(b.getAttribute('aria-controls'));
+        const cs = getComputedStyle(p);
+        const r = p.getBoundingClientRect();
+        return { id: p.id, expanded: b.getAttribute('aria-expanded'), shown: cs.visibility !== 'hidden' && r.height > 4, hidden: cs.visibility === 'hidden', inside: r.left >= -0.5 && r.right <= innerWidth + 0.5 };
+      }),
+    );
+  const settleReveals = (page) => page.evaluate(() => Promise.allSettled(document.getAnimations().filter((a) => a.effect?.getComputedTiming().iterations !== Infinity).map((a) => a.finished)));
+  // Pixel contrast over rendered pixels: hide all text, screenshot, and judge every text run against the pixels under it.
+  // Full scroll in viewport steps, or one scope (the estimate panel) centred in the viewport.
+  // `under` scrolls the scope so its top sits that many px from the viewport top: directly below the fixed bar, in its shadow.
+  const stagePixels = async (page, scope = null, under = null) => {
+    await page.addStyleTag({ content: 'html.px-hide *, html.px-hide *::before, html.px-hide *::after { color: transparent !important; -webkit-text-fill-color: transparent !important; text-shadow: none !important; } html.px-hide [data-px-clip] { background-image: none !important; }' });
+    // Posters and lazy images must be painted, or a stage reads as white.
+    await page.evaluate(async () => {
+      document.querySelectorAll('img[loading="lazy"]').forEach((img) => (img.loading = 'eager'));
+      await Promise.all([...document.querySelectorAll('video[poster], img')].map((n) => {
+        const i = new Image();
+        i.src = n.poster || n.currentSrc || n.src;
+        return i.decode().catch(() => {});
+      }));
+    });
+    const { height } = page.viewportSize();
+    const total = await page.evaluate(() => document.documentElement.scrollHeight);
+    const tops = scope ? [0] : Array.from({ length: Math.ceil(total / (height * 0.8)) }, (_, i) => Math.round(i * height * 0.8));
+    const sum = { checked: 0, lowest: Infinity, fails: [], failCount: 0 };
+    for (const top of tops) {
+      if (scope && under !== null) await page.evaluate(({ s, y }) => window.scrollBy({ top: document.querySelector(s).getBoundingClientRect().top - y, behavior: 'instant' }), { s: scope, y: under });
+      else if (scope) await page.evaluate((s) => document.querySelector(s).scrollIntoView({ block: 'center', behavior: 'instant' }), scope);
+      else await page.evaluate((y) => window.scrollTo({ top: y, behavior: 'instant' }), top);
+      await page.waitForFunction(() => [...document.querySelectorAll('.pricing .rv')].every((e) => e.getBoundingClientRect().top > innerHeight || parseFloat(getComputedStyle(e).opacity) > 0.99), null, { timeout: 4000 });
+      await settleReveals(page);
+      await sleep(150);
+      const runs = await page.evaluate(stageRuns, { scope });
+      await page.evaluate(() => document.documentElement.classList.add('px-hide'));
+      const png = (await page.screenshot()).toString('base64');
+      await page.evaluate(() => document.documentElement.classList.remove('px-hide'));
+      const r = await page.evaluate(worstOverPixels, { png, runs, scale: 1 });
+      sum.checked += r.checked;
+      sum.lowest = Math.min(sum.lowest, r.lowest);
+      sum.failCount += r.failCount;
+      sum.fails.push(...r.fails.map((f) => ({ ...f, at: top })));
+    }
+    sum.fails = sum.fails.slice(0, 8);
+    return sum;
+  };
+  if (run('reveals')) {
     for (const [label, width, height, mobile] of [['1280', 1280, 900, false], ['390', 390, 844, true]]) {
       const bad = [];
       const page = await open(`${paths.en}?region=latam`, { width, height, mobile });
-      for (const id of ['addon-extra-coach', 'addon-branded-app', 'addon-credits', 'education-rates']) {
-        const trigger = page.locator(`[data-open-modal="${id}"]`).first();
-        const dialog = page.locator(`dialog#${id}`);
-        await trigger.focus();
-        await page.keyboard.press('Enter');
-        const st = await page.evaluate((i) => {
-          const d = document.getElementById(i);
-          const r = d.getBoundingClientRect();
-          return {
-            open: d.open,
-            inside: d.contains(document.activeElement),
-            locked: getComputedStyle(document.documentElement).overflow === 'hidden',
-            fits: r.left >= -0.5 && r.top >= -0.5 && r.right <= innerWidth + 0.5 && r.bottom <= innerHeight + 0.5,
-            named: Boolean(d.getAttribute('aria-labelledby') && document.getElementById(d.getAttribute('aria-labelledby'))?.textContent.trim()),
-          };
-        }, id);
-        if (!st.open) bad.push(`${id}: Enter does not open it`);
-        if (!st.inside) bad.push(`${id}: focus not inside on open`);
-        if (!st.locked) bad.push(`${id}: page scroll not locked`);
-        if (!st.fits) bad.push(`${id}: dialog leaves the viewport`);
-        if (!st.named) bad.push(`${id}: no accessible name`);
-        for (const key of ['Tab', 'Shift+Tab']) {
-          let escaped = false;
-          for (let i = 0; i < 8; i++) {
-            await page.keyboard.press(key);
-            if (!(await page.evaluate((d) => document.getElementById(d).contains(document.activeElement), id))) escaped = true;
-          }
-          if (escaped) bad.push(`${id}: ${key} leaves the dialog`);
-        }
-        await page.keyboard.press('Escape');
-        const afterEsc = await page.evaluate((i) => ({ open: document.getElementById(i).open, back: document.activeElement?.getAttribute('data-open-modal') }), id);
-        if (afterEsc.open) bad.push(`${id}: Escape does not close`);
-        if (afterEsc.back !== id) bad.push(`${id}: focus not returned to its button after Escape`);
-
-        await trigger.click();
-        await page.mouse.click(3, height - 3);
-        if (await dialog.evaluate((d) => d.open)) bad.push(`${id}: backdrop click does not close`);
-        await trigger.click();
-        await dialog.locator('h2, h3').first().click();
-        if (!(await dialog.evaluate((d) => d.open))) bad.push(`${id}: a click inside closes it`);
-        await dialog.locator('[data-modal-close]').first().click();
-        const afterClose = await page.evaluate((i) => ({ open: document.getElementById(i).open, back: document.activeElement?.getAttribute('data-open-modal') }), id);
-        if (afterClose.open) bad.push(`${id}: close button does not close`);
-        if (afterClose.back !== id) bad.push(`${id}: focus not returned after the close button`);
+      const start = await reveals(page);
+      if (start.length !== 11) bad.push(`${start.length} reveal buttons, want 11`);
+      for (const r of start) {
+        if (r.expanded !== 'false' || r.shown || !r.hidden) bad.push(`${r.id}: not collapsed and hidden at start`);
       }
-      check('pricing/dialogs', `${label}px: all four dialogs open, trap focus, close on Escape, backdrop and button, return focus, lock scroll`, bad.length === 0, bad.slice(0, 4).join('; '));
-      check('pricing/dialogs', `${label}px: the page stayed clean (no console errors)`, page.problems.length === 0, page.problems.slice(0, 2).join('; '));
+      const dialogs = await page.locator('dialog').count();
+      if (dialogs) bad.push(`${dialogs} <dialog> on the page`);
+      const buttons = page.locator('[data-reveal-btn]');
+      const n = await buttons.count();
+      for (let i = 0; i < n; i++) {
+        const btn = buttons.nth(i);
+        const id = await btn.getAttribute('aria-controls');
+        await btn.scrollIntoViewIfNeeded();
+        await btn.focus();
+        await page.keyboard.press('Enter');
+        await settleReveals(page);
+        let now = (await reveals(page)).find((r) => r.id === id);
+        if (now.expanded !== 'true' || !now.shown || !now.inside) bad.push(`${id}: Enter does not open it (${JSON.stringify(now)})`);
+        if (!(await btn.evaluate((b) => b === document.activeElement))) bad.push(`${id}: focus left the button on open`);
+        const others = (await reveals(page)).filter((r) => r.id !== id && r.expanded === 'true');
+        if (others.length) bad.push(`${id}: opening it also opened ${others.map((o) => o.id)}`);
+        if (await page.evaluate(() => getComputedStyle(document.documentElement).overflow === 'hidden')) bad.push(`${id}: the page scroll is locked`);
+        await page.keyboard.press('Space');
+        await settleReveals(page);
+        now = (await reveals(page)).find((r) => r.id === id);
+        if (now.expanded !== 'false' || now.shown) bad.push(`${id}: Space does not close it`);
+        if (!(await btn.evaluate((b) => b === document.activeElement))) bad.push(`${id}: focus left the button on close`);
+        await btn.click();
+        await settleReveals(page);
+        now = (await reveals(page)).find((r) => r.id === id);
+        if (now.expanded !== 'true' || !now.shown) bad.push(`${id}: a click does not open it`);
+        await btn.click();
+        await settleReveals(page);
+        now = (await reveals(page)).find((r) => r.id === id);
+        if (now.expanded !== 'false' || now.shown) bad.push(`${id}: a second click does not close it`);
+      }
+      check('pricing/reveals', `${label}px: all 11 "More info" and FAQ buttons start collapsed and open and close on Enter, Space and click, keep focus, move the page scroll lock nowhere, and open no other panel`, bad.length === 0, bad.slice(0, 4).join('; '));
+      check('pricing/reveals', `${label}px: the page stayed clean (no console errors)`, page.problems.length === 0, page.problems.slice(0, 2).join('; '));
       await close(page);
     }
   }
 
-  // ------------------------------------------------------------ 5b. dialogs: closing and moving on at once never reopens the wrong thing
-  // Regression for a reviewed race: closing a dialog queued a `close` event whose handler gave focus back to the opener.
-  // A keyboard user who closed one dialog and moved straight to another trigger had their focus stolen, and Enter then
-  // opened the first dialog again. Two variants, each cycling through every ordered pair of triggers:
-  //   - same-task: close() and the next trigger's focus() run in one synchronous turn, the worst timing for a late handler;
-  //   - real keys: Escape or the close button, then focus the next trigger and press Enter, the way the reviewer did.
-  if (run('dialogs')) {
-    const ids = ['addon-extra-coach', 'addon-branded-app', 'addon-credits', 'education-rates'];
-    const pairs = ids.flatMap((a) => ids.filter((b) => b !== a).map((b) => [a, b]));
+  // ------------------------------------------------------------ 5b. reveals stay in step with their buttons under any order of toggling
+  // The old dialogs had a reviewed race (close, move on, press Enter, the first one reopened). Reveals have no event
+  // queue to race with, but a handler that keeps its own state could still drift from the DOM, so: a seeded random
+  // walk over all 11 buttons, mouse and keyboard mixed, checking after every step against a model of what should be open.
+  if (run('reveals')) {
     const bad = [];
-    let rounds = 0;
-    const page = await open(`${paths.en}?region=latam`);
-    const state = () => page.evaluate((all) => ({ opened: all.filter((i) => document.getElementById(i).open), active: document.activeElement?.getAttribute('data-open-modal') ?? document.activeElement?.tagName }), ids);
-    for (let round = 0; round < 2; round++) {
-      for (const [a, b] of pairs) {
-        for (const via of ['escape', 'button']) {
-          rounds++;
-          const tag = `${a} -> ${b} via ${via}`;
-          await page.locator(`[data-open-modal="${a}"]`).first().focus();
-          await page.keyboard.press('Enter');
-          if (round === 0) {
-            // Same task: no event-loop turn between close and the focus move.
-            await page.evaluate(
-              ([from, next]) => {
-                document.getElementById(from).close();
-                document.querySelector(`[data-open-modal="${next}"]`).focus();
-              },
-              [a, b],
-            );
-            await page.waitForTimeout(40);
-          } else {
-            if (via === 'escape') await page.keyboard.press('Escape');
-            else await page.locator(`dialog#${a} [data-modal-close]`).first().click();
-            await page.locator(`[data-open-modal="${b}"]`).first().focus();
-          }
-          const mid = await state();
-          if (mid.opened.length) bad.push(`${tag}: a dialog is open before Enter (${mid.opened})`);
-          if (mid.active !== b) bad.push(`${tag}: focus is on "${mid.active}" after the move, want ${b}`);
-          await page.keyboard.press('Enter');
-          const after = await state();
-          if (after.opened.join() !== b) bad.push(`${tag}: Enter opened [${after.opened}], want [${b}]`);
-          await page.keyboard.press('Escape');
-          if ((await state()).opened.length) bad.push(`${tag}: Escape left a dialog open`);
-        }
+    const page = await open(`${paths.en}?region=latam`, { reduced: false });
+    const buttons = page.locator('[data-reveal-btn]');
+    const n = await buttons.count();
+    const model = new Array(n).fill(false);
+    let seed = 20240601;
+    const rand = () => ((seed = (seed * 1664525 + 1013904223) >>> 0) / 4294967296);
+    const steps = 160;
+    for (let step = 0; step < steps; step++) {
+      const i = Math.floor(rand() * n);
+      const btn = buttons.nth(i);
+      await btn.scrollIntoViewIfNeeded();
+      if (rand() < 0.5) await btn.click();
+      else {
+        await btn.focus();
+        await page.keyboard.press(rand() < 0.5 ? 'Enter' : 'Space');
+      }
+      model[i] = !model[i];
+      if (step % 8 === 7 || step === steps - 1) {
+        await settleReveals(page);
+        const now = await reveals(page);
+        now.forEach((r, k) => {
+          if ((r.expanded === 'true') !== model[k]) bad.push(`step ${step}: ${r.id} aria-expanded=${r.expanded}, want ${model[k]}`);
+          if (r.shown !== model[k]) bad.push(`step ${step}: ${r.id} is ${r.shown ? 'shown' : 'hidden'}, want ${model[k] ? 'shown' : 'hidden'}`);
+        });
       }
     }
-    out.dialogRounds = rounds;
-    check('pricing/dialogs', `close then move to another trigger then Enter opens that dialog, never the previous one (${rounds} rounds: every ordered pair of 4 triggers x Escape and close button x same-task and real-key variants)`, bad.length === 0, bad.slice(0, 3).join('; '));
-    check('pricing/dialogs', 'the race run stayed clean (no console errors)', page.problems.length === 0, page.problems.slice(0, 2).join('; '));
+    out.revealSteps = steps;
+    check('pricing/reveals', `${steps} random toggles over the 11 reveal buttons (click, Enter, Space) leave every panel and aria-expanded matching the model`, bad.length === 0, bad.slice(0, 3).join('; '));
+    check('pricing/reveals', 'the random walk stayed clean (no console errors)', page.problems.length === 0, page.problems.slice(0, 2).join('; '));
     await close(page);
   }
 
-  // ------------------------------------------------------------ 5c. fallback: JavaScript on, pricing script never arrives
+  // ------------------------------------------------------------ 5c. the live estimate (its own file: the math, the limits, the motion)
+  if (run('estimate')) await estimateChecks({ open, close, check, sleep, out });
+
+  // ------------------------------------------------------------ 5c2. the motion: the odometer in the accessibility tree, the estimate loop, the iris ring
+  if (run('motion')) await motionChecks({ open, close, check, sleep, out });
+
+  // ------------------------------------------------------------ 5d. fallback: JavaScript on, pricing script never arrives
   if (run('fallback')) {
     for (const [label, width, height, mobile] of [['1280', 1280, 900, false], ['390', 390, 844, true]]) {
       const bad = [];
@@ -693,14 +774,16 @@ export async function pricingChecks({ browser, server, outDir, check, metrics, s
         };
         return {
           controls: shown('.controls'),
-          selector: shown('select[data-athletes]'),
+          selector: shown('input[data-athletes]'),
           segmented: shown('.seg'),
           note: shown('.controls-note'),
           noteText: document.querySelector('.controls-note')?.textContent.trim() ?? '',
-          triggers: [...document.querySelectorAll('[data-open-modal]')].filter((e) => getComputedStyle(e).display !== 'none' && e.getBoundingClientRect().width > 0).length,
-          modalsShown: shown('.modals'),
-          dialogsVisible: [...document.querySelectorAll('.modals dialog')].filter((d) => d.getBoundingClientRect().height > 0).length,
-          brandedFee: document.querySelector('.modals #addon-branded-app [data-price="branded-monthly"]')?.textContent.trim(),
+          triggers: [...document.querySelectorAll('[data-reveal-btn], .sw, .step button, .pcard__use')].filter((e) => getComputedStyle(e).display !== 'none' && e.getBoundingClientRect().width > 0).length,
+          estimate: shown('.est'),
+          panelsOpen: [...document.querySelectorAll('.reveal')].filter((p) => getComputedStyle(p).visibility !== 'hidden' && p.getBoundingClientRect().height > 4).length,
+          panels: document.querySelectorAll('.reveal').length,
+          faqText: [...document.querySelectorAll('.faq__static')].filter((e) => e.getBoundingClientRect().height > 0 && e.textContent.trim().length > 8).length,
+          brandedFee: document.querySelector('#addon-branded-app [data-price="branded-monthly"]')?.textContent.trim(),
           overflow: document.documentElement.scrollWidth > document.documentElement.clientWidth + 0.5,
         };
       });
@@ -708,10 +791,12 @@ export async function pricingChecks({ browser, server, outDir, check, metrics, s
       if (!view.note) bad.push('the US/monthly/100-athletes note is not shown');
       const noteWant = fill(en.controls.noScript, { athletes: String(DEFAULT_BAND) });
       if (view.noteText !== noteWant) bad.push(`note reads "${view.noteText}", want "${noteWant}"`);
-      if (view.triggers) bad.push(`${view.triggers} dialog trigger(s) still on screen`);
-      if (!view.modalsShown || view.dialogsVisible < 4) bad.push(`dialog content is not inline (${view.dialogsVisible} of 4)`);
+      if (view.triggers) bad.push(`${view.triggers} button(s) that would do nothing are still on screen`);
+      if (view.estimate) bad.push('the live estimate is on screen with no script to drive it');
+      if (view.panelsOpen !== view.panels || view.panels !== 11) bad.push(`More info and FAQ content is not inline (${view.panelsOpen} of ${view.panels} panels, want 11)`);
+      if (view.faqText !== 7) bad.push(`${view.faqText} of 7 FAQ questions show as plain text`);
       if (view.brandedFee !== fmt(BRANDED.monthly)) bad.push(`inline branded fee "${view.brandedFee}"`);
-      // Tab through the page: every stop is on screen, and none is a control or dialog trigger the fallback hides.
+      // Tab through the page: every stop is on screen, and none is a control the fallback hides.
       await page.evaluate(() => document.activeElement?.blur());
       const stops = [];
       for (let i = 0; i < 120; i++) {
@@ -722,16 +807,17 @@ export async function pricingChecks({ browser, server, outDir, check, metrics, s
       }
       for (const st of stops) {
         if (!st.visible || st.ariaHidden) bad.push(`Tab reaches "${st.name}", which is not visible`);
-        if (st.tag === 'select' || /^(More info|Más información)/.test(st.name) || /^(Monthly|Annual|Mensual|Anual)/.test(st.name)) bad.push(`Tab reaches "${st.name}", a control the fallback hides`);
+        if (st.tag === 'input' || /^(More info|Más información|Use this plan)/.test(st.name) || /^(Monthly|Annual|Mensual|Anual)/.test(st.name)) bad.push(`Tab reaches "${st.name}", a control the fallback hides`);
       }
       if (stops.length < 10) bad.push(`the Tab walk ended after ${stops.length} stops`);
       if (view.overflow) bad.push('the page scrolls sideways');
       // Nothing can move the state, so nothing can contradict it: force the events a control would send.
       await page.evaluate(() => {
-        const sel = document.querySelector('select[data-athletes]');
-        sel.value = '2000';
-        sel.dispatchEvent(new Event('change', { bubbles: true }));
-        const radio = document.querySelector('input[name="billing"][value="annual"], input[value="annual"]');
+        const range = document.querySelector('input[data-athletes]');
+        range.value = '0';
+        range.dispatchEvent(new Event('input', { bubbles: true }));
+        range.dispatchEvent(new Event('change', { bubbles: true }));
+        const radio = document.querySelector('input[data-billing][value="annual"]');
         radio.checked = true;
         radio.dispatchEvent(new Event('change', { bubbles: true }));
       });
@@ -739,7 +825,7 @@ export async function pricingChecks({ browser, server, outDir, check, metrics, s
       for (const key of ['core', 'performance', 'coreMeta', 'coreBilled', 'performanceBilled']) {
         if (forced[key] !== want[key]) bad.push(`after a forced change ${key} became "${forced[key]}"`);
       }
-      check('pricing/fallback', `${label}px: script blocked -> after the failsafe the page shows one honest state (US, monthly, ${DEFAULT_BAND} athletes: ${want.core} / ${want.performance}), hides the controls and dialog triggers, shows the note and the dialog content inline, and the Tab walk reaches nothing hidden`, bad.length === 0, bad.slice(0, 4).join('; '));
+      check('pricing/fallback', `${label}px: script blocked -> after the failsafe the page shows one honest state (US, monthly, ${DEFAULT_BAND} athletes: ${want.core} / ${want.performance}), hides the controls, the estimate and every button that would do nothing, shows the note, the More info and FAQ content inline, and the Tab walk reaches nothing hidden`, bad.length === 0, bad.slice(0, 4).join('; '));
       await close(page);
     }
   }
@@ -772,36 +858,92 @@ export async function pricingChecks({ browser, server, outDir, check, metrics, s
 
   // ------------------------------------------------------------ 7. contrast, touch targets, tab order, alt text
   if (run('contrast')) {
-    for (const scheme of ['light', 'dark']) {
-      for (const locale of ['en', 'es']) {
-        const page = await open(`${paths[locale]}?region=latam`, { width: 1440, scheme });
-        const rows = [];
-        const run = async (state) => rows.push({ state, ...(await page.evaluate(readContrast)) });
-        await run('default');
-        await setState(page, 'annual', 1000);
-        await run('annual 1000');
-        await page.locator('.faq details').first().evaluate((d) => (d.open = true));
-        await run('faq open');
-        for (const id of ['addon-extra-coach', 'addon-branded-app', 'addon-credits', 'education-rates']) {
-          await page.locator(`[data-open-modal="${id}"]`).first().click();
-          await run(id);
-          await page.keyboard.press('Escape');
+    for (const [width, mobile] of [[1440, false], [390, true]]) {
+      for (const scheme of ['light', 'dark']) {
+        for (const locale of ['en', 'es']) {
+          const page = await open(`${paths[locale]}?region=latam`, { width, height: mobile ? 844 : 900, scheme, mobile });
+          const rows = [];
+          const run = async (state, pixels = null) => {
+            const c = await page.evaluate(contrastProbe, { includeAriaHidden: true });
+            // The Monthly/Annual labels sit on a sliding thumb the page probe cannot see; the pixel pass judges them.
+            const fails = c.fails.filter((f) => !/seg__txt/.test(f.cls));
+            rows.push({ state, ...c, fails, failCount: c.failCount - (c.fails.length - fails.length) });
+            for (const scope of pixels === null ? [] : [].concat(pixels)) {
+              const p = await stagePixels(page, scope || null);
+              rows.push({ state: `${state}, pixels${scope ? ` of ${scope}` : ''}`, checked: p.checked, min: p.lowest, fails: p.fails, failCount: p.failCount, skippedImage: 0 });
+            }
+          };
+          await run('default', '');
+          await setState(page, 'annual', 1000);
+          await run('annual 1000', ['', '.seg']);
+          await page.locator('.faq__q').first().click();
+          await settleReveals(page);
+          await run('faq open');
+          for (const id of ['addon-extra-coach', 'addon-branded-app', 'addon-credits', 'education-rates']) {
+            await page.locator(`[data-reveal-btn][aria-controls="${id}"]`).first().click();
+            await settleReveals(page);
+            await run(id);
+          }
+          // Every other "More info" and FAQ panel open too, so the light cards carry their longest content.
+          const closed = page.locator('[data-reveal-btn][aria-expanded="false"]');
+          while ((await closed.count()) > 0) {
+            await closed.first().click();
+            await settleReveals(page);
+          }
+          await run('every reveal open');
+          // Estimate with everything on: the coach row, the app row, the credits row and the setup line all show.
+          await page.locator('.sw[data-sw="coach"]').click();
+          await page.locator('.sw[data-sw="app"]').click();
+          await page.locator('.sw[data-sw="ai"]').click();
+          await page.locator('[data-step="1"]').click();
+          await page.waitForFunction(() => document.querySelectorAll('.is-rolling').length === 0, null, { timeout: 2500 }).catch(() => {});
+          await run('estimate with every add-on', '.est');
+          for (const plan of ['free', 'performance', 'schools', 'federations']) {
+            await page.locator(`.pcard__use[data-use="${plan}"]`).click();
+            await page.waitForFunction(() => document.querySelectorAll('.is-rolling').length === 0, null, { timeout: 2500 }).catch(() => {});
+            await run(`estimate ${plan}`, '.est');
+          }
+          // The selected plan card changes its own look: scan the whole page once more with every panel open and Federations chosen.
+          await run('every reveal open, Federations chosen', '');
+          const isPixels = (r) => r.state.includes(', pixels');
+          const failing = rows.filter((r) => r.failCount > 0);
+          const checkedTotal = rows.reduce((a, r) => a + r.checked, 0);
+          const min = Math.min(...rows.filter(isPixels).map((r) => r.min));
+          check('pricing/contrast', `${scheme}/${locale}/${width}: text meets WCAG AA in ${rows.length} measurements (page probe in ${rows.filter((r) => !isPixels(r)).length} states, rendered pixels under every text run in ${rows.filter(isPixels).length} full-page and panel scans, light cards included; ${checkedTotal} text runs, lowest on pixels ${min.toFixed(2)}:1)`, failing.length === 0 && checkedTotal > 400, failing.map((r) => `${r.state}: ${r.fails.map((f) => `"${f.text}" ${f.ratio.toFixed(2)} (${f.cls}${f.box ? ` box ${f.box} scrollY ${f.at}` : ''})`).join(', ')}`).slice(0, 2).join(' | '));
+          out[`contrastSkipped-${scheme}-${locale}-${width}`] = rows.reduce((a, r) => Math.max(a, r.skippedImage), 0);
+          out[`contrastMin-${scheme}-${locale}-${width}`] = Number(min.toFixed(2));
+          await close(page);
         }
-        const failing = rows.filter((r) => r.failCount > 0);
-        const checkedTotal = rows.reduce((a, r) => a + r.checked, 0);
-        const min = Math.min(...rows.map((r) => r.min));
-        check('pricing/contrast', `${scheme}/${locale}: text meets WCAG AA in ${rows.length} states (${checkedTotal} text runs, lowest ${min.toFixed(2)}:1)`, failing.length === 0, failing.map((r) => `${r.state}: ${r.fails.map((f) => `"${f.text}" ${f.ratio.toFixed(2)} (${f.cls})`).join(', ')}`).slice(0, 2).join(' | '));
-        const skipped = rows.reduce((a, r) => Math.max(a, r.skippedImage), 0);
-        out[`contrastSkipped-${scheme}-${locale}`] = skipped;
-        out[`contrastMin-${scheme}-${locale}`] = Number(min.toFixed(2));
+      }
+    }
+
+    // The fixed bar throws a shadow on whatever rests just below it, and that text stays there once scrolling stops. Park a
+    // known text block 70px from the top (the bar ends at 68px or less), screenshot the composited page and judge the text
+    // against those pixels. A shadow restyle that darkens the area below the bar fails this, which the full-page scans may miss.
+    for (const [width, mobile] of [[1440, false], [390, true]]) {
+      for (const scheme of ['light', 'dark']) {
+        const page = await open(`${paths.en}?region=us`, { width, height: mobile ? 844 : 900, scheme, mobile });
+        await page.locator('.pcard__use[data-use="free"]').click();
+        await settleReveals(page);
+        await page.waitForFunction(() => !document.querySelector('[data-coach-note]').hidden && document.querySelector('[data-coach-note]').textContent.trim().length > 0, null, { timeout: 3000 }).catch(() => {});
+        const p = await stagePixels(page, '[data-coach-note]', 70);
+        const geo = await page.evaluate(() => ({
+          top: Math.round(document.querySelector('[data-coach-note]').getBoundingClientRect().top),
+          navBottom: Math.ceil(document.querySelector('.nav__bar').getBoundingClientRect().bottom),
+          scrolled: document.documentElement.hasAttribute('data-scrolled'),
+        }));
+        check('pricing/contrast', `${scheme}/${width}: the coach note parked ${geo.top}px from the top, below the ${geo.navBottom}px bar and in its shadow, keeps AA on composited pixels (${p.checked} runs, lowest ${p.lowest.toFixed(2)}:1)`, geo.scrolled && geo.top === 70 && geo.navBottom <= 70 && p.checked >= 1 && p.failCount === 0 && p.lowest >= 4.5, `${JSON.stringify(geo)} ${p.fails.map((f) => `"${f.text}" ${f.ratio}`).join(', ')}`);
         await close(page);
       }
     }
 
     for (const [width, mobile] of [[390, true], [1280, false]]) {
       const page = await open(paths.en, { width, mobile });
+      // The stepper and its buttons only show with the coach switch on: turn every add-on on so they are measured too.
+      for (const sw of ['coach', 'app', 'ai']) await page.locator(`.sw[data-sw="${sw}"]`).click();
+      await sleep(600);
       const t = await page.evaluate(readTargets);
-      check('pricing/targets', `${width}px: ${t.checked} buttons, controls and summaries are at least 44px`, t.small.length === 0, t.small.slice(0, 4).join('; '));
+      check('pricing/targets', `${width}px: ${t.checked} buttons, switches, the stepper, the slider and controls are at least 44px`, t.small.length === 0 && t.checked >= 20, t.small.slice(0, 4).join('; '));
       await close(page);
     }
 
@@ -875,17 +1017,19 @@ export async function pricingChecks({ browser, server, outDir, check, metrics, s
         return {
           core: text('[data-amount="core"]'),
           performance: text('[data-amount="performance"]'),
-          controls: shown('[data-controls] input, [data-controls] select'),
+          controls: shown('[data-controls] input'),
           note: shown('.controls-note'),
-          more: shown('[data-open-modal]'),
-          dialogs: [...document.querySelectorAll('dialog')].filter((d) => d.getClientRects().length > 0).length,
+          buttons: [...document.querySelectorAll('[data-reveal-btn], .sw, .step button, .pcard__use')].filter((e) => e.getClientRects().length > 0).length,
+          estimate: shown('.est'),
+          panels: [...document.querySelectorAll('.reveal')].filter((p) => getComputedStyle(p).visibility !== 'hidden' && p.getBoundingClientRect().height > 4).length,
           rates: shown('[data-edu-rate]'),
           overflow: document.documentElement.scrollWidth > document.documentElement.clientWidth + 0.5,
-          faq: document.querySelectorAll('.faq details').length,
-          opacity: [...document.querySelectorAll('.pricing [data-reveal]')].map((e) => parseFloat(getComputedStyle(e).opacity)).filter((o) => o < 1).length,
+          faq: document.querySelectorAll('.faq__item').length,
+          faqText: [...document.querySelectorAll('.faq__static')].filter((e) => e.getClientRects().length > 0).length,
+          hiddenEntrances: [...document.querySelectorAll('.pricing .rv, .pricing .lines > span > span')].map((e) => parseFloat(getComputedStyle(e).opacity)).filter((o) => o < 1).length,
         };
       });
-      check('pricing/no-js', `${width}px without JavaScript: US monthly prices for 100 athletes, controls hidden with a note, dialog content inline, no overflow`, s.core === '$199' && s.performance === '$299' && !s.controls && s.note && !s.more && s.dialogs === 4 && s.rates && !s.overflow && s.faq === 7 && s.opacity === 0, JSON.stringify(s));
+      check('pricing/no-js', `${width}px without JavaScript: US monthly prices for 100 athletes, controls, estimate and do-nothing buttons hidden with a note, More info and FAQ content inline, every entrance visible, no overflow`, s.core === '$199' && s.performance === '$299' && !s.controls && s.note && !s.buttons && !s.estimate && s.panels === 11 && s.rates && !s.overflow && s.faq === 7 && s.faqText === 7 && s.hiddenEntrances === 0, JSON.stringify(s));
       await close(page);
     }
   }
@@ -929,25 +1073,40 @@ export async function pricingChecks({ browser, server, outDir, check, metrics, s
       await close(page);
 
       page = await open(`${paths.en}?region=latam`, { width, height, mobile });
-      for (const id of ['addon-extra-coach', 'addon-branded-app', 'addon-credits', 'education-rates']) {
-        await page.locator(`[data-open-modal="${id}"]`).first().click();
-        await sleep(250);
-        await shot(page, `state-modal-${id}-${tag}`);
-        await page.keyboard.press('Escape');
+      await settle(page);
+      for (const id of ['addon-extra-coach', 'addon-branded-app', 'addon-credits']) {
+        await page.locator(`[data-reveal-btn][aria-controls="${id}"]`).first().click();
       }
-      await close(page);
-
-      page = await open(paths.es, { width, height, mobile });
-      await page.locator('[data-open-modal="education-rates"]').first().click();
-      await sleep(250);
-      await shot(page, `state-modal-education-rates-es-${tag}`);
+      await settleReveals(page);
+      await page.locator('.addons__grid').first().screenshot({ path: `${outDir}state-more-info-addons-${tag}.png` });
+      await page.locator('[data-reveal-btn][aria-controls="education-rates"]').first().click();
+      await settleReveals(page);
+      await page.locator('.plans-section').first().screenshot({ path: `${outDir}state-more-info-education-${tag}.png` });
       await close(page);
 
       page = await open(paths.en, { width, height, mobile });
       await settle(page);
-      await page.locator('.faq details').nth(0).evaluate((d) => (d.open = true));
-      await page.locator('.faq details').nth(2).evaluate((d) => (d.open = true));
-      await sleep(250);
+      await page.locator('.sw[data-sw="coach"]').click();
+      await page.locator('[data-step="1"]').click();
+      await page.locator('.sw[data-sw="app"]').click();
+      await page.locator('.sw[data-sw="ai"]').click();
+      await page.waitForFunction(() => document.querySelectorAll('.is-rolling').length === 0, null, { timeout: 2500 }).catch(() => {});
+      await page.locator('.addons__grid').first().screenshot({ path: `${outDir}state-estimate-addons-on-${tag}.png` });
+      await close(page);
+
+      page = await open(paths.es, { width, height, mobile });
+      await settle(page);
+      await page.locator('.sw[data-sw="coach"]').click();
+      await page.locator('.sw[data-sw="app"]').click();
+      await page.waitForFunction(() => document.querySelectorAll('.is-rolling').length === 0, null, { timeout: 2500 }).catch(() => {});
+      await page.locator('.addons__grid').first().screenshot({ path: `${outDir}state-estimate-addons-on-es-${tag}.png` });
+      await close(page);
+
+      page = await open(paths.en, { width, height, mobile });
+      await settle(page);
+      await page.locator('.faq__q').nth(0).click();
+      await page.locator('.faq__q').nth(2).click();
+      await settleReveals(page);
       await page.locator('.faq').first().screenshot({ path: `${outDir}state-faq-open-${tag}.png` });
       await close(page);
 
@@ -955,7 +1114,7 @@ export async function pricingChecks({ browser, server, outDir, check, metrics, s
       await page.focus('input[data-billing][value="monthly"]');
       await page.keyboard.press('Tab');
       await sleep(200);
-      await page.locator('.top').first().screenshot({ path: `${outDir}state-focus-select-${tag}.png` });
+      await page.locator('.p-hero').first().screenshot({ path: `${outDir}state-focus-slider-${tag}.png` });
       await page.keyboard.press('Tab');
       await sleep(200);
       await shot(page, `state-focus-cta-${tag}`);
@@ -963,7 +1122,7 @@ export async function pricingChecks({ browser, server, outDir, check, metrics, s
 
       page = await open(`${paths.en}?region=latam`, { width, height, mobile, noBundle: true });
       await sleep(300);
-      await page.locator('.top').first().screenshot({ path: `${outDir}state-fallback-top-${tag}.png` });
+      await page.locator('.p-hero').first().screenshot({ path: `${outDir}state-fallback-top-${tag}.png` });
       await page.locator('.plans-section').first().screenshot({ path: `${outDir}state-fallback-plans-${tag}.png` });
       await close(page);
     }
