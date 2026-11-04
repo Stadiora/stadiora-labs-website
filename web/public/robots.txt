@@ -1,0 +1,13 @@
+# stadioralabs.com
+
+User-agent: *
+Allow: /
+
+# The investor overview carries noindex, nofollow, noarchive, nosnippet and is
+# left out of sitemap.xml. It is deliberately not disallowed here. Disallow
+# blocks crawling, not indexing, so a crawler that obeys it never fetches the
+# page and never sees the noindex tag. A URL someone shared could then still be
+# indexed as a bare link. Letting crawlers read the page is what makes the
+# noindex bind.
+
+Sitemap: https://stadioralabs.com/sitemap.xml

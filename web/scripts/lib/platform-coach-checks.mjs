@@ -40,7 +40,6 @@ async function revealAll(page, sleep) {
 }
 
 // Routes the foundation registry marks `planned` (src/data/site.ts) belong to later slices and 404 until they land.
-const repoRoot = fileURLToPath(new URL('../../../', import.meta.url));
 const planned = new Set(
   [...readFileSync(fileURLToPath(new URL('../../src/data/site.ts', import.meta.url)), 'utf8').matchAll(/path: '([^']+)', status: 'planned'/g)].flatMap((m) => [m[1], `/es${m[1]}`]),
 );
@@ -228,10 +227,10 @@ export async function platformCoachChecks({ open, check, shot, el, sleep, settle
             const exists = (h) => {
               const clean = pathOnly(h);
               const file = clean.endsWith('/') ? `${clean}index.html` : clean;
-              return existsSync(`${dist}${file.slice(1)}`) || existsSync(`${repoRoot}${file.slice(1)}`);
+              return existsSync(`${dist}${decodeURIComponent(file.slice(1))}`);
             };
             const broken = unique.filter((h) => !exists(h) && !planned.has(pathOnly(h)));
-            check('coach-links', `${tag}: every internal link resolves in dist or the live site, or is a planned route`, broken.length === 0, broken.join(', '));
+            check('coach-links', `${tag}: every internal link resolves in dist (carried legacy pages included), or is a planned route`, broken.length === 0, broken.join(', '));
             metrics[`coach-planned-links-${slug}-${locale}`] = unique.filter((h) => !exists(h) && planned.has(pathOnly(h))).length;
             if (locale === 'es') {
               // Legacy pages (.html) are shared by both languages; every other internal page link must carry /es/.

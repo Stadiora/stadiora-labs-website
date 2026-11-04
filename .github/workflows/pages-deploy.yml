@@ -1,0 +1,69 @@
+name: pages-deploy
+
+# Publishes web/ (the Astro site) to GitHub Pages. Nothing here runs before the cutover:
+#   1. The jobs are gated on the repository variable PAGES_FROM_ACTIONS being "true". Until the cutover sets it, a push to
+#      main skips the whole workflow instead of failing while Pages still builds the repo root with Jekyll.
+#   2. The cutover switches Settings > Pages > Build and deployment > Source to "GitHub Actions" and then runs this
+#      workflow (workflow_dispatch). The runbook is in the PR that added this file and in web/README.md.
+# Pull requests are checked by web-ci.yml, which does not deploy.
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'web/**'
+      - '.github/workflows/pages-deploy.yml'
+  workflow_dispatch:
+
+# Least privilege: the build only reads the repo; the deploy job alone may write Pages and request the OIDC token.
+permissions:
+  contents: read
+
+# One deploy at a time, and never cancel one that is already publishing.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    if: vars.PAGES_FROM_ACTIONS == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - name: Install
+        working-directory: web
+        run: npm install --no-audit --no-fund
+      - name: Build
+        working-directory: web
+        run: npx astro build
+      - name: Verify built output
+        working-directory: web
+        run: npm run verify
+      - name: Check the artifact carries the custom domain
+        run: test "$(cat web/dist/CNAME)" = "stadioralabs.com"
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: web/dist
+
+  deploy:
+    needs: build
+    if: vars.PAGES_FROM_ACTIONS == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      pages: write
+      id-token: write
+      contents: read
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
