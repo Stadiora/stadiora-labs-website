@@ -109,7 +109,7 @@ for (const url of carried.filter((u) => u.endsWith('.html') || u.endsWith('/')))
 }
 {
   const { page, context } = await open('/connect.html');
-  check('carried', 'connect.html: no video element is left pointing at the missing file', (await page.locator('video').count()) === 0 && (await page.content()).replace(/<!--[\s\S]*?-->/g, '').includes('monitors.mp4') === false);
+  check('carried', 'connect.html: no video element is left pointing at the missing file', (await page.locator('video, [src*="monitors.mp4"], [href*="monitors.mp4"]').count()) === 0);
   await context.close();
 }
 

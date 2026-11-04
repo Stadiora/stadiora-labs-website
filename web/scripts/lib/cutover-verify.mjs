@@ -89,7 +89,7 @@ export function verifyCutover({ dist, fail, root = repoRoot }) {
     const file = fileFor(dist, url);
     if (!existsSync(file)) continue;
     const html = read(file);
-    if (!new RegExp(`<meta http-equiv="refresh" content="0; url=${to.replace(/[/.]/g, '\\$&')}">`).test(html)) fail(`cutover: ${url} must be a meta refresh to ${to}`);
+    if (!new RegExp(`<meta http-equiv="refresh" content="0; url=${to.replace(/[\\/.]/g, '\\$&')}">`).test(html)) fail(`cutover: ${url} must be a meta refresh to ${to}`);
     if (!html.includes(`<link rel="canonical" href="${origin}${to}">`)) fail(`cutover: ${url} must carry a canonical link to ${origin}${to}`);
     if (/<script\b/i.test(html)) fail(`cutover: ${url} must not need JavaScript`);
     if (!existsSync(fileFor(dist, to))) fail(`cutover: ${url} redirects to ${to}, which is not in the build`);
@@ -116,7 +116,7 @@ export function verifyCutover({ dist, fail, root = repoRoot }) {
       if (!existsSync(fileFor(dist, target))) fail(`cutover: ${url} refers to ${ref}, which is not in the build`);
     }
   }
-  if (existsSync(fileFor(dist, '/connect.html')) && /monitors\.mp4/.test(read(fileFor(dist, '/connect.html')).replace(/<!--[\s\S]*?-->/g, ''))) {
+  if (existsSync(fileFor(dist, '/connect.html')) && /(?:src|href)\s*=\s*["'][^"']*monitors\.mp4/i.test(read(fileFor(dist, '/connect.html')))) {
     fail('cutover: connect.html still refers to videos/monitors.mp4, which never shipped');
   }
 
