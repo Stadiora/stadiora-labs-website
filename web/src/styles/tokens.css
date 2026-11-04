@@ -34,6 +34,29 @@
   descent-override: 22.5%;
   line-gap-override: 0%;
 }
+/* Display fallback for the site's 62% uppercase lines and 88% headings: size-adjust approximates Archivo's average advances
+   and the overrides match line metrics, reducing swap CLS. Cap height and weight still differ; wrapping is not guaranteed
+   (the Schools EN/1440 H1 changes from three lines to two when Archivo arrives). */
+@font-face {
+  font-family: 'Archivo Fallback';
+  src: local('Arial Bold'), local('Arial-BoldMT'), local('Liberation Sans Bold'), local('LiberationSans-Bold'), local('Helvetica Bold'), local('Helvetica-Bold');
+  font-weight: 600 900;
+  font-stretch: 62% 75%;
+  size-adjust: 70.2%;
+  ascent-override: 125.1%;
+  descent-override: 29.9%;
+  line-gap-override: 0%;
+}
+@font-face {
+  font-family: 'Archivo Fallback';
+  src: local('Arial Bold'), local('Arial-BoldMT'), local('Liberation Sans Bold'), local('LiberationSans-Bold'), local('Helvetica Bold'), local('Helvetica-Bold');
+  font-weight: 600 900;
+  font-stretch: 76% 125%;
+  size-adjust: 92%;
+  ascent-override: 95.4%;
+  descent-override: 22.8%;
+  line-gap-override: 0%;
+}
 
 /* Typed custom properties: they let CSS animate an angle, a counter and a ring value. */
 @property --a {
@@ -125,7 +148,7 @@
   --lane: 3px;
 
   /* Type */
-  --f-display: 'Archivo', Impact, 'Arial Narrow', sans-serif;
+  --f-display: 'Archivo', 'Archivo Fallback', Impact, 'Arial Narrow', sans-serif;
   --f-text: 'Inter', 'Inter Fallback', system-ui, -apple-system, 'Segoe UI', sans-serif;
   --f-mono: 'JBM', ui-monospace, Menlo, monospace;
   --font-display: var(--f-display);

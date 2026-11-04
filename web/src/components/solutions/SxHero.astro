@@ -1,0 +1,93 @@
+---
+// The Floodlight hero of every Solutions, Resources and company page (DESIGN-4 section 6): an impact section on the
+// mesh with orbits, the page H1 at display size, an optional swapping line under it and a media slot on the right.
+import type { Locale } from '../../i18n';
+import type { SwapCopy } from '../../i18n/pages/solutions-fx';
+import { splitWord, swapSentence } from './swap';
+
+interface Action {
+  label: string;
+  href: string;
+  /** Opens the "get the app" chooser. */
+  sheet?: boolean;
+}
+interface Props {
+  locale: Locale;
+  eyebrow?: string;
+  title: string;
+  lead?: string;
+  primary?: Action;
+  secondary?: Action;
+  swap?: SwapCopy;
+  /** `split` puts the media slot beside the copy; `compact` is the shorter hero of the form and index pages. */
+  variant?: 'solo' | 'split' | 'compact';
+  /** Section id; the H1 id is derived from it. */
+  id?: string;
+}
+const { locale, eyebrow, title, lead, primary, secondary, swap, variant = 'solo', id = 'sx-hero' } = Astro.props;
+const first = swap ? splitWord(swap.words[0]) : undefined;
+const hasMedia = Astro.slots.has('default');
+const hasBelow = Astro.slots.has('below');
+---
+
+<section class:list={['sx-hero', 'impact', `sx-hero--${variant}`]} id={id} data-section data-sx-hero aria-labelledby={`${id}-h`}>
+  <div class="mesh" aria-hidden="true">
+    <i class="b b5"></i><i class="b b1"></i><i class="b b2"></i><i class="b b3"></i><i class="b b4"></i><i class="vig"></i>
+  </div>
+  <div class="orbits" aria-hidden="true">
+    <svg viewBox="0 0 1600 800"><ellipse cx="800" cy="400" rx="760" ry="250"></ellipse><ellipse class="dash" cx="800" cy="400" rx="620" ry="190"></ellipse><ellipse cx="800" cy="400" rx="470" ry="140"></ellipse></svg>
+  </div>
+  <div class="wrap sx-hero__grid">
+    <div class="sx-hero__copy" data-sx-copy>
+      {eyebrow && <p class="eyebrow">{eyebrow}</p>}
+      <h1 class="d sx-h1 lines" id={`${id}-h`}><span><span><slot name="title">{title}</slot></span></span></h1>
+      {
+        swap && first && (
+          <p class="sx-swapline d rv" style="--i:2" data-sx-swap data-words={JSON.stringify(swap.words)}>
+            <span class="sr">{swapSentence(locale, swap.pre, swap.words, swap.post)}</span>
+            <span aria-hidden="true">
+              <span class="sx-pre">{swap.pre}</span>
+              <span class="sx-slot" data-sx-slot>
+                <span class="sx-w" data-sx-word data-active style={`--m:${first.m}`}>
+                  {first.parts.map((p) => (
+                    <>
+                      {p.sp >= 0 && <span class="sx-sp" style={`--k:${p.sp}`}>{'\u00a0'}</span>}
+                      <span class="sx-part">
+                        {p.letters.map((l) => (
+                          <span class="sx-ch" style={`--k:${l.k}`}>
+                            {l.ch}
+                          </span>
+                        ))}
+                      </span>
+                    </>
+                  ))}
+                </span>
+              </span>
+              <span class="sx-post">{swap.post}</span>
+            </span>
+          </p>
+        )
+      }
+      {lead && <p class="lead rv" style="--i:3">{lead}</p>}
+      {
+        (primary || secondary) && (
+          <div class="sx-hero__cta rv" style="--i:4">
+            {primary && (
+              <a class="btn btn--white btn--lg" href={primary.href} data-open-sheet={primary.sheet ? '' : undefined}>
+                {primary.label} <span class="arr" aria-hidden="true">→</span>
+              </a>
+            )}
+            {secondary && (
+              <a class="btn btn--ghost btn--lg" href={secondary.href} data-open-sheet={secondary.sheet ? '' : undefined}>
+                {secondary.label}
+              </a>
+            )}
+          </div>
+        )
+      }
+      <slot name="copy" />
+    </div>
+    {hasMedia && <div class="sx-hero__media"><slot /></div>}
+  </div>
+  {hasBelow && <div class="wrap sx-hero__below"><slot name="below" /></div>}
+</section>

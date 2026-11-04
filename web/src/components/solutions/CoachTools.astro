@@ -19,15 +19,15 @@ const glyphs: Record<string, string> = {
 };
 ---
 
-<section class="tools" aria-labelledby="tools-title">
-  <div class="container">
-    <div class="section-head">
-      <h2 id="tools-title" class="h-lane">{copy.tools.title}</h2>
+<section class="tools sx-sec" aria-labelledby="tools-title">
+  <div class="wrap">
+    <div class="sec-head">
+      <h2 id="tools-title" class="d d2 lines"><span><span>{copy.tools.title}</span></span></h2>
     </div>
     <ul class="tools__grid">
       {
         copy.tools.items.map((item, i) => (
-          <li class="pcard tool" data-reveal style={`--reveal-i:${i}`}>
+          <li class="pcard tool rv" style={`--i:${i}`}>
             <span class="tool__icon" aria-hidden="true">
               <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" set:html={glyphs[item.id]} />
             </span>
@@ -45,15 +45,10 @@ const glyphs: Record<string, string> = {
 </section>
 
 <style>
-  .tools {
-    padding-block: 72px;
-    background: var(--surface);
-  }
   .tools__grid {
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 24px;
-    margin-top: 40px;
   }
   .tool {
     display: flex;
@@ -88,12 +83,8 @@ const glyphs: Record<string, string> = {
     }
   }
   @media (max-width: 720px) {
-    .tools {
-      padding-block: 48px;
-    }
     .tools__grid {
       grid-template-columns: minmax(0, 1fr);
-      margin-top: 28px;
     }
   }
 </style>

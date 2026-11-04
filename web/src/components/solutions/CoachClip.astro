@@ -1,0 +1,38 @@
+---
+// The coaches hero media: a text-free clip of three coaches at work (sprints, strength, soccer, in the order of the swap
+// words) with two live demo cards over it. The words are HTML; nothing is baked into the clip.
+import { common } from '../../i18n/pages/common';
+import type { CoachesCopy } from '../../i18n/pages/coaches';
+import type { Locale } from '../../i18n';
+
+interface Props {
+  copy: CoachesCopy;
+  locale: Locale;
+}
+const { copy, locale } = Astro.props;
+const row = copy.ready.rows[0];
+---
+
+<div class="media-frame sx-clip" data-sx-clip>
+  <video muted playsinline loop preload="none" data-clip poster="/solutions/media/sx-coaches.webp" aria-hidden="true" width="720" height="900">
+    <source src="/solutions/media/sx-coaches.webm" type="video/webm" />
+    <source src="/solutions/media/sx-coaches.mp4" type="video/mp4" />
+  </video>
+  <div class="vid-shade"></div>
+  <div class="sx-pop sx-pop--ready pop" data-depth="16" aria-hidden="true">
+    <div class="dring" style={`--v:${row.score}`}></div>
+    <div>
+      <small>{copy.ready.title}</small>
+      <b class="fnum"><span class="count" style={`--to:${row.score};--cd:1.6s`}></span></b>
+      <div class="st"><i class="dot-live"></i>{copy.ready.states.ready}</div>
+    </div>
+  </div>
+  <div class="sx-pop sx-pop--session glass" data-depth="26" aria-hidden="true">
+    <span class="tick"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg></span>
+    <div>
+      <b>{copy.session.name}</b>
+      <span class="meta">{copy.session.saved}</span>
+    </div>
+  </div>
+  <span class="sx-demo">{common[locale].demoTag}</span>
+</div>

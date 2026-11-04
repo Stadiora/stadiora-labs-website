@@ -40,6 +40,56 @@ node scripts/evidence.mjs --engage-motion-only --checks-only # just the Platform
   The approved post-submit status (EN and ES) is written out in `scripts/lib/contact-contract.mjs`, independent of
   `src/i18n/pages/contact.ts`; verify and evidence compare the page with it word for word, so editing that copy means
   editing the contract too.
+- Solutions, Resources, About and Contact in Floodlight (DESIGN-4 section 6): every page runs on `src/layouts/SolutionsPage.astro`
+  (the foundation, the motion kit and `src/styles/solutions/solutions.css`; everything in the lane is prefixed `sx-`). The hero is
+  `src/components/solutions/SxHero.astro` (impact, mesh, orbits, display H1; the Schools and Coaches swap line is one sentence for a
+  screen reader and its visible words are `aria-hidden`), every page ends on `FinalNight.astro` (night-stadium clip, HTML title) and
+  the dark footer. Copy for the added strings is in `src/i18n/pages/solutions-fx.ts` (EN and ES). Page scripts are in
+  `src/scripts/solutions/` (`index.ts` starts them, then the kit): `swap.ts` (hero word swap), `feed.ts` (clubs team feed),
+  `morph.ts` (athletes app morph), `contact.ts` (topic thumb, submit burst). Each one only animates away from the finished still
+  frame, uses `autoplayer()` (so it stops on hover, focus, off screen, in a hidden tab and under reduced motion) and never writes
+  copy: the contact burst is ten decorative dots, and the status text still comes only from `contact-contract.mjs`.
+  The Coaches hero clip is `public/solutions/media/sx-coaches.{webm,mp4,webp}` (lane clips are named `sx-*`, carry no words, and
+  follow the clip markup and budget above; the home clips `night-stadium`, `ai-bg`, `engage-bg`, `tile-chalk`, `tile-hurdler`
+  and `reel` are the only other text-free clips, and the `pillar-*` clips have titles baked in, so a page may not use them).
+  `scripts/lib/solutions-floodlight-verify.mjs` (run by `npm run verify`) fails the build on a missing mesh or orbits, an H1
+  that is not the display face, too few dark surfaces, a final that is not on the night-stadium clip or sits after the footer,
+  a swap line a screen reader cannot read as one sentence,
+  decoration that is neither `aria-hidden` nor a labelled image, a burst that carries text, a pre-rendered status or a topic
+  control that is not two radios. Its media part is `solutions-media-guard.mjs`: every `<video>` has its WebM source, its MP4
+  source and its poster checked one by one against the text-free list and against the clip that slot is meant to play (the hero,
+  the stage or the final band), and a `src` on the `<video>` itself, a missing source or an unlisted file fails; the mutation
+  proofs are a `src` of `pillar-training.mp4` on the opening tag, both sources swapped for the `pillar-training` pair with the
+  poster kept, and the final MP4 swapped for `ai-bg`, each of which must make `npm run verify` exit 1.
+  `scripts/lib/solutions-floodlight-checks.mjs` (run by `evidence`) drives Chromium: the
+  Floodlight anatomy in the light theme, text cut off by a clipping ancestor at 390 and 1440 (`clip-probe.mjs`), the swap line
+  moving, resting under reduced motion and pausing on hover, the coaches clip, the clubs feed, the athletes morph, the About "A"
+  window and the contact thumb, burst and approved status text. It also runs two measuring modules, both on rendered pixels:
+  `solutions-motion-checks.mjs` samples the transforms, boxes and clip times of every hover scope (the hero, conveyors, stages,
+  morph, feed) while it runs, while the pointer is over it, while focus is inside it, offscreen and in a hidden tab (a flag is
+  never read, so a CSS override that keeps a conveyor moving fails), and `solutions-pixel-contrast.mjs` takes five photographs
+  (real ink, hidden, black, white, and isolated black text on white). It compares sampled glyph interiors with the hidden-ink
+  backdrop, using 4.5:1 or 3:1 for large text. The configured cases are 390/1440, EN/ES and light/dark, with reduced-motion stills,
+  five animation phases, six shared-clock times in orbit sections, and the four athlete apps. Transitions are suppressed only
+  during each measurement and restored after real ink has resolved; production button styling is unchanged.
+
+  **Pixel-contrast coverage boundary.** PR #35's committed-head mutation table uses these proof IDs; claims are limited to
+  those payloads and variants, not arbitrary paint-order analysis:
+
+  | Proof ID | Covered regression |
+  | --- | --- |
+  | `front-text-erase` | Athletes EN/light/1440: erase the existing app name after moving it in front of the phone as a z-index 10 sibling; the ordinary exported guard fails. |
+  | `descendant-erase` | Same variant: erase the name inside the front phone; the ordinary exported guard fails. |
+  | `dot-half`, `dot-opaque` | Coaches EN/light/1440: reviewed foreground dots at half/full opacity fail the ordinary exported moving assertion. |
+  | `transition-restored` | Removing measurement transition suppression destabilizes repeated frozen About ES/dark/390 "Inversionistas" ratios; the clean control stays near 18.42:1. |
+  | `identity` | Unchanged guard: the scoped athlete/coaches checks and repeated About measurements pass. |
+
+  **NOT COVERED:** the fanned `.sx-morph > .sx-ms.l1` and `.r1` phone subtrees (even their visible text), the explicit
+  `PURE_DECORATION` selectors, hidden/near-transparent/1px-clipped text, nodes with no qualifying sampled pixels, arbitrary
+  overlays or layouts, and motion between sampled frames. There is no rectangle exemption around the front `.dphone`.
+  The solid/gradient/faded canaries remain checks, not broader mutation-coverage claims.
+  `solutions-checks.mjs` still owns overflow, overlap, contrast,
+  target size, forms and prices; its overlap probe now reads a tight display line by its line box, and ignores `.sr` text.
 - Platform pages (`src/pages/{,es/}platform/{messaging,guardian-portal,teams,custom-branded-apps,integrations}/`): thin
   wrappers around `src/components/engage/*Page.astro`; all copy is in `src/i18n/pages/engage.ts` (EN and ES, ES typed against EN).
   Every claim on them is backed by Aria code, see the PR's claims table. `scripts/lib/engage-verify.mjs` (run by `npm run verify`)

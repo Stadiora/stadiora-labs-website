@@ -19,9 +19,9 @@ const week = copy.guardian.days;
 const done = [true, true, false, true, true];
 ---
 
-<section class="section--tight-top cards" aria-label={copy.title}>
-  <div class="container cards__grid">
-    <article class="pcard" data-reveal>
+<section class="sx-sec cards" aria-label={copy.title}>
+  <div class="wrap cards__grid">
+    <article class="pcard rv">
       <h2 class="pcard__title">{copy.admin.title}</h2>
       <div class="screen admin">
         <p class="screen__head">{copy.admin.school}</p>
@@ -45,7 +45,7 @@ const done = [true, true, false, true, true];
       <p class="demo-note">{copy.admin.caption}</p>
     </article>
 
-    <article class="pcard guardian" data-reveal style="--reveal-i:1">
+    <article class="pcard guardian rv" style="--i:1">
       <h2 class="pcard__title">{copy.guardian.title}</h2>
       <div class="guardian__stage">
         <Phone decorative={false} class="guardian__phone">
@@ -93,25 +93,6 @@ const done = [true, true, false, true, true];
       <p class="demo-note">{copy.guardian.included}</p>
     </article>
 
-    <article class="pcard consent" data-reveal style="--reveal-i:2">
-      <h2 class="pcard__title">{copy.consent.title}</h2>
-      <ul class="consent__list">
-        {
-          copy.consent.lines.map((line, i) => (
-            <li class="consent__item">
-              <span class="consent__icon" aria-hidden="true">
-                <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
-                  {i === 0 && <path d="M7 3.5h7l4 4v13H7zM14 3.5v4h4M9.5 12h6M9.5 15.5h6" />}
-                  {i === 1 && <path d="M12 3.5l7 2.8v5.4c0 4.2-2.8 7.4-7 8.8-4.2-1.4-7-4.6-7-8.8V6.3zM9 12l2.2 2.2L15.5 10" />}
-                  {i === 2 && <path d="M12 3.5l7 2.8v5.4c0 4.2-2.8 7.4-7 8.8-4.2-1.4-7-4.6-7-8.8V6.3zM9.2 9.2l5.6 5.6M14.8 9.2l-5.6 5.6" />}
-                </svg>
-              </span>
-              <span class="consent__text">{line}</span>
-            </li>
-          ))
-        }
-      </ul>
-    </article>
   </div>
 </section>
 
@@ -121,7 +102,7 @@ const done = [true, true, false, true, true];
   }
   .cards__grid {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 24px;
     align-items: stretch;
   }
@@ -298,33 +279,6 @@ const done = [true, true, false, true, true];
     gap: 0.3em;
     color: var(--mint-ink);
     font-weight: 600;
-  }
-
-  /* Consent strip */
-  .consent__list {
-    display: grid;
-    gap: 28px;
-    margin-block: auto;
-  }
-  .consent__item {
-    display: flex;
-    align-items: center;
-    gap: 20px;
-  }
-  .consent__icon {
-    display: grid;
-    place-items: center;
-    flex: none;
-    width: 64px;
-    height: 64px;
-    border-radius: 50%;
-    background: var(--cyan-tint);
-    color: var(--cyan-ink);
-  }
-  .consent__text {
-    color: var(--ink);
-    font-size: 19px;
-    line-height: 26px;
   }
 
   @media (max-width: 1100px) {

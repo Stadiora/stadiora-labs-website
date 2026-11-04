@@ -13,19 +13,22 @@ const caption = common[locale].demoCaption;
 const initials = (name: string) => name.charAt(0);
 ---
 
-<section class="day" aria-labelledby="day-title">
-  <div class="container">
-    <div class="section-head">
-      <h2 id="day-title" class="h-lane">{copy.day.title}</h2>
+<section class="day sx-stage impact" data-section data-sx-stage aria-labelledby="day-title">
+  <div class="mesh" aria-hidden="true">
+    <i class="b b5"></i><i class="b b1"></i><i class="b b2"></i><i class="b b3"></i><i class="b b4"></i><i class="vig"></i>
+  </div>
+  <div class="wrap">
+    <div class="sec-head">
+      <h2 id="day-title" class="d d2 lines"><span><span>{copy.day.title}</span></span></h2>
     </div>
     <ol class="day__grid">
-      <li class="day__step" data-reveal>
+      <li class="day__step rv">
         <div class="day__head">
           <span class="day__dot" aria-hidden="true"></span>
           <p class="day__time">{copy.day.steps[0].time}</p>
           <h3 class="day__title">{copy.day.steps[0].title}</h3>
         </div>
-        <div class="pcard day__card">
+        <div class="pcard day__card reading">
           <p class="day__card-title">{copy.ready.title}</p>
           <ul class="ready">
             {
@@ -46,13 +49,13 @@ const initials = (name: string) => name.charAt(0);
         </div>
       </li>
 
-      <li class="day__step" data-reveal style="--reveal-i:1">
+      <li class="day__step rv" style="--i:1">
         <div class="day__head">
           <span class="day__dot" aria-hidden="true"></span>
           <p class="day__time">{copy.day.steps[1].time}</p>
           <h3 class="day__title">{copy.day.steps[1].title}</h3>
         </div>
-        <div class="pcard day__card">
+        <div class="pcard day__card reading">
           <div class="session__head">
             <div>
               <p class="session__name">{copy.session.name}</p>
@@ -69,13 +72,13 @@ const initials = (name: string) => name.charAt(0);
         </div>
       </li>
 
-      <li class="day__step" data-reveal style="--reveal-i:2">
+      <li class="day__step rv" style="--i:2">
         <div class="day__head">
           <span class="day__dot" aria-hidden="true"></span>
           <p class="day__time">{copy.day.steps[2].time}</p>
           <h3 class="day__title">{copy.day.steps[2].title}</h3>
         </div>
-        <div class="pcard day__card">
+        <div class="pcard day__card reading">
           <p class="day__card-title">{copy.chat.title} · {copy.chat.thread}</p>
           <ul class="chat">
             {
@@ -95,9 +98,6 @@ const initials = (name: string) => name.charAt(0);
 </section>
 
 <style>
-  .day {
-    padding-block: 56px 72px;
-  }
   .day__grid {
     position: relative;
     display: grid;
@@ -113,7 +113,7 @@ const initials = (name: string) => name.charAt(0);
     left: 5px;
     right: 5px;
     height: 2px;
-    background: var(--line);
+    background: rgba(255, 255, 255, 0.18);
   }
   .day__step {
     position: relative;
@@ -134,6 +134,32 @@ const initials = (name: string) => name.charAt(0);
     border-radius: 50%;
     background: var(--cyan);
     box-shadow: 0 0 0 4px var(--bg);
+  }
+  /* a ring leaves each step in turn, left to right, as if the day were moving along */
+  .day__dot::after {
+    content: '';
+    position: absolute;
+    inset: -4px;
+    border-radius: 50%;
+    border: 2px solid var(--cyan);
+    opacity: 0;
+    animation: dayPing 6s var(--e-out) infinite;
+    animation-delay: calc(var(--i, 0) * 1.6s);
+  }
+  /* the stage's autoplayer (scripts/solutions/stages.ts) rests the rings on hover, focus, offscreen and in a hidden tab */
+  .day[data-ap='off'] .day__dot::after {
+    animation-play-state: paused;
+  }
+  @keyframes dayPing {
+    0% {
+      opacity: 0.9;
+      transform: scale(1);
+    }
+    28%,
+    100% {
+      opacity: 0;
+      transform: scale(3.2);
+    }
   }
   .day__time {
     color: var(--ink-2);
@@ -300,9 +326,6 @@ const initials = (name: string) => name.charAt(0);
     }
   }
   @media (max-width: 720px) {
-    .day {
-      padding-block: 40px 56px;
-    }
     .ready__state {
       min-width: 0;
     }

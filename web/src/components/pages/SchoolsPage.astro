@@ -1,12 +1,16 @@
 ---
-import Page from '../../layouts/Page.astro';
-import FeatureHero from '../solutions/FeatureHero.astro';
+import SolutionsPage from '../../layouts/SolutionsPage.astro';
+import SxHero from '../solutions/SxHero.astro';
+import Conveyor from '../solutions/Conveyor.astro';
+import FinalNight from '../solutions/FinalNight.astro';
 import SchoolCards from '../solutions/SchoolCards.astro';
+import SchoolConsent from '../solutions/SchoolConsent.astro';
 import RegionPrice from '../ui/RegionPrice.astro';
 import Icon from '../ui/Icon.astro';
-import Photo from '../ui/Photo.astro';
-import { common, altFor } from '../../i18n/pages/common';
+import { common } from '../../i18n/pages/common';
 import { schools } from '../../i18n/pages/schools';
+import { solutionsFx } from '../../i18n/pages/solutions-fx';
+import { schoolsConveyor } from '../solutions/conveyors';
 import { contactHref } from '../../lib/links';
 import { hrefFor } from '../../data/nav';
 import type { Locale } from '../../i18n';
@@ -17,26 +21,30 @@ interface Props {
 const { locale } = Astro.props;
 const c = schools[locale];
 const k = common[locale];
+const fx = solutionsFx[locale];
 ---
 
-<Page locale={locale} path="/solutions/schools/" title={c.meta.title} description={c.meta.description}>
-  <FeatureHero
+<SolutionsPage locale={locale} path="/solutions/schools/" title={c.meta.title} description={c.meta.description}>
+  <SxHero
+    locale={locale}
+    variant="split"
     eyebrow={c.eyebrow}
     title={c.title}
-    sub={c.sub}
+    lead={c.sub}
+    swap={fx.swap.schools}
     primary={{ label: k.bookSchoolDemo, href: contactHref(locale, 'demo') }}
     secondary={{ label: k.seePricing, href: hrefFor('pricing', locale) }}
   >
-    <div class="fhero__photo">
-      <Photo slot="s1-schools" ratio="4/3" sizes="(max-width: 1100px) 92vw, 680px" alt={altFor('s1-schools', locale)} eager />
-    </div>
-  </FeatureHero>
+    <Conveyor variant="mini" blocks={schoolsConveyor.blocks} laneA={schoolsConveyor.laneA} laneB={schoolsConveyor.laneB} />
+  </SxHero>
 
   <SchoolCards copy={c} />
 
-  <section class="strip-section" aria-label={c.pricing.lead}>
-    <div class="container">
-      <div class="strip">
+  <SchoolConsent copy={c} />
+
+  <section class="sx-sec strip-section" aria-label={c.pricing.lead}>
+    <div class="wrap">
+      <div class="strip rv">
         <p class="strip__text">
           <strong>{c.pricing.lead}</strong><RegionPrice price="highSchool" text={c.pricing.text} />
         </p>
@@ -47,15 +55,18 @@ const k = common[locale];
       </div>
     </div>
   </section>
-</Page>
+
+  <FinalNight
+    title={k.ctaTitle}
+    actions={[
+      { label: k.bookSchoolDemo, href: contactHref(locale, 'demo') },
+      { label: k.seePricing, href: hrefFor('pricing', locale) },
+    ]}
+  />
+</SolutionsPage>
 
 <style>
   .strip-section {
-    padding-block: 0 80px;
-  }
-  @media (max-width: 720px) {
-    .strip-section {
-      padding-bottom: 56px;
-    }
+    padding-block: clamp(48px, 6vw, 80px);
   }
 </style>

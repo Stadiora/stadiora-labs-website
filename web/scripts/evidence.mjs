@@ -19,6 +19,7 @@ import { navChecks } from './lib/nav-checks.mjs';
 import { pricingChecks } from './lib/pricing-checks.mjs';
 import { platformCoachChecks } from './lib/platform-coach-checks.mjs';
 import { solutionsChecks } from './lib/solutions-checks.mjs';
+import { solutionsFloodlightChecks } from './lib/solutions-floodlight-checks.mjs';
 import { serve } from './lib/static-server.mjs';
 
 const root = fileURLToPath(new URL('..', import.meta.url));
@@ -446,6 +447,7 @@ check('perf', 'no clip is bundled into _astro (clips are public files, loaded on
 await pricingChecks({ browser, server, outDir, check, metrics, sleep, checksOnly });
 // ---------------------------------------------------------------- 6. solutions, resources and company pages
 await solutionsChecks({ open, settle, check, sleep, metrics, measure, outDir, checksOnly });
+await solutionsFloodlightChecks({ open, settle, check, sleep });
 
 await coachRun();
 await finish();
