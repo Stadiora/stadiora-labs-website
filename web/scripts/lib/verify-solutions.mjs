@@ -1,7 +1,7 @@
 // Post-build checks for the solutions, resources and company pages (EN and ES). Called from verify-dist.mjs.
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { CONTACT_EMAIL, approvedNote, approvedOpening, findDeliveryClaims } from './contact-contract.mjs';
+import { CONTACT_ENDPOINT, athleteRanges, approvedSuccess, findDeliveryClaims, missingContactHrefs, roles } from './contact-contract.mjs';
 import { EDU, FREE, ORACLE, fmt } from './pricing-oracle.mjs';
 
 // What the teasers must show for US visitors (and no-JavaScript visitors): Core from at 25 athletes, high school at 100.
@@ -120,23 +120,38 @@ export function verifySolutions({ dist, fail }) {
         if (route.path === '/solutions/schools/' || route.path === '/solutions/coaches/') need(Number(quoted) === teaserAthletes[key], `${key} teaser quotes ${quoted} athletes, expected ${teaserAthletes[key]}`);
       }
 
-      if (route.path === '/contact/') {
-        need(/<form[^>]*action="mailto:/.test(html), 'form must fall back to mailto');
-        need(count(html, /<input[^>]*type="radio"[^>]*name="topic"/g) === 2, 'two topic radios');
+      // Both regions' contact details sit in every page's footer.
+      const footer = /<footer\b[\s\S]*<\/footer>/.exec(html)?.[0] ?? '';
+      for (const href of missingContactHrefs(footer)) need(false, `the footer is missing the contact link ${href}`);
 
-        // Honest contact: nothing is delivered from the page. The post-submit status must be the approved text,
-        // word for word (contact-contract.mjs), and no text or script may claim a delivery, receipt or reply time.
+      if (route.path === '/contact/') {
+        for (const href of missingContactHrefs(html)) need(false, `the page is missing the contact link ${href}`);
+
+        // The form posts to the live endpoint, with no mailto action to fall back on. The honest-contact contract is in
+        // contact-contract.mjs: the endpoint, the role and athlete values, the honeypot, and the only success sentence.
+        const form = /<form\b[^>]*data-contact-form[^>]*>/.exec(html)?.[0] ?? '';
+        need(Boolean(form), 'the contact form is missing');
+        need(decodeEntities(/\bdata-endpoint="([^"]*)"/.exec(form)?.[1] ?? '') === CONTACT_ENDPOINT, `form endpoint must be exactly ${CONTACT_ENDPOINT}`);
+        need(!/\saction=/.test(form), 'the form must not carry an action (no mailto or page-reload path)');
+        need(count(html, /<input[^>]*type="radio"[^>]*name="topic"/g) === 2, 'two topic radios');
+        const optionValues = (id) => [...(new RegExp(`<select[^>]*id="${id}"[\\s\\S]*?</select>`).exec(html)?.[0] ?? '').matchAll(/<option value="([^"]+)"/g)].map((m) => m[1]);
+        need(JSON.stringify(optionValues('f-role')) === JSON.stringify(roles), `role values must be exactly ${roles.join(', ')}, found ${optionValues('f-role').join(', ')}`);
+        need(JSON.stringify(optionValues('f-athletes')) === JSON.stringify(athleteRanges), `athlete values must be exactly ${athleteRanges.join(', ')}`);
+        need(/<div class="hp" inert[^>]*>[\s\S]*?<input[^>]*name="website"/.test(html), 'the honeypot input "website" must be present and inert');
+
+        // The message for each outcome ships as data. Success reads exactly as approved; the failures claim nothing.
         let payload = null;
         try {
-          payload = JSON.parse(decodeEntities(/\bdata-mail="([^"]*)"/.exec(html)?.[1] ?? ''));
+          payload = JSON.parse(decodeEntities(/\bdata-send="([^"]*)"/.exec(form)?.[1] ?? ''));
         } catch {
           payload = null;
         }
-        need(payload?.opening === approvedOpening[lang], `post-submit status must be exactly "${approvedOpening[lang]}", found ${JSON.stringify(payload?.opening)}`);
-        need(payload?.to === CONTACT_EMAIL, `mail recipient must be exactly ${CONTACT_EMAIL}, found ${JSON.stringify(payload?.to)}`);
-        for (const what of findDeliveryClaims(String(payload?.opening ?? ''), lang)) need(false, `post-submit status claims receipt or delivery: ${what}`);
+        need(payload?.ok === approvedSuccess[lang], `the success message must be exactly "${approvedSuccess[lang]}", found ${JSON.stringify(payload?.ok)}`);
+        for (const key of ['invalid', 'limited', 'unavailable']) {
+          for (const what of findDeliveryClaims(String(payload?.[key] ?? ''), lang)) need(false, `the ${key} message claims receipt or delivery: ${what}`);
+        }
+        need(new Set(['invalid', 'limited', 'unavailable'].map((k) => payload?.[k])).size === 3, 'the 400, 429 and 503 messages must be three different messages');
         const text = pageText(html);
-        need(text.includes(approvedNote[lang]), `mailto note must read exactly "${approvedNote[lang]}"`);
         for (const what of findDeliveryClaims(text, lang)) need(false, `page text claims receipt or delivery: ${what}`);
         for (const script of pageScripts(html, dist)) {
           for (const what of findDeliveryClaims(script, lang)) need(false, `a script on the page claims receipt or delivery: ${what}`);

@@ -440,7 +440,8 @@
   max-width: 13ch;
 }
 .hero-logos {
-  --dur: 38s;
+  /* Nine logos: 38 s was the pace for six, so the loop is longer by the same ratio and the speed stays the same. */
+  --dur: 62s;
   flex: 1;
   min-width: 0;
 }

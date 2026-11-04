@@ -943,8 +943,7 @@ html:not(.js) .sx-page .rv-mask {
   flex: 1;
   flex-wrap: wrap;
   align-items: center;
-  justify-content: space-between;
-  gap: 20px 32px;
+  gap: 24px 40px;
 }
 .sx-partners__list img {
   display: block;

@@ -17,6 +17,7 @@ import { built, carried, liveUrls, notUrls, redirects, retired } from './live-ur
 import { isNoindex, scanTags } from './html-scan.mjs';
 import { linkProblems } from './link-guard.mjs';
 import { pendingRoutes } from './engage-links.mjs';
+import { CONTACT_ENDPOINT, MIN_FILL_MS, contactHrefs, contacts, missingContactHrefs } from './contact-contract.mjs';
 
 const origin = 'https://stadioralabs.com';
 const repoRoot = fileURLToPath(new URL('../../../', import.meta.url));
@@ -138,9 +139,16 @@ export function verifyCutover({ dist, fail, root = repoRoot }) {
     const file = fileFor(dist, url);
     if (!existsSync(file)) continue;
     const html = read(file);
-    if (/PASTE_ACCESS_KEY_HERE/.test(html)) fail(`cutover: ${url} still ships the Web3Forms placeholder key`);
-    if (!/\.then\(r => r\.json\(\)\.catch\(\(\) => \(\{\}\)\)\.then\(data => \{\s*if \(!r\.ok \|\| data\.success !== true\) throw/.test(html)) fail(`cutover: ${url} must check the HTTP status and the success flag before it shows success`);
-    if (!/if \(!WEB3FORMS_KEY\) \{[\s\S]{0,300}mailto:/.test(html)) fail(`cutover: ${url} must fall back to a mailto hand-off when no endpoint key is configured`);
+    if (/web3forms|PASTE_ACCESS_KEY_HERE/i.test(html)) fail(`cutover: ${url} still refers to Web3Forms; the lead form posts to ${CONTACT_ENDPOINT}`);
+    if (!html.includes(`'${CONTACT_ENDPOINT}'`)) fail(`cutover: ${url} must post to ${CONTACT_ENDPOINT}`);
+    if (/mailto:[^'"]*\?/.test(html)) fail(`cutover: ${url} must not hand the visitor a pre-filled mailto as the way to send`);
+    if (!/code === 202\) \{/.test(html)) fail(`cutover: ${url} must show success only when the endpoint answers exactly 202`);
+    if (!/website: honeypot\.value/.test(html) || !/startedAt: OPENED_AT/.test(html)) fail(`cutover: ${url} must always send the honeypot (website) and startedAt fields`);
+    if (!new RegExp(`MIN_FILL_MS = ${MIN_FILL_MS};`).test(html)) fail(`cutover: ${url} must wait out the ${MIN_FILL_MS} ms minimum fill time`);
+  }
+  // connect.html reaches LatAm by WhatsApp, so the page carries no separate tel: link for it.
+  if (existsSync(fileFor(dist, '/connect.html'))) {
+    for (const href of missingContactHrefs(read(fileFor(dist, '/connect.html')), contactHrefs.filter((h) => h !== `tel:${contacts.latam.tel}`))) fail(`cutover: /connect.html is missing the contact link ${href}`);
   }
 
   // ------------------------------------------------------------------ 8. investors wording: access to the support, never a replacement

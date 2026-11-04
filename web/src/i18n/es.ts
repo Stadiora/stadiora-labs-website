@@ -289,6 +289,7 @@ export const es: Dict = {
     contactLabel: 'Contacto',
     email: 'Correo',
     whatsapp: 'WhatsApp',
+    regions: { us: 'Estados Unidos', latam: 'Latinoamérica' },
     privacy: 'Privacidad',
     terms: 'Términos',
     rights: '© 2026 Stadiora Labs',

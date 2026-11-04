@@ -5,6 +5,7 @@
 //   node scripts/evidence.mjs --pricing-only   (the /pricing/ page only: prices, region, dialogs, layout, contrast; add --checks-only to skip screenshots)
 //   node scripts/evidence.mjs --engage-only    (the five Platform pages, EN and ES: overflow, contrast, a11y, interactions, motion guards)
 //   node scripts/evidence.mjs --engage-motion-only   (just the Platform motion guards: autoplayers, reduced motion, clips; ENGAGE_ONLY=teams,integrations narrows the pages)
+//   node scripts/evidence.mjs --contact-only   (the Contact forms against the intercepted endpoint: 202-only success, honeypot, startedAt, topic, burst)
 //   node scripts/evidence.mjs --home-only      (the home guards only: structure, autoplayers, reduced motion, marquees, hero words, clipping, contrast)
 // Output goes to web/.evidence/ (git-ignored): PNGs plus summary.json. Exit code 1 when a check fails.
 import { mkdir, readdir, readFile, rm, stat, writeFile } from 'node:fs/promises';
@@ -12,6 +13,7 @@ import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { chromium } from 'playwright';
 import { contrastProbe } from './lib/contrast.mjs';
+import { contactChecks } from './lib/contact-checks.mjs';
 import { engageChecks } from './lib/engage-checks.mjs';
 import { engageMotionChecks } from './lib/engage-motion-checks.mjs';
 import { homeChecks, homeSections } from './lib/home-checks.mjs';
@@ -31,6 +33,7 @@ const engageMotionOnly = process.argv.includes('--engage-motion-only');
 const checksOnly = process.argv.includes('--checks-only');
 const coachOnly = process.argv.includes('--coach-only');
 const homeOnly = process.argv.includes('--home-only');
+const contactOnly = process.argv.includes('--contact-only');
 
 await rm(outDir, { recursive: true, force: true });
 await mkdir(outDir, { recursive: true });
@@ -108,6 +111,17 @@ async function finish() {
 // ---------------------------------------------------------------- 0. pricing page (its own contexts, time zones and checks)
 if (pricingOnly) {
   await pricingChecks({ browser, server, outDir, check, metrics, sleep, checksOnly });
+  await finish();
+}
+
+// The Contact forms; `--contact-only` runs just these (the mutation battery uses it).
+const contactRun = async () => {
+  const shotsDir = `${outDir}solutions/`;
+  await mkdir(shotsDir, { recursive: true });
+  await contactChecks({ open, settle, check, sleep, shotsDir });
+};
+if (contactOnly) {
+  await contactRun();
   await finish();
 }
 
@@ -448,6 +462,7 @@ await pricingChecks({ browser, server, outDir, check, metrics, sleep, checksOnly
 // ---------------------------------------------------------------- 6. solutions, resources and company pages
 await solutionsChecks({ open, settle, check, sleep, metrics, measure, outDir, checksOnly });
 await solutionsFloodlightChecks({ open, settle, check, sleep });
+await contactRun();
 
 await coachRun();
 await finish();

@@ -246,13 +246,36 @@
 <script>
 const S = { role: null, sport: null, path: null, answers: [], qi: 0, history: ['s-intro'], currentScreen: 's-intro' };
 
-// No endpoint key is configured, so nothing is delivered from this page: the visitor's email app opens with the request
-// written out instead, and the page never says the request was received. Once a Web3Forms key is pasted here, the form
-// posts it and shows "on the list" only when the HTTP status is 2xx AND the response says success: true.
-const WEB3FORMS_KEY = '';
-const CONTACT_EMAIL = 'anthony@stadioralabs.com';
-const MSG_OPENING = 'Abriendo tu app de correo. Si no se abre, escribe a {email}.';
-const MSG_FAILED  = 'No pudimos enviar tu solicitud. Inténtalo de nuevo o escribe a {email}.';
+// The request goes to the live contact endpoint (Aria app-backend). "On the list" shows only when it answers 202. A 400,
+// a 429, a 503, any other status and a network failure each keep the form and show a message with the direct contacts.
+const CONTACT_API = 'https://api.runwitharia.com/api/public/website-contact';
+const LOCALE = 'es';
+const OPENED_AT = Date.now();
+const MIN_FILL_MS = 3000;
+const MSG = {
+  busy: 'Enviando…',
+  invalid: 'No pudimos aceptarlo. Revisa tu correo e inténtalo de nuevo, o escríbenos directamente:',
+  limited: 'Demasiados mensajes desde esta conexión por ahora. Inténtalo de nuevo en un rato, o escríbenos directamente:',
+  unavailable: 'No pudimos enviar tu solicitud ahora. Inténtalo de nuevo, o escríbenos directamente:'
+};
+const DIRECT = [
+  ['ian@stadioralabs.com', 'mailto:ian@stadioralabs.com'],
+  ['anthony@stadioralabs.com', 'mailto:anthony@stadioralabs.com'],
+  ['WhatsApp +506 6041-9069', 'https://wa.me/50660419069']
+];
+
+// The honeypot: an input no visitor can reach. The request always carries its value, which must stay empty.
+const honeypot = document.createElement('input');
+honeypot.type = 'text';
+honeypot.name = 'website';
+honeypot.tabIndex = -1;
+honeypot.autocomplete = 'off';
+honeypot.setAttribute('aria-label', 'Website');
+const honeypotBox = document.createElement('div');
+honeypotBox.setAttribute('inert', '');
+honeypotBox.style.cssText = 'position:absolute;left:-10000px;width:1px;height:1px;overflow:hidden';
+honeypotBox.append(honeypot);
+document.body.append(honeypotBox);
 
 const PRODUCT_LABELS = {
   'athlete-tf':     'Aria — Atleta de Atletismo',
@@ -598,46 +621,57 @@ function submitEmail(path) {
     status.setAttribute('role', 'status');
     row.insertAdjacentElement('afterend', status);
   }
-  const say = (text) => { if (status) status.textContent = text.replace('{email}', CONTACT_EMAIL); };
+  const say = (text, withDirect) => {
+    if (!status) return;
+    status.textContent = text;
+    if (!withDirect) return;
+    DIRECT.forEach(([name, href], i) => {
+      status.append(i ? ' · ' : ' ');
+      const a = document.createElement('a');
+      a.href = href;
+      a.textContent = name;
+      a.style.color = 'inherit';
+      status.append(a);
+    });
+  };
   const rest = btn ? btn.textContent : '';
-  const reset = (text) => { if (btn) { btn.disabled = false; btn.textContent = text; } };
-
-  const subject = `Solicitud de Acceso Anticipado — ${label}`;
-  const body = `Nueva solicitud de acceso anticipado\n\nCorreo: ${email}\nProducto de interés: ${label}\nIdioma: Español`;
-
-  if (!WEB3FORMS_KEY) {
-    say(MSG_OPENING);
-    window.location.href = `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-    return;
-  }
-
-  if (btn) { btn.disabled = true; btn.textContent = 'Enviando…'; }
+  if (btn) { btn.disabled = true; btn.textContent = MSG.busy; }
   say('');
 
-  fetch('https://api.web3forms.com/submit', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-    body: JSON.stringify({
-      access_key:  WEB3FORMS_KEY,
-      subject:     subject,
-      from_name:   'Stadiora Labs Website (ES)',
-      replyto:     email,
-      email:       email,
-      product:     label,
-      message:     body
-    })
-  })
-  .then(r => r.json().catch(() => ({})).then(data => {
-    if (!r.ok || data.success !== true) throw new Error('rejected');
-    if (row)     row.style.display     = 'none';
-    if (note)    note.style.display    = 'none';
-    if (status)  status.style.display  = 'none';
-    if (success) success.style.display = 'block';
-  }))
-  .catch(() => {
-    reset(rest);
-    say(MSG_FAILED);
-  });
+  const body = {
+    topic: 'demo',
+    name: 'Early access request',
+    email: email,
+    role: path.startsWith('coach') ? 'coach' : 'athlete',
+    organization: label,
+    message: `Solicitud de acceso anticipado desde la evaluación.\nProducto de interés: ${label}`,
+    locale: LOCALE,
+    page: window.location.pathname,
+    website: honeypot.value,
+    startedAt: OPENED_AT
+  };
+
+  // A post less than 3 s after the page opened would be rejected as too fast, so wait out the rest.
+  const wait = MIN_FILL_MS + 250 - (Date.now() - OPENED_AT);
+  new Promise(resolve => setTimeout(resolve, Math.max(0, wait)))
+    .then(() => fetch(CONTACT_API, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'omit',
+      body: JSON.stringify(body)
+    }))
+    .then(r => r.status, () => 0)
+    .then(code => {
+      if (code === 202) {
+        if (row)     row.style.display     = 'none';
+        if (note)    note.style.display    = 'none';
+        if (status)  status.style.display  = 'none';
+        if (success) success.style.display = 'block';
+        return;
+      }
+      if (btn) { btn.disabled = false; btn.textContent = rest; }
+      say(code === 400 ? MSG.invalid : code === 429 ? MSG.limited : MSG.unavailable, true);
+    });
 }
 
 updateProgress();
