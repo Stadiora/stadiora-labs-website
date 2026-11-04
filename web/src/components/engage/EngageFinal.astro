@@ -1,0 +1,42 @@
+---
+import '../../styles/engage/home-final.css';
+import '../../styles/engage/base.css';
+import { useDict, type Locale } from '../../i18n';
+import { homeFinal } from '../../i18n/pages/home-final';
+import { site } from '../../data/site';
+import StoreSheet from '../home/StoreSheet.astro';
+
+interface Props {
+  locale: Locale;
+  /** Replaces the coach button, e.g. "Talk to us" on the custom-branded apps page. */
+  middle?: { label: string; href: string };
+  demoHref: string;
+}
+const { locale, middle, demoHref } = Astro.props;
+const c = useDict(locale).cta;
+const t = homeFinal[locale];
+---
+
+<section class="final impact media-frame" id="final" data-section aria-labelledby="final-h">
+  <video muted playsinline loop preload="none" data-clip data-poster="/home/media/night-stadium.webp" aria-hidden="true" tabindex="-1">
+    <source src="/home/media/night-stadium.webm" type="video/webm" />
+    <source src="/home/media/night-stadium.mp4" type="video/mp4" />
+  </video>
+  <div class="orbits" aria-hidden="true">
+    <svg viewBox="0 0 1600 800">
+      <ellipse cx="800" cy="400" rx="760" ry="260"></ellipse>
+      <ellipse class="dash" cx="800" cy="400" rx="600" ry="200"></ellipse>
+      <circle class="fdot fdot--a" r="9" fill="#00BEF3"></circle>
+      <circle class="fdot fdot--b" r="7" fill="#8B5CF6"></circle>
+    </svg>
+  </div>
+  <div class="wrap">
+    <h2 class="d d1 lines" id="final-h"><span><span>{t.title[0]}</span></span><span><span class="grad-text" style="--i:1">{t.title[1]}</span></span></h2>
+    <div class="final-ctas rv" style="--i:2">
+      <a class="btn btn--white btn--lg" href="#get-app" data-open-sheet>{c.download}</a>
+      <a class="btn btn--ghost btn--lg" href={middle?.href ?? site.signUp}>{middle?.label ?? c.coach}</a>
+      <a class="btn btn--ghost btn--lg" href={demoHref}>{c.school}</a>
+    </div>
+  </div>
+</section>
+<StoreSheet locale={locale} />
