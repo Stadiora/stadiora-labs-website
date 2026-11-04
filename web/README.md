@@ -53,12 +53,8 @@ node scripts/evidence.mjs --engage-motion-only --checks-only # just the Platform
   `/pricing/` show the same schools price for the same visitor (`?region=us|latam`, ten time zones, a missing one). The clip
   check also sweeps 16 widths from 360 to 1600 px on all five pages. Three more guards read what a browser really produces:
   `engage-a11y-checks.mjs` (the selected Messaging and Guardian tabpanel is visible and in the accessibility tree with its text,
-  and every standalone link and control in `main` is 44 x 44 or larger at 390 px), `engage-heading-contrast.mjs` (the gradient
-  headings, measured on composited pixels: every eroded glyph-interior pixel against the same page with only that span hidden,
-  reduced motion in both themes at 390 and 1440, and motion on at five seeded points of the mesh, gradient and clip loops;
-  minimum 3:1 for large text, 4.5:1 otherwise, with no percentile forgiveness. Only the decorative orbit dots
-  `.eg-hero .orbits .fdot` and `.final .orbits .fdot` are hidden for all four captures and restored afterwards; the mesh, video and
-  scrims remain. The five motion samples do not prove an exhaustive minimum over time)
+  and every standalone link and control in `main` is 44 x 44 or larger at 390 px), `engage-heading-contrast.mjs` (sampled
+  `.grad-text` glyph-interior contrast; see "Heading contrast proof" below)
   and `engage-media-guard.mjs` (every `<video>` in the built HTML is judged on its own `src`, every `<source>` and its poster against
   the text-free list and the clip of its slot; `npm run verify` runs it).
 - Platform page look (Floodlight, R57 VB-3): every page is an `.impact` hero (`EngageHero`, split, overlap or orbit variant) with a
@@ -80,6 +76,7 @@ node scripts/evidence.mjs --engage-motion-only --checks-only # just the Platform
   `src/data/prices.ts` (`education`, `addOns`) with `{tokens}` in `engage.ts`, and the Teams script picks the region with
   `detectRegion` from `src/lib/region.ts`, the same two modules `/pricing/` uses. `npm run verify` fails on a dollar amount in
   `engage.ts`, and on a rendered price that disagrees with the oracle in `scripts/lib/pricing-oracle.mjs`.
+
 - Design tokens (Floodlight, DESIGN-4): `src/styles/tokens.css`. Light is the default and the toggle is kept; the `.impact` sections (hero,
   dark stages, final CTA, footer) are dark in both themes, and `.reading` panels follow the page theme. Text uses the `*-ink` tokens
   (`--cyan-ink` is `#0077A8` on light); the vivid brand colours are fills and decoration only. `floodlight.css` holds the shared
@@ -131,6 +128,30 @@ node scripts/evidence.mjs --engage-motion-only --checks-only # just the Platform
   `public/home/img/` (WebP).
 - Fonts (Archivo variable for display, Inter variable for text, JetBrains Mono variable for labels; SIL OFL, licences in
   `src/assets/fonts/`) are self-hosted woff2 files; Archivo and Inter are preloaded.
+
+## Heading contrast proof
+
+`scripts/lib/engage-heading-contrast.mjs` compares real, hidden-span, white-text and black-text captures with the
+orbit dots still visible. The white/black difference selects fully covered glyph pixels and their four neighbours;
+the assertion uses the minimum real/backdrop ratio, not a percentile. Runner configuration: the five Engage pages,
+EN/ES, 390/1440 px, reduced motion in both themes and five seeded motion-on frames in dark mode. The threshold is
+3:1 for large text, 4.5:1 otherwise.
+
+Mutation-proven claims are deliberately narrow. Proof pointers are the named rows in the
+[PR #34 round-3 author mutation table](https://github.com/Stadiora/stadiora-labs-website/pull/34), recorded against
+the committed head with content comparisons, restoration checks and assertion lines taken from runtime stacks:
+
+- `reviewer-dot`: enlarging the Spanish Teams closing dots to `r: 150px` at desktop with motion on fails the minimum
+  contrast assertion; their rendered backdrop is not exempted.
+- `round2-dark-stop`: the `#081223` stop at 87.40856–89.24949% on that heading fails the same minimum assertion;
+  a small lost glyph is not forgiven as a percentile.
+- `mobile-orbit-rollback`: restoring the closing orbit's old vertical position fails the mobile minimum assertion.
+  The phone layout moves the orbit paths down toward the actions; it does not hide or pause the dots.
+- `identity`: unchanged built CSS passes all 12 Teams checks.
+
+**NOT COVERED:** an exhaustive minimum over animation time, other browsers or widths, antialiased glyph edges,
+non-`.grad-text` text, the small-text 4.5:1 branch, or every possible style/media/stacking regression. Clean checks
+on the other configured pages and themes are samples, not mutation proof for those cases.
 
 ## Cutover (R57 lane C)
 

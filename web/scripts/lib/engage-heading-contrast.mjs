@@ -7,9 +7,9 @@
 // A pixel counts when its coverage is full and so are its four neighbours' (anti-aliased edges are left out). Its contrast
 // is the ratio of the real pixel to the hidden-span pixel at the same place. The lowest ratio over the glyph interiors must
 // meet WCAG AA: 3:1 for large text (24px, or 18.66px bold), 4.5:1 otherwise.
-// Only the named decorative orbit dots (.orbits .fdot in the hero and closing band) are hidden during the four captures.
 // With motion on, the mesh blobs, the gradient's own shift and the closing band's clip are frozen at five seeded points
 // of their loops first (`freezeAt`). These are sampled frames, not an exhaustive minimum over time.
+// Mutation proof and NOT COVERED scope: web/README.md, "Heading contrast proof" (PR #34, round-3 author table).
 
 const group = 'engage-heading-contrast';
 
@@ -115,7 +115,6 @@ export async function measureGradHeadings(page, seed = null) {
       return (await page.screenshot({ clip, type: 'png' })).toString('base64');
     };
     const solid = (c) => `background-image:none !important;color:${c} !important;-webkit-text-fill-color:${c} !important`;
-    const decoration = await page.addStyleTag({ content: '.eg-hero .orbits .fdot, .final .orbits .fdot { visibility:hidden !important; }' });
     try {
       const real = await shot('');
       const hidden = await shot('visibility:hidden');
@@ -125,7 +124,6 @@ export async function measureGradHeadings(page, seed = null) {
       out.push({ ...g, ...r });
     } finally {
       await style('');
-      await decoration.evaluate((el) => el.remove());
     }
   }
   return out;
