@@ -1,16 +1,18 @@
 // Post-build checks on dist/. Fails the build when something that must never ship is present.
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
-import { join } from 'node:path';
+import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { verifyCoachPages } from './lib/platform-coach-verify.mjs';
 import { parse } from 'yaml';
 import { verifyPricing } from './lib/pricing-verify.mjs';
 import { pendingReport } from './lib/engage-links.mjs';
 import { engagePages, verifyEngagePages } from './lib/engage-verify.mjs';
+import { verifyCutover } from './lib/cutover-verify.mjs';
 import { verifySolutions } from './lib/verify-solutions.mjs';
 import { verifyHomeClaims, verifyHomeMedia, verifyHomeSelectors, verifyHomeVideos } from './lib/home-verify.mjs';
 
-const dist = fileURLToPath(new URL('../dist/', import.meta.url));
+// DIST_DIR points the run at another build (a mutation copy), so the real dist/ stays untouched.
+const dist = process.env.DIST_DIR ? `${resolve(process.env.DIST_DIR)}/` : fileURLToPath(new URL('../dist/', import.meta.url));
 const errors = [];
 const fail = (msg) => errors.push(msg);
 
@@ -88,6 +90,7 @@ verifyEngagePages({ dist, fail, pending: pendingLinks });
 
 if (!existsSync(join(dist, 'sitemap-index.xml'))) fail('sitemap-index.xml: missing');
 verifyCoachPages({ dist, fail });
+verifyCutover({ dist, fail });
 
 // Budgets from DESIGN.md section 7: hero photos 180 KB, videos 1.5 MB, per delivered file.
 const assets = join(dist, '_astro');
@@ -135,4 +138,4 @@ if (errors.length) {
   for (const e of errors) console.error(`  - ${e}`);
   process.exit(1);
 }
-console.log(`verify-dist: ok (${pages.length} home pages + ${engagePages.length} platform pages + 14 solutions, resources and company pages, hreflang, OG, sitemap, no placeholders)`);
+console.log(`verify-dist: ok (${pages.length} home pages + ${engagePages.length} platform pages + 14 solutions, resources and company pages, hreflang, OG, sitemap, no placeholders, every live URL accounted for)`);

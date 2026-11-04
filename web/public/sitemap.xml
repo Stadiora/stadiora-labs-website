@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Kept at /sitemap.xml because that URL is the one robots.txt and Search Console already know. The sitemap itself is
+  generated at build time by @astrojs/sitemap (sitemap-0.xml, also listed in sitemap-index.xml): every EN and ES page of
+  the new site plus the carried legacy pages that should be indexed. Investors, the business cards, connect, the redirect
+  stubs and the 404 are not in it. `npm run verify` checks that this file points at the generated sitemap.
+-->
+<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <sitemap>
+    <loc>https://stadioralabs.com/sitemap-0.xml</loc>
+  </sitemap>
+</sitemapindex>

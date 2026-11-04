@@ -8,8 +8,8 @@ const origin = 'https://stadioralabs.com';
 export const coachSlugs = ['programs', 'nutrition', 'readiness', 'power-lab'];
 
 export const coachPages = coachSlugs.flatMap((slug) => [
-  { slug, lang: 'en', file: `platform/${slug}/index.html`, path: `/platform/${slug}/`, alt: `/es/platform/${slug}/`, og: '/og/home-en.png' },
-  { slug, lang: 'es', file: `es/platform/${slug}/index.html`, path: `/es/platform/${slug}/`, alt: `/platform/${slug}/`, og: '/og/home-es.png' },
+  { slug, lang: 'en', file: `platform/${slug}/index.html`, path: `/platform/${slug}/`, alt: `/es/platform/${slug}/`, og: '/og/platform-en.png' },
+  { slug, lang: 'es', file: `es/platform/${slug}/index.html`, path: `/es/platform/${slug}/`, alt: `/platform/${slug}/`, og: '/og/platform-es.png' },
 ]);
 
 const count = (html, re) => (html.match(re) ?? []).length;

@@ -1,6 +1,6 @@
 // Link guard for the Platform pages. Every internal href on the ten pages (header and footer included) must
-// resolve to a page that is built into dist/, a legacy page that exists at the repo root (it ships unchanged at
-// cutover), an element id on the same or the target page, or a route in `pendingRoutes`.
+// resolve to a page that is built into dist/ (the legacy pages are carried in through web/public), an element id on
+// the same or the target page, or a route in `pendingRoutes`.
 //
 // `pendingRoutes` is the explicit list of routes that other open PRs own. They are not in this branch's dist/,
 // so they are reported as "pending" in the verify output instead of passing silently, and a typo of one of them
@@ -8,9 +8,6 @@
 // into a normal pass and can be deleted.
 import { existsSync, readFileSync, statSync } from 'node:fs';
 import { join } from 'node:path';
-import { fileURLToPath } from 'node:url';
-
-const repoRoot = fileURLToPath(new URL('../../../', import.meta.url));
 
 const pr31 = 'PR #31 (platform coach pages)';
 const unowned = 'no open PR (linked by the foundation nav and footer, status "planned" in data/site.ts)';
@@ -77,8 +74,8 @@ export function checkLinks({ dist, page, html, fail, pending }) {
       continue;
     }
 
-    // Legacy standalone pages (api.html, connect.html, ...) are served unchanged from the repo root at cutover.
-    if (isFile && existsSync(join(repoRoot, path))) continue;
+    // Legacy standalone pages (api.html, connect.html, ...) are carried into dist/ from web/public.
+    if (isFile && existsSync(join(dist, decodeURIComponent(path)))) continue;
 
     const owner = pendingRoutes.get(route);
     if (owner) {
@@ -88,7 +85,7 @@ export function checkLinks({ dist, page, html, fail, pending }) {
       continue;
     }
 
-    fail(`${page.file}: link ${href} does not resolve to a built page, a legacy page or a documented cross-lane route (scripts/lib/engage-links.mjs)`);
+    fail(`${page.file}: link ${href} does not resolve to a built page, a carried legacy page or a documented cross-lane route (scripts/lib/engage-links.mjs)`);
   }
 }
 

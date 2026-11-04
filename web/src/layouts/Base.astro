@@ -18,16 +18,20 @@ interface Props {
   noindex?: boolean;
   /** Full-bleed dark hero under the floating nav (the home page): the page gets no top padding. */
   hero?: boolean;
+  /** No canonical, hreflang or og:url: the 404 page answers many URLs, so it has no address of its own. */
+  bare?: boolean;
 }
 
-const { locale, path, title, description, ogImage, noindex = false, hero = false } = Astro.props;
+const { locale, path, title, description, ogImage, noindex = false, hero = false, bare = false } = Astro.props;
 const t = useDict(locale);
 const pageTitle = title ?? t.meta.title;
 const pageDescription = description ?? t.meta.description;
 const abs = (p: string) => new URL(p, site.origin).toString();
 const canonical = abs(localePath(path, locale));
 const alternates = locales.map((l) => ({ lang: l, href: abs(localePath(path, l)) }));
-const image = abs(ogImage ?? `/og/home-${locale}.png`);
+// One OG card per page type and language (scripts/og.mjs): the first path segment picks the type.
+const ogType = path === '/' ? 'home' : (({ platform: 'platform', solutions: 'solutions', pricing: 'pricing' }) as Record<string, string>)[path.split('/')[1]] ?? 'company';
+const image = abs(ogImage ?? `/og/${ogType}-${locale}.png`);
 
 const jsonLd = {
   '@context': 'https://schema.org',
@@ -51,15 +55,15 @@ const jsonLd = {
     <meta name="description" content={pageDescription} />
     <meta name="color-scheme" content="light dark" />
     {noindex && <meta name="robots" content="noindex, follow" />}
-    <link rel="canonical" href={canonical} />
-    {alternates.map((a) => <link rel="alternate" hreflang={a.lang} href={a.href} />)}
-    <link rel="alternate" hreflang="x-default" href={alternates[0].href} />
+    {!bare && <link rel="canonical" href={canonical} />}
+    {!bare && alternates.map((a) => <link rel="alternate" hreflang={a.lang} href={a.href} />)}
+    {!bare && <link rel="alternate" hreflang="x-default" href={alternates[0].href} />}
 
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content={site.name} />
     <meta property="og:title" content={pageTitle} />
     <meta property="og:description" content={pageDescription} />
-    <meta property="og:url" content={canonical} />
+    {!bare && <meta property="og:url" content={canonical} />}
     <meta property="og:image" content={image} />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />

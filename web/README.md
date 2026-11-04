@@ -1,8 +1,9 @@
 # stadioralabs.com, Astro rebuild (R57)
 
-Not live. GitHub Pages still serves the static HTML at the repo root from `main`; nothing in `web/` is
-published until the cutover. The root `_config.yml` excludes `web/` from Pages' Jekyll build (Jekyll treats
-the `---` frontmatter of `.astro` files as invalid YAML and fails the build); `npm run verify` checks this.
+Not live until the Pages cutover (see "Cutover" below). GitHub Pages still serves the static HTML at the repo root
+from `main` (legacy Jekyll build); nothing in `web/` is published until Pages is switched to the Actions deploy.
+The root `_config.yml` excludes `web/` from that Jekyll build (Jekyll treats the `---` frontmatter of `.astro` files as
+invalid YAML and fails the build); `npm run verify` checks this.
 
 ```sh
 npm install
@@ -10,6 +11,7 @@ npm run dev        # http://localhost:4321
 npm run build      # static output in dist/
 npm run check      # astro check (types and templates)
 npm run verify     # asserts the built pages: SEO tags, hreflang, OG, no placeholders, budgets, Jekyll exclusion
+npm run cutover-checks   # Playwright: redirects without JS, the 404, every carried page loads, the lead form (EN and ES); `-- --shots <dir>` saves screenshots
 npm run evidence   # needs a build; Playwright screenshots, interaction checks and measured budgets in .evidence/
 node scripts/evidence.mjs --coach-only   # just the Platform Coach pages, EN and ES (see below); add --checks-only to skip screenshots
 node scripts/evidence.mjs --nav-only   # just the header checks: geometry 1025 to 1440, panel height, drawer and panel focus
@@ -42,8 +44,8 @@ node scripts/evidence.mjs --engage-only # just the Platform page checks, EN and 
   Every claim on them is backed by Aria code, see the PR's claims table. `scripts/lib/engage-verify.mjs` (run by `npm run verify`)
   fails the build on an unbacked claim, a user or customer count, a competitor name, "all wearables", a demo call to action that
   does not go to `/contact/?topic=demo` (or "Talk to us" to `?topic=question`), or an internal link that does not resolve.
-  The link guard (`scripts/lib/engage-links.mjs`) checks every internal href on the ten pages against `dist/`, the legacy pages at
-  the repo root and the element ids it points at. Routes that other open PRs own (`pendingRoutes`: the coach pages, help) are an explicit list and are printed as `pending` by `npm run verify`, never passed
+  The link guard (`scripts/lib/engage-links.mjs`) checks every internal href on the ten pages against `dist/`, the legacy pages
+  carried in `public/` (resolved against `dist/`) and the element ids it points at. Routes that other open PRs own (`pendingRoutes`: the coach pages, help) are an explicit list and are printed as `pending` by `npm run verify`, never passed
   silently; a typo of one of them fails. Delete an entry when its PR has merged. A `/contact/` link in the page body must carry `?topic=demo` or `?topic=question`; the footer and nav link to the plain page. `scripts/lib/engage-checks.mjs` (run by
   `evidence`) covers overflow and clipped text (`clip-probe.mjs`) at 390/1024/1280/1440, WCAG AA in both themes, alt text,
   heading order, the Guardian child switcher and that Teams and `/pricing/` show the same schools price for the same visitor
@@ -103,3 +105,28 @@ node scripts/evidence.mjs --engage-only # just the Platform page checks, EN and 
   `public/home/img/` (WebP).
 - Fonts (Archivo variable for display, Inter variable for text, JetBrains Mono variable for labels; SIL OFL, licences in
   `src/assets/fonts/`) are self-hosted woff2 files; Archivo and Inter are preloaded.
+
+## Cutover (R57 lane C)
+
+Every URL that answers on stadioralabs.com today must still answer after the switch. `scripts/lib/live-urls.mjs` is the
+manifest: `built` (Astro pages), `redirects`, `carried` (copied into `public/`), `retired` (each with a reason) and `notUrls`
+(repo files that were never URLs). `scripts/lib/cutover-verify.mjs`, run by `npm run verify`, fails when a live URL is missing
+from `dist/`, when a root file or old sitemap entry is in no group, and checks the rest of the cutover contract below. The root
+files are compared while the root `index.html` still exists; delete the legacy root once Pages is on Actions.
+
+- Carried at the same URLs (`public/`): `investors(.es).html` (noindex), `connect.html` (its dead `monitors.mp4` element is
+  removed), `privacy.html`, `terms.html`, `api(-es).html`, `lead-magnet(-es).html`, `anthony/`, `ian/`, `stadioralabs info/`,
+  `videos/api.mp4`, `CNAME`, `robots.txt` and `sitemap.xml` (a sitemap index pointing at the generated `sitemap-0.xml`).
+  Edit them in place; they are static HTML and are not part of the Astro design system.
+- Redirect stubs (meta refresh, canonical, no script): `team.html` to `/about/`, `team-es.html` to `/es/about/`,
+  `index-es.html` to `/es/`, `index-preview.html` to `/`. They are out of the sitemap.
+- `src/pages/404.astro`: one bilingual page (GitHub Pages cannot pick a language per path), noindex, no canonical.
+- Lead form (`lead-magnet*.html`): without a Web3Forms key it opens the visitor's email app (mailto) and says so with the approved
+  wording, and never claims success. With a key it reports success only for `response.ok` and `success === true`; anything else
+  shows an error and a usable button. Set `WEB3FORMS_KEY` in both files when a key exists.
+- SEO: canonical and hreflang on the carried pages that have a pair, per-type OG cards (`public/og/{home,platform,solutions,pricing,company}-{en,es}.png`,
+  rendered by `node scripts/og.mjs`), and a sitemap that lists every indexable page and none of the noindex, redirect or 404 pages.
+- Deploy: `.github/workflows/pages-deploy.yml` builds, verifies and deploys `web/dist`. Both jobs run only while the repository
+  variable `PAGES_FROM_ACTIONS` is `true`, so merging does nothing until the cutover. It is `workflow_dispatch` plus push to `main`.
+- Cutover: merge, set `PAGES_FROM_ACTIONS=true`, set Settings > Pages > Source to GitHub Actions, run the workflow, smoke the URLs.
+  Rollback: set Source back to Deploy from a branch (`main`, `/`); the legacy root files are still there. Unset the variable.

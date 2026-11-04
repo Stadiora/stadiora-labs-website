@@ -1,6 +1,8 @@
 // Hero (DESIGN-4 M3 + M4): the word swap and the photo conveyor step together; the side lanes loop in CSS.
 // The page ships the first word and the whole conveyor as HTML; this only positions the centre lane, builds the
-// next words and steps them. One autoplayer (host #hero, hover/focus on the copy) starts and stops the cycle.
+// next words and steps them. One autoplayer (host #hero, hover/focus on the copy) starts and stops the cycle. While it is
+// off nothing in the hero moves: the step's timeouts are held, and every transition and Web Animation in flight is paused
+// where it is (CSS keyframes are held by hero.css), then both carry on from there.
 import { $, $$, autoplayer, isReduced, onMotionChange } from '../motion/kit';
 
 const CYCLE_MS = 2800;
@@ -58,14 +60,49 @@ export function initHero() {
   let pos = 1; // block 0 is a clone of the last photo, block 1 is the first word's
   let wi = 0;
   let timer = 0;
-  // Every step finishes through short timeouts; tracking them lets reduced motion cut a half-finished step short.
-  const pending = new Set<number>();
+  // Every step finishes through short timeouts. They are held while the hero is paused (the time left is kept), and
+  // reduced motion can cut a half-finished step short.
+  interface Job {
+    fn: () => void;
+    left: number;
+    since: number;
+    id: number;
+  }
+  const pending = new Set<Job>();
+  let held = false;
+  const arm = (job: Job) => {
+    job.since = performance.now();
+    job.id = window.setTimeout(() => {
+      pending.delete(job);
+      job.fn();
+    }, job.left);
+  };
   const later = (fn: () => void, ms: number) => {
-    const id = window.setTimeout(() => {
-      pending.delete(id);
-      fn();
-    }, ms);
-    pending.add(id);
+    const job: Job = { fn, left: ms, since: 0, id: 0 };
+    pending.add(job);
+    if (!held) arm(job);
+  };
+  // Transitions and Web Animations only: the looping keyframes are paused by `animation-play-state` in hero.css, and
+  // pausing them from script would override that rule.
+  const stopped = new Set<Animation>();
+  const hold = () => {
+    held = true;
+    const now = performance.now();
+    for (const job of pending) {
+      window.clearTimeout(job.id);
+      job.left = Math.max(0, job.left - (now - job.since));
+    }
+    for (const a of hero.getAnimations({ subtree: true })) {
+      if (a instanceof CSSAnimation || a.playState !== 'running') continue;
+      a.pause();
+      stopped.add(a);
+    }
+  };
+  const release = () => {
+    held = false;
+    for (const a of stopped) if (a.playState === 'paused') a.play();
+    stopped.clear();
+    for (const job of pending) arm(job);
   };
 
   /** Centres the big tile of block `p` in the lane. */
@@ -160,8 +197,9 @@ export function initHero() {
   // Reduced motion mid-cycle: back to the first word, its photo and its toast, which is what the page ships (and what a page
   // loaded with reduced motion shows).
   const stillFrame = () => {
-    pending.forEach((id) => window.clearTimeout(id));
+    pending.forEach((job) => window.clearTimeout(job.id));
     pending.clear();
+    stopped.clear();
     const first = buildWord(words[0], 0);
     first.dataset.active = '';
     slot.replaceChildren(first);
@@ -187,10 +225,14 @@ export function initHero() {
   autoplayer(hero, {
     within: copy,
     play: () => {
+      release();
       window.clearInterval(timer);
       timer = window.setInterval(step, CYCLE_MS);
     },
-    pause: () => window.clearInterval(timer),
+    pause: () => {
+      window.clearInterval(timer);
+      hold();
+    },
   });
 
   // pointer parallax on the conveyor: mouse only, one frame at a time
@@ -198,7 +240,7 @@ export function initHero() {
   window.addEventListener(
     'pointermove',
     (e) => {
-      if (e.pointerType !== 'mouse' || isReduced() || raf || hero.classList.contains('is-off')) return;
+      if (e.pointerType !== 'mouse' || isReduced() || raf || hero.dataset.ap !== 'on') return;
       raf = requestAnimationFrame(() => {
         raf = 0;
         cv.style.setProperty('--cvx', `${(e.clientX / innerWidth - 0.5) * -14}px`);
