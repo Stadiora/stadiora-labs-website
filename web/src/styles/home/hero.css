@@ -305,7 +305,7 @@
   background: linear-gradient(110deg, transparent 30%, rgba(255, 255, 255, 0.55) 48%, transparent 66%);
 }
 
-/* live cards (demo data) */
+/* live cards */
 .hero-chip {
   position: absolute;
   z-index: 4;
@@ -322,19 +322,6 @@
   right: 5vw;
   top: 17%;
   min-width: 300px;
-}
-.hero-demo {
-  position: absolute;
-  top: -10px;
-  left: 14px;
-  padding: 5px 8px;
-  border-radius: 7px;
-  font: 600 9.5px/1 var(--f-mono);
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: #fff;
-  background: #040a1a;
-  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.18);
 }
 .hero-ready {
   display: flex;

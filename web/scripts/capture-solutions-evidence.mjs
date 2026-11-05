@@ -115,7 +115,7 @@ if (wantMotion) {
         await sleep(700);
         await page.locator('.seg__opt:has(#topic-question)').click();
         await sleep(1200);
-        await page.locator('.seg__opt:has(#topic-demo)').click();
+        await page.locator('.seg__opt:has(#topic-call)').click();
         await sleep(1200);
         await page.focus('#f-name');
         await sleep(900);

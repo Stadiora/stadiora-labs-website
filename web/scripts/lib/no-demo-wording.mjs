@@ -12,20 +12,22 @@ import { fileURLToPath } from 'node:url';
 
 const BANNED = /\[preview\]|vista previa|preview|demostraci|demo(?!nstrat|strar|strad|stró)/gi;
 
-// The allowlist has exactly two entries, each matched to its own site.
+// The allowlist has exactly two entries, each matched to its own site. The contact script ships inline in the two contact
+// pages (or, if it grows, as an _astro chunk), and the minifier may switch the quote style, so all three quotes match.
+const SCRIPT_FILES = /^(?:(?:es\/)?contact\/index\.html|_astro\/.*\.js)$/;
 const ALLOWED = [
   {
     // The wire value of the contact endpoint's fixed `demo|question` enum, set where the POST body is built.
     what: "wire value topic: 'demo'",
-    file: /^_astro\/.*\.js$/,
-    site: /topic\s*:\s*(['"])demo\1/g,
+    file: SCRIPT_FILES,
+    site: /topic\s*:\s*(['"`])demo\1/g,
   },
   {
     // The old `?topic=demo` links keep opening the same form: the contact script maps the legacy name to `call`.
     what: 'legacy ?topic=demo alias',
-    file: /^_astro\/.*\.js$/,
+    file: SCRIPT_FILES,
     needs: 'data-contact-form',
-    site: /\{\s*demo\s*:\s*(['"])call\1\s*\}/g,
+    site: /\{\s*demo\s*:\s*(['"`])call\1\s*\}/g,
   },
 ];
 

@@ -237,8 +237,8 @@ export async function platformCoachChecks({ open, check, shot, el, sleep, settle
               const wrong = unique.filter((h) => !/^\/es\//.test(h) && !/\.\w+(\?|#|$)/.test(pathOnly(h)) && pathOnly(h) !== '/');
               check('coach-links', `${tag}: internal page links stay in Spanish`, wrong.length === 0, wrong.slice(0, 6).join(', '));
             }
-            const demo = hrefs.filter((h) => h.includes('topic=demo'));
-            check('coach-links', `${tag}: "Book a demo" goes to the contact form with topic=demo`, demo.length > 0 && demo.every((h) => /(connect\.html|\/contact\/)$/.test(pathOnly(h))), `${demo.length} links: ${[...new Set(demo)].join(', ')}`);
+            const call = hrefs.filter((h) => h.includes('topic=call'));
+            check('coach-links', `${tag}: "Book a call" goes to the contact form with topic=call`, call.length > 0 && call.every((h) => /(connect\.html|\/contact\/)$/.test(pathOnly(h))), `${call.length} links: ${[...new Set(call)].join(', ')}`);
           }
           await page.context().close();
         }

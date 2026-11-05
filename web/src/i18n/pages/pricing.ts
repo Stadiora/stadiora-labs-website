@@ -61,7 +61,7 @@ export const en = {
       name: 'Schools and institutions',
       line: 'Education pricing for high schools, departments and colleges',
       sub: 'All program coaches included.',
-      cta: 'Book a school demo',
+      cta: 'Book a call for your school',
       checks: ['Admin overview', 'Guardian portal', 'Consent for minors'],
     },
     federations: {
@@ -132,7 +132,7 @@ export const en = {
     colAthletes: 'Athletes',
     colPrice: 'Per month',
     rows: { highSchool: 'High school', department: 'Department', college: 'College' },
-    note: 'Education rates do not change with the annual toggle. Book a demo and we will fit them to your program.',
+    note: 'Education rates do not change with the annual toggle. Book a call and we will fit them to your program.',
   },
   faq: {
     eyebrow: 'FAQ',
@@ -157,7 +157,7 @@ export const en = {
       },
       {
         q: 'Do schools get special pricing?',
-        a: "Yes. Schools and institutions have education rates, and every coach in the program is included. See the rates on the Schools and institutions card, or book a demo and we'll fit them to your program.",
+        a: "Yes. Schools and institutions have education rates, and every coach in the program is included. See the rates on the Schools and institutions card, or book a call and we'll fit them to your program.",
       },
       {
         q: 'What happens to athlete data and privacy?',
@@ -174,7 +174,7 @@ export const en = {
     title: ['Ready when', 'your season is.'],
     lead: 'Start free with one coach and up to {athletes} athletes. No card needed.',
     coach: 'Start as a coach',
-    demo: 'Book a school demo',
+    call: 'Book a call for your school',
   },
 };
 
@@ -237,7 +237,7 @@ export const es: PricingCopy = {
       name: 'Escuelas e instituciones',
       line: 'Tarifas educativas para secundarias, departamentos y universidades',
       sub: 'Todos los entrenadores del programa incluidos.',
-      cta: 'Agenda una demo escolar',
+      cta: 'Agenda una llamada para tu colegio',
       checks: ['Panel de administración', 'Portal de tutores', 'Consentimiento para menores'],
     },
     federations: {
@@ -307,7 +307,7 @@ export const es: PricingCopy = {
     colAthletes: 'Atletas',
     colPrice: 'Por mes',
     rows: { highSchool: 'Secundaria', department: 'Departamento', college: 'Universidad' },
-    note: 'Las tarifas educativas no cambian con la opción anual. Agenda una demo y las ajustamos a tu programa.',
+    note: 'Las tarifas educativas no cambian con la opción anual. Agenda una llamada y las ajustamos a tu programa.',
   },
   faq: {
     eyebrow: 'Preguntas frecuentes',
@@ -331,7 +331,7 @@ export const es: PricingCopy = {
       },
       {
         q: 'Las escuelas tienen precios especiales?',
-        a: 'Sí. Las escuelas e instituciones tienen tarifas educativas e incluyen a todos los entrenadores del programa. Mira las tarifas en la tarjeta de Escuelas e instituciones o agenda una demo y las ajustamos a tu programa.',
+        a: 'Sí. Las escuelas e instituciones tienen tarifas educativas e incluyen a todos los entrenadores del programa. Mira las tarifas en la tarjeta de Escuelas e instituciones o agenda una llamada y las ajustamos a tu programa.',
       },
       {
         q: 'Qué pasa con los datos de los atletas y la privacidad?',
@@ -347,6 +347,6 @@ export const es: PricingCopy = {
     title: ['Listos cuando', 'empiece tu temporada.'],
     lead: 'Empieza gratis con un entrenador y hasta {athletes} atletas. Sin tarjeta.',
     coach: 'Empieza como entrenador',
-    demo: 'Agenda una demo escolar',
+    call: 'Agenda una llamada para tu colegio',
   },
 };

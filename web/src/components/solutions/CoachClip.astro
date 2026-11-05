@@ -1,7 +1,6 @@
 ---
 // The coaches hero media: a text-free clip of three coaches at work (sprints, strength, soccer, in the order of the swap
-// words) with two live demo cards over it. The words are HTML; nothing is baked into the clip.
-import { common } from '../../i18n/pages/common';
+// words) with two live cards over it. The words are HTML; nothing is baked into the clip.
 import type { CoachesCopy } from '../../i18n/pages/coaches';
 import type { Locale } from '../../i18n';
 
@@ -9,7 +8,7 @@ interface Props {
   copy: CoachesCopy;
   locale: Locale;
 }
-const { copy, locale } = Astro.props;
+const { copy } = Astro.props;
 const row = copy.ready.rows[0];
 ---
 
@@ -34,5 +33,4 @@ const row = copy.ready.rows[0];
       <span class="meta">{copy.session.saved}</span>
     </div>
   </div>
-  <span class="sx-demo">{common[locale].demoTag}</span>
 </div>

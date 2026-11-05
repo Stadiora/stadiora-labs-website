@@ -1,5 +1,5 @@
 // Copy for the home "four pillars" section (round-4 Floodlight). EN and ES.
-// The clips behind it carry no text: every label and demo card is drawn from `scenes` as live HTML.
+// The clips behind it carry no text: every label and card is drawn from `scenes` as live HTML.
 export interface PillarScenes {
   training: { head: string; title: string; rows: { day: string; name: string; reps: string }[]; send: string; sent: { title: string; sub: string }; coach: { name: string; sub: string } };
   nutrition: { snap: string; head: string; unit: string; macros: { name: string; value: string }[]; logged: { title: string; sub: string } };
@@ -12,7 +12,6 @@ export interface HomePillarsCopy {
   title: [string, string];
   tablistLabel: string;
   learnMore: string;
-  demoNote: string;
   items: { tab: string; text: string }[];
   scenes: PillarScenes;
 }
@@ -22,7 +21,6 @@ const en: HomePillarsCopy = {
   title: ['Four ways to coach.', 'One place to do it.'],
   tablistLabel: 'What you can coach',
   learnMore: 'Learn more',
-  demoNote: 'Demo data: a fictional coach and team.',
   items: [
     { tab: 'Training programs', text: 'Plan a season, a block or a single session. Push it to one athlete or the whole team.' },
     { tab: 'Nutrition', text: 'Meal plans, macros and a food diary, plus meal photos athletes can log in seconds.' },
@@ -79,7 +77,6 @@ const es: HomePillarsCopy = {
   title: ['Cuatro formas de entrenar.', 'Un solo lugar para hacerlo.'],
   tablistLabel: 'Lo que puedes entrenar',
   learnMore: 'Conoce más',
-  demoNote: 'Datos de demostración: una entrenadora y un equipo ficticios.',
   items: [
     { tab: 'Programas de entrenamiento', text: 'Planifica una temporada, un bloque o una sola sesión. Envíala a un atleta o a todo el equipo.' },
     { tab: 'Nutrición', text: 'Planes de comidas, macros y un diario de alimentos, además de fotos de comidas que los atletas registran en segundos.' },

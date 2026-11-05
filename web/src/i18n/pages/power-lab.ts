@@ -1,4 +1,4 @@
-// Copy for /platform/power-lab/ (DESIGN-2 section 3). Fictional demo data only.
+// Copy for /platform/power-lab/ (DESIGN-2 section 3). Fictional data only.
 // Honest by design: these are estimates from video, not force-plate measurements.
 import type { Locale } from '../index';
 import type { PageMeta } from './coach-common';
@@ -33,7 +33,6 @@ const en = {
         { value: 38.4, decimals: 1, unit: 'cm', label: 'Jump height' },
         { value: 560, decimals: 0, unit: 'ms', label: 'Flight time' },
       ],
-      demo: 'Demo values',
     },
   },
   chart: {
@@ -100,7 +99,6 @@ const es: PowerLabCopy = {
         { value: 38.4, decimals: 1, unit: 'cm', label: 'Altura del salto' },
         { value: 560, decimals: 0, unit: 'ms', label: 'Tiempo de vuelo' },
       ],
-      demo: 'Valores de ejemplo',
     },
   },
   chart: {

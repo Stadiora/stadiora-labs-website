@@ -8,11 +8,10 @@ const title = (pre: string, lane: string, post: string) => ({ pre, lane, post })
 export const engageEn = {
   common: {
     startFree: 'Start free',
-    bookDemo: 'Book a demo',
-    bookSchoolDemo: 'Book a school demo',
+    bookCall: 'Book a call',
+    bookSchoolCall: 'Book a call for your school',
     talkToUs: 'Talk to us',
     seePricing: 'See pricing',
-    demoNote: 'Demo data: a fictional coach and team.',
     alsoTitle: 'Also in Aria',
     alsoLabel: 'More of the platform',
   },
@@ -90,7 +89,7 @@ export const engageEn = {
     eyebrow: 'Guardian portal',
     title: title('', 'Keep families', ' in the loop.'),
     sub: 'Aria for Families shows parents their child’s week, coach messages and forms to sign. In the browser, nothing to install.',
-    ctaPrimary: 'Book a school demo',
+    ctaPrimary: 'Book a call for your school',
     ctaSecondary: 'See how it works',
     photoAlt:
       'A mother and her teenage son look at her phone together at the kitchen table in lamp light, a backpack on the chair beside them.',
@@ -100,7 +99,7 @@ export const engageEn = {
     switcherLabel: 'Choose a child',
     children: [
       {
-        name: 'Sofia (Demo)',
+        name: 'Sofia',
         week: 'This week: 4 sessions',
         weekDetail: '2 practices · 1 game · 1 meet',
         coach: 'Coach Daniela',
@@ -111,7 +110,7 @@ export const engageEn = {
         signed: true,
       },
       {
-        name: 'Mateo (Demo)',
+        name: 'Mateo',
         week: 'This week: 2 sessions',
         weekDetail: '1 practice · 1 game',
         coach: 'Coach Moore',
@@ -149,11 +148,11 @@ export const engageEn = {
     eyebrow: 'Teams and institutions',
     title: title('', 'Every team, one clear view.', ''),
     sub: 'Teams, staff and reports for schools, clubs and departments.',
-    ctaPrimary: 'Book a demo',
+    ctaPrimary: 'Book a call',
     ctaSecondary: 'See pricing',
     photoAlt: 'An athletic director with a tablet in a school gym.',
     panelLabel: 'A school workspace with five teams',
-    school: 'Riverside High School (Demo)',
+    school: 'Your School',
     coach: 'Coach Rivera',
     initials: 'CR',
     sidebar: ['Home', 'Teams', 'Staff', 'Calendar', 'Reports'],
@@ -165,7 +164,7 @@ export const engageEn = {
       { value: '18', label: 'sessions this week', icon: 'calendar' },
     ],
     table: {
-      caption: 'Teams at Riverside High School (Demo)',
+      caption: 'Teams at your school',
       head: ['Team', 'Athletes', 'Head coach', 'Status'],
       rows: [
         { team: 'Track and field', athletes: '42', coach: 'Coach Rivera' },
@@ -228,14 +227,14 @@ export const engageEn = {
       { icon: 'ball', label: 'Sport and features' },
       { icon: 'store', label: 'Store listing' },
     ],
-    demoGym: {
-      name: 'Demo Gym',
+    gym: {
+      name: 'Your Gym',
+      mark: 'YG',
       tagline: 'Train. Progress. Together.',
-      iconLabel: 'Demo Gym app icon, a fictional example',
+      iconLabel: 'Your Gym app icon',
       colours: 'Brand colours in the example',
       cta: 'Get started',
     },
-    demoNote: 'Demo Gym is a fictional example.',
     howTitle: 'How it works',
     steps: ['Talk to us', 'We set up your brand with you', 'We publish it to the stores together'],
     addon: 'Add-on: {monthly}/mo + {setup} setup',
@@ -288,11 +287,10 @@ export type EngageDict = typeof engageEn;
 export const engageEs: EngageDict = {
   common: {
     startFree: 'Empieza gratis',
-    bookDemo: 'Agenda una demo',
-    bookSchoolDemo: 'Agenda una demo escolar',
+    bookCall: 'Agenda una llamada',
+    bookSchoolCall: 'Agenda una llamada para tu colegio',
     talkToUs: 'Habla con nosotros',
     seePricing: 'Ver precios',
-    demoNote: 'Datos de ejemplo: una entrenadora y un equipo ficticios.',
     alsoTitle: 'También en Aria',
     alsoLabel: 'Más de la plataforma',
   },
@@ -370,7 +368,7 @@ export const engageEs: EngageDict = {
     eyebrow: 'Portal de tutores',
     title: title('', 'Mantén a las familias', ' al tanto.'),
     sub: 'Aria for Families muestra a los padres la semana de su hijo, los mensajes del coach y los formularios por firmar. En el navegador, sin instalar nada.',
-    ctaPrimary: 'Agenda una demo escolar',
+    ctaPrimary: 'Agenda una llamada para tu colegio',
     ctaSecondary: 'Mira cómo funciona',
     photoAlt:
       'Una madre y su hijo adolescente miran juntos su teléfono en la mesa de la cocina con luz de lámpara, con una mochila en la silla.',
@@ -380,7 +378,7 @@ export const engageEs: EngageDict = {
     switcherLabel: 'Elige un hijo',
     children: [
       {
-        name: 'Sofía (Demo)',
+        name: 'Sofía',
         week: 'Esta semana: 4 sesiones',
         weekDetail: '2 prácticas · 1 juego · 1 competencia',
         coach: 'Coach Daniela',
@@ -391,7 +389,7 @@ export const engageEs: EngageDict = {
         signed: true,
       },
       {
-        name: 'Mateo (Demo)',
+        name: 'Mateo',
         week: 'Esta semana: 2 sesiones',
         weekDetail: '1 práctica · 1 juego',
         coach: 'Coach Moore',
@@ -433,11 +431,11 @@ export const engageEs: EngageDict = {
     eyebrow: 'Equipos e instituciones',
     title: title('', 'Cada equipo, una vista clara.', ''),
     sub: 'Equipos, cuerpo técnico y reportes para colegios, clubes y departamentos.',
-    ctaPrimary: 'Agenda una demo',
+    ctaPrimary: 'Agenda una llamada',
     ctaSecondary: 'Ver precios',
     photoAlt: 'Un director deportivo con una tableta en un gimnasio escolar.',
     panelLabel: 'El espacio de un colegio con cinco equipos',
-    school: 'Riverside High School (Demo)',
+    school: 'Tu colegio',
     coach: 'Coach Rivera',
     initials: 'CR',
     sidebar: ['Inicio', 'Equipos', 'Cuerpo técnico', 'Calendario', 'Reportes'],
@@ -449,7 +447,7 @@ export const engageEs: EngageDict = {
       { value: '18', label: 'sesiones esta semana', icon: 'calendar' },
     ],
     table: {
-      caption: 'Equipos de Riverside High School (Demo)',
+      caption: 'Equipos de tu colegio',
       head: ['Equipo', 'Atletas', 'Coach principal', 'Estado'],
       rows: [
         { team: 'Atletismo', athletes: '42', coach: 'Coach Rivera' },
@@ -512,14 +510,14 @@ export const engageEs: EngageDict = {
       { icon: 'ball', label: 'Deporte y funciones' },
       { icon: 'store', label: 'Ficha en las tiendas' },
     ],
-    demoGym: {
-      name: 'Demo Gym',
+    gym: {
+      name: 'Tu Gym',
+      mark: 'TG',
       tagline: 'Entrena. Progresa. Juntos.',
-      iconLabel: 'Ícono de la app Demo Gym, un ejemplo ficticio',
+      iconLabel: 'Ícono de la app Tu Gym',
       colours: 'Colores de marca del ejemplo',
       cta: 'Empezar',
     },
-    demoNote: 'Demo Gym es un ejemplo ficticio.',
     howTitle: 'Cómo funciona',
     steps: ['Habla con nosotros', 'Preparamos tu marca contigo', 'La publicamos juntos en las tiendas'],
     addon: 'Complemento: {monthly}/mes + {setup} de configuración',

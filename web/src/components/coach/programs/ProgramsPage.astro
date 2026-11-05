@@ -1,6 +1,5 @@
 ---
 import { programsCopy } from '../../../i18n/pages/programs';
-import { coachCommon } from '../../../i18n/pages/coach-common';
 import type { Locale } from '../../../i18n';
 import CoachHero from '../CoachHero.astro';
 import CoachFinal from '../CoachFinal.astro';
@@ -23,7 +22,6 @@ interface Props {
 }
 const { locale } = Astro.props;
 const c = programsCopy[locale];
-const common = coachCommon[locale];
 const items = c.rows.map((r) => ({ title: r.title, body: r.body, ai: r.key === 'ai' }));
 ---
 
@@ -62,7 +60,6 @@ const items = c.rows.map((r) => ({ title: r.title, body: r.body, ai: r.key === '
           </div>
         </Accordion>
       </div>
-      <p class="cf-demo">{common.demoNote}</p>
     </div>
   </section>
 
@@ -96,7 +93,6 @@ const items = c.rows.map((r) => ({ title: r.title, body: r.body, ai: r.key === '
           </div>
         </div>
       </div>
-      <p class="cf-demo">{common.demoNote}</p>
       <h3 class="t-title pg-list-title rv">{c.proof.listTitle}</h3>
       <ul class="pg-list">
         {

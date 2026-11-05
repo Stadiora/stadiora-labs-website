@@ -7,10 +7,6 @@
   min-height: 620px;
   border-radius: var(--r-xl);
 }
-.eg-gh .badge-demo {
-  left: 16px;
-  bottom: 16px;
-}
 .eg-gh__cards {
   position: absolute;
   inset: 0;

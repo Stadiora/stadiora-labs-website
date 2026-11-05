@@ -5,7 +5,6 @@ export interface HomeAiCopy {
   /** One entry per display line of the h2. */
   title: [string, string, string];
   lead: string;
-  demoBadge: string;
   /** Text description of the 12 s story for assistive tech. */
   story: string;
   stepsLabel: string;
@@ -33,9 +32,8 @@ const en: HomeAiCopy = {
   eyebrow: 'AI program builder',
   title: ['Ask for a program.', 'Review it. Send it', 'to the calendar.'],
   lead: "Aria drafts it. You make the calls. Then it lands on every athlete's calendar.",
-  demoBadge: 'Demo data · fictional coach and team',
   story:
-    'Demo of the AI program builder. A coach asks Aria for an 8-week, 400 m speed-endurance block for a sprint group, 4 days a week. Aria drafts four sessions a week, the coach reviews them and adds the block to the calendar, and two weeks of sessions appear on the Sprint group calendar for its 18 athletes.',
+    'The AI program builder at work. A coach asks Aria for an 8-week, 400 m speed-endurance block for a sprint group, 4 days a week. Aria drafts four sessions a week, the coach reviews them and adds the block to the calendar, and two weeks of sessions appear on the Sprint group calendar for its 18 athletes.',
   stepsLabel: 'How the AI program builder works',
   steps: [
     { title: 'Ask Aria', text: 'Describe the block in plain words.' },
@@ -65,9 +63,8 @@ const es: HomeAiCopy = {
   eyebrow: 'Creador de programas con IA',
   title: ['Pide un programa.', 'Revísalo. Envíalo', 'al calendario.'],
   lead: 'Aria lo redacta. Tú tomas las decisiones. Luego aparece en el calendario de cada atleta.',
-  demoBadge: 'Datos de demostración · entrenadora y equipo ficticios',
   story:
-    'Demostración del creador de programas con IA. Una entrenadora le pide a Aria un bloque de 8 semanas de resistencia a la velocidad en 400 m para un grupo de velocistas, 4 días por semana. Aria redacta cuatro sesiones por semana, la entrenadora las revisa y agrega el bloque al calendario, y dos semanas de sesiones aparecen en el calendario del grupo de velocistas para sus 18 atletas.',
+    'El creador de programas con IA en acción. Una entrenadora le pide a Aria un bloque de 8 semanas de resistencia a la velocidad en 400 m para un grupo de velocistas, 4 días por semana. Aria redacta cuatro sesiones por semana, la entrenadora las revisa y agrega el bloque al calendario, y dos semanas de sesiones aparecen en el calendario del grupo de velocistas para sus 18 atletas.',
   stepsLabel: 'Cómo funciona el creador de programas con IA',
   steps: [
     { title: 'Pregúntale a Aria', text: 'Describe el bloque con tus palabras.' },

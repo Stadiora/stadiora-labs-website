@@ -267,7 +267,7 @@ export async function solutionsFloodlightChecks({ open, settle: settleRaw, check
     await mo.locator('#topic-question').check();
     await sleep(900);
     const t1 = await thumb(mo);
-    await mo.locator('#topic-demo').check();
+    await mo.locator('#topic-call').check();
     await sleep(900);
     const t2 = await thumb(mo);
     check('solutions-floodlight', `${locale} contact: the topic thumb glides to the second option and back`, Math.abs(t0) < 1 && t1 > 40 && Math.abs(t2) < 1, JSON.stringify({ t0, t1, t2 }));

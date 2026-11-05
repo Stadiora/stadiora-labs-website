@@ -6,11 +6,9 @@ type Pair<T> = Record<Locale, T>;
 export const common: Pair<{
   seePricing: string;
   startFree: string;
-  bookDemo: string;
-  bookSchoolDemo: string;
+  bookCall: string;
+  bookSchoolCall: string;
   talkToUs: string;
-  demoCaption: string;
-  demoTag: string;
   eyebrowSolutions: string;
   ctaTitle: string;
   breadcrumbHome: string;
@@ -18,11 +16,9 @@ export const common: Pair<{
   en: {
     seePricing: 'See pricing',
     startFree: 'Start free',
-    bookDemo: 'Book a demo',
-    bookSchoolDemo: 'Book a school demo',
+    bookCall: 'Book a call',
+    bookSchoolCall: 'Book a call for your school',
     talkToUs: 'Talk to us',
-    demoCaption: 'Demo data: a fictional coach and team.',
-    demoTag: 'Demo',
     eyebrowSolutions: 'Solutions',
     ctaTitle: 'Ready when your season is.',
     breadcrumbHome: 'Home',
@@ -30,11 +26,9 @@ export const common: Pair<{
   es: {
     seePricing: 'Ver precios',
     startFree: 'Empieza gratis',
-    bookDemo: 'Agenda una demo',
-    bookSchoolDemo: 'Agenda una demo escolar',
+    bookCall: 'Agenda una llamada',
+    bookSchoolCall: 'Agenda una llamada para tu colegio',
     talkToUs: 'Habla con nosotros',
-    demoCaption: 'Datos de demostración: un entrenador y un equipo ficticios.',
-    demoTag: 'Demo',
     eyebrowSolutions: 'Soluciones',
     ctaTitle: 'Listos cuando empiece tu temporada.',
     breadcrumbHome: 'Inicio',

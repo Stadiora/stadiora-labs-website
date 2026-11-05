@@ -17,7 +17,6 @@ interface Props {
 const { locale } = Astro.props;
 const e = useEngage(locale);
 const t = e.teams;
-const c = e.common;
 const rowIcons = ['run', 'ball', 'ball', 'ball', 'dumbbell'] as const;
 const sidebarIcons = ['home', 'users', 'user', 'calendar', 'file'] as const;
 // The HTML always holds the US rate; the script below swaps in the visitor's region (same table as /pricing).
@@ -35,7 +34,7 @@ const events = [
   title={t.title}
   sub={t.sub}
   ctas={[
-    { label: t.ctaPrimary, href: contactHref(locale, 'demo') },
+    { label: t.ctaPrimary, href: contactHref(locale, 'call') },
     { label: t.ctaSecondary, href: hrefFor('pricing', locale) },
   ]}
 >
@@ -149,7 +148,7 @@ const events = [
         }
       </div>
     </div>
-    <p class="eg-note eg-notes">{c.demoNote} {t.consent}</p>
+    <p class="eg-note eg-notes">{t.consent}</p>
   </div>
 </section>
 
@@ -164,7 +163,7 @@ const events = [
 </section>
 
 <AlsoInAria locale={locale} items={t.also} />
-<EngageFinal locale={locale} demoHref={contactHref(locale, 'demo')} />
+<EngageFinal locale={locale} callHref={contactHref(locale, 'call')} />
 
 <script>
   import '../../scripts/engage/teams';
