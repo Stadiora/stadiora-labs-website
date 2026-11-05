@@ -31,7 +31,7 @@ const en = {
       placeholder: 'Choose a range',
       options: ['1 to 10', '11 to 25', '26 to 100', '100 to 250', '250 to 1,000', 'More than 1,000'],
     },
-    message: { call: 'What would you like to see?', question: 'Your question', placeholder: 'Tell us about your program' },
+    message: { call: 'What would you like to talk about?', question: 'Your question', placeholder: 'Tell us about your program' },
   },
   errors: {
     name: 'Enter your name.',
@@ -84,7 +84,7 @@ const es: ContactCopy = {
       placeholder: 'Elige un rango',
       options: ['1 a 10', '11 a 25', '26 a 100', '100 a 250', '250 a 1.000', 'Más de 1.000'],
     },
-    message: { call: 'Qué te gustaría ver?', question: 'Tu pregunta', placeholder: 'Cuéntanos sobre tu programa' },
+    message: { call: 'De qué te gustaría hablar?', question: 'Tu pregunta', placeholder: 'Cuéntanos sobre tu programa' },
   },
   errors: {
     name: 'Escribe tu nombre.',
