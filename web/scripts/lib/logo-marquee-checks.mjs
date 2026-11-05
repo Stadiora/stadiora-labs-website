@@ -91,7 +91,12 @@ export async function logoMarqueeChecks({ open, settle, check, sleep, pauses = t
             await sleep(400);
             moved = (await left(page, t.sel)) - x0;
           }
-          check(group, `${tag}: the strip moves on its own`, Math.abs(moved) >= 4, `${moved.toFixed(1)}px within 6 s`);
+          const why = await page.evaluate((sel) => {
+            const m = document.querySelector(sel);
+            const h = m.closest('[data-ap]');
+            return { ap: h?.dataset.ap, why: h?.dataset.apWhy, hidden: document.hidden, state: getComputedStyle(m.querySelector('.marquee-track')).animationPlayState, html: document.documentElement.className };
+          }, t.sel);
+          check(group, `${tag}: the strip moves on its own`, Math.abs(moved) >= 4, `${moved.toFixed(1)}px within 6 s ${JSON.stringify(why)}`);
           if (width === 1440 && scheme === 'light') {
             const bx = await page.evaluate((s) => {
               const r = document.querySelector(s).getBoundingClientRect();
