@@ -74,6 +74,9 @@ const results = [];
 const identity = treeHash(dist);
 try {
   cpSync(dist, copy, { recursive: true });
+  // Coach verification resolves this source stylesheet relative to DIST_DIR.
+  mkdirSync(join(scratch, 'src/styles/coach'), { recursive: true });
+  cpSync(join(web, 'src/styles/coach/cf.css'), join(scratch, 'src/styles/coach/cf.css'));
   assert.equal(treeHash(copy), identity, 'Copied dist must be identical');
   for (const test of cases) {
     const path = test.file ? join(copy, test.file) : null;
