@@ -14,10 +14,8 @@ interface Props {
   secondary: { label: string; href: string };
   /** Name of a clip in public/home/media (WebM + MP4 + WebP poster). */
   clip: string;
-  /** Where the demo note sits when the hero shows demo data. */
-  demo?: boolean;
 }
-const { locale, eyebrow, title, emphasis, sub, secondary, clip, demo = true } = Astro.props;
+const { locale, eyebrow, title, emphasis, sub, secondary, clip } = Astro.props;
 const common = coachCommon[locale];
 
 // The h1 is one masked line group: [before, gradient, after].
@@ -63,7 +61,6 @@ if (emphasis && at >= 0) {
         </video>
         <div class="vid-shade"></div>
         <div class="cf-overlay"><slot name="overlay" /></div>
-        {demo && <span class="badge-demo">{common.demoNote}</span>}
       </div>
     </div>
   </div>

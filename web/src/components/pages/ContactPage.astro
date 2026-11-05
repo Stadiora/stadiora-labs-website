@@ -44,8 +44,8 @@ const regions = [
         <fieldset class="seg">
           <legend class="sr-only">{c.topicLabel}</legend>
           <label class="seg__opt">
-            <input type="radio" name="topic" value="demo" id="topic-demo" checked />
-            <span>{c.topics.demo}</span>
+            <input type="radio" name="topic" value="call" id="topic-call" checked />
+            <span>{c.topics.call}</span>
           </label>
           <label class="seg__opt">
             <input type="radio" name="topic" value="question" id="topic-question" />
@@ -76,7 +76,7 @@ const regions = [
             <label for="f-org">{f.org.label}</label>
             <input id="f-org" name="organization" type="text" maxlength="160" autocomplete="organization" placeholder={f.org.placeholder} />
           </div>
-          <div class="field field--wide only-demo" data-demo-only>
+          <div class="field field--wide only-call" data-call-only>
             <label for="f-athletes">{f.athletes.label}</label>
             <select id="f-athletes" name="athletes">
               <option value="" selected>{f.athletes.placeholder}</option>
@@ -89,7 +89,7 @@ const regions = [
           </div>
           <div class="field field--wide">
             <label for="f-message">
-              <span class="for-demo">{f.message.demo}</span>
+              <span class="for-call">{f.message.call}</span>
               <span class="for-question">{f.message.question}</span>
             </label>
             <textarea id="f-message" name="message" rows="4" maxlength="4000" placeholder={f.message.placeholder}></textarea>
@@ -98,7 +98,7 @@ const regions = [
 
         <div class="form__actions">
           <button class="btn btn--primary btn--lg form__submit" type="submit" disabled>
-            <span class="for-demo">{c.submit.demo}</span>
+            <span class="for-call">{c.submit.call}</span>
             <span class="for-question">{c.submit.question}</span>
           </button>
           <span class="sx-burst" aria-hidden="true" data-decorative>
@@ -415,9 +415,9 @@ const regions = [
   }
 
   /* Topic-driven parts use :has() so the page still behaves with JavaScript off. */
-  .form:has(#topic-demo:checked) .for-question,
-  .form:has(#topic-question:checked) .for-demo,
-  .form:has(#topic-question:checked) .only-demo {
+  .form:has(#topic-call:checked) .for-question,
+  .form:has(#topic-question:checked) .for-call,
+  .form:has(#topic-question:checked) .only-call {
     display: none;
   }
 

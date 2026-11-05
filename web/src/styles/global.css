@@ -415,14 +415,6 @@ small,
   }
 }
 
-.demo-note {
-  margin-top: 12px;
-  color: var(--ink-3);
-  font-size: 14px;
-  line-height: 20px;
-}
-
-/* Photos: containers own the radius and clip; <picture> is layout-transparent. */
 .photo-pic {
   display: contents;
 }

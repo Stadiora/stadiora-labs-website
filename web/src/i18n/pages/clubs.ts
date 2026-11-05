@@ -1,5 +1,5 @@
 // Copy for /solutions/teams-and-clubs/ (DESIGN-2.md section 10, DECISIONS #13 and #14). EN and ES.
-// The squad data is fictional demo data. Availability words match the app: available, doubtful, unavailable.
+// The squad data is fictional. Availability words match the app: available, doubtful, unavailable.
 const en = {
   meta: {
     title: 'Teams, clubs and academies | Stadiora Labs',
@@ -29,13 +29,12 @@ const en = {
     chartLabel: 'Squad average countermovement jump, from {first} cm on Sep 21 to {last} cm on Oct 12',
   },
   squads: [
-    { id: 'u12', label: 'U12', fixture: { day: 'Sat', opponent: 'Demo Rovers', time: '9:00 am', venue: 'Away' }, practices: [{ day: 'Mon', time: '4:30 pm' }, { day: 'Wed', time: '4:30 pm' }], available: 15, doubtful: 2, unavailable: 1, note: 'Photo day Saturday', read: 14, total: 18, cmj: [32, 33, 35, 36] },
-    { id: 'u14', label: 'U14', fixture: { day: 'Sat', opponent: 'Demo Athletic', time: '11:00 am', venue: 'Home' }, practices: [{ day: 'Tue', time: '5:00 pm' }, { day: 'Thu', time: '5:00 pm' }], available: 17, doubtful: 2, unavailable: 1, note: 'Bring both kits Saturday', read: 17, total: 20, cmj: [36, 37, 39, 40] },
-    { id: 'u16', label: 'U16', fixture: { day: 'Sat', opponent: 'Demo FC', time: '10:00 am', venue: 'Home' }, practices: [{ day: 'Tue', time: '5:00 pm' }, { day: 'Thu', time: '5:00 pm' }], available: 18, doubtful: 3, unavailable: 1, note: 'Kit check Friday', read: 20, total: 22, cmj: [39, 41, 40, 43] },
-    { id: 'first', label: 'First team', fixture: { day: 'Sun', opponent: 'Demo City', time: '3:00 pm', venue: 'Away' }, practices: [{ day: 'Mon', time: '6:30 pm' }, { day: 'Wed', time: '6:30 pm' }, { day: 'Fri', time: '6:30 pm' }], available: 21, doubtful: 2, unavailable: 1, note: 'Travel plan for Sunday', read: 23, total: 24, cmj: [42, 43, 45, 46] },
+    { id: 'u12', label: 'U12', fixture: { day: 'Sat', opponent: 'Rovers', time: '9:00 am', venue: 'Away' }, practices: [{ day: 'Mon', time: '4:30 pm' }, { day: 'Wed', time: '4:30 pm' }], available: 15, doubtful: 2, unavailable: 1, note: 'Photo day Saturday', read: 14, total: 18, cmj: [32, 33, 35, 36] },
+    { id: 'u14', label: 'U14', fixture: { day: 'Sat', opponent: 'Athletic', time: '11:00 am', venue: 'Home' }, practices: [{ day: 'Tue', time: '5:00 pm' }, { day: 'Thu', time: '5:00 pm' }], available: 17, doubtful: 2, unavailable: 1, note: 'Bring both kits Saturday', read: 17, total: 20, cmj: [36, 37, 39, 40] },
+    { id: 'u16', label: 'U16', fixture: { day: 'Sat', opponent: 'United', time: '10:00 am', venue: 'Home' }, practices: [{ day: 'Tue', time: '5:00 pm' }, { day: 'Thu', time: '5:00 pm' }], available: 18, doubtful: 3, unavailable: 1, note: 'Kit check Friday', read: 20, total: 22, cmj: [39, 41, 40, 43] },
+    { id: 'first', label: 'First team', fixture: { day: 'Sun', opponent: 'City', time: '3:00 pm', venue: 'Away' }, practices: [{ day: 'Mon', time: '6:30 pm' }, { day: 'Wed', time: '6:30 pm' }, { day: 'Fri', time: '6:30 pm' }], available: 21, doubtful: 2, unavailable: 1, note: 'Travel plan for Sunday', read: 23, total: 24, cmj: [42, 43, 45, 46] },
   ],
   defaultSquad: 'u16',
-  demoNote: 'Demo data: a fictional coach and team.',
   focus: 'Soccer first. Track and field too.',
   cols: [
     { title: 'Coaches', text: "Set the week's fixtures and practices, and see who is available before game day." },
@@ -44,7 +43,7 @@ const en = {
   ],
   price: { text: 'Priced by athletes, not by squads. Core from {price}/mo.', link: 'See pricing' },
   ask: "Ask us about your club's setup",
-  cta: { primary: 'Book a demo', secondary: 'Start free' },
+  cta: { primary: 'Book a call', secondary: 'Start free' },
 };
 
 export type ClubsCopy = typeof en;
@@ -78,13 +77,12 @@ const es: ClubsCopy = {
     chartLabel: 'Promedio del equipo en salto con contramovimiento, de {first} cm el 21 de sep a {last} cm el 12 de oct',
   },
   squads: [
-    { id: 'u12', label: 'U12', fixture: { day: 'Sáb', opponent: 'Demo Rovers', time: '9:00 a. m.', venue: 'Visita' }, practices: [{ day: 'Lun', time: '4:30 p. m.' }, { day: 'Mié', time: '4:30 p. m.' }], available: 15, doubtful: 2, unavailable: 1, note: 'Día de fotos el sábado', read: 14, total: 18, cmj: [32, 33, 35, 36] },
-    { id: 'u14', label: 'U14', fixture: { day: 'Sáb', opponent: 'Demo Athletic', time: '11:00 a. m.', venue: 'Local' }, practices: [{ day: 'Mar', time: '5:00 p. m.' }, { day: 'Jue', time: '5:00 p. m.' }], available: 17, doubtful: 2, unavailable: 1, note: 'Trae las dos camisetas el sábado', read: 17, total: 20, cmj: [36, 37, 39, 40] },
-    { id: 'u16', label: 'U16', fixture: { day: 'Sáb', opponent: 'Demo FC', time: '10:00 a. m.', venue: 'Local' }, practices: [{ day: 'Mar', time: '5:00 p. m.' }, { day: 'Jue', time: '5:00 p. m.' }], available: 18, doubtful: 3, unavailable: 1, note: 'Revisión de uniformes el viernes', read: 20, total: 22, cmj: [39, 41, 40, 43] },
-    { id: 'first', label: 'Primer equipo', fixture: { day: 'Dom', opponent: 'Demo City', time: '3:00 p. m.', venue: 'Visita' }, practices: [{ day: 'Lun', time: '6:30 p. m.' }, { day: 'Mié', time: '6:30 p. m.' }, { day: 'Vie', time: '6:30 p. m.' }], available: 21, doubtful: 2, unavailable: 1, note: 'Plan de viaje del domingo', read: 23, total: 24, cmj: [42, 43, 45, 46] },
+    { id: 'u12', label: 'U12', fixture: { day: 'Sáb',     opponent: 'Rovers', time: '9:00 a. m.', venue: 'Visita' }, practices: [{ day: 'Lun', time: '4:30 p. m.' }, { day: 'Mié', time: '4:30 p. m.' }], available: 15, doubtful: 2, unavailable: 1, note: 'Día de fotos el sábado', read: 14, total: 18, cmj: [32, 33, 35, 36] },
+    { id: 'u14', label: 'U14', fixture: { day: 'Sáb',     opponent: 'Athletic', time: '11:00 a. m.', venue: 'Local' }, practices: [{ day: 'Mar', time: '5:00 p. m.' }, { day: 'Jue', time: '5:00 p. m.' }], available: 17, doubtful: 2, unavailable: 1, note: 'Trae las dos camisetas el sábado', read: 17, total: 20, cmj: [36, 37, 39, 40] },
+    { id: 'u16', label: 'U16', fixture: { day: 'Sáb',     opponent: 'United', time: '10:00 a. m.', venue: 'Local' }, practices: [{ day: 'Mar', time: '5:00 p. m.' }, { day: 'Jue', time: '5:00 p. m.' }], available: 18, doubtful: 3, unavailable: 1, note: 'Revisión de uniformes el viernes', read: 20, total: 22, cmj: [39, 41, 40, 43] },
+    { id: 'first', label: 'Primer equipo', fixture: { day: 'Dom',     opponent: 'City', time: '3:00 p. m.', venue: 'Visita' }, practices: [{ day: 'Lun', time: '6:30 p. m.' }, { day: 'Mié', time: '6:30 p. m.' }, { day: 'Vie', time: '6:30 p. m.' }], available: 21, doubtful: 2, unavailable: 1, note: 'Plan de viaje del domingo', read: 23, total: 24, cmj: [42, 43, 45, 46] },
   ],
   defaultSquad: 'u16',
-  demoNote: 'Datos de demostración: un entrenador y un equipo ficticios.',
   focus: 'Primero fútbol. Y también atletismo.',
   cols: [
     { title: 'Entrenadores', text: 'Define los partidos y las prácticas de la semana, y mira quién está disponible antes del día de partido.' },
@@ -93,7 +91,7 @@ const es: ClubsCopy = {
   ],
   price: { text: 'Precio por atleta, no por equipo. Core desde {price}/mes.', link: 'Ver precios' },
   ask: 'Pregúntanos por la configuración de tu club',
-  cta: { primary: 'Agenda una demo', secondary: 'Empieza gratis' },
+  cta: { primary: 'Agenda una llamada', secondary: 'Empieza gratis' },
 };
 
 export const clubs = { en, es };

@@ -2,9 +2,8 @@
 import type { ShowcaseCopy } from '../../../i18n/pages/home-showcase';
 interface Props {
   t: ShowcaseCopy['engage'];
-  demo: string;
 }
-const { t, demo } = Astro.props;
+const { t } = Astro.props;
 const p = t.phone;
 const scenes = ['chat', 'feed', 'bc', 'ann'] as const;
 const bubblePos = { chat: 'a', feed: 'b', bc: 'c', ann: 'd' } as const;
@@ -117,7 +116,6 @@ const bubbleDepth = { chat: 24, feed: 30, bc: 20, ann: 26 } as const;
           </div>
         ))
       }
-      <span class="badge-demo">{demo}</span>
     </div>
   </div>
 </article>

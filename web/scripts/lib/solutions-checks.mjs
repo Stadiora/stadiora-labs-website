@@ -335,7 +335,7 @@ export async function solutionsChecks({ open, settle: settleRaw, check, sleep, m
     await page.screenshot({ path: `${shotsDir}interaction-about-popover-open.jpg`, type: 'jpeg', quality: 82 });
     await page.context().close();
   }
-  for (const topic of ['demo', 'question']) {
+  for (const topic of ['call', 'question']) {
     const page = await open({ width: 1440, height: 900, reduced: true }, `/contact/?topic=${topic}`);
     await settle(page);
     await sleep(300);

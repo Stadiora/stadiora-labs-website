@@ -2,9 +2,8 @@
 import type { ShowcaseCopy } from '../../../i18n/pages/home-showcase';
 interface Props {
   t: ShowcaseCopy['measure'];
-  note: string;
 }
-const { t, note } = Astro.props;
+const { t } = Astro.props;
 const s = t.slides;
 // Tab icons (one per tab, same order as t.tabs).
 const icons = [
@@ -123,5 +122,4 @@ const icons = [
       </div>
     </div>
   </div>
-  <p class="dnote">{note}</p>
 </article>

@@ -1,0 +1,42 @@
+---
+import '../../styles/home/final.css';
+import type { Locale } from '../../i18n';
+import type { ApiCopy } from '../../i18n/pages/api';
+import { apiLinks } from './links';
+
+interface Props {
+  locale: Locale;
+  copy: ApiCopy;
+}
+const { locale, copy } = Astro.props;
+const t = copy.final;
+const links = apiLinks(locale);
+---
+
+<section class="final impact media-frame" id="early-access" data-section aria-labelledby="fn-h">
+  <video muted playsinline loop preload="none" data-clip data-poster="/home/media/night-stadium.webp" aria-hidden="true">
+    <source src="/home/media/night-stadium.webm" type="video/webm" />
+    <source src="/home/media/night-stadium.mp4" type="video/mp4" />
+  </video>
+  <div class="orbits" aria-hidden="true">
+    <svg viewBox="0 0 1600 800">
+      <ellipse cx="800" cy="400" rx="760" ry="260"></ellipse>
+      <ellipse class="dash" cx="800" cy="400" rx="600" ry="200"></ellipse>
+      <circle class="fdot fdot--a" r="9" fill="#00BEF3"></circle>
+      <circle class="fdot fdot--b" r="7" fill="#8B5CF6"></circle>
+    </svg>
+  </div>
+  <div class="wrap">
+    <p class="eyebrow rv" style="color:#B7C2D4;justify-content:center">{t.eyebrow}</p>
+    <h2 class="d d1 lines" id="fn-h"><span><span>{t.h2[0]}</span></span><span><span class="grad-text" style="--i:1">{t.h2[1]}</span></span></h2>
+    <p class="lead rv">{t.lead}</p>
+    <div class="final-ctas rv" style="--i:2">
+      <a class="btn btn--white btn--lg" href={links.mail} data-magnet>{t.join} <span class="arr">→</span></a>
+    </div>
+    <div class="final-ctas rv" style="--i:3;margin-top:18px">
+      <a class="btn btn--ghost btn--lg" href={links.ask}>{t.ask}</a>
+      <a class="btn btn--ghost btn--lg" href={links.home}>{t.back}</a>
+    </div>
+    <p class="a-fine rv" style="--i:4">{t.fine}</p>
+  </div>
+</section>

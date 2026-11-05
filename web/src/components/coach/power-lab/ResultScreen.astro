@@ -11,7 +11,7 @@ const fmt = (m: { value: number; decimals: number }) =>
   new Intl.NumberFormat(locale, { minimumFractionDigits: m.decimals, maximumFractionDigits: m.decimals }).format(m.value);
 ---
 
-<!-- Fictional values for the demo jump. The number text is final in the HTML; the script only adds motion. -->
+<!-- Values for the jump result. The number text is final in the HTML; the script only adds motion. -->
 <div class="pr">
   <p class="pr__title">{copy.title}</p>
   <dl class="pr__list">
@@ -27,7 +27,6 @@ const fmt = (m: { value: number; decimals: number }) =>
       ))
     }
   </dl>
-  <p class="pr__demo">{copy.demo}</p>
 </div>
 
 <script>
@@ -78,10 +77,5 @@ const fmt = (m: { value: number; decimals: number }) =>
     color: var(--ink-2);
     font-size: 16px;
     line-height: 24px;
-  }
-  .pr__demo {
-    color: var(--ink-3);
-    font-size: 13px;
-    line-height: 18px;
   }
 </style>

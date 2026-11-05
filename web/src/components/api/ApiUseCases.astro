@@ -1,0 +1,78 @@
+---
+import type { ApiCopy } from '../../i18n/pages/api';
+
+interface Props {
+  copy: ApiCopy;
+}
+const t = Astro.props.copy.uc;
+const num = (i: number) => String(i + 1).padStart(2, '0');
+const img = (n: string) => ({ src: `/home/img/${n}-800.webp`, big: n.startsWith('hero3') ? `/home/img/${n}-800.webp` : `/home/img/${n}-1600.webp` });
+const photos = ['panel-phone-locker', 'cine-team-floodlight', 'panel-wrist-closeup', 'cine-readiness', 'panel-sprinter-night', 'hero3-soccer-academies-big'];
+const pos = ['--tx:-34px;--ty:52%', '--tx:-34px;--ty:56%', '--tx:-34px;--ty:50%', '--tx:-34px;--ty:54%', '--tx:-34px;--ty:54%', '--tx:-34px;--ty:56%'];
+---
+
+<section class="sec uc" id="use-cases" data-section aria-labelledby="uc-h">
+  <div class="wrap">
+    <div class="sec-head">
+      <div>
+        <p class="eyebrow rv">{t.eyebrow}</p>
+        <h2 class="d d2 lines" id="uc-h"><span><span>{t.h2[0]}</span></span><span><span style="--i:1" class="grad-text">{t.h2[1]}</span></span></h2>
+      </div>
+      <p class="lead rv">{t.lead}</p>
+    </div>
+    <div class="uc-grid" data-uc data-at="6200" data-api-stage="uc">
+      <div class="uc-list">
+        {
+          t.rows.map((r, i) => (
+            <div class:list={['uc-row', i === 0 && 'open']} data-uc-row>
+              <h3>
+                <button type="button" aria-expanded={i === 0 ? 'true' : 'false'} aria-controls={`ucb-${i + 1}`} id={`uch-${i + 1}`}>
+                  <span class="uc-n">{num(i)}</span>
+                  {r.h}
+                  <i class="at-bar"><i></i></i>
+                </button>
+              </h3>
+              <div class="uc-body" id={`ucb-${i + 1}`} role="region" aria-labelledby={`uch-${i + 1}`}>
+                <div>
+                  <p>{r.p}</p>
+                  <p class="uc-tags">{r.tags.map((g) => <span>{g}</span>)}</p>
+                </div>
+              </div>
+            </div>
+          ))
+        }
+      </div>
+      <div class="uc-media media-frame" aria-hidden="true">
+        {
+          t.pops.map((p, i) => {
+            const im = img(photos[i]);
+            return (
+              <figure class:list={['uc-fig', i === 0 && 'on']} data-uc-fig>
+                {i === 0 ? (
+                  <img src={im.src} srcset={`${im.src} 800w, ${im.big} 1600w`} sizes="(max-width:900px) 100vw, 640px" width="800" height="1000" alt="" loading="lazy" decoding="async" />
+                ) : (
+                  <img data-src={im.big} alt="" decoding="async" style={i === 3 ? 'object-position:70% 50%' : undefined} />
+                )}
+                <div class="pop uc-pop" style={pos[i]} data-depth="24">
+                  <p class="pk">{p.k}</p>
+                  {p.t && <p class="pt">{p.t}</p>}
+                  {p.sq && (
+                    <div class="sq">
+                      {p.sq.map((s, j) => (
+                        <span class={j === 2 ? 'hot' : undefined}><b>{s[0]}</b>{s[1]}</span>
+                      ))}
+                    </div>
+                  )}
+                  {i === 3 && <div class="mini-steps"><i class="d"></i><i class="d"></i><i class="d"></i><i></i><i></i></div>}
+                  {p.s && <p class="ps">{p.s}</p>}
+                </div>
+                {p.tier && <div class="pop uc-pop sm" style="--tx:58%;--ty:16%" data-depth="34"><span class="tier">{p.tier}</span></div>}
+              </figure>
+            );
+          })
+        }
+        <span class="badge-plan">{t.badge}</span>
+      </div>
+    </div>
+  </div>
+</section>

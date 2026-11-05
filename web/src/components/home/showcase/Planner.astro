@@ -2,9 +2,8 @@
 import type { ShowcaseCopy } from '../../../i18n/pages/home-showcase';
 interface Props {
   t: ShowcaseCopy['plan'];
-  demo: string;
 }
-const { t, demo } = Astro.props;
+const { t } = Astro.props;
 const st = t.stage;
 // Planner hooks the timeline in showcase/planner.ts moves (by data-el).
 const hook = (wi: number, bi: number) => (wi === 0 && bi === 1 ? 'srcblk' : wi > 0 && bi < 2 ? `w${wi + 1}${bi === 0 ? 'a' : 'b'}` : undefined);
@@ -102,7 +101,6 @@ const seeks = [0, 3.6, 6.4, 9.2];
         <div class="pl-send" data-el="send">{st.send}</div>
       </div>
     </div>
-    <span class="badge-demo">{demo}</span>
   </div>
   <div class="pl-steps" role="group" aria-label={t.stepsLabel} data-steps="planner">
     {

@@ -91,14 +91,7 @@
   background: var(--cyan);
 }
 
-/* The "demo data" caption sits under every product screen. */
-.co-demo {
-  margin-top: 14px;
-  color: var(--ink-3);
-  font-size: 14px;
-  line-height: 20px;
-  text-align: center;
-}
+
 
 .co-section-title {
   max-width: 22ch;

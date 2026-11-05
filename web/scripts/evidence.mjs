@@ -8,6 +8,7 @@
 //   node scripts/evidence.mjs --contact-only   (the Contact forms against the intercepted endpoint: 202-only success, honeypot, startedAt, topic, burst)
 //   node scripts/evidence.mjs --logos-only     (the shared logo marquee on the home hero and the About partners strip, plus the About pause guards)
 //   node scripts/evidence.mjs --home-only      (the home guards only: structure, autoplayers, reduced motion, marquees, hero words, clipping, contrast)
+//   node scripts/evidence.mjs --api-only       (the API page, EN and ES: pause, reduced motion and glyph-pixel contrast of the API and legal pages)
 // Output goes to web/.evidence/ (git-ignored): PNGs plus summary.json. Exit code 1 when a check fails.
 import { mkdir, readdir, readFile, rm, stat, writeFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
@@ -15,6 +16,11 @@ import { fileURLToPath } from 'node:url';
 import { chromium } from 'playwright';
 import { contrastProbe } from './lib/contrast.mjs';
 import { contactChecks } from './lib/contact-checks.mjs';
+import { apiMotionChecks, apiReducedMotionChecks } from './lib/api-motion-checks.mjs';
+import { apiTapChecks } from './lib/api-tap-checks.mjs';
+import { apiUseCaseA11yChecks } from './lib/api-uc-a11y-checks.mjs';
+import { apiHeroFitChecks } from './lib/api-hero-fit-checks.mjs';
+import { pageContrastChecks } from './lib/page-contrast-checks.mjs';
 import { engageChecks } from './lib/engage-checks.mjs';
 import { engageMotionChecks } from './lib/engage-motion-checks.mjs';
 import { homeChecks, homeSections } from './lib/home-checks.mjs';
@@ -37,6 +43,7 @@ const coachOnly = process.argv.includes('--coach-only');
 const homeOnly = process.argv.includes('--home-only');
 const contactOnly = process.argv.includes('--contact-only');
 const logosOnly = process.argv.includes('--logos-only');
+const apiOnly = process.argv.includes('--api-only');
 
 await rm(outDir, { recursive: true, force: true });
 await mkdir(outDir, { recursive: true });
@@ -131,6 +138,37 @@ if (contactOnly) {
 // The shared logo marquee (home hero band, About partners); `--logos-only` runs just this and the About pause guards.
 if (logosOnly) {
   await logoMarqueeChecks({ open, settle, check, sleep, pauses: true });
+  await finish();
+}
+
+// API and legal pages: pause, reduced motion and glyph-pixel contrast. `--api-only` runs just these.
+//   --api-motion-only: just the pause and reduced-motion checks. --api-contrast-only[=tag,width,scheme[,reduced]]: just the contrast scans
+//   (optionally one job), which is what the mutation battery runs.
+const apiMotionOnly = process.argv.includes('--api-motion-only');
+const apiTapOnly = process.argv.includes('--api-tap-only');
+const apiFitOnly = process.argv.includes('--api-fit-only');
+const apiA11yOnly = process.argv.includes('--api-a11y-only');
+const contrastArg = process.argv.find((a) => a.startsWith('--api-contrast-only'));
+const apiRun = async () => {
+  if (apiTapOnly || apiFitOnly || apiA11yOnly) {
+    if (apiA11yOnly) await apiUseCaseA11yChecks({ open, check, sleep, settle });
+    if (apiFitOnly) await apiHeroFitChecks({ open, check, sleep, settle });
+    if (apiTapOnly) await apiTapChecks({ open, check, sleep, settle });
+    return;
+  }
+  if (!contrastArg) {
+    await apiMotionChecks({ open, check, sleep, settle, metrics });
+    await apiReducedMotionChecks({ open, check, sleep, settle });
+  }
+  if (!apiMotionOnly && !contrastArg) {
+    await apiHeroFitChecks({ open, check, sleep, settle });
+    await apiTapChecks({ open, check, sleep, settle });
+    await apiUseCaseA11yChecks({ open, check, sleep, settle });
+  }
+  if (!apiMotionOnly) await pageContrastChecks({ open, check, sleep, metrics, browser, only: contrastArg?.split('=')[1] });
+};
+if (apiOnly || apiMotionOnly || apiTapOnly || apiFitOnly || apiA11yOnly || contrastArg) {
+  await apiRun();
   await finish();
 }
 
@@ -475,4 +513,5 @@ await logoMarqueeChecks({ open, settle, check, sleep, pauses: false });
 await contactRun();
 
 await coachRun();
+await apiRun();
 await finish();

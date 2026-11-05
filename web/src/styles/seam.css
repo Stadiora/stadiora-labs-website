@@ -1,0 +1,55 @@
+/* Seamless gradient words for the API and legal pages. The shared 200% gradient in floodlight.css shows a hard seam on long
+   lines, so these pages loop a mirrored five-stop gradient instead. It is scoped to .api-page and .legal-page on purpose:
+   the site-wide .grad-text is not touched here.
+   Impact sections are dark in both themes and keep the brand colours. On the sections that follow the theme the stops
+   switch to the ink variants, which keep AA contrast against the page in light and dark. */
+.api-page .grad-text,
+.legal-page .grad-text {
+  background-image: linear-gradient(100deg, #00bef3 0%, #34d399 25%, #a78bfa 50%, #34d399 75%, #00bef3 100%);
+  background-size: 200% 100%;
+  /* The background box ends at the last glyph advance and at the font's ascent and descent, so a wide capital's overhang,
+     an accent on a capital (Spanish) and the tail of a q or y would be clipped to nothing. Vertical padding on an inline box
+     only grows what is painted, not the line. */
+  padding: 0.32em 0.05em;
+  margin: 0 -0.05em;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+  animation-name: seamShift;
+}
+.api-page :is(.dw, .how, .open, .uc) .grad-text {
+  background-image: linear-gradient(100deg, var(--cyan-ink) 0%, var(--mint-ink) 25%, var(--violet-ink) 50%, var(--mint-ink) 75%, var(--cyan-ink) 100%);
+}
+@keyframes seamShift {
+  to {
+    background-position: -200% 0;
+  }
+}
+
+/* The line-reveal mask clips to its box, which cuts accents on capitals (Spanish) and the overhang of the last glyph. Same
+   idea as above: give the box room and take it back with a negative margin, so the layout does not move. */
+.api-page .lines > span,
+.legal-page .lines > span {
+  padding: 0.34em 0.06em 0.06em;
+  margin: -0.34em -0.06em -0.06em;
+}
+
+/* The hero glow sits behind small text (the eyebrow, the nav, the status line). Kept lower so that text keeps AA over it. */
+.api-page .a-hero .mesh .b1,
+.legal-page .lg-hero .mesh .b1 {
+  --o: 0.3;
+}
+.api-page .a-hero .mesh :is(.b2, .b3),
+.legal-page .lg-hero .mesh :is(.b2, .b3) {
+  --o: 0.45;
+}
+/* A phone is narrow and tall, so the 70vmax blobs cover the whole headline; keep them fainter there. */
+@media (max-width: 640px) {
+  .api-page .a-hero .mesh .b1,
+  .legal-page .lg-hero .mesh .b1 {
+    --o: 0.2;
+  }
+  .api-page .a-hero .mesh :is(.b2, .b3),
+  .legal-page .lg-hero .mesh :is(.b2, .b3) {
+    --o: 0.28;
+  }
+}

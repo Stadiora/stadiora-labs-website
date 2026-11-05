@@ -12,25 +12,21 @@
 
 const names = (dir, files) => files.map((f) => `${dir}${f}`);
 
-export const built = ['/', '/index.html', '/404.html'];
+// The API page (EN and ES) and the two legal pages are built by Astro and keep their flat .html URLs (the flatHtml step in astro.config.mjs).
+export const built = ['/', '/index.html', '/404.html', '/api.html', '/api-es.html', '/privacy.html', '/terms.html'];
 
 export const redirects = [
   { url: '/team.html', to: '/about/' },
   { url: '/team-es.html', to: '/es/about/' },
   { url: '/index-es.html', to: '/es/' },
-  { url: '/index-preview.html', to: '/' },
 ];
 
 export const carried = [
-  '/api.html',
-  '/api-es.html',
   '/connect.html',
   '/investors.html',
   '/investors-es.html',
   '/lead-magnet.html',
   '/lead-magnet-es.html',
-  '/privacy.html',
-  '/terms.html',
   '/anthony/',
   '/anthony/index.html',
   '/ian/',

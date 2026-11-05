@@ -14,7 +14,7 @@ import { join } from 'node:path';
 // and the unowned /help/ link was removed from the nav and footer).
 export const pendingRoutes = new Map([]);
 
-const contactTopics = new Set(['demo', 'question']);
+const contactTopics = new Set(['call', 'question']);
 const unescape = (s) => s.replace(/&#39;|&#x27;/g, "'").replace(/&quot;/g, '"').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&');
 const withoutLocale = (path) => path.replace(/^\/es(?=\/)/, '') || '/';
 
@@ -56,7 +56,7 @@ export function checkLinks({ dist, page, html, fail, pending }) {
 
     const route = withoutLocale(path);
     if (route === '/contact/' && bodyHrefs.has(href) && !contactTopics.has(url.searchParams.get('topic') ?? '')) {
-      fail(`${page.file}: link ${href} goes to the contact page without ?topic=demo or ?topic=question`);
+      fail(`${page.file}: link ${href} goes to the contact page without ?topic=call or ?topic=question`);
     }
 
     const target = builtPage(dist, path);

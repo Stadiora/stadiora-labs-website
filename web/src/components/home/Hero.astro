@@ -135,7 +135,6 @@ const first = split(t.words[0]);
   </div>
 
   <div class="hero-chip hero-chip--ready pop" data-depth="18" aria-hidden="true">
-    <span class="hero-demo">{t.demoData}</span>
     <div class="hero-ready">
       <div class="dring" style="--v:82"></div>
       <div>
@@ -146,7 +145,6 @@ const first = split(t.words[0]);
     </div>
   </div>
   <div class="hero-chip hero-chip--toast glass" data-depth="30" aria-hidden="true">
-    <span class="hero-demo">{t.demoData}</span>
     <div class="hero-toast">
       <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 12.5l4.5 4.5L19 7.5"></path></svg></span>
       <div class="tx" data-toast data-toasts={JSON.stringify(t.toasts)}><b>{t.toasts[0].title}</b><span>{t.toasts[0].text}</span></div>
@@ -184,7 +182,7 @@ const first = split(t.words[0]);
       <p class="lead">{t.sub}</p>
       <div class="hero-ctas">
         <a class="btn btn--white btn--lg" href={site.signUp}>{t.start} <span class="arr" aria-hidden="true">→</span></a>
-        <a class="btn btn--ghost btn--lg" href={contactHref(locale, 'demo')}>{t.demo}</a>
+        <a class="btn btn--ghost btn--lg" href={contactHref(locale, 'call')}>{t.call}</a>
       </div>
       <p class="hero-note"><i class="dot-live"></i>{t.note}</p>
     </div>

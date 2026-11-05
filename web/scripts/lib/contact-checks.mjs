@@ -5,7 +5,7 @@
 //   - the honeypot ("website") and startedAt are always sent, and startedAt is at least 3 s older than the post;
 //   - an invalid form posts nothing; ?topic=question preselects and posts the question topic;
 //   - the burst is decoration and fires only after a 202; the sent text is exactly the approved one.
-import { approvedSuccess, contactHrefs, findDeliveryClaims, roles } from './contact-contract.mjs';
+import { approvedSuccess, contactHrefs, findDeliveryClaims, roles, wireTopic } from './contact-contract.mjs';
 import { interceptContact, postProblems } from './contact-route.mjs';
 
 const localized = (locale, path) => (locale === 'es' ? `/es${path}` : path);
@@ -28,12 +28,20 @@ export async function contactChecks({ open, settle: settleRaw, check, sleep, sho
     const qState = await topic.evaluate(() => ({
       question: document.querySelector('#topic-question').checked,
       athletesDisabled: document.querySelector('#f-athletes').disabled,
-      demoOnlyHidden: document.querySelector('[data-demo-only]').hidden,
+      callOnlyHidden: document.querySelector('[data-call-only]').hidden,
     }));
-    await topic.locator('#topic-demo').check();
-    const dState = await topic.evaluate(() => ({ demo: document.querySelector('#topic-demo').checked, athletesDisabled: document.querySelector('#f-athletes').disabled, url: location.search }));
-    check('solutions-contact', `${locale} contact: ?topic=question preselects the question topic and hides the athletes field; switching back restores it`, qState.question && qState.athletesDisabled && qState.demoOnlyHidden && dState.demo && !dState.athletesDisabled && /topic=demo/.test(dState.url), JSON.stringify({ qState, dState }));
+    await topic.locator('#topic-call').check();
+    const cState = await topic.evaluate(() => ({ call: document.querySelector('#topic-call').checked, athletesDisabled: document.querySelector('#f-athletes').disabled, url: location.search }));
+    check('solutions-contact', `${locale} contact: ?topic=question preselects the question topic and hides the athletes field; switching back restores it`, qState.question && qState.athletesDisabled && qState.callOnlyHidden && cState.call && !cState.athletesDisabled && /topic=call/.test(cState.url), JSON.stringify({ qState, cState }));
     await topic.context().close();
+
+    // A link shared before the rename still opens the call form, and the address bar moves to the new name.
+    const legacy = await open({ width: 1440, height: 900, reduced: true }, `${base}?topic=${wireTopic.call}`);
+    const lState = await legacy.evaluate(() => ({ call: document.querySelector('#topic-call').checked, question: document.querySelector('#topic-question').checked, hidden: document.querySelector('[data-call-only]').hidden }));
+    await legacy.locator('#topic-question').check();
+    const lUrl = await legacy.evaluate(() => location.search);
+    check('solutions-contact', `${locale} contact: a legacy ?topic link opens the call form silently and a topic change rewrites the URL to the new name`, lState.call && !lState.question && !lState.hidden && /topic=question/.test(lUrl), JSON.stringify({ lState, lUrl }));
+    await legacy.context().close();
 
     // Validation: nothing is posted for an invalid form.
     const page = await open({ width: 1440, height: 900, reduced: true }, base);
@@ -64,7 +72,7 @@ export async function contactChecks({ open, settle: settleRaw, check, sleep, sho
     // Every outcome that is not a 202, on this one page: the first post waits out the 3 s fill time, the rest go at once.
     await page.fill('#f-email', 'ana@escuela.example');
     await page.fill('#f-org', 'Colegio Norte');
-    await page.fill('#f-message', 'Quiero una demo para 3 equipos.');
+    await page.fill('#f-message', 'Quiero una llamada para 3 equipos.');
     const outcomes = [['HTTP 400', 400], ['HTTP 429', 429], ['HTTP 503', 503], ['HTTP 500', 500], ['HTTP 200', 200], ['a dropped connection', 'abort']];
     const seen = {};
     for (const [label, outcome] of outcomes) {
@@ -93,7 +101,7 @@ export async function contactChecks({ open, settle: settleRaw, check, sleep, sho
     check(
       'solutions-contact',
       `${locale} contact: every post carries the honeypot, a startedAt at least 3 s old and only contract fields; role is an endpoint role; athletes is left out when unset`,
-      posts.length === 7 && posts.every((p) => postProblems(p, { topic: 'demo', locale, email: 'ana@escuela.example', organization: 'Colegio Norte', name: 'Ana López', page: new URL(page.url()).pathname }).length === 0 && roles.includes(p.body.role) && !('athletes' in p.body)),
+      posts.length === 7 && posts.every((p) => postProblems(p, { topic: wireTopic.call, locale, email: 'ana@escuela.example', organization: 'Colegio Norte', name: 'Ana López', page: new URL(page.url()).pathname }).length === 0 && roles.includes(p.body.role) && !('athletes' in p.body)),
       posts.map((p) => postProblems(p).join('; ')).find(Boolean) ?? JSON.stringify(posts[0]?.body),
     );
     await page.screenshot({ path: `${shotsDir}interaction-contact-success-${locale}.jpg`, type: 'jpeg', quality: 82 });
@@ -101,7 +109,7 @@ export async function contactChecks({ open, settle: settleRaw, check, sleep, sho
     check('solutions-contact', `${locale} contact: after the 202 the page claims no receipt or reply time beyond the approved sentence`, claims.length === 0, JSON.stringify({ claims }));
     await page.context().close();
 
-    // The question topic posts as a question, and the athletes range travels when the demo form has one.
+    // The question topic posts as a question, and the athletes range travels when the call form has one.
     const q = await open({ width: 1440, height: 900, reduced: true }, `${base}?topic=question`);
     const qPosts = await interceptContact(q, new URL(q.url()).origin, () => 202);
     await q.fill('#f-name', 'Ana López');
@@ -112,16 +120,16 @@ export async function contactChecks({ open, settle: settleRaw, check, sleep, sho
     check('solutions-contact', `${locale} contact: ?topic=question posts topic "question" with no athletes range`, qPosts.length === 1 && postProblems(qPosts[0], { topic: 'question', locale }).length === 0 && !('athletes' in qPosts[0].body), JSON.stringify(qPosts[0]?.body));
     await q.context().close();
 
-    const d = await open({ width: 1440, height: 900, reduced: true }, base);
-    const dPosts = await interceptContact(d, new URL(d.url()).origin, () => 202);
-    await d.fill('#f-name', 'Ana López');
-    await d.fill('#f-email', 'ana@escuela.example');
-    await d.selectOption('#f-role', 'school-admin');
-    await d.selectOption('#f-athletes', '26-100');
-    await d.locator(submitButton).click();
-    await d.locator('[data-status][data-state="ok"]').waitFor({ timeout: 6000 }).catch(() => {});
-    check('solutions-contact', `${locale} contact: the demo form posts the chosen role and athletes range as endpoint values`, dPosts.length === 1 && postProblems(dPosts[0], { topic: 'demo', locale, role: 'school-admin', athletes: '26-100' }).length === 0, JSON.stringify(dPosts[0]?.body));
-    await d.context().close();
+    const c = await open({ width: 1440, height: 900, reduced: true }, base);
+    const cPosts = await interceptContact(c, new URL(c.url()).origin, () => 202);
+    await c.fill('#f-name', 'Ana López');
+    await c.fill('#f-email', 'ana@escuela.example');
+    await c.selectOption('#f-role', 'school-admin');
+    await c.selectOption('#f-athletes', '26-100');
+    await c.locator(submitButton).click();
+    await c.locator('[data-status][data-state="ok"]').waitFor({ timeout: 6000 }).catch(() => {});
+    check('solutions-contact', `${locale} contact: the call form posts the endpoint's wire value for a call with the chosen role and athletes range`, cPosts.length === 1 && postProblems(cPosts[0], { topic: wireTopic.call, locale, role: 'school-admin', athletes: '26-100' }).length === 0, JSON.stringify(cPosts[0]?.body));
+    await c.context().close();
   }
 
   // ---------------------------------------------------------- contact: spring thumb, burst, honest status
@@ -158,7 +166,7 @@ export async function contactChecks({ open, settle: settleRaw, check, sleep, sho
     await mo.locator('#topic-question').check();
     await sleep(900);
     const t1 = await thumb(mo);
-    await mo.locator('#topic-demo').check();
+    await mo.locator('#topic-call').check();
     await sleep(900);
     const t2 = await thumb(mo);
     check('solutions-floodlight', `${locale} contact: the topic thumb glides to the second option and back`, Math.abs(t0) < 1 && t1 > 40 && Math.abs(t2) < 1, JSON.stringify({ t0, t1, t2 }));

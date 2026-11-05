@@ -10,7 +10,7 @@ import { mkdir } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { chromium } from 'playwright';
-import { findDeliveryClaims, leadSuccess, roles } from './lib/contact-contract.mjs';
+import { findDeliveryClaims, leadSuccess, roles, wireTopic } from './lib/contact-contract.mjs';
 import { interceptContact, postProblems } from './lib/contact-route.mjs';
 import { serve } from './lib/static-server.mjs';
 import { carried, redirects } from './lib/live-urls.mjs';
@@ -125,22 +125,45 @@ for (const url of ['/api.html', '/lead-magnet.html', '/privacy.html', '/terms.ht
   await context.close();
 }
 
-// ---------------------------------------------------------------- the API footers: every link lands where it says, no redirect in between
-for (const url of ['/api.html', '/api-es.html']) {
-  const { page, context } = await open(url);
+// ---------------------------------------------------------------- the API and legal pages (built Floodlight pages at their old flat URLs)
+// They left `carried`, so the load and footer checks that covered them live here: the site footer's links land where they say,
+// and the old deep links into the legal pages (#s1 ... #sN) still reach a section.
+const flatPages = [
+  { url: '/api.html', lang: 'en', sections: 0 },
+  { url: '/api-es.html', lang: 'es', sections: 0 },
+  { url: '/privacy.html', lang: 'en', sections: 14 },
+  { url: '/terms.html', lang: 'en', sections: 17 },
+];
+for (const { url, lang, sections } of flatPages) {
+  const { page, response, context } = await open(url);
+  await sleep(300);
+  check('flat-pages', `${url}: loads (200) with no failed local request or page error`, response.status() === 200 && page.failed.length === 0 && page.problems.length === 0, [...page.failed, ...page.problems].join(', '));
+  check('flat-pages', `${url}: one h1, lang="${lang}", and the URL stays flat (no redirect to a folder)`, (await page.locator('h1').count()) === 1 && (await page.locator('html').getAttribute('lang')) === lang && new URL(page.url()).pathname === url, new URL(page.url()).pathname);
   const hrefs = await page.locator('footer a[href]').evaluateAll((as) => as.map((a) => a.getAttribute('href')).filter((h) => h && h.startsWith('/')));
-  const prefix = url.includes('-es') ? '/es' : '';
-  const expected = ['/solutions/athletes/', '/solutions/coaches/', '/about/', '/platform/programs/'].map((p) => `${prefix}${p}`);
-  check('api-footer', `${url}: the footer carries the Aria 12, Aria for Coaches, Mission and Engine links`, expected.every((h) => hrefs.includes(h)), hrefs.join(' '));
+  const prefix = lang === 'es' ? '/es' : '';
+  const expected = ['/solutions/athletes/', '/solutions/coaches/', '/platform/programs/', '/about/'].map((p) => `${prefix}${p}`);
+  check('flat-pages', `${url}: the site footer carries the Aria 12, Aria for Coaches, Programs and About links`, expected.every((h) => hrefs.includes(h)), hrefs.join(' '));
   for (const href of new Set(hrefs)) {
     const target = new URL(href, server.url);
     const res = await page.goto(target.href, { waitUntil: 'load' });
     await sleep(100);
     const landed = new URL(page.url());
     const frag = target.hash ? await page.evaluate((id) => !!document.getElementById(id), decodeURIComponent(target.hash.slice(1))) : true;
-    check('api-footer', `${url}: ${href} lands on itself (200), with its section if it names one`, res.status() === 200 && landed.pathname === target.pathname && frag, `${res.status()} ${landed.pathname}${landed.hash}`);
+    check('flat-pages', `${url}: ${href} lands on itself (200), with its section if it names one`, res.status() === 200 && landed.pathname === target.pathname && frag, `${res.status()} ${landed.pathname}${landed.hash}`);
   }
   await context.close();
+  if (sections) {
+    const legal = await open(url);
+    const ids = await legal.page.evaluate((n) => Array.from({ length: n }, (_, i) => `s${i + 1}`).filter((id) => !document.getElementById(id)), sections);
+    check('flat-pages', `${url}: the old deep links #s1 ... #s${sections} all reach a section`, ids.length === 0, ids.join(' '));
+    const toc = await legal.page.locator('[data-toc]').count();
+    check('flat-pages', `${url}: the contents list has one entry per section and the text is in the HTML with JavaScript off`, toc === sections, String(toc));
+    await legal.context.close();
+    const off = await open(url, { js: false });
+    const visibleWords = await off.page.locator('[data-v="content"]').innerText().then((t) => t.split(/\s+/).length);
+    check('flat-pages', `${url}: the legal text is readable with JavaScript off`, visibleWords > 1500, `${visibleWords} words`);
+    await off.context.close();
+  }
 }
 
 {
@@ -223,7 +246,7 @@ for (const [path, { locale, again }] of Object.entries(copy)) {
     }
     check('lead-form', t('a 400, a 429 and a 503 each get their own message'), new Set([messages[400], messages[429], messages[503]]).size === 3, JSON.stringify([messages[400], messages[429], messages[503]]));
     check('lead-form', t('every other non-202 answer reads as the 503 message'), [500, 200, 201, 204, 'abort'].every((o) => messages[o] === messages[503]));
-    check('lead-form', t('every post carries the honeypot, an old enough startedAt and only contract fields'), posts.length === outcomes.length && posts.every((p) => postProblems(p, { locale, topic: 'demo', role: 'athlete', email: `athlete-${locale}@example.com` }).length === 0), posts.map((p) => postProblems(p).join('; ')).filter(Boolean)[0] ?? `${posts.length} posts`);
+    check('lead-form', t('every post carries the honeypot, an old enough startedAt and only contract fields'), posts.length === outcomes.length && posts.every((p) => postProblems(p, { locale, topic: wireTopic.call, role: 'athlete', email: `athlete-${locale}@example.com` }).length === 0), posts.map((p) => postProblems(p).join('; ')).filter(Boolean)[0] ?? `${posts.length} posts`);
     check('lead-form', t('the role sent is one of the endpoint roles, the page is the path'), posts.every((p) => roles.includes(p.body?.role) && p.body?.page === path), JSON.stringify(posts[0]?.body?.role));
 
     // The 202 comes last, on the same page: only now does the page say they are on the list.

@@ -1,6 +1,5 @@
 // Copy for the dark showcase on the home page (EN and ES): the "for every coach" header and the plan,
-// measure, engage, scale and apps blocks. Every name in the demo UI is fictional (Coach Daniela, Valeria,
-// Riverside High School (Demo)). ES is neutral Latin American, tú form, no opening ¿ ¡.
+// measure, engage, scale and apps blocks. ES is neutral Latin American, tú form, no opening ¿ ¡.
 export interface PlanEx {
   n: string;
   q: string;
@@ -12,10 +11,6 @@ export interface PlanBlock {
 export type Row = [name: string, value: string, tone?: 'ok' | 'warn'];
 
 export interface ShowcaseCopy {
-  demoData: string;
-  demoNoteMeasure: string;
-  demoNoteScale: string;
-  demoNoteApps: string;
   head: {
     heading: string;
     fromLabel: string;
@@ -108,10 +103,6 @@ export interface ShowcaseCopy {
 }
 
 const en: ShowcaseCopy = {
-  demoData: 'Demo data',
-  demoNoteMeasure: 'Demo data: a fictional coach and team.',
-  demoNoteScale: 'Demo data: a fictional school, coaches and athletes.',
-  demoNoteApps: 'Demo data: fictional coach and athlete screens.',
   head: {
     heading: 'For every coach',
     fromLabel: 'From',
@@ -285,7 +276,7 @@ const en: ShowcaseCopy = {
     org: {
       h: 'Every team in one view',
       p: 'Admins see the whole program at a glance.',
-      school: 'Riverside High School (Demo)',
+      school: 'Your School',
       meta: '5 TEAMS · 166 ATHLETES',
       rows: [
         { name: 'Track and field', n: '42 athletes', st: 'Active' },
@@ -385,10 +376,6 @@ const en: ShowcaseCopy = {
 };
 
 const es: ShowcaseCopy = {
-  demoData: 'Datos de demostración',
-  demoNoteMeasure: 'Datos de ejemplo: un entrenador y un equipo ficticios.',
-  demoNoteScale: 'Datos de ejemplo: un colegio, entrenadores y atletas ficticios.',
-  demoNoteApps: 'Datos de ejemplo: pantallas de un entrenador y un atleta ficticios.',
   head: {
     heading: 'Para cada entrenador',
     fromLabel: 'De',
@@ -562,7 +549,7 @@ const es: ShowcaseCopy = {
     org: {
       h: 'Todos los equipos en una vista',
       p: 'Los administradores ven todo el programa de un vistazo.',
-      school: 'Riverside High School (Demo)',
+      school: 'Tu colegio',
       meta: '5 EQUIPOS · 166 ATLETAS',
       rows: [
         { name: 'Atletismo', n: '42 atletas', st: 'Activo' },

@@ -1,6 +1,5 @@
 ---
 import { readinessCopy } from '../../../i18n/pages/readiness';
-import { coachCommon } from '../../../i18n/pages/coach-common';
 import type { Locale } from '../../../i18n';
 import ReadinessCard from '../../ui/ReadinessCard.astro';
 import CoachHero from '../CoachHero.astro';
@@ -23,7 +22,7 @@ interface Props {
 }
 const { locale } = Astro.props;
 const c = readinessCopy[locale];
-const common = coachCommon[locale];
+
 const p = c.phones;
 ---
 
@@ -74,7 +73,6 @@ const p = c.phones;
           </div>
         </Accordion>
       </div>
-      <p class="cf-demo">{common.demoNote}</p>
     </div>
   </section>
 

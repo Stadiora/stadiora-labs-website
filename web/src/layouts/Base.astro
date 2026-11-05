@@ -20,15 +20,17 @@ interface Props {
   hero?: boolean;
   /** No canonical, hreflang or og:url: the 404 page answers many URLs, so it has no address of its own. */
   bare?: boolean;
+  /** Languages this page exists in. The legal pages are English only, so they get no `es` alternate. */
+  langs?: readonly Locale[];
 }
 
-const { locale, path, title, description, ogImage, noindex = false, hero = false, bare = false } = Astro.props;
+const { locale, path, title, description, ogImage, noindex = false, hero = false, bare = false, langs = locales } = Astro.props;
 const t = useDict(locale);
 const pageTitle = title ?? t.meta.title;
 const pageDescription = description ?? t.meta.description;
 const abs = (p: string) => new URL(p, site.origin).toString();
 const canonical = abs(localePath(path, locale));
-const alternates = locales.map((l) => ({ lang: l, href: abs(localePath(path, l)) }));
+const alternates = langs.map((l) => ({ lang: l, href: abs(localePath(path, l)) }));
 // One OG card per page type and language (scripts/og.mjs): the first path segment picks the type.
 const ogType = path === '/' ? 'home' : (({ platform: 'platform', solutions: 'solutions', pricing: 'pricing' }) as Record<string, string>)[path.split('/')[1]] ?? 'company';
 const image = abs(ogImage ?? `/og/${ogType}-${locale}.png`);
@@ -69,7 +71,7 @@ const jsonLd = {
     <meta property="og:image:height" content="630" />
     <meta property="og:image:alt" content={t.meta.ogImageAlt} />
     <meta property="og:locale" content={t.meta.locale} />
-    {locales.filter((l) => l !== locale).map((l) => <meta property="og:locale:alternate" content={useDict(l).meta.locale} />)}
+    {langs.filter((l) => l !== locale).map((l) => <meta property="og:locale:alternate" content={useDict(l).meta.locale} />)}
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={pageTitle} />
     <meta name="twitter:description" content={pageDescription} />

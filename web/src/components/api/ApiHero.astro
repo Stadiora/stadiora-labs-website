@@ -1,0 +1,88 @@
+---
+import type { Locale } from '../../i18n';
+import type { ApiCopy } from '../../i18n/pages/api';
+import { fill } from '../../lib/template';
+
+interface Props {
+  locale: Locale;
+  copy: ApiCopy;
+}
+const { copy } = Astro.props;
+const t = copy.hero;
+const e = copy.engine;
+const c = e.card;
+// Desktop places all seven signals on an ellipse of the 640px stage. A phone shows the three marked data-ph, in a row.
+const pos = [
+  [112, 64],
+  [320, 30],
+  [530, 66],
+  [66, 198],
+  [578, 204],
+  [92, 330],
+  [552, 334],
+];
+const phone = new Set([0, 3, 5]);
+---
+
+<section class="a-hero impact" data-section aria-labelledby="a-h">
+  <div class="mesh" aria-hidden="true"><i class="b b5"></i><i class="b b1"></i><i class="b b2"></i><i class="b b3"></i><i class="b b4"></i><i class="vig"></i></div>
+  <div class="orbits" aria-hidden="true">
+    <svg viewBox="0 0 1600 800">
+      <ellipse cx="800" cy="400" rx="760" ry="250"></ellipse>
+      <ellipse class="dash" cx="800" cy="400" rx="620" ry="190"></ellipse>
+      <circle class="fdot a-fdot" r="7" fill="#8B5CF6"></circle>
+    </svg>
+  </div>
+  <div class="wrap a-hero-grid">
+    <div class="a-copy">
+      <p class="eyebrow rv">{t.eyebrow}</p>
+      <h1 class="d a-h1 lines" id="a-h">
+        <span><span>{t.h1[0]}</span></span><span><span style="--i:1">{t.h1[1]}</span></span><span><span style="--i:2" class="grad-text">{t.h1[2]}</span></span>
+      </h1>
+      <p class="lead rv" style="--i:2">{t.lead}</p>
+      <div class="a-ctas rv" style="--i:3">
+        <a class="btn btn--white btn--lg" href="#early-access">{t.join} <span class="arr">→</span></a>
+        <a class="btn btn--ghost btn--lg" href="#how">{t.how}</a>
+      </div>
+      <p class="a-honest rv" style="--i:4" data-api-stage="status"><i class="dot-dev" aria-hidden="true"></i>{t.honest}</p>
+    </div>
+
+    <div class="eng-host" data-fit="640" data-api-stage="engine" aria-hidden="true">
+      <div class="eng" data-engine>
+        <svg class="eng-rings" viewBox="0 0 640 640"><ellipse cx="320" cy="250" rx="250" ry="132" transform="rotate(-14 320 250)"></ellipse><ellipse class="dash" cx="320" cy="250" rx="190" ry="98" transform="rotate(-14 320 250)"></ellipse></svg>
+        <svg class="eng-lines" viewBox="0 0 640 640" data-lines></svg>
+        <div class="eng-orb" data-orb><div class="orb" style="--s:150px"><i class="halo"></i></div><i class="eng-shock" data-shock></i></div>
+        <p class="eng-status"><span data-st-a data-tpl={e.reading}>{fill(e.reading, { n: '7' })}</span><span data-st-b>{e.decision}</span></p>
+        {
+          e.signals.map((s, i) => (
+            <div class="sig" style={`--x:${pos[i][0]}px;--y:${pos[i][1]}px`} data-sig data-ph={phone.has(i) ? '' : undefined}>
+              <b>{s.k}</b>
+              <span>
+                {s.v}
+                {s.u && <small>{s.u}</small>}
+              </span>
+            </div>
+          ))
+        }
+        <div class="dec" data-card>
+          <div class="dec-top">
+            <div><span class="tier">{c.tier}</span><p class="dec-k">{c.kicker}</p></div>
+            <div class="dec-score"><i class="dec-ring" data-ring></i><b class="dec-n" data-n></b><small>{c.score}</small></div>
+          </div>
+          <p class="dec-t">{c.title}</p>
+          <p class="dec-r">{c.reason}</p>
+          <div class="dec-flags">{c.flags.map((f) => <span data-flag>{f}</span>)}</div>
+          <div class="dec-foot" data-coach><span><i class="dot-live"></i>{c.coach}</span><span class="mono">{c.confidence}</span></div>
+        </div>
+      </div>
+      <span class="badge-plan">{t.badge}</span>
+    </div>
+  </div>
+
+  <div class="wrap a-stats">
+    <div class="rv"><b class="d"><span class="count" style="--to:6;--cd:1s"></span></b><span>{t.stats[0]}</span></div>
+    <div class="rv" style="--i:1"><b class="d">{t.statsAny}</b><span>{t.stats[1]}</span></div>
+    <div class="rv" style="--i:2"><b class="d">0</b><span>{t.stats[2]}</span></div>
+    <div class="rv" style="--i:3"><b class="d">1</b><span>{t.stats[3]}</span></div>
+  </div>
+</section>

@@ -1,0 +1,44 @@
+---
+import type { ApiCopy } from '../../i18n/pages/api';
+
+interface Props {
+  copy: ApiCopy;
+}
+const { copy } = Astro.props;
+const t = copy.how;
+const k = t.code;
+// The sample's two comments are the only words in the code that change with the language. Keys and values stay English.
+const strings = JSON.stringify({ cReq: k.cReq, cRes: k.cRes, typing: k.typing, sending: k.sending, receiving: k.receiving, ready: k.ready });
+---
+
+<section class="sec how" id="how" data-section aria-labelledby="how-h">
+  <div class="wrap how-grid">
+    <div class="how-copy">
+      <p class="eyebrow rv">{t.eyebrow}</p>
+      <h2 class="d d2 lines" id="how-h"><span><span>{t.h2[0]}</span></span><span><span style="--i:1" class="grad-text">{t.h2[1]}</span></span></h2>
+      <p class="lead rv">{t.lead}</p>
+      <ul class="how-list" data-how-list>
+        {t.list.map((x, i) => <li class="rv" style={`--i:${i + 1}`} data-k={i + 1}>{x}</li>)}
+      </ul>
+    </div>
+    <div class="code rv" style="--i:1" data-code data-api-stage="code">
+      <div class="code-bar">
+        <span class="code-dots" aria-hidden="true"><i></i><i></i><i></i></span>
+        <div class="code-tabs" role="tablist" aria-label={k.tabsLabel}>
+          <button type="button" role="tab" id="ct-req" aria-selected="true" aria-controls="cp-req" data-ct="req">{k.request}</button>
+          <button type="button" role="tab" id="ct-res" aria-selected="false" aria-controls="cp-res" data-ct="res" tabindex="-1">{k.response}</button>
+        </div>
+        <button class="code-replay" type="button" data-replay aria-label={k.replay}>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"></path><path d="M3 3v5h5"></path></svg>
+        </button>
+      </div>
+      <div class="code-body">
+        <pre class="code-pane" id="cp-req" role="tabpanel" aria-labelledby="ct-req" tabindex="0" data-pane="req"><code></code></pre>
+        <pre class="code-pane" id="cp-res" role="tabpanel" aria-labelledby="ct-res" tabindex="0" data-pane="res" hidden><code></code></pre>
+        <div class="code-send" aria-hidden="true"><i></i><span>{k.sendBar}</span></div>
+      </div>
+      <div class="code-foot"><span class="mono">{k.sketch}</span><span class="code-state" data-code-state aria-hidden="true"></span></div>
+      <script type="application/json" data-code-strings set:html={strings} />
+    </div>
+  </div>
+</section>

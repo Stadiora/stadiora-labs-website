@@ -10,7 +10,10 @@ export const CONTACT_ENDPOINT = 'https://api.runwitharia.com/api/public/website-
 // Request body: exactly these keys, plus the optional organization and athletes when the visitor filled them.
 export const requiredKeys = ['topic', 'name', 'email', 'role', 'message', 'locale', 'page', 'website', 'startedAt'];
 export const optionalKeys = ['organization', 'athletes'];
-export const topics = ['demo', 'question'];
+// The endpoint's topic enum is fixed (backend, out of scope). The page's topics are `call` and `question`; the form maps
+// `call` to the enum value below at the one place it builds the body, and the browser checks assert that exact wire value.
+export const wireTopic = { call: 'demo', question: 'question' };
+export const topics = Object.values(wireTopic);
 export const roles = ['coach', 'athletic-director', 'school-admin', 'club-academy', 'gym', 'athlete', 'other'];
 export const athleteRanges = ['1-10', '11-25', '26-100', '100-250', '250-1000', '1000+'];
 // The endpoint rejects a post made less than this long after startedAt (the moment the form opened).

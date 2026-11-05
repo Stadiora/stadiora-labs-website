@@ -1,4 +1,4 @@
-/* Phone kit: the demo handset used by the engage and custom-apps blocks. Always-light product UI mock-ups, so
+/* Phone kit: the handset used by the engage and custom-apps blocks. Always-light product UI mock-ups, so
    the colours here are literal on purpose (they do not follow the page theme). The finished still frame is
    the base state; the timelines in scripts/home/showcase/engage.ts animate away from it. */
 .dphone{position:relative;width:300px;height:620px;border-radius:48px;background:#0A0F1C;padding:11px;box-shadow:0 0 0 2px #2A3550,0 50px 100px -30px rgba(0,0,0,.8);z-index:3}

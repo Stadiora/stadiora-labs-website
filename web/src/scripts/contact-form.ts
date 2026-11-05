@@ -9,8 +9,10 @@ interface Messages {
   unavailable: string;
 }
 
-type Topic = 'demo' | 'question';
+type Topic = 'call' | 'question';
 type Outcome = 'ok' | 'invalid' | 'limited' | 'unavailable';
+// Links shared before the rename carry ?topic=demo; they still open the same form.
+const LEGACY_TOPICS: Record<string, Topic> = { demo: 'call' };
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 // The endpoint rejects a post that arrives less than 3 s after startedAt (the moment the form opened).
 const MIN_FILL_MS = 3000;
@@ -48,10 +50,10 @@ function init(form: HTMLFormElement) {
   const status = form.querySelector<HTMLElement>('[data-status]');
   let openedAt = Date.now();
   let inflight = false;
-  const demoOnly = form.querySelector<HTMLElement>('[data-demo-only]');
+  const callOnly = form.querySelector<HTMLElement>('[data-call-only]');
   const radios = Array.from(form.querySelectorAll<HTMLInputElement>('input[name="topic"]'));
   const field = (name: string) => form.elements.namedItem(name) as HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement;
-  const topic = (): Topic => (radios.find((r) => r.checked)?.value === 'question' ? 'question' : 'demo');
+  const topic = (): Topic => (radios.find((r) => r.checked)?.value === 'question' ? 'question' : 'call');
 
   // Our own messages replace the browser's, so they can be tied to each field with aria-describedby.
   form.noValidate = true;
@@ -74,14 +76,15 @@ function init(form: HTMLFormElement) {
   };
 
   const applyTopic = () => {
-    const isDemo = topic() === 'demo';
-    if (demoOnly) {
-      demoOnly.hidden = !isDemo;
-      field('athletes').disabled = !isDemo;
+    const isCall = topic() === 'call';
+    if (callOnly) {
+      callOnly.hidden = !isCall;
+      field('athletes').disabled = !isCall;
     }
   };
 
-  const requested = new URLSearchParams(window.location.search).get('topic');
+  const asked = new URLSearchParams(window.location.search).get('topic') ?? '';
+  const requested = LEGACY_TOPICS[asked] ?? asked;
   const initial = radios.find((r) => r.value === requested);
   if (initial) initial.checked = true;
   applyTopic();
@@ -136,7 +139,7 @@ function init(form: HTMLFormElement) {
     }
 
     const value = (name: string) => field(name).value.trim();
-    const isDemo = topic() === 'demo';
+    const isCall = topic() === 'call';
     inflight = true;
     if (submit) submit.disabled = true;
     form.setAttribute('aria-busy', 'true');
@@ -147,7 +150,8 @@ function init(form: HTMLFormElement) {
     if (wait > 0) await new Promise((resolve) => window.setTimeout(resolve, wait));
 
     const body: Record<string, unknown> = {
-      topic: topic(),
+      // The endpoint accepts only the enum 'demo' | 'question', so the visible 'call' topic goes out as 'demo'.
+      topic: isCall ? 'demo' : 'question',
       name: value('name'),
       email: value('email'),
       role: value('role'),
@@ -158,7 +162,7 @@ function init(form: HTMLFormElement) {
       startedAt: openedAt,
     };
     if (value('organization')) body.organization = value('organization');
-    if (isDemo && value('athletes')) body.athletes = value('athletes');
+    if (isCall && value('athletes')) body.athletes = value('athletes');
 
     const outcome = await post(endpoint, body);
     inflight = false;

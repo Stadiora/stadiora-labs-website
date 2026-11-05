@@ -4,12 +4,12 @@
 const en = {
   meta: {
     title: 'Contact | Let’s talk | Stadiora Labs',
-    description: 'Book a demo or ask us anything about Aria for coaches, schools and clubs. Write to us or chat on WhatsApp.',
+    description: 'Book a call or ask us anything about Aria for coaches, schools and clubs. Write to us or chat on WhatsApp.',
   },
   title: 'Let’s talk.',
-  sub: 'Book a demo or ask us anything.',
+  sub: 'Book a call or ask us anything.',
   topicLabel: 'What would you like to do?',
-  topics: { demo: 'Book a demo', question: 'Ask a question' },
+  topics: { call: 'Book a call', question: 'Ask a question' },
   fields: {
     name: { label: 'Name', placeholder: 'Your name' },
     email: { label: 'Work email', placeholder: 'you@organization.com' },
@@ -39,14 +39,14 @@ const en = {
         { value: '1000+', label: 'More than 1,000' },
       ],
     },
-    message: { demo: 'What would you like to see?', question: 'Your question', placeholder: 'Tell us about your program' },
+    message: { call: 'What would you like to talk about?', question: 'Your question', placeholder: 'Tell us about your program' },
   },
   errors: {
     name: 'Enter your name.',
     email: 'Enter a valid email address.',
     role: 'Choose your role.',
   },
-  submit: { demo: 'Send request', question: 'Send' },
+  submit: { call: 'Send request', question: 'Send' },
   note: 'We only use this to reply to you.',
   privacy: 'Privacy',
   // One message per outcome. The three failure messages end in a colon: the direct email and WhatsApp links follow them.
@@ -66,12 +66,12 @@ export type ContactCopy = typeof en;
 const es: ContactCopy = {
   meta: {
     title: 'Contacto | Hablemos | Stadiora Labs',
-    description: 'Agenda una demo o pregúntanos lo que quieras sobre Aria para entrenadores, colegios y clubes. Escríbenos o chatea por WhatsApp.',
+    description: 'Agenda una llamada o pregúntanos lo que quieras sobre Aria para entrenadores, colegios y clubes. Escríbenos o chatea por WhatsApp.',
   },
   title: 'Hablemos.',
-  sub: 'Agenda una demo o pregúntanos lo que quieras.',
+  sub: 'Agenda una llamada o pregúntanos lo que quieras.',
   topicLabel: 'Qué quieres hacer?',
-  topics: { demo: 'Agenda una demo', question: 'Haz una pregunta' },
+  topics: { call: 'Agenda una llamada', question: 'Haz una pregunta' },
   fields: {
     name: { label: 'Nombre', placeholder: 'Tu nombre' },
     email: { label: 'Correo de trabajo', placeholder: 'tu@organizacion.com' },
@@ -101,14 +101,14 @@ const es: ContactCopy = {
         { value: '1000+', label: 'Más de 1.000' },
       ],
     },
-    message: { demo: 'Qué te gustaría ver?', question: 'Tu pregunta', placeholder: 'Cuéntanos sobre tu programa' },
+    message: { call: 'De qué te gustaría hablar?', question: 'Tu pregunta', placeholder: 'Cuéntanos sobre tu programa' },
   },
   errors: {
     name: 'Escribe tu nombre.',
     email: 'Escribe un correo válido.',
     role: 'Elige tu rol.',
   },
-  submit: { demo: 'Enviar solicitud', question: 'Enviar' },
+  submit: { call: 'Enviar solicitud', question: 'Enviar' },
   note: 'Solo usamos esto para responderte.',
   privacy: 'Privacidad',
   send: {
