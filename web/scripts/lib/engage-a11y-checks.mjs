@@ -78,8 +78,14 @@ export async function engageA11yChecks({ open, check, sleep, settle }) {
           await page.locator(tabs).nth(k).click();
           await sleep(500);
         }
-        const s = await panelState(page, tabs);
-        const ok = s.count === 1 && s.visible && s.id === s.controlled && s.listed;
+        // The outgoing panel is still in the tree while it cross-fades, which takes longer on a busy machine.
+        const good = (x) => x.count === 1 && x.visible && x.id === x.controlled && x.listed;
+        let s = await panelState(page, tabs);
+        for (let waited = 0; waited < 6000 && !good(s); waited += 400) {
+          await sleep(400);
+          s = await panelState(page, tabs);
+        }
+        const ok = good(s);
         check(group, `${lang}/${label}: tab ${k + 1} of ${total} selected, its panel is visible, the only tabpanel in the accessibility tree, and its text is in the snapshot`, ok, JSON.stringify(s));
       }
       await page.context().close();
