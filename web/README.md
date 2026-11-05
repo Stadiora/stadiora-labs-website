@@ -47,7 +47,8 @@ node scripts/evidence.mjs --engage-motion-only --checks-only # just the Platform
 - Both regions are listed on Contact, in the footer and on `public/connect.html` (US: Ian Rowe; LatAm: Anthony Rugama, WhatsApp). The data is
   in `src/data/site.ts` (`contacts`), also used by Organization JSON-LD for both public emails and phones with US/Latin America areas.
 - Both quiz locales abort requests after 15 seconds (the same deadline as Contact), show the localized failure/direct contacts and
-  restore retry. Cutover checks hold a fetch pending until its AbortSignal fires, assert the exact deadline and exercise a successful retry.
+  restore retry. Cutover checks hold a fetch pending until its AbortSignal fires, assert the exact deadline and independently stated
+  EN/ES failure sentences, and exercise a successful retry. M38/M39 change only AbortError copy to the wrong locale.
 - `node scripts/mutation-prove-contact.mjs` (clean tree only) breaks each contact rule in the source, rebuilds, and proves the gate that
   protects it fails on the intended assertion; it prints the table with the head SHA.
   Set `EVIDENCE_DIR` to separate artifact directories when running independent evidence jobs concurrently.

@@ -86,6 +86,18 @@ const mutations = [
   { id: 'M35', rule: 'quiz: abort a never-settling fetch at 15 s (EN)', file: LM, find: 'timer = setTimeout(() => abort.abort(), 15000);', put: 'timer = undefined;', gate: 'lead', expect: 'a never-settling fetch is aborted at 15 s' },
   { id: 'M36', rule: 'quiz: abort a never-settling fetch at 15 s (ES)', file: LMES, find: 'timer = setTimeout(() => abort.abort(), 15000);', put: 'timer = undefined;', gate: 'lead', expect: 'a never-settling fetch is aborted at 15 s' },
   { id: 'M37', rule: 'About marquee pauses on keyboard focus', file: 'src/styles/logo-marquee.css', find: "/* the pause host reports hover, focus, offscreen and a hidden tab as data-ap=\"off\" */", put: ".logo-marquee[data-logo-marquee]:focus-within .marquee-track {\n  animation-play-state: running !important;\n}\n/* the pause host reports hover, focus, offscreen and a hidden tab as data-ap=\"off\" */", gate: 'logos', expect: 'keyboard focus inside the scope stops everything in it', src: 'scripts/lib/solutions-motion-checks.mjs', at: 'stops everything in it (loops' },
+  ...[
+    { id: 'M38', file: LM, locale: 'en', wrong: 'No pudimos enviar tu solicitud ahora. Inténtalo de nuevo, o escríbenos directamente:' },
+    { id: 'M39', file: LMES, locale: 'es', wrong: 'We could not send your request right now. Try again, or reach us directly:' },
+  ].map(({ id, file, locale, wrong }) => ({
+    id, file, rule: `quiz: localized AbortError failure (${locale.toUpperCase()})`, gate: 'lead',
+    expect: `${locale}: a never-settling fetch is aborted at 15 s with localized failure, direct links and retry`,
+    at: "t('a never-settling fetch is aborted at 15 s with localized failure, direct links and retry')",
+    edits: [
+      { find: '.then(r => r.status, () => 0)', put: ".then(r => r.status, error => error.name === 'AbortError' ? -1 : 0)" },
+      { find: 'say(code === 400 ? MSG.invalid : code === 429 ? MSG.limited : MSG.unavailable, true);', put: `say(code === -1 ? '${wrong}' : code === 400 ? MSG.invalid : code === 429 ? MSG.limited : MSG.unavailable, true);` },
+    ],
+  })),
 ];
 
 const only = process.argv.slice(2);
@@ -135,12 +147,16 @@ for (const m of todo) {
   const before = readFileSync(path, 'utf8');
   const row = { ...m };
   try {
-    const hits = before.split(m.find).length - 1;
-    if (hits !== 1) throw new Error(`the search text was found ${hits} times in ${m.file}, expected exactly 1`);
-    const after = before.replace(m.find, () => m.put);
-    if (after === before) throw new Error('the payload did not change the file');
+    let after = before;
+    for (const edit of m.edits ?? [m]) {
+      const hits = after.split(edit.find).length - 1;
+      if (hits !== 1) throw new Error(`the search text was found ${hits} times in ${m.file}, expected exactly 1`);
+      const edited = after.replace(edit.find, () => edit.put);
+      if (edited === after) throw new Error('the payload edit did not change the file');
+      after = edited;
+    }
     writeFileSync(path, after);
-    if (readFileSync(path, 'utf8') === before) throw new Error('the file on disk is unchanged after the payload');
+    if (readFileSync(path, 'utf8') !== after) throw new Error('the file on disk does not match the payload');
 
     const dist = distFor(m.id);
     build(dist);

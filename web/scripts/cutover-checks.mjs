@@ -177,6 +177,10 @@ const copy = {
   '/lead-magnet.html': { locale: 'en', again: /Get Early Access/ },
   '/lead-magnet-es.html': { locale: 'es', again: /Acceso Anticipado/ },
 };
+const leadFailure = {
+  en: 'We could not send your request right now. Try again, or reach us directly:',
+  es: 'No pudimos enviar tu solicitud ahora. Inténtalo de nuevo, o escríbenos directamente:',
+};
 
 async function toResults(page, locale) {
   await page.locator('.screen.active .btn-primary').first().click();
@@ -233,8 +237,9 @@ for (const [path, { locale, again }] of Object.entries(copy)) {
     await page.clock.runFor(1);
     const hung = await page.evaluate(() => window.__hungContact);
     const status = await statusOf(page);
+    const failure = await page.locator('#email-status').evaluate((el) => el.firstChild?.textContent?.trim());
     const retry = await page.locator('.email-row button').isEnabled();
-    check('lead-form', t('a never-settling fetch is aborted at 15 s with localized failure, direct links and retry'), hung.aborted && hung.elapsed === 15000 && retry && again.test(await page.locator('.email-row button').innerText()) && status.length > 20 && findDeliveryClaims(status, locale).length === 0 && JSON.stringify(await statusLinks(page)) === JSON.stringify(directLinks) && !(await visible(page, '#email-success')), JSON.stringify({ hung, retry, status }));
+    check('lead-form', t('a never-settling fetch is aborted at 15 s with localized failure, direct links and retry'), hung.aborted && hung.elapsed === 15000 && retry && again.test(await page.locator('.email-row button').innerText()) && failure === leadFailure[locale] && findDeliveryClaims(status, locale).length === 0 && JSON.stringify(await statusLinks(page)) === JSON.stringify(directLinks) && !(await visible(page, '#email-success')), JSON.stringify({ hung, retry, status }));
     if (retry) {
       await page.locator('.email-row button').click();
       await page.clock.runFor(1);
