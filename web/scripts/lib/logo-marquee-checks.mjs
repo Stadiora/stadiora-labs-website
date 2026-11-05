@@ -60,10 +60,7 @@ const missing = { width: 0, aria: null, inert: false, shownSet: false, names: []
 export async function logoMarqueeChecks({ open, settle, check, sleep, pauses = true }) {
   const group = 'logo-marquee';
   const left = (page, sel) => page.evaluate((s) => document.querySelector(`${s} .marquee-track`).getBoundingClientRect().left, sel);
-  const park = async (page) => {
-    const b = await page.locator('header a').first().boundingBox();
-    await page.mouse.move(b.x + b.width / 2, b.y + b.height / 2);
-  };
+  // A fresh context has no pointer, so nothing is hovered until the hover check moves one onto the strip.
 
   for (const t of targets) {
     for (const scheme of t.schemes) {
@@ -73,7 +70,6 @@ export async function logoMarqueeChecks({ open, settle, check, sleep, pauses = t
         try {
           await settle(page);
           await page.evaluate((s) => document.querySelector(s).scrollIntoView({ block: 'center', behavior: 'instant' }), t.sel);
-          await park(page);
           await sleep(900);
           const p = await page.evaluate(probe, t.sel);
           const [a, b = missing] = p.sets;
