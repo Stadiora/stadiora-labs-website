@@ -1,0 +1,754 @@
+[
+  {
+    "shot": "contact-en-1440-light",
+    "mainHas": [
+      [
+        "ian@stadioralabs.com",
+        true
+      ],
+      [
+        "anthony@stadioralabs.com",
+        true
+      ],
+      [
+        "+1 859 285 9529",
+        true
+      ],
+      [
+        "+506 6041-9069",
+        true
+      ]
+    ],
+    "footerHas": [
+      [
+        "ian@stadioralabs.com",
+        true
+      ],
+      [
+        "anthony@stadioralabs.com",
+        true
+      ],
+      [
+        "+1 859 285 9529",
+        true
+      ],
+      [
+        "+506 6041-9069",
+        true
+      ]
+    ],
+    "blockedApiCalls": 0
+  },
+  {
+    "shot": "home-en-1440-light",
+    "footerHas": [
+      [
+        "ian@stadioralabs.com",
+        true
+      ],
+      [
+        "anthony@stadioralabs.com",
+        true
+      ],
+      [
+        "+1 859 285 9529",
+        true
+      ],
+      [
+        "+506 6041-9069",
+        true
+      ]
+    ],
+    "marqueeMoved": 103.39895629882812,
+    "logos": [
+      [
+        "costa-rica-tech-week",
+        true
+      ],
+      [
+        "technnis",
+        true
+      ],
+      [
+        "carfyd",
+        true
+      ]
+    ]
+  },
+  {
+    "shot": "about-en-1440-light",
+    "marqueeMoved": 102.44802856445312,
+    "logos": [
+      [
+        "costa-rica-tech-week",
+        true
+      ],
+      [
+        "technnis",
+        true
+      ],
+      [
+        "carfyd",
+        true
+      ]
+    ]
+  },
+  {
+    "shot": "contact-en-1440-dark",
+    "mainHas": [
+      [
+        "ian@stadioralabs.com",
+        true
+      ],
+      [
+        "anthony@stadioralabs.com",
+        true
+      ],
+      [
+        "+1 859 285 9529",
+        true
+      ],
+      [
+        "+506 6041-9069",
+        true
+      ]
+    ],
+    "footerHas": [
+      [
+        "ian@stadioralabs.com",
+        true
+      ],
+      [
+        "anthony@stadioralabs.com",
+        true
+      ],
+      [
+        "+1 859 285 9529",
+        true
+      ],
+      [
+        "+506 6041-9069",
+        true
+      ]
+    ],
+    "blockedApiCalls": 0
+  },
+  {
+    "shot": "home-en-1440-dark",
+    "footerHas": [
+      [
+        "ian@stadioralabs.com",
+        true
+      ],
+      [
+        "anthony@stadioralabs.com",
+        true
+      ],
+      [
+        "+1 859 285 9529",
+        true
+      ],
+      [
+        "+506 6041-9069",
+        true
+      ]
+    ],
+    "marqueeMoved": 101.97613525390625,
+    "logos": [
+      [
+        "costa-rica-tech-week",
+        true
+      ],
+      [
+        "technnis",
+        true
+      ],
+      [
+        "carfyd",
+        true
+      ]
+    ]
+  },
+  {
+    "shot": "about-en-1440-dark",
+    "marqueeMoved": 101.97378540039062,
+    "logos": [
+      [
+        "costa-rica-tech-week",
+        true
+      ],
+      [
+        "technnis",
+        true
+      ],
+      [
+        "carfyd",
+        true
+      ]
+    ]
+  },
+  {
+    "shot": "contact-en-390-light",
+    "mainHas": [
+      [
+        "ian@stadioralabs.com",
+        true
+      ],
+      [
+        "anthony@stadioralabs.com",
+        true
+      ],
+      [
+        "+1 859 285 9529",
+        true
+      ],
+      [
+        "+506 6041-9069",
+        true
+      ]
+    ],
+    "footerHas": [
+      [
+        "ian@stadioralabs.com",
+        true
+      ],
+      [
+        "anthony@stadioralabs.com",
+        true
+      ],
+      [
+        "+1 859 285 9529",
+        true
+      ],
+      [
+        "+506 6041-9069",
+        true
+      ]
+    ],
+    "blockedApiCalls": 0
+  },
+  {
+    "shot": "home-en-390-light",
+    "footerHas": [
+      [
+        "ian@stadioralabs.com",
+        true
+      ],
+      [
+        "anthony@stadioralabs.com",
+        true
+      ],
+      [
+        "+1 859 285 9529",
+        true
+      ],
+      [
+        "+506 6041-9069",
+        true
+      ]
+    ],
+    "marqueeMoved": 71.81263732910156,
+    "logos": [
+      [
+        "costa-rica-tech-week",
+        true
+      ],
+      [
+        "technnis",
+        true
+      ],
+      [
+        "carfyd",
+        true
+      ]
+    ]
+  },
+  {
+    "shot": "about-en-390-light",
+    "marqueeMoved": 72.48812484741211,
+    "logos": [
+      [
+        "costa-rica-tech-week",
+        true
+      ],
+      [
+        "technnis",
+        true
+      ],
+      [
+        "carfyd",
+        true
+      ]
+    ]
+  },
+  {
+    "shot": "contact-en-390-dark",
+    "mainHas": [
+      [
+        "ian@stadioralabs.com",
+        true
+      ],
+      [
+        "anthony@stadioralabs.com",
+        true
+      ],
+      [
+        "+1 859 285 9529",
+        true
+      ],
+      [
+        "+506 6041-9069",
+        true
+      ]
+    ],
+    "footerHas": [
+      [
+        "ian@stadioralabs.com",
+        true
+      ],
+      [
+        "anthony@stadioralabs.com",
+        true
+      ],
+      [
+        "+1 859 285 9529",
+        true
+      ],
+      [
+        "+506 6041-9069",
+        true
+      ]
+    ],
+    "blockedApiCalls": 0
+  },
+  {
+    "shot": "home-en-390-dark",
+    "footerHas": [
+      [
+        "ian@stadioralabs.com",
+        true
+      ],
+      [
+        "anthony@stadioralabs.com",
+        true
+      ],
+      [
+        "+1 859 285 9529",
+        true
+      ],
+      [
+        "+506 6041-9069",
+        true
+      ]
+    ],
+    "marqueeMoved": 71.81265258789062,
+    "logos": [
+      [
+        "costa-rica-tech-week",
+        true
+      ],
+      [
+        "technnis",
+        true
+      ],
+      [
+        "carfyd",
+        true
+      ]
+    ]
+  },
+  {
+    "shot": "about-en-390-dark",
+    "marqueeMoved": 72.48832511901855,
+    "logos": [
+      [
+        "costa-rica-tech-week",
+        true
+      ],
+      [
+        "technnis",
+        true
+      ],
+      [
+        "carfyd",
+        true
+      ]
+    ]
+  },
+  {
+    "shot": "contact-es-1440-light",
+    "mainHas": [
+      [
+        "ian@stadioralabs.com",
+        true
+      ],
+      [
+        "anthony@stadioralabs.com",
+        true
+      ],
+      [
+        "+1 859 285 9529",
+        true
+      ],
+      [
+        "+506 6041-9069",
+        true
+      ]
+    ],
+    "footerHas": [
+      [
+        "ian@stadioralabs.com",
+        true
+      ],
+      [
+        "anthony@stadioralabs.com",
+        true
+      ],
+      [
+        "+1 859 285 9529",
+        true
+      ],
+      [
+        "+506 6041-9069",
+        true
+      ]
+    ],
+    "blockedApiCalls": 0
+  },
+  {
+    "shot": "home-es-1440-light",
+    "footerHas": [
+      [
+        "ian@stadioralabs.com",
+        true
+      ],
+      [
+        "anthony@stadioralabs.com",
+        true
+      ],
+      [
+        "+1 859 285 9529",
+        true
+      ],
+      [
+        "+506 6041-9069",
+        true
+      ]
+    ],
+    "marqueeMoved": 101.50169372558594,
+    "logos": [
+      [
+        "costa-rica-tech-week",
+        true
+      ],
+      [
+        "technnis",
+        true
+      ],
+      [
+        "carfyd",
+        true
+      ]
+    ]
+  },
+  {
+    "shot": "about-es-1440-light",
+    "marqueeMoved": 101.97389221191406,
+    "logos": [
+      [
+        "costa-rica-tech-week",
+        true
+      ],
+      [
+        "technnis",
+        true
+      ],
+      [
+        "carfyd",
+        true
+      ]
+    ]
+  },
+  {
+    "shot": "contact-es-1440-dark",
+    "mainHas": [
+      [
+        "ian@stadioralabs.com",
+        true
+      ],
+      [
+        "anthony@stadioralabs.com",
+        true
+      ],
+      [
+        "+1 859 285 9529",
+        true
+      ],
+      [
+        "+506 6041-9069",
+        true
+      ]
+    ],
+    "footerHas": [
+      [
+        "ian@stadioralabs.com",
+        true
+      ],
+      [
+        "anthony@stadioralabs.com",
+        true
+      ],
+      [
+        "+1 859 285 9529",
+        true
+      ],
+      [
+        "+506 6041-9069",
+        true
+      ]
+    ],
+    "blockedApiCalls": 0
+  },
+  {
+    "shot": "home-es-1440-dark",
+    "footerHas": [
+      [
+        "ian@stadioralabs.com",
+        true
+      ],
+      [
+        "anthony@stadioralabs.com",
+        true
+      ],
+      [
+        "+1 859 285 9529",
+        true
+      ],
+      [
+        "+506 6041-9069",
+        true
+      ]
+    ],
+    "marqueeMoved": 101.50141906738281,
+    "logos": [
+      [
+        "costa-rica-tech-week",
+        true
+      ],
+      [
+        "technnis",
+        true
+      ],
+      [
+        "carfyd",
+        true
+      ]
+    ]
+  },
+  {
+    "shot": "about-es-1440-dark",
+    "marqueeMoved": 102.92231750488281,
+    "logos": [
+      [
+        "costa-rica-tech-week",
+        true
+      ],
+      [
+        "technnis",
+        true
+      ],
+      [
+        "carfyd",
+        true
+      ]
+    ]
+  },
+  {
+    "shot": "contact-es-390-light",
+    "mainHas": [
+      [
+        "ian@stadioralabs.com",
+        true
+      ],
+      [
+        "anthony@stadioralabs.com",
+        true
+      ],
+      [
+        "+1 859 285 9529",
+        true
+      ],
+      [
+        "+506 6041-9069",
+        true
+      ]
+    ],
+    "footerHas": [
+      [
+        "ian@stadioralabs.com",
+        true
+      ],
+      [
+        "anthony@stadioralabs.com",
+        true
+      ],
+      [
+        "+1 859 285 9529",
+        true
+      ],
+      [
+        "+506 6041-9069",
+        true
+      ]
+    ],
+    "blockedApiCalls": 0
+  },
+  {
+    "shot": "home-es-390-light",
+    "footerHas": [
+      [
+        "ian@stadioralabs.com",
+        true
+      ],
+      [
+        "anthony@stadioralabs.com",
+        true
+      ],
+      [
+        "+1 859 285 9529",
+        true
+      ],
+      [
+        "+506 6041-9069",
+        true
+      ]
+    ],
+    "marqueeMoved": 71.81243896484375,
+    "logos": [
+      [
+        "costa-rica-tech-week",
+        true
+      ],
+      [
+        "technnis",
+        true
+      ],
+      [
+        "carfyd",
+        true
+      ]
+    ]
+  },
+  {
+    "shot": "about-es-390-light",
+    "marqueeMoved": 72.48820209503174,
+    "logos": [
+      [
+        "costa-rica-tech-week",
+        true
+      ],
+      [
+        "technnis",
+        true
+      ],
+      [
+        "carfyd",
+        true
+      ]
+    ]
+  },
+  {
+    "shot": "contact-es-390-dark",
+    "mainHas": [
+      [
+        "ian@stadioralabs.com",
+        true
+      ],
+      [
+        "anthony@stadioralabs.com",
+        true
+      ],
+      [
+        "+1 859 285 9529",
+        true
+      ],
+      [
+        "+506 6041-9069",
+        true
+      ]
+    ],
+    "footerHas": [
+      [
+        "ian@stadioralabs.com",
+        true
+      ],
+      [
+        "anthony@stadioralabs.com",
+        true
+      ],
+      [
+        "+1 859 285 9529",
+        true
+      ],
+      [
+        "+506 6041-9069",
+        true
+      ]
+    ],
+    "blockedApiCalls": 0
+  },
+  {
+    "shot": "home-es-390-dark",
+    "footerHas": [
+      [
+        "ian@stadioralabs.com",
+        true
+      ],
+      [
+        "anthony@stadioralabs.com",
+        true
+      ],
+      [
+        "+1 859 285 9529",
+        true
+      ],
+      [
+        "+506 6041-9069",
+        true
+      ]
+    ],
+    "marqueeMoved": 71.81266784667969,
+    "logos": [
+      [
+        "costa-rica-tech-week",
+        true
+      ],
+      [
+        "technnis",
+        true
+      ],
+      [
+        "carfyd",
+        true
+      ]
+    ]
+  },
+  {
+    "shot": "about-es-390-dark",
+    "marqueeMoved": 72.48869132995605,
+    "logos": [
+      [
+        "costa-rica-tech-week",
+        true
+      ],
+      [
+        "technnis",
+        true
+      ],
+      [
+        "carfyd",
+        true
+      ]
+    ]
+  }
+]
