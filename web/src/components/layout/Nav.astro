@@ -152,7 +152,7 @@ const appStores: Record<string, { label: string; href: string }[]> = {
                     {
                       resourceItems.map((id) => (
                         <li>
-                          <a class="mega__link" href={hrefFor(id, locale)} data-mega-link>
+                          <a class="mega__link" href={hrefFor(id, locale)} aria-current={id === 'api' && (path === '/api.html' || path === '/api-es.html') ? 'page' : undefined} data-mega-link>
                             <span class="mega__name">{t.nav.items[id].name}</span>
                             <span class="mega__desc">{t.nav.items[id].desc}</span>
                           </a>
@@ -593,7 +593,8 @@ const appStores: Record<string, { label: string; href: string }[]> = {
     min-height: 44px;
   }
   .mega__link:hover,
-  .mega__link:focus-visible {
+  .mega__link:focus-visible,
+  .mega__link[aria-current='page'] {
     background: rgb(255 255 255 / 0.08);
   }
   .mega__name {

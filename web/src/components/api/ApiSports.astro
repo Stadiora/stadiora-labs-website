@@ -1,0 +1,28 @@
+---
+import type { ApiCopy } from '../../i18n/pages/api';
+
+interface Props {
+  copy: ApiCopy;
+}
+const t = Astro.props.copy.sports;
+const first = t.words[0];
+const total = String(t.words.length);
+// The headline is decorative while it swaps; screen readers get "Configurable across any sport." from the first two spans.
+const strings = JSON.stringify({ words: t.words });
+---
+
+<section class="sp-strip" id="sports" data-section aria-labelledby="sp-h" data-sports data-api-stage="sports">
+  <div class="wrap">
+    <div class="sp-meta" aria-hidden="true"><span>{t.meta[0]}</span><span>{t.meta[1]}</span><span data-sp-idx>01 / {total}</span></div>
+    <h2 class="d sp-h" id="sp-h"><span class="sp-l1">{t.l1}</span><span class="sr">{t.sr}</span><span class="sp-word" data-sp-word aria-hidden="true">{first}</span></h2>
+    <div class="sp-grid">
+      <p class="sp-p">{t.p}</p>
+      <ul class="sp-chips" data-sp-chips>
+        {t.chips.map((c, i) => <li class={i === 0 ? 'on' : undefined}>{c}</li>)}
+        <li class="any">{t.any}</li>
+      </ul>
+    </div>
+    <p class="sp-note">{t.note}</p>
+    <script type="application/json" data-sp-strings set:html={strings} />
+  </div>
+</section>

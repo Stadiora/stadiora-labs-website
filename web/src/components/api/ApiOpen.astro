@@ -1,0 +1,61 @@
+---
+import type { ApiCopy } from '../../i18n/pages/api';
+
+interface Props {
+  copy: ApiCopy;
+}
+const t = Astro.props.copy.open;
+const icons = [
+  { c: '#00BEF3', d: '<rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/>' },
+  { c: '#34D399', d: '<circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 010 20M12 2a15.3 15.3 0 000 20"/>' },
+  { c: '#8B5CF6', d: '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>' },
+  { c: '#FF4D5E', d: '<polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>' },
+];
+const outer = "path('M40,230 a260,150 0 1,0 520,0 a260,150 0 1,0 -520,0')";
+const inner = "path('M110,230 a190,104 0 1,0 380,0 a190,104 0 1,0 -380,0')";
+const sats = [
+  { op: outer, o: '0%', d: '' },
+  { op: outer, o: '50%', d: '' },
+  { op: inner, o: '25%', d: '--d:22s;' },
+  { op: inner, o: '75%', d: '--d:22s;' },
+];
+---
+
+<section class="sec open" data-section aria-labelledby="op-h" style="padding-top:0">
+  <div class="wrap open-grid">
+    <div>
+      <p class="eyebrow rv">{t.eyebrow}</p>
+      <h2 class="d d2 lines" id="op-h">
+        <span><span>{t.h2[0]}</span></span><span><span style="--i:1" class="grad-text">{t.h2[1]}</span></span><span><span style="--i:2" class="grad-text">{t.h2[2]}</span></span>
+      </h2>
+      <p class="lead rv">{t.lead}</p>
+    </div>
+    <div class="hub rv" style="--i:1" data-fit="600" data-api-stage="hub" aria-hidden="true">
+      <div class="hub-in">
+        <svg viewBox="0 0 600 460"><ellipse cx="300" cy="230" rx="260" ry="150"></ellipse><ellipse class="dash" cx="300" cy="230" rx="190" ry="104"></ellipse><ellipse cx="300" cy="230" rx="120" ry="64"></ellipse></svg>
+        <div class="hub-core"><div class="orb" style="--s:96px"><i class="halo"></i></div><b>{t.core}</b></div>
+        {t.sats.map((s, i) => <span class="sat" style={`--op:${sats[i].op};--o:${sats[i].o};${sats[i].d}`}>{s}</span>)}
+        <span class="hub-note">{t.note}</span>
+      </div>
+    </div>
+  </div>
+  <div class="wrap open-feats">
+    {
+      t.feats.map((f, i) => (
+        <article class="of rv" style={i ? `--i:${i}` : undefined}>
+          <i class="of-ico" style={`--c:${icons[i].c}`}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" set:html={icons[i].d} /></i>
+          <h3>{f.h}</h3>
+          <p>{f.p}</p>
+        </article>
+      ))
+    }
+  </div>
+  <div class="open-pills" aria-label={t.pillsLabel}>
+    <div class="marquee" style="--dur:46s" data-api-stage="pills">
+      <ul class="marquee-track">
+        {t.pills.map((p) => <li>{p}</li>)}
+        {t.pills.map((p) => <li aria-hidden="true">{p}</li>)}
+      </ul>
+    </div>
+  </div>
+</section>

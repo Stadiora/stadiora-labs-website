@@ -8,6 +8,8 @@ import { verifyPricing } from './lib/pricing-verify.mjs';
 import { pendingReport } from './lib/engage-links.mjs';
 import { engagePages, verifyEngagePages } from './lib/engage-verify.mjs';
 import { verifyCutover } from './lib/cutover-verify.mjs';
+import { verifyLegalVerbatim } from './lib/legal-verbatim.mjs';
+import { verifyApiPages } from './lib/api-verify.mjs';
 import { verifyNoDemoWording } from './lib/no-demo-wording.mjs';
 import { verifySolutions } from './lib/verify-solutions.mjs';
 import { verifySolutionsFloodlight } from './lib/solutions-floodlight-verify.mjs';
@@ -17,6 +19,14 @@ import { verifyHomeClaims, verifyHomeMedia, verifyHomeSelectors, verifyHomeVideo
 const dist = process.env.DIST_DIR ? `${resolve(process.env.DIST_DIR)}/` : fileURLToPath(new URL('../dist/', import.meta.url));
 const errors = [];
 const fail = (msg) => errors.push(msg);
+
+// The URL contract comes first: when a flat page is missing, the guards below would crash on it instead of naming it.
+verifyApiPages({ dist, fail });
+if (errors.some((e) => e.startsWith('urls.'))) {
+  console.error(`verify-dist: ${errors.length} problem${errors.length === 1 ? '' : 's'}`);
+  for (const e of errors) console.error(`  - ${e}`);
+  process.exit(1);
+}
 
 const pages = [
   { file: 'index.html', lang: 'en', canonical: 'https://stadioralabs.com/', og: '/og/home-en.png' },
@@ -94,6 +104,7 @@ verifyEngagePages({ dist, fail, pending: pendingLinks });
 if (!existsSync(join(dist, 'sitemap-index.xml'))) fail('sitemap-index.xml: missing');
 verifyCoachPages({ dist, fail });
 verifyCutover({ dist, fail });
+verifyLegalVerbatim({ dist, fail });
 verifyNoDemoWording({ dist, fail });
 
 // Budgets from DESIGN.md section 7: hero photos 180 KB, videos 1.5 MB, per delivered file.

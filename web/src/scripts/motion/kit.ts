@@ -60,6 +60,8 @@ export interface AutoplayerOptions {
 export interface Autoplayer {
   readonly running: boolean;
   refresh: () => void;
+  /** Re-applies the freeze to transitions that started while the host was already paused (a click under the pointer). No-op while it runs. */
+  hold: () => void;
   /** setTimeout on the host's clock: pausing keeps the time left, resuming carries on. `flush` runs it at once on pause instead. */
   later: (fn: () => void, ms: number, flush?: boolean) => void;
 }
@@ -148,6 +150,9 @@ export function autoplayer(host: HTMLElement, opts: AutoplayerOptions): Autoplay
       return running;
     },
     refresh,
+    hold() {
+      if (!running) hold();
+    },
     later(fn, ms, flush = false) {
       const t: Pending = { fn, left: ms, at: 0, id: 0, flush };
       pending.add(t);

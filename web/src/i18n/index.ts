@@ -19,9 +19,16 @@ export function useDict(locale: string | undefined): Dict {
   return dictionaries[getLocale(locale)];
 }
 
-/** Locale-prefixed path: EN at /, ES at /es/. Paths ending in a file extension are returned unchanged. */
+/** Flat .html pages with a separate Spanish file. The API page is the only one: its ES twin stays at /api-es.html, not /es/. */
+const flatPairs: Record<string, Record<Locale, string>> = {
+  '/api.html': { en: '/api.html', es: '/api-es.html' },
+  '/api-es.html': { en: '/api.html', es: '/api-es.html' },
+};
+
+/** Locale-prefixed path: EN at /, ES at /es/. Other paths ending in a file extension are returned unchanged. */
 export function localePath(path: string, locale: Locale): string {
   const clean = path.startsWith('/') ? path : `/${path}`;
+  if (flatPairs[clean]) return flatPairs[clean][locale];
   if (/\.[a-z0-9]+$/i.test(clean) || clean.startsWith('/#')) return clean;
   if (locale === defaultLocale) return clean;
   return `/es${clean === '/' ? '/' : clean}`;
