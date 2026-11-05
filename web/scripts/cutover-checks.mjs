@@ -204,7 +204,9 @@ for (const [path, { locale, again }] of Object.entries(copy)) {
     const { page, context } = await open(path);
     const posts = await interceptContact(page, server.url, () => 202);
     await toResults(page, locale);
-    await page.clock.install();
+    const now = Date.now();
+    await page.clock.install({ time: new Date(now) });
+    await page.clock.pauseAt(new Date(now + 1000));
     await page.clock.runFor(3500);
     await page.evaluate(() => {
       const original = window.fetch;
@@ -214,7 +216,7 @@ for (const [path, { locale, again }] of Object.entries(copy)) {
         first = false;
         const signal = args[1]?.signal;
         window.__hungContact = { started: Date.now(), aborted: false, elapsed: null };
-        return new Promise((resolve, reject) => {
+        return new Promise((_, reject) => {
           signal?.addEventListener('abort', () => {
             window.__hungContact.aborted = true;
             window.__hungContact.elapsed = Date.now() - window.__hungContact.started;
