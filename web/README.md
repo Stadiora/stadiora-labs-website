@@ -66,9 +66,12 @@ node scripts/evidence.mjs --engage-motion-only --checks-only # just the Platform
   the page's `call` topic is mapped to `demo` where the body is built; everywhere else the topic is `call` (`#topic-call`,
   `data-call-only`, `?topic=call`; `?topic=demo` stays a silent alias). Other pages and all bundles remain scanned. The battery asserts each
   copied-dist edit by content and hash, requires failures from the wording guard itself, retains legal-word/identity controls,
-  records the clean head, and writes `.evidence/no-demo-wording-battery.json`. Each exemption pins the complete designated statement
-  and its lookup/request binding, exactly once per file; missing sites, site-swaps and relocations fail independently of the global count.
-  **NOT COVERED:** static scans cannot see text composed at runtime, for example by `String.fromCharCode`.
+  records the clean head, and writes `.evidence/no-demo-wording-battery.json`. Each wire exemption pins one exact contiguous block,
+  exactly once per file and inside its request script: the lead `const body` declaration through `body: JSON.stringify(body)`,
+  or the stable minified contact serializer through its wire object and `await r(a,y)` request call. The legacy alias entry is unchanged.
+  Missing sites, site-swaps and complete-statement/shadow-block relocations fail independently of the global count.
+  **NOT COVERED:** this is a text match against one exact block, not proof of data flow. Runtime composition, for example by
+  `String.fromCharCode`, remains outside the static scan.
 - Solutions, Resources, About and Contact in Floodlight (DESIGN-4 section 6): every page runs on `src/layouts/SolutionsPage.astro`
   (the foundation, the motion kit and `src/styles/solutions/solutions.css`; everything in the lane is prefixed `sx-`). The hero is
   `src/components/solutions/SxHero.astro` (impact, mesh, orbits, display H1; the Schools and Coaches swap line is one sentence for a

@@ -5,7 +5,7 @@
 // file is scanned, so nothing a reader, a crawler or someone viewing the page source can see is skipped.
 // Only these whole unrelated words are tolerated: `demonstrated` (legal text), `demostrar`, `demostrado`, `demostró`.
 // `demonstration`, `demonstrate` and `demostración` are NOT tolerated.
-// NOT COVERED: a static scan cannot see text composed at runtime, for example by String.fromCharCode.
+// NOT COVERED: exemptions match one exact contiguous block, not proven data flow; runtime composition such as String.fromCharCode is unseen.
 // Run alone: `node scripts/lib/no-demo-wording.mjs [distDir]`.
 import { readdirSync, readFileSync } from 'node:fs';
 import { join, relative, resolve, sep } from 'node:path';
@@ -15,13 +15,13 @@ import { scanTags } from './html-scan.mjs';
 const BANNED = /\[preview\]|vista previa|preview|demostraci|demo/gi;
 const LEGAL_WORDS = /(?<![\p{L}\p{N}_])(?:demonstrated|demostrar|demostrado|demostró)(?![\p{L}\p{N}_])/giu;
 
-// Pin the actual statements, not object-shaped fragments. A compiler change must deliberately update these expectations.
-// Each site must occur exactly once in its own file and in the script containing its real lookup/request.
+// Pin contiguous wire/request blocks, not detached statements. Compiler changes must deliberately update these expectations.
+// The contact serializer precedes its caller, so its block spans both; the legacy alias entry stays unchanged.
 const contactSites = [
   { name: 'contact legacy alias', statement: 'var e={demo:`call`},t=/^[^\\s@]+@[^\\s@]+\\.[^\\s@]{2,}$/,n=15e3;', request: 'b=e[y]??y,x=p.find(e=>e.value===b)' },
   {
     name: 'contact POST body',
-    statement: 'let y={topic:l?`demo`:`question`,name:c(`name`),email:c(`email`),role:c(`role`),message:c(`message`),locale:o,page:window.location.pathname,website:m(`website`).value,startedAt:u};',
+    statement: 'async function r(e,t){let r=new AbortController,i=window.setTimeout(()=>r.abort(),n);try{let n=await fetch(e,{method:`POST`,headers:{"Content-Type":`application/json`},credentials:`omit`,body:JSON.stringify(t),signal:r.signal});return n.status===202?`ok`:n.status===400?`invalid`:n.status===429?`limited`:`unavailable`}catch{return`unavailable`}finally{window.clearTimeout(i)}}function i(n){let i=JSON.parse(n.dataset.send??`{}`),a=n.dataset.endpoint??``,o=n.dataset.locale===`es`?`es`:`en`,s=n.querySelector(`button[type="submit"]`),c=n.querySelector(`template[data-fallback]`),l=n.querySelector(`[data-status]`),u=Date.now(),d=!1,f=n.querySelector(`[data-call-only]`),p=Array.from(n.querySelectorAll(`input[name="topic"]`)),m=e=>n.elements.namedItem(e),h=()=>p.find(e=>e.checked)?.value===`question`?`question`:`call`;n.noValidate=!0;let g=()=>{l&&(l.removeAttribute(`data-state`),l.textContent=``)},_=(e,t,n=!1)=>{if(!l)return;let r=document.createElement(`span`);r.className=`form__msg`,r.textContent=t,n&&c&&r.append(` `,c.content.cloneNode(!0)),l.dataset.state=e,l.replaceChildren(r)},v=()=>{let e=h()===`call`;f&&(f.hidden=!e,m(`athletes`).disabled=!e)},y=new URLSearchParams(window.location.search).get(`topic`)??``,b=e[y]??y,x=p.find(e=>e.value===b);x&&(x.checked=!0),v(),p.forEach(e=>e.addEventListener(`change`,()=>{v();let e=new URL(window.location.href);e.searchParams.set(`topic`,h()),window.history.replaceState(null,``,e),g()}));let S=(e,t)=>{let r=m(e),i=n.querySelector(`#e-${e}`);i&&(i.hidden=!t,i.textContent=t??``,t?r.setAttribute(`aria-invalid`,`true`):r.removeAttribute(`aria-invalid`))};[`name`,`email`,`role`].forEach(e=>{m(e).addEventListener(`input`,()=>S(e,null)),m(e).addEventListener(`change`,()=>S(e,null))});let C=()=>{let e=[[`name`,m(`name`).value.trim().length>0,n.dataset.errName],[`email`,t.test(m(`email`).value.trim()),n.dataset.errEmail],[`role`,m(`role`).value!==``,n.dataset.errRole]],r=null;for(let[t,n,i]of e)S(t,n?null:i??``),!n&&!r&&(r=t);return r};n.addEventListener(`submit`,async e=>{if(e.preventDefault(),d)return;g();let t=C();if(t){m(t).focus();return}let c=e=>m(e).value.trim(),l=h()===`call`;d=!0,s&&(s.disabled=!0),n.setAttribute(`aria-busy`,`true`),_(`busy`,i.busy);let f=3250-(Date.now()-u);f>0&&await new Promise(e=>window.setTimeout(e,f));let y={topic:l?`demo`:`question`,name:c(`name`),email:c(`email`),role:c(`role`),message:c(`message`),locale:o,page:window.location.pathname,website:m(`website`).value,startedAt:u};c(`organization`)&&(y.organization=c(`organization`)),l&&c(`athletes`)&&(y.athletes=c(`athletes`));let b=await r(a,y);',
     request: 'let b=await r(a,y);',
   },
 ];
@@ -38,7 +38,20 @@ const leadSite = (locale) => ({
     page: window.location.pathname,
     website: honeypot.value,
     startedAt: OPENED_AT
-  };`,
+  };
+
+  // A post less than 3 s after the page opened would be rejected as too fast, so wait out the rest.
+  const wait = MIN_FILL_MS + 250 - (Date.now() - OPENED_AT);
+  let timer;
+  new Promise(resolve => setTimeout(resolve, Math.max(0, wait)))
+    .then(() => {
+      const abort = new AbortController();
+      timer = setTimeout(() => abort.abort(), 15000);
+      return fetch(CONTACT_API, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'omit',
+        body: JSON.stringify(body)`,
   request: "fetch(CONTACT_API, {\n        method: 'POST',",
 });
 const expectedSites = new Map([
@@ -99,8 +112,9 @@ export function scanDist(dist) {
             hits.push(tag.contentStart + at + site.statement.indexOf('demo'));
           }
         }
-        if (hits.length === 1) allowedAt.add(hits[0]);
-        else problems.push({ file: rel, where: site.name, match: site.name, context: `expected exactly 1 designated statement, found ${hits.length}` });
+        const occurrences = text.split(site.statement).length - 1;
+        if (hits.length === 1 && occurrences === 1) allowedAt.add(hits[0]);
+        else problems.push({ file: rel, where: site.name, match: site.name, context: `expected exactly 1 designated block, found ${occurrences} in file / ${hits.length} in request script` });
       }
     }
     for (const m of wordingMatches(text)) {

@@ -107,6 +107,12 @@ const cases = [
   ...[lead, esLead].flatMap((file) => [
     { name: `Lead site-swap to unrelated script (${file})`, file, edit: (text) => replaceOnce(text, "topic: 'demo',", 'topic: String.fromCharCode(100, 101, 109, 111),').replace('</body>', `${marker}</body>`), match: 'demo' },
     { name: `Lead relocation within the request script (${file})`, file, edit: (text) => replaceOnce(text, "topic: 'demo',", 'topic: String.fromCharCode(100, 101, 109, 111),').replace('  const body = {', "  const marker = { topic: 'demo', name: 'Early access request' };\n  const body = {"), match: 'demo' },
+    { name: `full-statement-relocation.patch (${file})`, file, edit: (text) => {
+      const body = /  const body = \{[\s\S]*?\n  \};/.exec(text)?.[0];
+      assert.ok(body);
+      const computed = replaceOnce(body, "topic: 'demo',", 'topic: String.fromCharCode(100, 101, 109, 111),');
+      return replaceOnce(text, body, `${computed}\n\n  {\n${body}\n    const visible = document.createElement('p');\n    visible.id = 'relocated-literal';\n    visible.textContent = body.topic;\n    document.body.append(visible);\n  }`);
+    }, match: 'demo' },
     { name: `Missing designated lead body (${file})`, file, needle: "topic: 'demo',", insert: 'topic: String.fromCharCode(100, 101, 109, 111),', match: 'lead POST body' },
     { name: `Lead request binding missing (${file})`, file, needle: 'fetch(CONTACT_API, {', insert: 'fetch(String(CONTACT_API), {', match: 'lead POST body' },
     { name: `Duplicate designated lead body (${file})`, file, edit: (text) => { const body = /  const body = \{[\s\S]*?\n  \};/.exec(text)?.[0]; assert.ok(body); return replaceOnce(text, body, `${body}\n${body}`); }, match: 'lead POST body' },
