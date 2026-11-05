@@ -3,10 +3,9 @@ import type { ShowcaseCopy } from '../../../i18n/pages/home-showcase';
 import Icon from '../../ui/Icon.astro';
 interface Props {
   t: ShowcaseCopy['apps'];
-  note: string;
   contact: string;
 }
-const { t, note, contact } = Astro.props;
+const { t, contact } = Astro.props;
 const img = (id: string) => `url(/home/img/${id}.webp)`;
 const brands = t.brands.map((b) => ({ n: b.n, m: b.m, c: b.c, i: img(b.i) }));
 const labelled = t.brands.filter((b) => b.status);
@@ -82,5 +81,4 @@ const right = brands[1];
       <div class="flychip fc3" data-depth="26"><i></i>{t.chips[2]}</div>
     </div>
   </div>
-  <p class="dnote">{note}</p>
 </article>

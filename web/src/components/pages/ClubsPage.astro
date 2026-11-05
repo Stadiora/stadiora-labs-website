@@ -31,7 +31,7 @@ const fx = solutionsFx[locale];
     eyebrow={c.eyebrow}
     title={c.title}
     lead={c.sub}
-    primary={{ label: k.bookDemo, href: contactHref(locale, 'demo') }}
+    primary={{ label: k.bookCall, href: contactHref(locale, 'call') }}
     secondary={{ label: k.seePricing, href: hrefFor('pricing', locale) }}
   >
     <Conveyor variant="grid" {...clubsConveyor} />
@@ -67,7 +67,7 @@ const fx = solutionsFx[locale];
     </div>
   </section>
 
-  <FinalNight title={k.ctaTitle} actions={[{ label: c.cta.primary, href: contactHref(locale, 'demo') }, { label: c.cta.secondary, href: site.signUp }]} />
+  <FinalNight title={k.ctaTitle} actions={[{ label: c.cta.primary, href: contactHref(locale, 'call') }, { label: c.cta.secondary, href: site.signUp }]} />
 </SolutionsPage>
 
 <style>

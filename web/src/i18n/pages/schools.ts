@@ -10,7 +10,7 @@ const en = {
   sub: 'Coaches plan. Families stay informed. You see the whole program.',
   admin: {
     title: 'Admin overview',
-    school: 'Riverside High School (Demo)',
+    school: 'Your School',
     athletes: 'athletes',
     status: { active: 'Active', planning: 'Planning' },
     rows: [
@@ -20,12 +20,11 @@ const en = {
       { sport: 'Volleyball', glyph: 'volleyball', count: 14, status: 'planning' },
       { sport: 'Strength and conditioning', glyph: 'weights', count: 60, status: 'active' },
     ],
-    caption: 'Demo data: a fictional school.',
   },
   guardian: {
     title: 'Guardian portal',
     app: 'Aria for Families',
-    child: 'Sofia (Demo)',
+    child: 'Sofia',
     childMeta: "Girls' soccer · Grade 11",
     week: 'This week: 4 sessions',
     days: ['Mon', 'Tue', 'Wed', 'Thu', 'Sat'],
@@ -42,7 +41,7 @@ const en = {
     lead: 'Education pricing:',
     text: ' high schools from {price}/mo for {athletes} athletes',
     link: 'See pricing',
-    cta: 'Book a school demo',
+    cta: 'Book a call for your school',
   },
 };
 
@@ -59,7 +58,7 @@ const es: SchoolsCopy = {
   sub: 'Los entrenadores planifican. Las familias están al tanto. Tú ves todo el programa.',
   admin: {
     title: 'Vista del administrador',
-    school: 'Colegio Riverside (Demo)',
+    school: 'Tu colegio',
     athletes: 'atletas',
     status: { active: 'Activo', planning: 'En planificación' },
     rows: [
@@ -69,12 +68,11 @@ const es: SchoolsCopy = {
       { sport: 'Voleibol', glyph: 'volleyball', count: 14, status: 'planning' },
       { sport: 'Fuerza y acondicionamiento', glyph: 'weights', count: 60, status: 'active' },
     ],
-    caption: 'Datos de demostración: un colegio ficticio.',
   },
   guardian: {
     title: 'Portal para tutores',
     app: 'Aria for Families',
-    child: 'Sofía (Demo)',
+    child: 'Sofía',
     childMeta: 'Fútbol femenino · 11.º grado',
     week: 'Esta semana: 4 sesiones',
     days: ['Lun', 'Mar', 'Mié', 'Jue', 'Sáb'],
@@ -91,7 +89,7 @@ const es: SchoolsCopy = {
     lead: 'Precios para educación:',
     text: ' colegios desde {price}/mes para {athletes} atletas',
     link: 'Ver precios',
-    cta: 'Agenda una demo escolar',
+    cta: 'Agenda una llamada escolar',
   },
 };
 

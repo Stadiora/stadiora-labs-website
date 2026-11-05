@@ -522,20 +522,6 @@ html:not(.js) .sx-page .rv-mask {
 .sx-pop--session.glass {
   background: rgba(6, 13, 30, 0.88);
 }
-.sx-demo {
-  position: absolute;
-  z-index: 4;
-  left: 16px;
-  bottom: 14px;
-  font: 500 11px/1 var(--f-mono);
-  letter-spacing: 0.08em;
-  color: rgba(255, 255, 255, 0.8);
-  background: rgba(4, 10, 26, 0.55);
-  padding: 7px 10px;
-  border-radius: 8px;
-  -webkit-backdrop-filter: blur(8px);
-  backdrop-filter: blur(8px);
-}
 
 /* ---------- clubs: team-feed phone on the engage clip ---------- */
 .sq-phone .dphone {

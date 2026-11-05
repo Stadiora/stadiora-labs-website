@@ -42,7 +42,7 @@ const initials = (name: string) => name.split(' ').map((w) => w[0]).join('').sli
   sub={m.sub}
   ctas={[
     { label: c.startFree, href: site.signUp },
-    { label: c.bookDemo, href: contactHref(locale, 'demo') },
+    { label: c.bookCall, href: contactHref(locale, 'call') },
   ]}
 >
   <div slot="media" class="eg-live" data-autotabs data-at="7600">
@@ -117,7 +117,6 @@ const initials = (name: string) => name.split(' ').map((w) => w[0]).join('').sli
           </div>
         ))
       }
-      <span class="badge-demo">{c.demoNote}</span>
     </div>
     <div class="eg-tabs" role="tablist" aria-label={m.gridLabel}>
       {
@@ -188,8 +187,7 @@ const initials = (name: string) => name.split(' ').map((w) => w[0]).join('').sli
           </div>
         </article>
       </div>
-      <p class="dnote">{m.privacy}</p>
-      <p class="dnote">{c.demoNote}</p>
+      <p class="fnote">{m.privacy}</p>
     </div>
 
     <div class="eg-fam glass rv">
@@ -200,7 +198,7 @@ const initials = (name: string) => name.split(' ').map((w) => w[0]).join('').sli
 </section>
 
 <AlsoInAria locale={locale} items={m.also} />
-<EngageFinal locale={locale} demoHref={contactHref(locale, 'demo')} />
+<EngageFinal locale={locale} callHref={contactHref(locale, 'call')} />
 
 <script>
   import '../../scripts/engage/messaging';

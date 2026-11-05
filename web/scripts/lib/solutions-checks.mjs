@@ -304,11 +304,11 @@ export async function solutionsChecks({ open, settle: settleRaw, check, sleep, m
     const qState = await topic.evaluate(() => ({
       question: document.querySelector('#topic-question').checked,
       athletesDisabled: document.querySelector('#f-athletes').disabled,
-      demoOnlyHidden: document.querySelector('[data-demo-only]').hidden,
+      callOnlyHidden: document.querySelector('[data-call-only]').hidden,
     }));
-    await topic.locator('#topic-demo').check();
-    const dState = await topic.evaluate(() => ({ demo: document.querySelector('#topic-demo').checked, athletesDisabled: document.querySelector('#f-athletes').disabled, url: location.search }));
-    check('solutions-contact', `${locale} contact: ?topic=question preselects the question topic and hides the athletes field; switching back restores it`, qState.question && qState.athletesDisabled && qState.demoOnlyHidden && dState.demo && !dState.athletesDisabled && /topic=demo/.test(dState.url), JSON.stringify({ qState, dState }));
+    await topic.locator('#topic-call').check();
+    const dState = await topic.evaluate(() => ({ call: document.querySelector('#topic-call').checked, athletesDisabled: document.querySelector('#f-athletes').disabled, url: location.search }));
+    check('solutions-contact', `${locale} contact: ?topic=question preselects the question topic and hides the athletes field; switching back restores it`, qState.question && qState.athletesDisabled && qState.callOnlyHidden && dState.call && !dState.athletesDisabled && /topic=call/.test(dState.url), JSON.stringify({ qState, dState }));
     await topic.context().close();
 
     const page = await open({ width: 1440, height: 900, reduced: true, init: watchMail }, base);
@@ -336,7 +336,7 @@ export async function solutionsChecks({ open, settle: settleRaw, check, sleep, m
 
     await page.fill('#f-email', 'ana@escuela.example');
     await page.fill('#f-org', 'Colegio Norte');
-    await page.fill('#f-message', 'Quiero una demo para 3 equipos.');
+    await page.fill('#f-message', 'Quiero una llamada para 3 equipos.');
     await page.locator('#contact-form button[type="submit"]').click();
     await sleep(250);
     const sent = await page.evaluate(() => ({ mail: window.__mail, status: document.querySelector('[data-status]').textContent.trim(), body: document.body.innerText }));
@@ -408,7 +408,7 @@ export async function solutionsChecks({ open, settle: settleRaw, check, sleep, m
     await page.screenshot({ path: `${shotsDir}interaction-about-popover-open.jpg`, type: 'jpeg', quality: 82 });
     await page.context().close();
   }
-  for (const topic of ['demo', 'question']) {
+  for (const topic of ['call', 'question']) {
     const page = await open({ width: 1440, height: 900, reduced: true }, `/contact/?topic=${topic}`);
     await settle(page);
     await sleep(300);

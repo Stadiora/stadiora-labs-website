@@ -2,9 +2,8 @@
 import type { ShowcaseCopy } from '../../../i18n/pages/home-showcase';
 interface Props {
   t: ShowcaseCopy['scale'];
-  note: string;
 }
-const { t, note } = Astro.props;
+const { t } = Astro.props;
 const r = t.rail;
 const calendarOn = [0, 3, 5, 8, 10, 12, 15, 17, 19];
 const jumps = [52, 58, 55, 63, 61, 68, 72];
@@ -135,5 +134,4 @@ const jumps = [52, 58, 55, 63, 61, 68, 72];
       }
     </div>
   </div>
-  <p class="dnote">{note}</p>
 </article>

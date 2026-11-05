@@ -16,7 +16,6 @@ interface Props {
 const { locale } = Astro.props;
 const e = useEngage(locale);
 const g = e.guardian;
-const c = e.common;
 const first = g.children[0];
 const left = g.cards.slice(0, 2);
 const right = g.cards.slice(2);
@@ -29,7 +28,7 @@ const coachInitial = (coach: string) => coach.split(' ')[1][0];
   title={g.title}
   sub={g.sub}
   ctas={[
-    { label: g.ctaPrimary, href: contactHref(locale, 'demo') },
+    { label: g.ctaPrimary, href: contactHref(locale, 'call') },
     { label: g.ctaSecondary, href: '#how' },
   ]}
 >
@@ -54,7 +53,6 @@ const coachInitial = (coach: string) => coach.split(' ')[1][0];
         <span class="eg-gc__ok" data-el="c4"><EIcon name="check" size={18} /></span>
       </div>
     </div>
-    <span class="badge-demo">{c.demoNote}</span>
   </div>
 </EngageHero>
 
@@ -116,7 +114,6 @@ const coachInitial = (coach: string) => coach.split(' ')[1][0];
           {right.map((card, i) => (<li class="eg-tile rv" style={`--i:${i + 2}`}><span class="eg-tile__ic"><EIcon name={card.icon as 'calendar'} size={22} /></span><h3>{card.title}</h3><p>{card.body}</p></li>))}
         </ul>
       </div>
-      <p class="eg-note">{c.demoNote}</p>
     </div>
   </div>
 </section>
@@ -144,7 +141,7 @@ const coachInitial = (coach: string) => coach.split(' ')[1][0];
 </section>
 
 <AlsoInAria locale={locale} items={g.also} />
-<EngageFinal locale={locale} demoHref={contactHref(locale, 'demo')} />
+<EngageFinal locale={locale} callHref={contactHref(locale, 'call')} />
 
 <script>
   import '../../scripts/engage/guardian';

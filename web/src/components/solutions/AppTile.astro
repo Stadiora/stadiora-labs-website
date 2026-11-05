@@ -29,7 +29,7 @@ const stores: Record<string, { ios?: string; android?: string; beta?: string }> 
   fitmg: { android: site.stores.fitmgAndroid, beta: site.stores.fitmgIosBeta },
 };
 const links = stores[app.id] ?? {};
-// Each app has its own tint for the session icon on the demo screen.
+// Each app has its own tint for the session icon on the screen.
 const tint: Record<string, string> = {
   run: 'var(--cyan-tint)',
   aria12: 'rgb(52 211 153 / 0.22)',
@@ -238,7 +238,7 @@ const tint: Record<string, string> = {
     padding-inline: 4px;
   }
 
-  /* The demo screen inside the phone: sized in em from --phone-w. */
+  /* The screen inside the phone: sized in em from --phone-w. */
   .ap {
     padding: 0 1.1em;
   }

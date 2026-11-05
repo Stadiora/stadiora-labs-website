@@ -4,9 +4,8 @@ import type { Locale } from '../index';
 
 const en = {
   startFree: 'Start free',
-  demoNote: 'Demo data: a fictional coach and team.',
   also: 'Also in Aria',
-  cta: { title: 'Ready when your season is.', coach: 'Start as a coach', demo: 'Book a demo' },
+  cta: { title: 'Ready when your season is.', coach: 'Start as a coach', call: 'Book a call' },
   stepWord: 'Step',
 };
 
@@ -14,9 +13,8 @@ export type CoachCommon = typeof en;
 
 const es: CoachCommon = {
   startFree: 'Empieza gratis',
-  demoNote: 'Datos de ejemplo: una entrenadora y un equipo ficticios.',
   also: 'También en Aria',
-  cta: { title: 'Listos cuando empiece tu temporada.', coach: 'Empieza como coach', demo: 'Agenda una demo' },
+  cta: { title: 'Listos cuando empiece tu temporada.', coach: 'Empieza como coach', call: 'Agenda una llamada' },
   stepWord: 'Paso',
 };
 
