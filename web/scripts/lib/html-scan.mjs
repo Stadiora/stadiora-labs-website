@@ -1,9 +1,10 @@
 // A small HTML tag scanner for the build guards. It walks the markup the way a browser tokenizes it, so what it returns is
-// what is ACTIVE on the page: tags inside comments, <script>, <style>, <textarea> and <title> are skipped, not matched.
+// what is ACTIVE on the page: tags inside comments, <script>, <style>, <textarea>, <title> and <noscript> (with scripting
+// enabled) are skipped, not matched.
 // (The guards used to match raw text, so `<!-- <meta name="robots" content="noindex"> -->` passed as a noindex tag.)
 // No regular expression strips anything here; every skip is an explicit index search.
 
-const rawText = new Set(['script', 'style', 'textarea', 'title']);
+const rawText = new Set(['script', 'style', 'textarea', 'title', 'noscript', 'xmp', 'iframe', 'noembed']);
 const space = (c) => c === ' ' || c === '\n' || c === '\t' || c === '\r' || c === '\f';
 const letter = (c) => (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z');
 
@@ -15,7 +16,7 @@ const decodeAttr = (v) =>
     .split('&gt;').join('>')
     .split('&amp;').join('&');
 
-/** Every start tag outside comments and raw-text elements: `{ name, attrs }`, names and attribute names lower-cased. */
+/** Every start tag outside comments and raw-text elements; raw-text tags also carry contentStart/contentEnd offsets. */
 export function scanTags(html) {
   const tags = [];
   const lower = html.toLowerCase();
@@ -69,10 +70,13 @@ export function scanTags(html) {
       }
       if (key && !(key in attrs)) attrs[key] = decodeAttr(value);
     }
-    tags.push({ name, attrs });
+    const tag = { name, attrs };
+    tags.push(tag);
     i = p + 1;
     if (rawText.has(name)) {
       const end = lower.indexOf(`</${name}`, i);
+      tag.contentStart = i;
+      tag.contentEnd = end === -1 ? html.length : end;
       i = end === -1 ? html.length : end;
     }
   }

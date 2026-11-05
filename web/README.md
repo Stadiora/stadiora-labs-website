@@ -11,6 +11,7 @@ npm run dev        # http://localhost:4321
 npm run build      # static output in dist/
 npm run check      # astro check (types and templates)
 npm run verify     # asserts the built pages: SEO tags, hreflang, OG, no placeholders, budgets, Jekyll exclusion
+node scripts/no-demo-wording-battery.mjs # after a build, on a clean committed tree: wording mutations through npm run verify
 npm run cutover-checks   # Playwright: redirects without JS, the 404, every carried page loads, the investor pages and cards carry an active noindex, the API footer links land, the lead form (EN and ES); `-- --shots <dir>` saves screenshots
 npm run evidence   # needs a build; Playwright screenshots, interaction checks and measured budgets in .evidence/
 node scripts/evidence.mjs --coach-only   # just the Platform Coach pages, EN and ES (see below); add --checks-only to skip screenshots
@@ -40,6 +41,14 @@ node scripts/evidence.mjs --engage-motion-only --checks-only # just the Platform
   The approved post-submit status (EN and ES) is written out in `scripts/lib/contact-contract.mjs`, independent of
   `src/i18n/pages/contact.ts`; verify and evidence compare the page with it word for word, so editing that copy means
   editing the contract too.
+- The shipped-wording guard (`scripts/lib/no-demo-wording.mjs`, run by `npm run verify`) scans text files and file names in
+  `dist/` for `demo`, `demostraci`, `preview`, `vista previa` and `[preview]`, case-insensitively. Only the exact whole words
+  `demonstrated`, `demostrar`, `demostrado` and `demostró` are tolerated. Its sole code exemption is one `{demo:'call'}`
+  literal (single, double or backtick quotes) inside the inline contact-form module's script content in each of
+  `contact/index.html` and `es/contact/index.html`. Visible text, attributes, comments, noscript content, other pages and
+  all bundles remain scanned; there is no POST wire-value exemption. The battery asserts each copied-dist edit by content
+  and hash, requires failures from the wording guard itself, retains legal-word/identity controls, records the clean head,
+  and writes `.evidence/no-demo-wording-battery.json`.
 - Solutions, Resources, About and Contact in Floodlight (DESIGN-4 section 6): every page runs on `src/layouts/SolutionsPage.astro`
   (the foundation, the motion kit and `src/styles/solutions/solutions.css`; everything in the lane is prefixed `sx-`). The hero is
   `src/components/solutions/SxHero.astro` (impact, mesh, orbits, display H1; the Schools and Coaches swap line is one sentence for a
