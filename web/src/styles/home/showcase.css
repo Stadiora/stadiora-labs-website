@@ -1,7 +1,7 @@
 /* Dark showcase: the "for every coach" header and the plan / measure / engage / scale / apps panels.
    The section is an always-dark `.impact`; the panels are `.reading` and follow the page theme, so text on
    them uses tokens. Product mock-ups (stage, pops, phones) are always-light UI and use literal colours.
-   Base styles are the finished still frame; the scripts animate away from it and pause on hover, focus,
+   Base styles are the finished still frame; the scripts animate away from it and pause on keyboard focus,
    offscreen and hidden tabs. */
 .show{background:#02060F;padding:var(--sec) 0;font-size:16px;line-height:1.55}
 .pl-step,.acc-row,.en-tab{appearance:none;margin:0;border:0;border-radius:0;background:none;font:inherit;cursor:pointer}

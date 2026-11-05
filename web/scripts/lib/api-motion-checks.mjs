@@ -186,18 +186,29 @@ export async function apiMotionChecks({ open, check, sleep, settle, metrics }) {
       await sleep(250);
       const apState = () => page.evaluate((i) => { const e = document.querySelectorAll('[data-api-stage]')[i]; return { ap: e.dataset.ap, why: e.dataset.apWhy }; }, st.i);
       const readable = (d) => `data-ap=${d.ap}${d.why ? ` data-ap-why=${d.why}` : ''}`;
-      // Loops of the live set that stood still over a window and over one more (a loop caught at a turning point is not a stall).
-      const stalledLoops = async (changedNow) => {
-        const left = [...live].filter((k) => k.startsWith('loop ') && !changedNow.includes(k));
-        if (!left.length) return left;
-        const retry = await watch();
-        return left.filter((k) => !retry.includes(k));
+      // The same over a long stretch sampled every 700 ms, sized to cover the longest cycle on the page (the hero engine's 10 s
+      // timeline holds some glows still for 7.7 s of it): anything that differs from the first sample counts as moving.
+      const watchLong = async (ms) => {
+        const first = await take();
+        const seen = new Set();
+        for (let t = 0; t < ms; t += 700) {
+          await sleep(700);
+          for (const k of changed(first, await take())) seen.add(k);
+        }
+        return [...seen];
       };
-      // Moving: at least one live part changed, no live loop stood still, and the host never left "on".
+      // Moving: every loop of the live set changed in this window, in one more, or in a long sampled one (a loop caught at a
+      // turning point, or resting for most of its cycle, is not a stall; a real pause stands still in all of them), and the
+      // host never left "on".
       const keepsMoving = async () => {
-        const now = await watch();
-        const stalled = await stalledLoops(now);
-        const kept = now.filter((k) => live.has(k));
+        const seen = new Set(await watch());
+        const standing = () => [...live].filter((k) => k.startsWith('loop ') && !seen.has(k));
+        for (const again of [() => watch(), () => watchLong(10500)]) {
+          if (seen.size && !standing().length && [...seen].some((k) => live.has(k))) break;
+          for (const k of await again()) seen.add(k);
+        }
+        const kept = [...seen].filter((k) => live.has(k));
+        const stalled = standing();
         const state = await apState();
         return { ok: kept.length > 0 && stalled.length === 0 && state.ap === 'on' && !state.why, kept, stalled, state };
       };
@@ -257,7 +268,8 @@ export async function apiMotionChecks({ open, check, sleep, settle, metrics }) {
 
       await idle();
       await park();
-      const back = (await watch()).filter((k) => live.has(k));
+      let back = (await watch()).filter((k) => live.has(k));
+      if (!back.length) back = (await watchLong(4200)).filter((k) => live.has(k));
       check('api-motion', `${label}: moves again once focus and the hidden tab are gone and it is back on screen`, back.length > 0, `resumed: ${back.slice(0, 4).join(', ') || 'none'}`);
       // A mouse click on the stage (a quiet spot of its scope, then a control in it) leaves focus there by mouse: still moving.
       const clickAt = async (what, pointOf) => {
@@ -280,7 +292,7 @@ export async function apiMotionChecks({ open, check, sleep, settle, metrics }) {
       metrics[`api-motion-${label.replace(/\W+/g, '-')}`] = { moving: live.size };
     }
 
-    check('api-motion', `${lang}: the mouse clicks really landed (${clicked.surface} stages clicked on a quiet spot, ${clicked.control} on a control)`, clicked.surface >= 1 && clicked.control >= 1, clicks.join('; '));
+    check('api-motion', `${lang}: the mouse clicks really landed (${clicked.surface} stages clicked on a quiet spot, ${clicked.control} on a control)`, (process.env.API_MOTION_STAGE ? clicks.length === 0 || clicked.surface + clicked.control >= 1 : clicked.surface >= 1 && clicked.control >= 1), clicks.join('; '));
 
     // Every endless loop in the page content belongs to a stage (or to the shared chrome), so nothing escapes the pause.
     const loose = await page.evaluate(

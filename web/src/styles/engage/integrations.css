@@ -42,7 +42,7 @@
   --ax: calc(12px + min(110px, 35cqw) - 50cqw);
   --ay: calc(34px - 44cqw);
 }
-/* The CSS loops of the stage (the live dot's pulse and the orbit ring) stop with the chips: hover, focus, offscreen and a
+/* The CSS loops of the stage (the live dot's pulse and the orbit ring) stop with the chips: keyboard focus, offscreen and a
    hidden tab all set data-ap="off" on the stage (scripts/engage/integrations.ts); reduced motion removes them. */
 .eg-ih[data-ap='off'] .dot-live,
 .eg-ih[data-ap='off'] .ring-path {

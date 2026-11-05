@@ -141,7 +141,7 @@ const initials = (name: string) => name.charAt(0);
     animation: dayPing 6s var(--e-out) infinite;
     animation-delay: calc(var(--i, 0) * 1.6s);
   }
-  /* the stage's autoplayer (scripts/solutions/stages.ts) rests the rings on hover, focus, offscreen and in a hidden tab */
+  /* the stage's autoplayer (scripts/solutions/stages.ts) rests the rings on keyboard focus, offscreen and in a hidden tab */
   .day[data-ap='off'] .day__dot::after {
     animation-play-state: paused;
   }

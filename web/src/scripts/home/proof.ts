@@ -30,7 +30,7 @@ export function initProof() {
     pause: () => {
       timers.forEach(clearTimeout);
       timers = [];
-      // leaving the page or the screen resumes where it stopped; a pointer or reduced motion must never leave the quote dim
+      // leaving the page or the screen resumes where it stopped; keyboard focus or reduced motion must never leave the quote dim
       const why = quote.dataset.apWhy;
       if (why !== 'offscreen' && why !== 'hidden') words.forEach((w) => w.classList.add('lit'));
     },

@@ -1,6 +1,6 @@
 // Use cases: rows auto-advance every 6.2 s (a progress bar under the open row) while the photo crossfades.
 // One requestAnimationFrame accumulator owned by the kit's autoplayer: it is cancelled while the block is off screen,
-// hovered, focused, in a hidden tab or under reduced motion. Reduced motion keeps rows manual, the bar full.
+// under keyboard focus, in a hidden tab or under reduced motion. Reduced motion keeps rows manual, the bar full.
 // The photo's 7 s scale is a CSS transition, not the frame loop, so the autoplayer's freeze holds it in place while paused
 // (and settles the crossfade and the pop-ups, which carry text, to their end state).
 import { $, $$, autoplayer, clamp, type Autoplayer, isReduced, onMotionChange } from '../motion/kit';

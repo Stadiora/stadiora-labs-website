@@ -1,5 +1,5 @@
 /* Customers and partners logo marquee, shared by the home hero band and the About partners strip (components/ui/LogoMarquee.astro).
-   The motion itself (.marquee, .marquee-track, pause on hover and focus, hidden tab, reduced motion) comes from floodlight.css;
+   The motion itself (.marquee, .marquee-track, pause on keyboard focus, hidden tab, reduced motion) comes from floodlight.css;
    offscreen it pauses with the [data-section] that holds it. */
 .logo-marquee {
   /* Nine logos: 38 s was the pace for six, so the loop is longer by the same ratio and the speed stays the same. */
@@ -31,7 +31,7 @@
   transform: scale(1.06);
 }
 
-/* the pause host reports hover, focus, offscreen and a hidden tab as data-ap="off" */
+/* the pause host reports keyboard focus, offscreen and a hidden tab as data-ap="off" */
 .logo-marquee[data-ap='off'] .marquee-track {
   animation-play-state: paused;
 }

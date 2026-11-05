@@ -1,9 +1,10 @@
 // Floodlight motion kit (DESIGN-4 section 5). Small, dependency-free primitives the home sections build on.
 // Rules every primitive follows:
 //  - Reduced motion is checked live; nothing autoplays or loops under it and every effect has a still state.
-//  - An autoplayer runs only while its host is on screen, the tab is visible, and the pointer and focus are
-//    elsewhere. The state is mirrored to data-ap / data-ap-why (and the hover/focus element is marked
-//    data-ap-scope) so the guards can assert it.
+//  - An autoplayer runs only while its host is on screen, the tab is visible, and keyboard focus is elsewhere. A mouse
+//    pointer (hovering or clicking) never pauses anything: keyboard focus (:focus-visible) is the WCAG 2.2.2 pause.
+//    The state is mirrored to data-ap / data-ap-why (and the keyboard-focus element is marked data-ap-scope) so the
+//    guards can assert it.
 //  - Only transform, opacity and clip-path animate (plus short filter swaps).
 
 const RMQ = window.matchMedia('(prefers-reduced-motion: reduce)');
@@ -47,12 +48,12 @@ export interface AutoplayerOptions {
   pause: (ap: Autoplayer) => void;
   /** Share of the host that must be visible before it runs. */
   threshold?: number;
-  /** Element whose hover and focus pause the host (defaults to the host). */
+  /** Element whose keyboard focus pauses the host (defaults to the host). */
   within?: HTMLElement;
   /**
    * Stops a scene that animates through transitions and WAAPI as well as timers. While the host is paused the elements
    * matching `hold` keep their in-flight transitions and one-shot animations where they are and carry on from there;
-   * those matching `settle` jump to their end state (text that has to stay readable under the pointer). CSS loops
+   * those matching `settle` jump to their end state (text that has to stay readable while the host rests). CSS loops
    * (animation-iteration-count: infinite) are not touched: they stop through their own [data-ap="off"] rules.
    */
   freeze?: { hold?: string; settle?: string; scope?: HTMLElement };
@@ -60,7 +61,7 @@ export interface AutoplayerOptions {
 export interface Autoplayer {
   readonly running: boolean;
   refresh: () => void;
-  /** Re-applies the freeze to transitions that started while the host was already paused (a click under the pointer). No-op while it runs. */
+  /** Re-applies the freeze to transitions that started while the host was already paused (a key press on a focused control). No-op while it runs. */
   hold: () => void;
   /** setTimeout on the host's clock: pausing keeps the time left, resuming carries on. `flush` runs it at once on pause instead. */
   later: (fn: () => void, ms: number, flush?: boolean) => void;
@@ -75,9 +76,9 @@ interface Pending {
 
 export function autoplayer(host: HTMLElement, opts: AutoplayerOptions): Autoplayer {
   const within = opts.within ?? host;
-  // Marks the element whose hover and focus pause this host, so the guards can find it.
+  // Marks the element whose keyboard focus pauses this host, so the guards can find it.
   within.setAttribute('data-ap-scope', '');
-  const seen = { visible: false, hover: false, focus: false };
+  const seen = { visible: false, focus: false };
   let running = false;
   let first = true;
   const pending = new Set<Pending>();
@@ -128,7 +129,7 @@ export function autoplayer(host: HTMLElement, opts: AutoplayerOptions): Autoplay
   };
 
   const refresh = () => {
-    const why = RMQ.matches ? 'reduced' : document.hidden ? 'hidden' : !seen.visible ? 'offscreen' : seen.hover ? 'hover' : seen.focus ? 'focus' : '';
+    const why = RMQ.matches ? 'reduced' : document.hidden ? 'hidden' : !seen.visible ? 'offscreen' : seen.focus ? 'focus' : '';
     const want = why === '';
     host.dataset.ap = want ? 'on' : 'off';
     if (why) host.dataset.apWhy = why;
@@ -167,17 +168,9 @@ export function autoplayer(host: HTMLElement, opts: AutoplayerOptions): Autoplay
     },
     { threshold: opts.threshold ?? 0.25 },
   ).observe(host);
-  within.addEventListener('pointerenter', (e) => {
-    if (e.pointerType !== 'mouse') return;
-    seen.hover = true;
-    refresh();
-  });
-  within.addEventListener('pointerleave', () => {
-    seen.hover = false;
-    refresh();
-  });
-  within.addEventListener('focusin', () => {
-    seen.focus = true;
+  // Only keyboard focus pauses: a mouse click leaves focus on the control it hit, which must not freeze the scene.
+  within.addEventListener('focusin', (e) => {
+    seen.focus = (e.target as Element).matches(':focus-visible');
     refresh();
   });
   within.addEventListener('focusout', (e) => {
@@ -236,8 +229,8 @@ function initVideos() {
     // A clip inside a tab panel only plays while its panel is the active one.
     const panel = v.closest<HTMLElement>('[data-panel]');
     const active = () => !panel || panel.classList.contains('on') || panel.hasAttribute('data-active');
-    // Hover and focus pause the clip through the surface the user can actually reach: an explicit
-    // `data-ap-within` selector (decorative clips that cannot be hovered themselves), else the tab group or frame around it.
+    // Keyboard focus pauses the clip through the surface the user can actually reach: an explicit
+    // `data-ap-within` selector (decorative clips that cannot take focus themselves), else the tab group or frame around it.
     const within =
       (v.dataset.apWithin ? document.querySelector<HTMLElement>(v.dataset.apWithin) : null) ??
       v.closest<HTMLElement>('[data-autotabs]') ??
@@ -447,7 +440,7 @@ export function tl(el: Element | null, dur: number, frames: Frame[], opt: { once
   return a;
 }
 
-/** A set of timelines on one clock. Plays only while the host is in view and not hovered or focused. */
+/** A set of timelines on one clock. Plays only while the host is in view and keyboard focus is elsewhere. */
 export interface Group {
   anims: Animation[];
   time: () => number;
@@ -518,10 +511,9 @@ function initPointerFx() {
     for (const el of depth) {
       const host = el.closest('[data-section]') ?? el.parentElement;
       if (host?.classList.contains('is-off')) continue;
-      // An autoplayer paused by the pointer or by focus holds its floating cards where they are: they must not keep
+      // An autoplayer paused by keyboard focus holds its floating cards where they are: they must not keep
       // following the pointer (the offset is read from the card's own, already shifted, box).
-      const why = el.closest<HTMLElement>('[data-ap]')?.dataset.apWhy;
-      if (why === 'hover' || why === 'focus') continue;
+      if (el.closest<HTMLElement>('[data-ap]')?.dataset.apWhy === 'focus') continue;
       const r = el.getBoundingClientRect();
       if (r.bottom < -200 || r.top > vh + 200) continue;
       const d = Number(el.dataset.depth);

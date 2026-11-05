@@ -7,7 +7,7 @@ const O = 'opacity';
 const T = 'transform';
 const SP = 'cubic-bezier(.34,1.56,.64,1)';
 const EASE = 'cubic-bezier(.2,.7,.2,1)';
-// A tab picked by hand while the tabs are paused (pointer or focus inside) shows the cards once they have all arrived.
+// A tab picked by hand while the tabs are paused (keyboard focus inside) shows the cards once they have all arrived.
 const ARRIVED = 5.6;
 
 function buildScenes(root: HTMLElement, dur: number) {

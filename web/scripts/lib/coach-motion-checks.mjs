@@ -59,20 +59,37 @@ export async function coachMotionChecks({ open, check, sleep, settle, metrics })
       };
       const interval = 1200;
       // One measurement: sample, wait, sample, and report what moved between the two.
-      const measure = async (i) => {
+      const measure = async (i, ms = interval) => {
         const a = await page.evaluate(sample, [i, SEL]);
-        await sleep(interval);
+        await sleep(ms);
         const b = await page.evaluate(sample, [i, SEL]);
         return { keys: Object.keys(b), moved: moved(a, b) };
       };
+      // The same over a long stretch, sampled every ~600 ms: comparing only its two ends would alias with a loop whose cycle
+      // is shorter than the stretch, so a loop counts as moving if any sample differs from the first.
+      const watch = async (i, ms) => {
+        const first = await page.evaluate(sample, [i, SEL]);
+        const seen = new Set();
+        let last = first;
+        for (let t = 0; t < ms; t += 600) {
+          await sleep(600);
+          last = await page.evaluate(sample, [i, SEL]);
+          for (const k of moved(first, last)) seen.add(k);
+        }
+        return { keys: Object.keys(last), moved: [...seen] };
+      };
       // Of the loops that were really moving, those still present that stood still over this window and over one more window
-      // (which rules out a loop caught at a turning point). A loop that left the DOM tree because a mouse click switched an
-      // accordion row is not a stall.
+      // (which rules out a loop caught at a turning point), and over a third, longer one: a keyframe loop such as the send ring
+      // holds still for about 3.5 s of its 4.8 s cycle, so only a window that long tells a rest from a pause. A loop that left
+      // the DOM tree because a mouse click switched an accordion row is not a stall.
       const stalledIn = async (i, live, m) => {
         const left = [...live].filter((k) => m.keys.includes(k) && !m.moved.includes(k));
         if (!left.length) return left;
         const retry = await measure(i);
-        return left.filter((k) => retry.keys.includes(k) && !retry.moved.includes(k));
+        const rest = left.filter((k) => retry.keys.includes(k) && !retry.moved.includes(k));
+        if (!rest.length) return rest;
+        const long = await watch(i, 3600);
+        return rest.filter((k) => long.keys.includes(k) && !long.moved.includes(k));
       };
       const apOf = (i) => page.evaluate(([s, k]) => ({ ap: document.querySelectorAll(s)[k].dataset.ap, why: document.querySelectorAll(s)[k].dataset.apWhy }), [SEL, i]);
       const park = async (i) => {

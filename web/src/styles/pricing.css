@@ -852,7 +852,7 @@
     radial-gradient(circle at 80% 0%, rgb(0 190 243 / 0.35), transparent 40%),
     radial-gradient(circle at 0% 100%, rgb(139 92 246 / 0.35), transparent 45%);
   animation: drift1 18s ease-in-out infinite alternate;
-  /* Runs only while the shared autoplayer (pricing.ts) marks the panel on: visible, tab shown, no hover or focus inside. */
+  /* Runs only while the shared autoplayer (pricing.ts) marks the panel on: visible, tab shown, no keyboard focus inside. */
   animation-play-state: paused;
 }
 .est[data-ap='on']::before {

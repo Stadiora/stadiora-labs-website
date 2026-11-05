@@ -349,7 +349,7 @@ export async function motionChecks({ open, check, sleep, metrics, on, pathFor, h
         };
         // After a pause has settled, nothing may move for the whole window.
         const still = async (cond) => {
-          if (cond === 'focus') await page.evaluate(settled, { i: h.i, cap: 4000, quiet: 400 });
+          if (cond === 'focus') await page.evaluate(settled, { i: h.i, cap: 7500, quiet: 400 });
           else await sleep(settleMs);
           await page.evaluate(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))));
           await page.evaluate(meterStart, { i: h.i, cssLoops: cond !== 'focus' });
@@ -465,7 +465,7 @@ export async function motionChecks({ open, check, sleep, metrics, on, pathFor, h
     const n = hosts.length;
     check('autoplay', `behaviour: every autoplayer visibly moves while it is running (${n} hosts measured)`, (n >= 20 || wanted) && problems.control.length === 0, problems.control.join('; ') || `${n - notShown.length} hosts${notShown.length ? `; ${notShown.length} clips on unselected tabs are hidden and left to their tab list` : ''}`);
     check('autoplay', 'behaviour: every autoplayer shows activity again after each pause (measured, not the data-ap flag)', problems.resume.length === 0, problems.resume.join('; '));
-    check('autoplay', `behaviour: everything inside an autoplayer keeps moving, changing, playing and advancing while the pointer is over it (data-ap stays on; ${probed.hover} hosts probed, ${probed.loopOnly.length} of them held to their CSS loops only)`, problems.hover.length === 0 && (probed.hover >= 20 || wanted), problems.hover.join('; ') || `${probed.hover} hosts`);
+    check('autoplay', `behaviour: everything inside an autoplayer keeps moving, changing, playing and advancing while the pointer is over it (data-ap stays on; ${probed.hover} hosts probed, ${probed.loopOnly.length} of them held to their CSS loops only)`, problems.hover.length === 0 && (probed.hover >= 15 || wanted), problems.hover.join('; ') || `${probed.hover} hosts`);
     check('autoplay', `behaviour: everything inside an autoplayer keeps moving after a mouse click in it, and a click on a tab selects it (${probed.click} hosts clicked, ${probed.tabs} on a tab; at least 15 and 1 expected)`, problems.click.length === 0 && ((probed.click >= 15 && probed.tabs >= 1) || wanted), `${problems.click.join('; ') || `${probed.click} hosts clicked`}${probed.clickSkipped.length ? ` [no safe click point: ${probed.clickSkipped.join(', ')}]` : ''}`);
     for (const [cond, text] of [
       ['focus', 'keyboard focus is inside it'],

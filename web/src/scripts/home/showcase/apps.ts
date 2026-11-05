@@ -1,6 +1,6 @@
 // Custom-apps morph (DESIGN-4 M17): the white-label phone re-skins through each brand (colour, mark, name,
 // photo), the side phones and chips follow, and the label list highlights the active app. One autoplayer on
-// the phone, paused by hovering or focusing the stage. The still markup is the first brand.
+// the phone, paused by keyboard focus on the stage. The still markup is the first brand.
 import { $, $$, autoplayer, onMotionChange, scramble } from '../../motion/kit';
 
 interface Brand {
