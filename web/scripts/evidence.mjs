@@ -9,7 +9,7 @@
 //   node scripts/evidence.mjs --logos-only     (the shared logo marquee on the home hero and the About partners strip, plus the About pause guards)
 //   node scripts/evidence.mjs --home-only      (the home guards only: structure, autoplayers, reduced motion, marquees, hero words, clipping, contrast)
 //   node scripts/evidence.mjs --api-only       (the API page, EN and ES: pause, reduced motion and glyph-pixel contrast of the API and legal pages)
-// Output goes to web/.evidence/ (git-ignored): PNGs plus summary.json. Exit code 1 when a check fails.
+// Output goes to EVIDENCE_DIR or web/.evidence/ (git-ignored): PNGs plus summary.json. Exit code 1 when a check fails.
 import { mkdir, readdir, readFile, rm, stat, writeFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -33,7 +33,7 @@ import { solutionsFloodlightChecks } from './lib/solutions-floodlight-checks.mjs
 import { serve } from './lib/static-server.mjs';
 
 const root = fileURLToPath(new URL('..', import.meta.url));
-const outDir = `${root}.evidence/`;
+const outDir = process.env.EVIDENCE_DIR ? `${resolve(process.env.EVIDENCE_DIR)}/` : `${root}.evidence/`;
 const navOnly = process.argv.includes('--nav-only');
 const pricingOnly = process.argv.includes('--pricing-only');
 const engageOnly = process.argv.includes('--engage-only');

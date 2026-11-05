@@ -1540,15 +1540,22 @@ function submitEmail(path) {
 
   // A post less than 3 s after the page opened would be rejected as too fast, so wait out the rest.
   const wait = MIN_FILL_MS + 250 - (Date.now() - OPENED_AT);
+  let timer;
   new Promise(resolve => setTimeout(resolve, Math.max(0, wait)))
-    .then(() => fetch(CONTACT_API, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'omit',
-      body: JSON.stringify(body)
-    }))
+    .then(() => {
+      const abort = new AbortController();
+      timer = setTimeout(() => abort.abort(), 15000);
+      return fetch(CONTACT_API, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'omit',
+        body: JSON.stringify(body),
+        signal: abort.signal
+      });
+    })
     .then(r => r.status, () => 0)
     .then(code => {
+      clearTimeout(timer);
       if (code === 202) {
         if (row)     row.style.display     = 'none';
         if (note)    note.style.display    = 'none';

@@ -44,14 +44,18 @@ node scripts/evidence.mjs --engage-motion-only --checks-only # just the Platform
   the approved "sent" sentence (EN and ES) are written out in `scripts/lib/contact-contract.mjs`, independent of `src/`; verify and
   evidence compare the page with it, so editing that copy means editing the contract too. The browser checks intercept the endpoint
   (`scripts/lib/contact-route.mjs`): no test sends real email. `node scripts/evidence.mjs --contact-only` runs just those checks.
-- Both regions are listed on Contact, in the footer and on `public/connect.html` (US: Ian Rowe; LatAm: Anthony, WhatsApp). The data is
-  in `src/data/site.ts` (`contacts`).
+- Both regions are listed on Contact, in the footer and on `public/connect.html` (US: Ian Rowe; LatAm: Anthony Rugama, WhatsApp). The data is
+  in `src/data/site.ts` (`contacts`), also used by Organization JSON-LD for both public emails and phones with US/Latin America areas.
+- Both quiz locales abort requests after 15 seconds (the same deadline as Contact), show the localized failure/direct contacts and
+  restore retry. Cutover checks hold a fetch pending until its AbortSignal fires, assert the exact deadline and exercise a successful retry.
 - `node scripts/mutation-prove-contact.mjs` (clean tree only) breaks each contact rule in the source, rebuilds, and proves the gate that
   protects it fails on the intended assertion; it prints the table with the head SHA.
+  Set `EVIDENCE_DIR` to separate artifact directories when running independent evidence jobs concurrently.
 - The customers and partners marks move in one shared marquee, `src/components/ui/LogoMarquee.astro` (`src/styles/logo-marquee.css`): the
   home hero band (always on the dark stage) and the About partners strip (`surface="theme"`, own pause host through
   `src/scripts/logo-marquee.ts`). `node scripts/evidence.mjs --logos-only` guards both (two seamless sets, theme variants, no clipped
-  mark, movement, reduced motion) and the About pause scopes; the mutation battery covers it as M32 to M34.
+  mark, movement, reduced motion) and the About pause scopes, requiring rendered focus stillness and resumption after blur even when
+  the scope itself is the only keyboard target; the mutation battery covers it as M32 to M34 and M37.
 - The shipped-wording guard (`scripts/lib/no-demo-wording.mjs`, run by `npm run verify`) scans text files and file names in
   `dist/` for `demo`, `demostraci`, `preview`, `vista previa` and `[preview]`, case-insensitively. Only the exact whole words
   `demonstrated`, `demostrar`, `demostrado` and `demostró` are tolerated. Its only code exemptions are three exact literals, each
@@ -62,7 +66,9 @@ node scripts/evidence.mjs --engage-motion-only --checks-only # just the Platform
   the page's `call` topic is mapped to `demo` where the body is built; everywhere else the topic is `call` (`#topic-call`,
   `data-call-only`, `?topic=call`; `?topic=demo` stays a silent alias). Other pages and all bundles remain scanned. The battery asserts each
   copied-dist edit by content and hash, requires failures from the wording guard itself, retains legal-word/identity controls,
-  records the clean head, and writes `.evidence/no-demo-wording-battery.json`.
+  records the clean head, and writes `.evidence/no-demo-wording-battery.json`. Each exemption pins the complete designated statement
+  and its lookup/request binding, exactly once per file; missing sites, site-swaps and relocations fail independently of the global count.
+  **NOT COVERED:** static scans cannot see text composed at runtime, for example by `String.fromCharCode`.
 - Solutions, Resources, About and Contact in Floodlight (DESIGN-4 section 6): every page runs on `src/layouts/SolutionsPage.astro`
   (the foundation, the motion kit and `src/styles/solutions/solutions.css`; everything in the lane is prefixed `sx-`). The hero is
   `src/components/solutions/SxHero.astro` (impact, mesh, orbits, display H1; the Schools and Coaches swap line is one sentence for a

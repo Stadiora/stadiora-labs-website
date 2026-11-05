@@ -16,7 +16,7 @@ export const site = {
   // One contact per region, shown on the Contact page, in the footer and on connect.html.
   contacts: {
     us: { name: 'Ian Rowe', email: 'ian@stadioralabs.com', phone: '+1 859 285 9529', tel: '+18592859529' },
-    latam: { name: 'Anthony', email: 'anthony@stadioralabs.com', phone: '+506 6041-9069', tel: '+50660419069', whatsapp: 'https://wa.me/50660419069' },
+    latam: { name: 'Anthony Rugama', email: 'anthony@stadioralabs.com', phone: '+506 6041-9069', tel: '+50660419069', whatsapp: 'https://wa.me/50660419069' },
   },
   linkedin: 'https://www.linkedin.com/company/stadioralabs',
   stores: {

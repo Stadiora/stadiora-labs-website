@@ -5,6 +5,7 @@
 // file is scanned, so nothing a reader, a crawler or someone viewing the page source can see is skipped.
 // Only these whole unrelated words are tolerated: `demonstrated` (legal text), `demostrar`, `demostrado`, `demostró`.
 // `demonstration`, `demonstrate` and `demostración` are NOT tolerated.
+// NOT COVERED: a static scan cannot see text composed at runtime, for example by String.fromCharCode.
 // Run alone: `node scripts/lib/no-demo-wording.mjs [distDir]`.
 import { readdirSync, readFileSync } from 'node:fs';
 import { join, relative, resolve, sep } from 'node:path';
@@ -14,20 +15,38 @@ import { scanTags } from './html-scan.mjs';
 const BANNED = /\[preview\]|vista previa|preview|demostraci|demo/gi;
 const LEGAL_WORDS = /(?<![\p{L}\p{N}_])(?:demonstrated|demostrar|demostrado|demostró)(?![\p{L}\p{N}_])/giu;
 
-// Three exemptions, each one literal at one site in a <script> element, found with scanTags so comments, attributes, <noscript>
-// and visible text can never use them. Nothing else is exempt: no other file, bundle or wire value.
-//  1. The legacy alias `{demo:'call'}` in the inline contact-form module of each contact page.
-//  2. The endpoint's fixed topic enum, in the same inline module, at the one place the POST body is built:
-//     `{topic: <identifier> ? 'demo' : 'question', name:`. The backend accepts only `demo` or `question`, so the form maps its
-//     `call` topic to `demo` there (a minified bundle writes the strings in backticks, so any quote style is read).
-//  3. The same enum value in the plain inline script of each lead-magnet page, where its body is built:
-//     `{topic: 'demo', name: 'Early access request'`. The lead pages are static HTML with no shared constant, and a neutral-named
-//     constant would still put the literal in the file, so the exact site is the narrowest entry.
-const CONTACT_PAGES = /^(?:es\/)?contact\/index\.html$/;
-const LEGACY_ALIAS = /\{\s*demo\s*:\s*(['"`])call\1\s*\}/;
-const CONTACT_WIRE = /\{\s*topic\s*:\s*[\w$]+\s*\?\s*(['"`])demo\1\s*:\s*(['"`])question\2\s*,\s*name\s*:/;
-const LEAD_PAGES = /^lead-magnet(?:-es)?\.html$/;
-const LEAD_WIRE = /\{\s*topic\s*:\s*(['"`])demo\1\s*,\s*name\s*:\s*(['"`])Early access request\2/;
+// Pin the actual statements, not object-shaped fragments. A compiler change must deliberately update these expectations.
+// Each site must occur exactly once in its own file and in the script containing its real lookup/request.
+const contactSites = [
+  { name: 'contact legacy alias', statement: 'var e={demo:`call`},t=/^[^\\s@]+@[^\\s@]+\\.[^\\s@]{2,}$/,n=15e3;', request: 'b=e[y]??y,x=p.find(e=>e.value===b)' },
+  {
+    name: 'contact POST body',
+    statement: 'let y={topic:l?`demo`:`question`,name:c(`name`),email:c(`email`),role:c(`role`),message:c(`message`),locale:o,page:window.location.pathname,website:m(`website`).value,startedAt:u};',
+    request: 'let b=await r(a,y);',
+  },
+];
+const leadSite = (locale) => ({
+  name: 'lead POST body',
+  statement: `const body = {
+    topic: 'demo',
+    name: 'Early access request',
+    email: email,
+    role: path.startsWith('coach') ? 'coach' : 'athlete',
+    organization: label,
+    message: ${locale === 'en' ? '`Early access request from the readiness check.\\nProduct interest: ${label}`' : '`Solicitud de acceso anticipado desde la evaluación.\\nProducto de interés: ${label}`'},
+    locale: LOCALE,
+    page: window.location.pathname,
+    website: honeypot.value,
+    startedAt: OPENED_AT
+  };`,
+  request: "fetch(CONTACT_API, {\n        method: 'POST',",
+});
+const expectedSites = new Map([
+  ['contact/index.html', contactSites],
+  ['es/contact/index.html', contactSites],
+  ['lead-magnet.html', [leadSite('en')]],
+  ['lead-magnet-es.html', [leadSite('es')]],
+]);
 
 const wordingMatches = (text) => {
   const legalAt = new Set([...text.matchAll(LEGAL_WORDS)].map((m) => m.index));
@@ -54,6 +73,7 @@ const snippet = (text, index, length) => {
 export function scanDist(dist) {
   const root = resolve(dist);
   const problems = [];
+  const seenFiles = new Set();
   let allowedUsed = 0;
   for (const path of walk(root)) {
     const rel = relative(root, path).split(sep).join('/');
@@ -62,24 +82,25 @@ export function scanDist(dist) {
     if (isBinary(buf)) continue;
     const text = buf.toString('utf8');
     const allowedAt = new Set();
-    const allowAt = (script, tag, re) => {
-      const hit = re.exec(script);
-      if (hit) allowedAt.add(tag.contentStart + hit.index + hit[0].indexOf('demo'));
-      return Boolean(hit);
-    };
-    if (CONTACT_PAGES.test(rel)) {
-      for (const tag of scanTags(text)) {
-        if (tag.name !== 'script' || tag.attrs.type !== 'module' || 'src' in tag.attrs) continue;
-        const script = text.slice(tag.contentStart, tag.contentEnd);
-        if (!script.includes('data-contact-form')) continue;
-        const alias = allowAt(script, tag, LEGACY_ALIAS);
-        const wire = allowAt(script, tag, CONTACT_WIRE);
-        if (alias || wire) break;
-      }
-    } else if (LEAD_PAGES.test(rel)) {
-      for (const tag of scanTags(text)) {
-        if (tag.name !== 'script' || 'src' in tag.attrs) continue;
-        if (allowAt(text.slice(tag.contentStart, tag.contentEnd), tag, LEAD_WIRE)) break;
+    const sites = expectedSites.get(rel);
+    if (sites) {
+      seenFiles.add(rel);
+      const scripts = scanTags(text).filter((tag) => tag.name === 'script' && !('src' in tag.attrs));
+      for (const site of sites) {
+        const hits = [];
+        for (const tag of scripts) {
+          const script = text.slice(tag.contentStart, tag.contentEnd);
+          const contact = rel.endsWith('contact/index.html');
+          const requestSite = contact
+            ? tag.attrs.type === 'module' && script.includes('a=n.dataset.endpoint??``') && script.includes('fetch(e,{method:`POST`') && script.includes('document.querySelectorAll(`[data-contact-form]`)') && text.includes('data-endpoint="https://api.runwitharia.com/api/public/website-contact"')
+            : script.includes("const CONTACT_API = 'https://api.runwitharia.com/api/public/website-contact';") && script.includes('body: JSON.stringify(body)');
+          if (!requestSite || !script.includes(site.request)) continue;
+          for (let at = script.indexOf(site.statement); at !== -1; at = script.indexOf(site.statement, at + site.statement.length)) {
+            hits.push(tag.contentStart + at + site.statement.indexOf('demo'));
+          }
+        }
+        if (hits.length === 1) allowedAt.add(hits[0]);
+        else problems.push({ file: rel, where: site.name, match: site.name, context: `expected exactly 1 designated statement, found ${hits.length}` });
       }
     }
     for (const m of wordingMatches(text)) {
@@ -89,6 +110,9 @@ export function scanDist(dist) {
       }
       problems.push({ file: rel, where: `line ${lineOf(text, m.index)}`, match: m[0], context: snippet(text, m.index, m[0].length) });
     }
+  }
+  for (const [file, sites] of expectedSites) {
+    if (!seenFiles.has(file)) for (const site of sites) problems.push({ file, where: site.name, match: site.name, context: 'missing expected file/site' });
   }
   return { problems, allowedUsed };
 }

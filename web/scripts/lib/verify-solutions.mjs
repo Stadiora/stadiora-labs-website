@@ -1,7 +1,7 @@
 // Post-build checks for the solutions, resources and company pages (EN and ES). Called from verify-dist.mjs.
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { CONTACT_ENDPOINT, athleteRanges, approvedSuccess, findDeliveryClaims, missingContactHrefs, roles } from './contact-contract.mjs';
+import { CONTACT_ENDPOINT, athleteRanges, approvedSuccess, contacts, findDeliveryClaims, missingContactHrefs, roles } from './contact-contract.mjs';
 import { EDU, FREE, ORACLE, fmt } from './pricing-oracle.mjs';
 
 // What the teasers must show for US visitors (and no-JavaScript visitors): Core from at 25 athletes, high school at 100.
@@ -123,8 +123,16 @@ export function verifySolutions({ dist, fail }) {
       // Both regions' contact details sit in every page's footer.
       const footer = /<footer\b[\s\S]*<\/footer>/.exec(html)?.[0] ?? '';
       for (const href of missingContactHrefs(footer)) need(false, `the footer is missing the contact link ${href}`);
+      for (const contact of Object.values(contacts)) need(footer.includes(contact.name), `the footer is missing the full contact name ${contact.name}`);
+      const organization = [...html.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)].map((m) => JSON.parse(m[1])).find((data) => data['@type'] === 'Organization');
+      const points = organization?.contactPoint ?? [];
+      need(points.length === 2, 'Organization JSON-LD must publish exactly two regional contacts');
+      for (const [region, contact] of Object.entries(contacts)) {
+        need(points.some((point) => point['@type'] === 'ContactPoint' && point.name === contact.name && point.email === contact.email && point.telephone === contact.tel && point.areaServed === (region === 'us' ? 'US' : 'Latin America')), `Organization JSON-LD is missing the shared ${region} contact name, email, phone or areaServed`);
+      }
 
       if (route.path === '/contact/') {
+        for (const contact of Object.values(contacts)) need(pageText(html).includes(contact.name), `the page is missing the full contact name ${contact.name}`);
         for (const href of missingContactHrefs(html)) need(false, `the page is missing the contact link ${href}`);
 
         // The form posts to the live endpoint, with no mailto action to fall back on. The honest-contact contract is in

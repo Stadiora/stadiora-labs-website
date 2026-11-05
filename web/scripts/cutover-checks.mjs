@@ -200,6 +200,45 @@ const directLinks = ['mailto:ian@stadioralabs.com', 'mailto:anthony@stadioralabs
 
 for (const [path, { locale, again }] of Object.entries(copy)) {
   const t = (name) => `${locale}: ${name}`;
+  {
+    const { page, context } = await open(path);
+    const posts = await interceptContact(page, server.url, () => 202);
+    await toResults(page, locale);
+    await page.clock.install();
+    await page.clock.runFor(3500);
+    await page.evaluate(() => {
+      const original = window.fetch;
+      let first = true;
+      window.fetch = (...args) => {
+        if (!first) return original(...args);
+        first = false;
+        const signal = args[1]?.signal;
+        window.__hungContact = { started: Date.now(), aborted: false, elapsed: null };
+        return new Promise((resolve, reject) => {
+          signal?.addEventListener('abort', () => {
+            window.__hungContact.aborted = true;
+            window.__hungContact.elapsed = Date.now() - window.__hungContact.started;
+            reject(new DOMException('Aborted', 'AbortError'));
+          }, { once: true });
+        });
+      };
+    });
+    await page.locator('.email-row button').click();
+    await page.waitForFunction(() => Boolean(window.__hungContact));
+    await page.clock.runFor(14999);
+    check('lead-form', t('a never-settling fetch remains pending until the 15 s deadline'), await page.locator('.email-row button').isDisabled() && !(await page.evaluate(() => window.__hungContact.aborted)));
+    await page.clock.runFor(1);
+    const hung = await page.evaluate(() => window.__hungContact);
+    const status = await statusOf(page);
+    const retry = await page.locator('.email-row button').isEnabled();
+    check('lead-form', t('a never-settling fetch is aborted at 15 s with localized failure, direct links and retry'), hung.aborted && hung.elapsed === 15000 && retry && again.test(await page.locator('.email-row button').innerText()) && status.length > 20 && findDeliveryClaims(status, locale).length === 0 && JSON.stringify(await statusLinks(page)) === JSON.stringify(directLinks) && !(await visible(page, '#email-success')), JSON.stringify({ hung, retry, status }));
+    if (retry) {
+      await page.locator('.email-row button').click();
+      await page.locator('#email-success').waitFor({ state: 'visible', timeout: 3000 });
+    }
+    check('lead-form', t('retry after a timed-out request can succeed on 202'), retry && posts.length === 1 && await visible(page, '#email-success'));
+    await context.close();
+  }
   // Every outcome that is not exactly 202. The first three get their own message; the rest share the "unavailable" one.
   const outcomes = [
     ['HTTP 400', 400],

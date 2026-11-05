@@ -38,6 +38,11 @@ const contact = 'contact/index.html';
 const esContact = 'es/contact/index.html';
 const lead = 'lead-magnet.html';
 const esLead = 'lead-magnet-es.html';
+const replaceOnce = (text, needle, replacement) => {
+  assert.equal(text.split(needle).length - 1, 1, `Expected one mutation anchor: ${needle}`);
+  return text.replace(needle, replacement);
+};
+const marker = "<script>const marker = { topic: 'demo', name: 'Early access request' }; const visible = document.createElement('p'); visible.textContent = marker.topic; document.body.append(visible);</script>";
 const cases = [
   { name: 'Demo in title', file: home, needle: '<title>', insert: '<title>Demo ', match: 'Demo' },
   { name: '[PREVIEW] in title', file: home, needle: '<title>', insert: '<title>[PREVIEW] ', match: '[PREVIEW]' },
@@ -99,6 +104,21 @@ const cases = [
   { name: 'control: demostrar and demostró', file: esPricing, html: '<p>demostrar demostró</p>', green: true },
   { name: 'control: clean-tree identity', green: true },
   { name: 'control: exactly 6 exempt sites (contact alias and wire, lead wire, EN and ES)', green: true, allowlisted: 6 },
+  ...[lead, esLead].flatMap((file) => [
+    { name: `Lead site-swap to unrelated script (${file})`, file, edit: (text) => replaceOnce(text, "topic: 'demo',", 'topic: String.fromCharCode(100, 101, 109, 111),').replace('</body>', `${marker}</body>`), match: 'demo' },
+    { name: `Lead relocation within the request script (${file})`, file, edit: (text) => replaceOnce(text, "topic: 'demo',", 'topic: String.fromCharCode(100, 101, 109, 111),').replace('  const body = {', "  const marker = { topic: 'demo', name: 'Early access request' };\n  const body = {"), match: 'demo' },
+    { name: `Missing designated lead body (${file})`, file, needle: "topic: 'demo',", insert: 'topic: String.fromCharCode(100, 101, 109, 111),', match: 'lead POST body' },
+    { name: `Lead request binding missing (${file})`, file, needle: 'fetch(CONTACT_API, {', insert: 'fetch(String(CONTACT_API), {', match: 'lead POST body' },
+    { name: `Duplicate designated lead body (${file})`, file, edit: (text) => { const body = /  const body = \{[\s\S]*?\n  \};/.exec(text)?.[0]; assert.ok(body); return replaceOnce(text, body, `${body}\n${body}`); }, match: 'lead POST body' },
+  ]),
+  ...[contact, esContact].flatMap((file) => [
+    { name: `Contact alias site-swap (${file})`, file, edit: (text) => replaceOnce(text, '{demo:`call`}', '{[String.fromCharCode(100,101,109,111)]:`call`}').replace('</body>', '<script type="module">const marker={demo:"call"};document.querySelector("[data-contact-form]");</script></body>'), match: 'demo' },
+    { name: `Contact body site-swap (${file})`, file, edit: (text) => replaceOnce(text, '?`demo`:`question`', '?String.fromCharCode(100,101,109,111):`question`').replace('</body>', '<script type="module">const marker={topic:l?`demo`:`question`,name:1};document.querySelector("[data-contact-form]");</script></body>'), match: 'demo' },
+    { name: `Contact alias relocation within the module (${file})`, file, edit: (text) => replaceOnce(text, '{demo:`call`}', '{[String.fromCharCode(100,101,109,111)]:`call`}').replace('var e=', 'const marker={demo:`call`};var e='), match: 'demo' },
+    { name: `Contact body relocation within the module (${file})`, file, edit: (text) => replaceOnce(text, '?`demo`:`question`', '?String.fromCharCode(100,101,109,111):`question`').replace('let y={topic:', 'const marker={topic:l?`demo`:`question`,name:1};let y={topic:'), match: 'demo' },
+    { name: `Missing designated contact alias (${file})`, file, needle: '{demo:`call`}', insert: '{}', match: 'contact legacy alias' },
+    { name: `Missing designated contact body (${file})`, file, needle: '?`demo`:`question`', insert: '?`call`:`question`', match: 'contact POST body' },
+  ]),
 ];
 
 const scratch = mkdtempSync(join(tmpdir(), 'r57-wording-'));
@@ -120,8 +140,8 @@ try {
       if (path) {
         const original = before?.toString('utf8') ?? '';
         const needle = test.needle ?? '</body>';
-        const edited = test.content ?? original.replace(needle, test.insert ?? `${test.html}</body>`);
-        if (test.content === undefined) assert.ok(original.includes(needle), `${test.name}: anchor missing`);
+        const edited = test.edit ? test.edit(original) : test.content ?? original.replace(needle, test.insert ?? `${test.html}</body>`);
+        if (test.content === undefined && !test.edit) assert.ok(original.includes(needle), `${test.name}: anchor missing`);
         assert.notEqual(edited, original, `${test.name}: edit did not land`);
         mkdirSync(join(path, '..'), { recursive: true });
         writeFileSync(path, edited);

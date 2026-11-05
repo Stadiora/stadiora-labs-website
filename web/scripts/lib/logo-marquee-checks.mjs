@@ -132,5 +132,5 @@ export async function logoMarqueeChecks({ open, settle, check, sleep, pauses = t
   }
 
   // Hover, keyboard focus, offscreen and hidden-tab pauses of the About instance, measured on rendered values.
-  if (pauses) await solutionsMotionChecks({ open, settle, check, sleep, only: 'en/about/' });
+  if (pauses) await solutionsMotionChecks({ open, settle, check, sleep, only: 'en/about/', requireMarqueeFocus: true });
 }

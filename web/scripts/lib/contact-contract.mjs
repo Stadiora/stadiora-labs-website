@@ -22,7 +22,7 @@ export const MIN_FILL_MS = 3000;
 // Both regions, on the Contact page, in the footer and on connect.html.
 export const contacts = {
   us: { name: 'Ian Rowe', email: 'ian@stadioralabs.com', tel: '+18592859529', phone: '+1 859 285 9529' },
-  latam: { name: 'Anthony', email: 'anthony@stadioralabs.com', tel: '+50660419069', phone: '+506 6041-9069', whatsapp: 'https://wa.me/50660419069' },
+  latam: { name: 'Anthony Rugama', email: 'anthony@stadioralabs.com', tel: '+50660419069', phone: '+506 6041-9069', whatsapp: 'https://wa.me/50660419069' },
 };
 export const contactHrefs = [
   `mailto:${contacts.us.email}`,
