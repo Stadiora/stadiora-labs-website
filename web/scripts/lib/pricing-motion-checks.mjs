@@ -138,8 +138,9 @@ export async function motionChecks({ open, close, check, sleep, out }) {
   }
 
   // ------------------------------------------------------------ 2. the estimate's background loop follows the autoplayer
-  // Measured: the computed transform of .est::before is read 700 ms apart. A loop that ignores hover, focus, the viewport,
-  // a hidden tab or reduced motion shows up as movement where there must be none; a loop that never runs fails the control.
+  // Measured: the computed transform of .est::before is read 700 ms apart. A loop that ignores keyboard focus, the viewport,
+  // a hidden tab or reduced motion shows up as movement where there must be none; a loop that never runs fails the control, and
+  // so does a loop that a mouse pointer over the panel or a click on it stops (the pointer never pauses anything).
   {
     const bad = [];
     const page = await open(paths.en, { width: 1280, height: 900, reduced: false });
@@ -152,11 +153,15 @@ export async function motionChecks({ open, close, check, sleep, out }) {
       const delta = x.length === 6 && y.length === 6 ? Math.abs(x[0] - y[0]) * 1000 + Math.abs(x[4] - y[4]) + Math.abs(x[5] - y[5]) : a === c ? 0 : 999;
       return { still: a === c, delta: Math.round(delta * 100) / 100 };
     };
-    const expectMoving = async (label) => {
+    const expectMoving = async (label, into = bad) => {
       await page.evaluate(parkEstLoop);
       const r = await moved();
-      if (r.delta < 5) bad.push(`${label}: the loop should be moving but moved ${r.delta}`);
+      if (r.delta < 5) into.push(`${label}: the loop should be moving but moved ${r.delta}`);
       return r.delta;
+    };
+    const expectOn = async (label, into) => {
+      const state = await page.evaluate(estState);
+      if (state.ap !== 'on' || state.why) into.push(`${label}: data-ap is ${JSON.stringify(state)}, want on with no reason${state.why === 'hover' ? ' (paused under the pointer: data-ap-why=hover)' : ''}`);
     };
     const expectStill = async (label, why) => {
       await page.evaluate(parkEstLoop);
@@ -175,20 +180,39 @@ export async function motionChecks({ open, close, check, sleep, out }) {
     await toEst();
     out.motionEstControlDelta = await expectMoving('in view, pointer away');
 
-    const title = await page.locator('.est__title').boundingBox();
-    await page.mouse.move(title.x + title.width / 2, title.y + title.height / 2);
-    await sleep(150);
-    await expectStill('pointer over the panel', 'hover');
-    await parked(page);
-    await sleep(150);
-    await expectMoving('pointer left the panel');
-
     await page.locator('[data-est-cta]').focus();
     await sleep(150);
     await expectStill('focus inside the panel', 'focus');
     await page.evaluate(() => document.activeElement?.blur());
     await sleep(150);
     await expectMoving('focus left the panel');
+
+    // The pointer never pauses the loop: parked on the panel, after a click on it and on its button (which leaves focus there), and
+    // once it has left again, data-ap stays on and the drift keeps moving. Runs after the keyboard focus case, because a script
+    // focus that follows a mouse click does not count as keyboard focus.
+    const pointerBad = [];
+    const title = await page.locator('.est__title').boundingBox();
+    await page.mouse.move(title.x + title.width / 2, title.y + title.height / 2);
+    await sleep(150);
+    await expectOn('pointer over the panel', pointerBad);
+    out.motionEstUnderPointerDelta = await expectMoving('pointer over the panel', pointerBad);
+    await page.mouse.click(title.x + title.width / 2, title.y + title.height / 2);
+    await sleep(150);
+    await expectOn('mouse click on the panel', pointerBad);
+    await expectMoving('mouse click on the panel', pointerBad);
+    // the button is a link: the click must leave focus on it without leaving the page
+    await page.evaluate(() => window.addEventListener('click', (e) => e.target instanceof Element && e.target.closest('[data-est-cta]') && e.preventDefault(), true));
+    const cta = await page.locator('[data-est-cta]').boundingBox();
+    await page.mouse.click(cta.x + cta.width / 2, cta.y + cta.height / 2);
+    await sleep(150);
+    await expectOn('mouse click on the panel button', pointerBad);
+    await expectMoving('mouse click on the panel button', pointerBad);
+    await page.evaluate(() => document.activeElement?.blur());
+    await parked(page);
+    await sleep(150);
+    await expectOn('pointer left the panel', pointerBad);
+    await expectMoving('pointer left the panel', pointerBad);
+    check('pricing/motion', 'the estimate background loop keeps moving (computed transform differs 700 ms apart, data-ap stays on) with the pointer on the panel, after a mouse click on it and on its button, and after the pointer leaves', pointerBad.length === 0, pointerBad.slice(0, 3).join('; '));
 
     await page.evaluate(() => window.scrollTo({ top: 0, behavior: 'instant' }));
     await page.waitForFunction(() => document.querySelector('.est')?.dataset.ap === 'off', null, { timeout: 3000 }).catch(() => {});
@@ -213,7 +237,7 @@ export async function motionChecks({ open, close, check, sleep, out }) {
     await sleep(200);
     await expectMoving('reduced motion switched off');
 
-    check('pricing/motion', 'the estimate background loop is measured moving in view, and still (computed transform equal 700 ms apart) with the pointer on the panel, focus inside it, scrolled away, a hidden tab and reduced motion, and moving again after each', bad.length === 0, bad.slice(0, 3).join('; '));
+    check('pricing/motion', 'the estimate background loop is measured moving in view, and still (computed transform equal 700 ms apart) with keyboard focus inside the panel, scrolled away, a hidden tab and reduced motion, and moving again after each', bad.length === 0, bad.slice(0, 3).join('; '));
     check('pricing/motion', 'the estimate loop pass logged no console errors', page.problems.length === 0, page.problems.slice(0, 2).join('; '));
     await close(page);
 

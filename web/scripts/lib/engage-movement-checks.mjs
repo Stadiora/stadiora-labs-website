@@ -4,10 +4,11 @@
 //   - the clocks of every animation and transition in the scope (a running clock advances, a paused one holds still),
 //   - the scope's markup with the kit's own data-ap* flags removed (text, classes, inline styles: scrambles, tab progress bars),
 //   - the currentTime of every clip in the scope.
-// For each host: a positive control (it must move while it runs, so "nothing moved" can mean something), then for hover,
-// keyboard focus, leaving the screen, a hidden tab and reduced motion switched on mid-run: pause at the START of a burst of work
+// For each host: a positive control (it must move while it runs, so "nothing moved" can mean something). Then, for keyboard
+// focus, leaving the screen, a hidden tab and reduced motion switched on mid-run: pause at the START of a burst of work
 // (so a swap, a reveal or a scramble is in flight), take the clocks, wait 1.4 s, and nothing may have advanced; then lift the
-// condition and the host must move again. Page chrome that is not an autoplayer (.mesh, .orbits, .grad-text) is out of scope,
+// condition and the host must move again. A mouse pointer is not a pause condition: with the pointer parked over the host's
+// scope, and again after a mouse click there, the host must keep moving (data-ap stays on, no data-ap-why). Page chrome that is not an autoplayer (.mesh, .orbits, .grad-text) is out of scope,
 // as in the Coach guard (coach-motion-checks.mjs). Transitions on the link or button under the pointer or focus are user
 // feedback, not autoplay, and are ignored.
 // Mutation proof (see the PR): kit.ts `pause: () => g.anims.forEach((a) => a.pause())` -> `pause: () => {}` fails Integrations
@@ -75,9 +76,10 @@ const readHeld = () =>
     })
     .filter(Boolean);
 
-// A point inside the host's scope that is visible, belongs to it and sits on no control and no transition, so hovering it
-// does nothing but report "the pointer is here".
-const quietPoint = (i) => {
+// A point inside the host's scope that is visible, belongs to it and sits on no control and no transition, so parking the pointer
+// or clicking there does nothing but report "the pointer is here". A click point may sit on a tabindex scope (a mouse click that
+// leaves focus there must not pause); a pointer point avoids every focus stop.
+const quietPoint = ({ i, click }) => {
   const host = document.querySelector(`[data-ap-i="${i}"]`);
   const scope = (host.dataset.apWithin && document.querySelector(host.dataset.apWithin)) || host.closest('[data-ap-scope]') || host.querySelector('[data-ap-scope]') || host;
   const r = scope.getBoundingClientRect();
@@ -93,8 +95,8 @@ const quietPoint = (i) => {
       const y = y0 + (y1 - y0) * fy;
       const hit = document.elementFromPoint(x, y);
       if (!hit || !scope.contains(hit)) continue;
-      any ??= { x, y };
-      if (!hit.closest('a, button, [role="tab"], [tabindex]:not([tabindex="-1"]), input, select, textarea')) return { x, y };
+      any ??= { x, y, quiet: false };
+      if (!hit.closest(click ? 'a, button, [role="tab"], input, select, textarea, summary, label' : 'a, button, [role="tab"], [tabindex]:not([tabindex="-1"]), input, select, textarea')) return { x, y, quiet: true };
     }
   }
   return any;
@@ -201,20 +203,6 @@ export async function engageMovementChecks({ open, check, sleep, settle }, p) {
 
   const conditions = [
     {
-      name: 'the pointer is over it',
-      flag: 'off/hover',
-      apply: async (h) => {
-        const pt = await page.evaluate(quietPoint, h.i);
-        if (!pt) return false;
-        await page.mouse.move(pt.x, pt.y);
-        return true;
-      },
-      release: async (h) => {
-        const rest = await page.evaluate(restPoint, h.i);
-        await page.mouse.move(rest.x, rest.y);
-      },
-    },
-    {
       name: 'keyboard focus is inside it',
       flag: 'off/focus',
       apply: (h) => page.evaluate(focusIn, h.i),
@@ -249,6 +237,10 @@ export async function engageMovementChecks({ open, check, sleep, settle }, p) {
     },
   ];
 
+  const readable = (st) => {
+    const [ap, why] = st.split('/');
+    return `data-ap=${ap}${why ? ` data-ap-why=${why}` : ''}`;
+  };
   const still = Object.fromEntries(conditions.map((c) => [c.name, []]));
   const resumed = [];
   const flags = [];
@@ -298,6 +290,40 @@ export async function engageMovementChecks({ open, check, sleep, settle }, p) {
     }
   }
   const hostCount = hosts.length;
+
+  // The pointer is not a pause condition. Parked over a host's scope, and again after a mouse click there, the host stays on
+  // and something in its scope keeps moving (the same clocks, markup and clip time the pauses above are measured on).
+  const pointer = { hover: [], click: [], hoverProbed: 0, clickProbed: 0, noPoint: [] };
+  for (const h of hosts) {
+    await page.evaluate(centreHost, h.i);
+    if (!(await waitState(h.i, 'on/', 3000)).ok) continue;
+    const pt = await page.evaluate(quietPoint, { i: h.i, click: false });
+    if (!pt) pointer.noPoint.push(h.label);
+    else {
+      pointer.hoverProbed++;
+      await page.mouse.move(pt.x, pt.y);
+      await sleep(250);
+      const state = await page.evaluate(hostState, h.i);
+      if (state !== 'on/') pointer.hover.push(`${h.label}: paused under the pointer (${readable(state)})`);
+      else if (!(await untilMoved(h.i, 9000))) pointer.hover.push(`${h.label}: nothing moved for 9 s with the pointer parked over it`);
+      const rest = await page.evaluate(restPoint, h.i);
+      await page.mouse.move(rest.x, rest.y);
+    }
+    if (!(await waitState(h.i, 'on/', 3000)).ok) continue;
+    const cp = await page.evaluate(quietPoint, { i: h.i, click: true });
+    if (!cp?.quiet) continue;
+    pointer.clickProbed++;
+    await page.mouse.click(cp.x, cp.y);
+    await sleep(300);
+    const state = await page.evaluate(hostState, h.i);
+    if (state !== 'on/') pointer.click.push(`${h.label}: stopped by a mouse click (${readable(state)})`);
+    else if (!(await untilMoved(h.i, 9000))) pointer.click.push(`${h.label}: nothing moved for 9 s after a mouse click in it`);
+    const rest = await page.evaluate(restPoint, h.i);
+    await page.mouse.move(rest.x, rest.y);
+    await page.evaluate(blurAll);
+  }
+  check(group, `${label}: with the pointer parked over an autoplayer's scope it keeps moving (data-ap stays on, no data-ap-why=hover; clocks, markup or clip time change; ${pointer.hoverProbed} of ${hostCount} hosts probed)`, pointer.hover.length === 0 && pointer.hoverProbed >= p.hosts, pointer.hover.join(' | ') || `only ${pointer.hoverProbed} hosts could be probed, at least ${p.hosts} expected: ${pointer.noPoint.join(', ')}`);
+  check(group, `${label}: after a mouse click in an autoplayer's scope it keeps moving (data-ap stays on; ${pointer.clickProbed} of ${hostCount} hosts clicked)`, pointer.click.length === 0 && pointer.clickProbed >= p.hosts, pointer.click.join(' | ') || `only ${pointer.clickProbed} hosts had a quiet point to click, at least ${p.hosts} expected`);
   check(group, `${label}: every autoplayer host moves while it runs (clocks, markup or clip time change within 14 s; ${hostCount} hosts)`, idle.length === 0 && hostCount >= 1, idle.join('; '));
   for (const c of conditions) {
     check(group, `${label}: nothing in an autoplayer's scope moves for 1.4 s after it pauses because ${c.name} (animation clocks, text and markup, clip time; ${exercised[c.name]} of ${hostCount} hosts exercised)`, still[c.name].length === 0 && exercised[c.name] >= 1, still[c.name].join(' | ') || `no host could be put in that condition: ${unavailable.join(', ')}`);

@@ -1,11 +1,13 @@
-// Pause and reduced motion for the API page's moving stages, measured on what is rendered.
+// Pause (keyboard focus, hidden tab, off screen), pointer and reduced motion for the API page's moving stages, measured on what is rendered.
 //   A stage is every [data-api-stage] unit (hero engine, status line, data wall, capability cards, how-it-works sample, sports
 //   strip, use cases, hub). For each one the check takes a fingerprint, waits, and takes another:
 //     - the rendered value of every property an endless loop (CSS or the kit's timelines) inside it animates, and
 //     - the serialised markup of the stage, which carries what the timers and frame loops write (typed code, the swapped
 //       sport word, the progress variable, class changes).
 //   running: the fingerprint must change (the positive control, so a stage that never moved cannot pass as "paused");
-//   hovered, focused, off screen, or in a hidden tab: it must not change at all; after that it must change again.
+//   focused (keyboard), off screen, or in a hidden tab: it must not change at all; after that it must change again.
+//   A mouse pointer never pauses a stage: with the pointer parked over it, and again after a mouse click on it, the same loops
+//   (a stalled one is retried over a second window) and the fingerprint must keep changing and data-ap must stay on.
 //   Reading playState instead would pass a loop that something else keeps moving, so only rendered values count.
 //   Finite transitions: a stage's fingerprint also lists every transition or one-shot animation still in flight with the rendered
 //   value of each property it drives (the use-case photo's 7 s scale), so a pause that leaves one running fails whatever its duration.
@@ -56,6 +58,34 @@ const fingerprint = (idx) => {
   return out;
 };
 
+// A viewport point inside the stage's scope that sits on no control, and one on a control that a click cannot navigate away with.
+// Serialised into the page, so each helper is self-contained.
+const quietPoint = (i) => {
+  const host = document.querySelectorAll('[data-api-stage]')[i];
+  const scope = host.matches('[data-ap-scope]') ? host : host.querySelector('[data-ap-scope]') || host;
+  const r = scope.getBoundingClientRect();
+  for (const fy of [0.5, 0.3, 0.7, 0.15, 0.85]) {
+    for (const fx of [0.5, 0.3, 0.7, 0.15, 0.85]) {
+      const x = Math.min(Math.max(r.left, 0) + (Math.min(r.right, innerWidth) - Math.max(r.left, 0)) * fx, innerWidth - 1);
+      const y = Math.max(r.top, 0) + (Math.min(r.bottom, innerHeight) - Math.max(r.top, 0)) * fy;
+      const hit = document.elementFromPoint(x, y);
+      if (hit && scope.contains(hit) && !hit.closest('a, button, input, select, textarea, summary, label')) return { x, y };
+    }
+  }
+  return null;
+};
+const controlPoint = (i) => {
+  const host = document.querySelectorAll('[data-api-stage]')[i];
+  const scope = host.matches('[data-ap-scope]') ? host : host.querySelector('[data-ap-scope]') || host;
+  for (const c of scope.querySelectorAll('button, [tabindex="0"]')) {
+    const r = c.getBoundingClientRect();
+    if (r.width < 4 || r.height < 4 || r.left < 0 || r.right > innerWidth || r.top < 0 || r.bottom > innerHeight) continue;
+    const hit = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2);
+    if (hit && c.contains(hit)) return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
+  }
+  return null;
+};
+
 // Waits until the page has stopped scrolling, then lets the observers report.
 const settled = async (page) => {
   let last = -1;
@@ -80,6 +110,8 @@ export async function apiMotionChecks({ open, check, sleep, settle, metrics }) {
     );
     check('api-motion', `${lang}: the page declares its moving stages`, stages.length >= 8, `${stages.length}: ${stages.map((s) => s.name).join(', ')}`);
 
+    const clicks = [];
+    const clicked = { surface: 0, control: 0 };
     for (const st of stages) {
       if (only && !only.has(st.name)) continue;
       if (process.env.API_MOTION_STAGE && !`${lang}:${st.name}#${st.i}`.startsWith(process.env.API_MOTION_STAGE)) continue;
@@ -90,7 +122,7 @@ export async function apiMotionChecks({ open, check, sleep, settle, metrics }) {
       const take = () => page.evaluate(fingerprint, st.i);
       const idle = async () => {
         await page.evaluate(() => document.activeElement instanceof HTMLElement && document.activeElement.blur());
-        // Outside the viewport: a pointer parked inside a full-screen stage would count as hovering it.
+        // Outside the viewport, so the positive control and the pause conditions are measured with no pointer over any stage.
         await page.mouse.move(-5, -5);
         await sleep(250);
       };
@@ -152,24 +184,52 @@ export async function apiMotionChecks({ open, check, sleep, settle, metrics }) {
       const box = await scopeEl.boundingBox();
       await page.mouse.move(box.x + Math.min(box.width / 2, 400), box.y + Math.min(box.height / 2, 200), { steps: 4 });
       await sleep(250);
-      let still = (await watch()).filter((k) => live.has(k));
-      check('api-motion', `${label}: mouse over it stops everything in it`, still.length === 0, still.length ? `still moving: ${still.join(', ')}` : `${live.size} moving parts held still`);
+      const apState = () => page.evaluate((i) => { const e = document.querySelectorAll('[data-api-stage]')[i]; return { ap: e.dataset.ap, why: e.dataset.apWhy }; }, st.i);
+      const readable = (d) => `data-ap=${d.ap}${d.why ? ` data-ap-why=${d.why}` : ''}`;
+      // Loops of the live set that stood still over a window and over one more (a loop caught at a turning point is not a stall).
+      const stalledLoops = async (changedNow) => {
+        const left = [...live].filter((k) => k.startsWith('loop ') && !changedNow.includes(k));
+        if (!left.length) return left;
+        const retry = await watch();
+        return left.filter((k) => !retry.includes(k));
+      };
+      // Moving: at least one live part changed, no live loop stood still, and the host never left "on".
+      const keepsMoving = async () => {
+        const now = await watch();
+        const stalled = await stalledLoops(now);
+        const kept = now.filter((k) => live.has(k));
+        const state = await apState();
+        return { ok: kept.length > 0 && stalled.length === 0 && state.ap === 'on' && !state.why, kept, stalled, state };
+      };
+      const verdict = (m, how) => (m.ok ? `${m.kept.length} of ${live.size} moving parts kept changing` : `${how} (${readable(m.state)}); changing ${m.kept.length} of ${live.size}${m.stalled.length ? `, loops that stood still: ${m.stalled.join(', ')}` : ''}`);
+      let m = await keepsMoving();
+      check('api-motion', `${label}: mouse over it keeps everything in it moving (data-ap stays on)`, m.ok, verdict(m, 'paused under the pointer'));
 
       if (st.name === 'uc') {
-        // A row opened under the pointer starts a new transition while the host is already paused; it must be held as well.
+        // A row opened under the pointer starts a new transition; it runs as well.
         await provoke();
         await sleep(700);
-        still = (await watch()).filter((k) => live.has(k));
-        check('api-motion', `${label}: a row opened while the pointer is over it stays still too`, still.length === 0, still.length ? `still moving: ${still.join(', ')}` : `${live.size} moving parts held still`);
+        m = await keepsMoving();
+        check('api-motion', `${label}: a row opened while the pointer is over it keeps moving too (data-ap stays on)`, m.ok, verdict(m, 'paused under the pointer'));
       }
 
+      let still;
       if (st.focusable) {
         await idle();
         await provoke();
+        // Keyboard focus, as a keyboard user gets it: any earlier mouse click must not make this a mouse focus.
+        await page.keyboard.press('Shift');
         await scopeEl.evaluate((e) => (e.matches('button, a[href], input, [tabindex="0"]') ? e : e.querySelector('button, a[href], input, [tabindex="0"]')).focus());
         await sleep(250);
         still = (await watch()).filter((k) => live.has(k));
         check('api-motion', `${label}: focus on a control inside it stops everything in it`, still.length === 0, still.length ? `still moving: ${still.join(', ')}` : `${live.size} moving parts held still`);
+        if (st.name === 'uc') {
+          // A row opened while keyboard focus holds the block starts a transition that must be held as well.
+          await provoke();
+          await sleep(700);
+          still = (await watch()).filter((k) => live.has(k));
+          check('api-motion', `${label}: a row opened while keyboard focus is inside it stays still too`, still.length === 0, still.length ? `still moving: ${still.join(', ')}` : `${live.size} moving parts held still`);
+        }
       }
 
       await idle();
@@ -198,9 +258,29 @@ export async function apiMotionChecks({ open, check, sleep, settle, metrics }) {
       await idle();
       await park();
       const back = (await watch()).filter((k) => live.has(k));
-      check('api-motion', `${label}: moves again once the pointer, focus and hidden tab are gone and it is back on screen`, back.length > 0, `resumed: ${back.slice(0, 4).join(', ') || 'none'}`);
+      check('api-motion', `${label}: moves again once focus and the hidden tab are gone and it is back on screen`, back.length > 0, `resumed: ${back.slice(0, 4).join(', ') || 'none'}`);
+      // A mouse click on the stage (a quiet spot of its scope, then a control in it) leaves focus there by mouse: still moving.
+      const clickAt = async (what, pointOf) => {
+        await idle();
+        await park();
+        await provoke();
+        const pt = await pointOf();
+        if (!pt) return false;
+        await page.mouse.click(pt.x, pt.y);
+        await sleep(250);
+        const m = await keepsMoving();
+        check('api-motion', `${label}: a mouse click on ${what} keeps everything in it moving (data-ap stays on)`, m.ok, verdict(m, 'stopped by a mouse click'));
+        return true;
+      };
+      const quiet = await clickAt('its surface', () => page.evaluate(quietPoint, st.i));
+      const onControl = await clickAt('a control in it', () => page.evaluate(controlPoint, st.i));
+      clicks.push(`${label}: surface ${quiet}, control ${onControl}`);
+      if (quiet) clicked.surface++;
+      if (onControl) clicked.control++;
       metrics[`api-motion-${label.replace(/\W+/g, '-')}`] = { moving: live.size };
     }
+
+    check('api-motion', `${lang}: the mouse clicks really landed (${clicked.surface} stages clicked on a quiet spot, ${clicked.control} on a control)`, clicked.surface >= 1 && clicked.control >= 1, clicks.join('; '));
 
     // Every endless loop in the page content belongs to a stage (or to the shared chrome), so nothing escapes the pause.
     const loose = await page.evaluate(

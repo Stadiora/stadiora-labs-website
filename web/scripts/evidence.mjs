@@ -9,6 +9,7 @@
 //   node scripts/evidence.mjs --logos-only     (the shared logo marquee on the home hero and the About partners strip, plus the About pause guards)
 //   node scripts/evidence.mjs --home-only      (the home guards only: structure, autoplayers, reduced motion, marquees, hero words, clipping, contrast)
 //   node scripts/evidence.mjs --api-only       (the API page, EN and ES: pause, reduced motion and glyph-pixel contrast of the API and legal pages)
+//   node scripts/evidence.mjs --no-hover-pause-only   (every page, EN and ES, legacy pages included: no :hover or :focus-within pause in any resolved style, and a real mouse over every animation host pauses nothing; NHP_PAGES=/pricing/,/es/ narrows the pages)
 // Output goes to EVIDENCE_DIR or web/.evidence/ (git-ignored): PNGs plus summary.json. Exit code 1 when a check fails.
 import { mkdir, readdir, readFile, rm, stat, writeFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
@@ -26,6 +27,7 @@ import { engageMotionChecks } from './lib/engage-motion-checks.mjs';
 import { homeChecks, homeSections } from './lib/home-checks.mjs';
 import { logoMarqueeChecks } from './lib/logo-marquee-checks.mjs';
 import { navChecks } from './lib/nav-checks.mjs';
+import { noHoverPauseChecks } from './lib/no-hover-pause-checks.mjs';
 import { pricingChecks } from './lib/pricing-checks.mjs';
 import { platformCoachChecks } from './lib/platform-coach-checks.mjs';
 import { solutionsChecks } from './lib/solutions-checks.mjs';
@@ -44,6 +46,7 @@ const homeOnly = process.argv.includes('--home-only');
 const contactOnly = process.argv.includes('--contact-only');
 const logosOnly = process.argv.includes('--logos-only');
 const apiOnly = process.argv.includes('--api-only');
+const noHoverPauseOnly = process.argv.includes('--no-hover-pause-only');
 
 await rm(outDir, { recursive: true, force: true });
 await mkdir(outDir, { recursive: true });
@@ -56,7 +59,8 @@ const check = (group, name, pass, detail = '') => {
 const metrics = {};
 
 // DIST_DIR points the run at another build (a mutation build in its own folder, so the real dist stays untouched).
-const server = await serve(process.env.DIST_DIR ? resolve(process.env.DIST_DIR) : `${root}dist`);
+const distDir = process.env.DIST_DIR ? resolve(process.env.DIST_DIR) : `${root}dist`;
+const server = await serve(distDir);
 const browser = await chromium.launch();
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -138,6 +142,13 @@ if (contactOnly) {
 // The shared logo marquee (home hero band, About partners); `--logos-only` runs just this and the About pause guards.
 if (logosOnly) {
   await logoMarqueeChecks({ open, settle, check, sleep, pauses: true });
+  await finish();
+}
+
+// A mouse pointer never pauses anything, on any page. `--no-hover-pause-only` runs just this (the mutation battery uses it).
+const noHoverPauseRun = () => noHoverPauseChecks({ open, check, sleep, metrics, distDir, only: process.env.NHP_PAGES?.split(',').filter(Boolean) });
+if (noHoverPauseOnly) {
+  await noHoverPauseRun();
   await finish();
 }
 
@@ -514,4 +525,5 @@ await contactRun();
 
 await coachRun();
 await apiRun();
+await noHoverPauseRun();
 await finish();

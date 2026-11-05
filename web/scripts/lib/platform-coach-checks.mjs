@@ -273,7 +273,7 @@ export async function platformCoachChecks({ open, check, shot, el, sleep, settle
   await coachAiContrastChecks({ open, check, sleep, settle });
 
   // ---- 2. interactions (motion on)
-  // Hover and focus pause, measured on rendered values for every moving stage on every page.
+  // Pointer, mouse click and keyboard-focus behaviour, measured on rendered values for every moving stage on every page.
   await coachMotionChecks({ open, check, sleep, settle, metrics });
   for (const locale of locales) {
     // Accordions: programs and readiness.
