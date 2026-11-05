@@ -8,7 +8,7 @@ interface Card {
   alt: string;
   label: string;
   /** Read aloud instead of the phone, which is decorative. */
-  preview: string;
+  description: string;
 }
 interface Props {
   locale: Locale;
@@ -38,7 +38,7 @@ const phones = await Promise.all(cards.map((_, i) => Astro.slots.render(`phone-$
         <div class="hrc__bar">
           <h3 class="hrc__label">{card.label}</h3>
         </div>
-        <p class="sr-only">{card.preview}</p>
+        <p class="sr-only">{card.description}</p>
         <div class="hrc__phone-wrap" aria-hidden="true">
           <div class="hrc__phone" set:html={phones[i]} />
         </div>

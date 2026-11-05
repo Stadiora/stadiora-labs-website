@@ -2,35 +2,38 @@
 // email app. It never shows a "sent" state, because nothing is sent from the page.
 interface MailPayload {
   to: string;
-  demoSubject: string;
+  callSubject: string;
   questionSubject: string;
   labels: { name: string; email: string; role: string; org: string; athletes: string };
   opening: string;
 }
 
-type Topic = 'demo' | 'question';
+type Topic = 'call' | 'question';
+// Links shared before the rename carry ?topic=demo; they still open the same form.
+const LEGACY_TOPICS: Record<string, Topic> = { demo: 'call' };
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
 function init(form: HTMLFormElement) {
   const mail = JSON.parse(form.dataset.mail ?? '{}') as MailPayload;
   const status = form.querySelector<HTMLElement>('[data-status]');
-  const demoOnly = form.querySelector<HTMLElement>('[data-demo-only]');
+  const callOnly = form.querySelector<HTMLElement>('[data-call-only]');
   const radios = Array.from(form.querySelectorAll<HTMLInputElement>('input[name="topic"]'));
   const field = (name: string) => form.elements.namedItem(name) as HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement;
-  const topic = (): Topic => (radios.find((r) => r.checked)?.value === 'question' ? 'question' : 'demo');
+  const topic = (): Topic => (radios.find((r) => r.checked)?.value === 'question' ? 'question' : 'call');
 
   // Our own messages replace the browser's, so they can be tied to each field with aria-describedby.
   form.noValidate = true;
 
   const applyTopic = () => {
-    const isDemo = topic() === 'demo';
-    if (demoOnly) {
-      demoOnly.hidden = !isDemo;
-      field('athletes').disabled = !isDemo;
+    const isCall = topic() === 'call';
+    if (callOnly) {
+      callOnly.hidden = !isCall;
+      field('athletes').disabled = !isCall;
     }
   };
 
-  const requested = new URLSearchParams(window.location.search).get('topic');
+  const asked = new URLSearchParams(window.location.search).get('topic') ?? '';
+  const requested = LEGACY_TOPICS[asked] ?? asked;
   const initial = radios.find((r) => r.value === requested);
   if (initial) initial.checked = true;
   applyTopic();
@@ -84,15 +87,15 @@ function init(form: HTMLFormElement) {
     }
 
     const value = (name: string) => field(name).value.trim();
-    const isDemo = topic() === 'demo';
-    const subject = (isDemo ? mail.demoSubject : mail.questionSubject).replace('{name}', value('name'));
+    const isCall = topic() === 'call';
+    const subject = (isCall ? mail.callSubject : mail.questionSubject).replace('{name}', value('name'));
     const lines = [
       `${mail.labels.name}: ${value('name')}`,
       `${mail.labels.email}: ${value('email')}`,
       `${mail.labels.role}: ${value('role')}`,
     ];
     if (value('organization')) lines.push(`${mail.labels.org}: ${value('organization')}`);
-    if (isDemo && value('athletes')) lines.push(`${mail.labels.athletes}: ${value('athletes')}`);
+    if (isCall && value('athletes')) lines.push(`${mail.labels.athletes}: ${value('athletes')}`);
     if (value('message')) lines.push('', value('message'));
 
     const href = `mailto:${mail.to}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(lines.join('\r\n'))}`;

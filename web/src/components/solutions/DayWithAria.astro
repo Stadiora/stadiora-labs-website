@@ -1,6 +1,5 @@
 ---
 import Icon from '../ui/Icon.astro';
-import { common } from '../../i18n/pages/common';
 import type { CoachesCopy } from '../../i18n/pages/coaches';
 import type { Locale } from '../../i18n';
 
@@ -8,8 +7,7 @@ interface Props {
   copy: CoachesCopy;
   locale: Locale;
 }
-const { copy, locale } = Astro.props;
-const caption = common[locale].demoCaption;
+const { copy } = Astro.props;
 const initials = (name: string) => name.charAt(0);
 ---
 
@@ -45,7 +43,6 @@ const initials = (name: string) => name.charAt(0);
               ))
             }
           </ul>
-          <p class="demo-note">{caption}</p>
         </div>
       </li>
 
@@ -68,7 +65,6 @@ const initials = (name: string) => name.charAt(0);
             <li class="session__row session__row--edit"><span>{copy.session.one}</span><span class="num">{copy.session.oneSets}</span></li>
           </ul>
           <p class="session__note">{copy.session.note}</p>
-          <p class="demo-note">{caption}</p>
         </div>
       </li>
 
@@ -90,7 +86,6 @@ const initials = (name: string) => name.charAt(0);
               ))
             }
           </ul>
-          <p class="demo-note">{caption}</p>
         </div>
       </li>
     </ol>
@@ -178,10 +173,6 @@ const initials = (name: string) => name.charAt(0);
     flex-direction: column;
     gap: 16px;
     padding: 24px;
-  }
-  .day__card .demo-note {
-    margin-top: auto;
-    padding-top: 4px;
   }
   .day__card-title {
     font-size: 16px;

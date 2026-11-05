@@ -42,8 +42,8 @@ const forbidden = [
 const competitors = /everfit|trainerize|trainheroic|teambuildr|truecoach|sportsengine|teamsnap/i;
 const integrationBrands = /garmin|strava|polar/i;
 
-// DESIGN-2 section 0.4: demo CTAs go to /contact/?topic=demo and "Talk to us" to /contact/?topic=question.
-const demoLabel = /^(book a (school )?demo|agenda una demo( escolar)?)$/i;
+// DESIGN-2 section 0.4: call CTAs go to /contact/?topic=call and "Talk to us" to /contact/?topic=question.
+const callLabel = /^(book a call( for your school)?|book a school call|agenda una llamada( para tu colegio| escolar)?)$/i;
 const talkLabel = /^(talk to us|habla con nosotros)$/i;
 
 /** `pending` is a Map that checkLinks fills with the routes other open PRs own; the caller prints it. */
@@ -135,10 +135,10 @@ export function verifyEngagePages({ dist, fail, pending = new Map() }) {
     for (const m of html.matchAll(/<a\b([^>]*)>([\s\S]*?)<\/a>/g)) {
       const href = m[1].match(/\shref="([^"]*)"/)?.[1] ?? '';
       const label = text(m[2]).trim();
-      if (demoLabel.test(label) && href !== `${prefix}/contact/?topic=demo`) fail(`${page.file}: "${label}" goes to ${href}, expected ${prefix}/contact/?topic=demo`);
+      if (callLabel.test(label) && href !== `${prefix}/contact/?topic=call`) fail(`${page.file}: "${label}" goes to ${href}, expected ${prefix}/contact/?topic=call`);
       if (talkLabel.test(label) && href !== `${prefix}/contact/?topic=question`) fail(`${page.file}: "${label}" goes to ${href}, expected ${prefix}/contact/?topic=question`);
     }
-    if (/bookings\.cloud\.microsoft/.test(html)) fail(`${page.file}: links to the external booking page; demo calls to action use the contact page`);
+    if (/bookings\.cloud\.microsoft/.test(html)) fail(`${page.file}: links to the external booking page; calls to action use the contact page`);
 
     checkLinks({ dist, page, html, fail, pending });
 

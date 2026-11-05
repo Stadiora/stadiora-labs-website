@@ -18,7 +18,7 @@ const sessions = [
 const byDay = new Map<number, (typeof sessions)[number]>(sessions.map((s) => [s.day, s]));
 ---
 
-<!-- Read-only week view. Same sessions as the AI demo on the home page. -->
+<!-- Read-only week view. Same sessions as the AI program builder on the home page. -->
 <div class:list={['pc', { 'co-card': !bare, 'pc--bare': bare }]}>
   <p class="pc__title">{title}</p>
   <ul class="pc__week">

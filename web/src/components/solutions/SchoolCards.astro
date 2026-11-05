@@ -42,7 +42,6 @@ const done = [true, true, false, true, true];
           }
         </ul>
       </div>
-      <p class="demo-note">{copy.admin.caption}</p>
     </article>
 
     <article class="pcard guardian rv" style="--i:1">
@@ -90,7 +89,7 @@ const done = [true, true, false, true, true];
           </div>
         </Phone>
       </div>
-      <p class="demo-note">{copy.guardian.included}</p>
+      <p class="pcard__note">{copy.guardian.included}</p>
     </article>
 
   </div>
@@ -111,8 +110,11 @@ const done = [true, true, false, true, true];
     flex-direction: column;
     gap: 20px;
   }
-  .pcard .demo-note {
+  .pcard__note {
     margin-top: auto;
+    color: var(--ink-3);
+    font-size: 14px;
+    line-height: 20px;
   }
 
   /* Admin overview */

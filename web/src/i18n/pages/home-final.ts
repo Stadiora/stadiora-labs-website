@@ -5,7 +5,7 @@ export interface HomeFinalCopy {
   lead: string;
   download: string;
   coach: string;
-  demo: string;
+  call: string;
 }
 
 const en: HomeFinalCopy = {
@@ -13,7 +13,7 @@ const en: HomeFinalCopy = {
   lead: 'Start free with one coach and up to 10 athletes. No card needed.',
   download: 'Download the app',
   coach: 'Start as a coach',
-  demo: 'Book a demo',
+  call: 'Book a call',
 };
 
 const es: HomeFinalCopy = {
@@ -21,7 +21,7 @@ const es: HomeFinalCopy = {
   lead: 'Empieza gratis con un coach y hasta 10 atletas. Sin tarjeta.',
   download: 'Descarga la app',
   coach: 'Empieza como coach',
-  demo: 'Agenda una demo',
+  call: 'Agenda una llamada',
 };
 
 export const homeFinal: { en: HomeFinalCopy; es: HomeFinalCopy } = { en, es };

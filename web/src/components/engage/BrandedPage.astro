@@ -35,10 +35,10 @@ const same = [
   { key: 'lift', src: liftIcon },
   { key: 'fitmg', src: fitmgIcon },
 ] as const;
-// The morphing phone re-skins through Demo Gym and the four apps. Colours are deep enough for white type (AA).
+// The morphing phone re-skins through Your Gym and the four apps. Colours are deep enough for white type (AA).
 const img = (id: string) => `url(/home/img/${id}.webp)`;
 const brands = [
-  { n: b.demoGym.name, m: 'DG', c: '#0b1f4a', i: img('night-huddle-800') },
+  { n: b.gym.name, m: b.gym.mark, c: '#0b1f4a', i: img('night-huddle-800') },
   { n: t.nav.apps.run.name, m: 'R', c: '#006f9c', i: img('A1-athletes-sprinter-800') },
   { n: t.nav.apps.aria12.name, m: '12', c: '#047857', i: img('hero3-soccer-academies-big-800') },
   { n: t.nav.apps.lift.name, m: 'L', c: '#6d28d9', i: img('hero5-gyms-and-studios-big-800') },
@@ -99,7 +99,6 @@ const right = brands[1];
       <div class="flychip fc2" data-depth="34"><i></i>{b.makeItems[1].label}</div>
       <div class="flychip fc3" data-depth="26"><i></i>{b.makeItems[2].label}</div>
     </div>
-    <span class="badge-demo">{b.demoNote}</span>
   </div>
 </EngageHero>
 
@@ -119,21 +118,20 @@ const right = brands[1];
       </ul>
       <div class="eg-dg rv" style="--i:2">
         <div class="eg-dg__top">
-          <span class="eg-dg__icon" role="img" aria-label={b.demoGym.iconLabel}><EIcon name="dumbbell" size={40} /></span>
+          <span class="eg-dg__icon" role="img" aria-label={b.gym.iconLabel}><EIcon name="dumbbell" size={40} /></span>
           <div>
-            <p class="eg-dg__name">{b.demoGym.name}</p>
-            <span class="eg-dg__dots" role="img" aria-label={b.demoGym.colours}><i style="background:#08132b"></i><i style="background:#00bef3"></i><i style="background:#c3ccd9"></i></span>
+            <p class="eg-dg__name">{b.gym.name}</p>
+            <span class="eg-dg__dots" role="img" aria-label={b.gym.colours}><i style="background:#08132b"></i><i style="background:#00bef3"></i><i style="background:#c3ccd9"></i></span>
           </div>
         </div>
         <div class="eg-dg__scr" aria-hidden="true">
           <span class="eg-dg__mark"><EIcon name="dumbbell" size={30} /></span>
-          <p class="eg-dg__brand">{b.demoGym.name}</p>
-          <p class="eg-dg__tag">{b.demoGym.tagline}</p>
-          <span class="eg-dg__cta">{b.demoGym.cta}</span>
+          <p class="eg-dg__brand">{b.gym.name}</p>
+          <p class="eg-dg__tag">{b.gym.tagline}</p>
+          <span class="eg-dg__cta">{b.gym.cta}</span>
         </div>
       </div>
     </div>
-    <p class="eg-note">{b.demoNote}</p>
 
     <div class="eg-how">
       <h2 class="d d3 eg-stage-title lines" id="how-title"><span><span>{b.howTitle}</span></span></h2>
@@ -171,7 +169,7 @@ const right = brands[1];
 </section>
 
 <AlsoInAria locale={locale} items={b.also} />
-<EngageFinal locale={locale} middle={{ label: e.common.talkToUs, href: contact }} demoHref={contactHref(locale, 'demo')} />
+<EngageFinal locale={locale} middle={{ label: e.common.talkToUs, href: contact }} callHref={contactHref(locale, 'call')} />
 
 <script>
   import '../../scripts/engage/branded';

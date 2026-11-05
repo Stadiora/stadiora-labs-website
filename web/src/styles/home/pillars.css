@@ -23,7 +23,7 @@
 .pil-clip.on{opacity:1;transform:none}
 .pil-clip video{display:block;width:100%;height:100%;object-fit:cover}
 
-/* The demo cards over the clips: a 1280x800 stage scaled to the frame (kit data-fit). The clips carry no text, so every label
+/* The cards over the clips: a 1280x800 stage scaled to the frame (kit data-fit). The clips carry no text, so every label
    and card is live HTML in the page's locale. The base is the finished frame; scripts/home/pillars.ts animates it. */
 .pm-stage{width:1280px;height:800px}
 .pm-scene{position:absolute;inset:0;opacity:0;visibility:hidden;transition:opacity 600ms var(--e-out),visibility 0s linear 600ms}

@@ -1,4 +1,4 @@
-// Copy for /platform/programs/ (DESIGN.md section 3). Fictional demo data only.
+// Copy for /platform/programs/ (DESIGN.md section 3). Fictional data only.
 import type { Locale } from '../index';
 import type { PageMeta } from './coach-common';
 
@@ -57,13 +57,13 @@ const en = {
       program: '400 m speed endurance',
       tabs: ['Groups', 'One athlete'],
       groups: [
-        { name: 'Sprint group (Demo)', meta: '8 athletes' },
-        { name: 'Distance group (Demo)', meta: '6 athletes' },
+        { name: 'Sprint group', meta: '8 athletes' },
+        { name: 'Distance group', meta: '6 athletes' },
       ],
       start: 'Start date',
       startValue: 'Mon, Apr 22',
       variantTitle: 'Need a change for one athlete?',
-      variantBody: 'Make a copy just for Valeria (Demo) and edit it.',
+      variantBody: 'Make a copy just for Valeria and edit it.',
       send: 'Send',
     },
     import: {
@@ -108,7 +108,7 @@ const en = {
     sub: 'You plan on the web. Athletes see it on their phone.',
     plan: 'What you plan',
     see: 'What they see',
-    calendar: 'Sprint group (Demo) · Week 1',
+    calendar: 'Sprint group · Week 1',
     listTitle: 'What you can do',
     list: [
       'Sessions with sets, reps, distances and loads',
@@ -191,13 +191,13 @@ const es: ProgramsCopy = {
       program: 'Resistencia a la velocidad 400 m',
       tabs: ['Grupos', 'Un atleta'],
       groups: [
-        { name: 'Grupo de velocidad (Demo)', meta: '8 atletas' },
-        { name: 'Grupo de fondo (Demo)', meta: '6 atletas' },
+        { name: 'Grupo de velocidad', meta: '8 atletas' },
+        { name: 'Grupo de fondo', meta: '6 atletas' },
       ],
       start: 'Fecha de inicio',
       startValue: 'Lun, 22 abr',
       variantTitle: 'Necesitas un cambio para un atleta?',
-      variantBody: 'Haz una copia solo para Valeria (Demo) y edítala.',
+      variantBody: 'Haz una copia solo para Valeria y edítala.',
       send: 'Enviar',
     },
     import: {
@@ -242,7 +242,7 @@ const es: ProgramsCopy = {
     sub: 'Tú planificas en la web. Los atletas lo ven en su teléfono.',
     plan: 'Lo que planificas',
     see: 'Lo que ven ellos',
-    calendar: 'Grupo de velocidad (Demo) · Semana 1',
+    calendar: 'Grupo de velocidad · Semana 1',
     listTitle: 'Lo que puedes hacer',
     list: [
       'Sesiones con series, repeticiones, distancias y cargas',

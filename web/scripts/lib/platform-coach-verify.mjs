@@ -131,8 +131,8 @@ export function verifyCoachPages({ dist, fail }) {
 
     // The language switch and the hreflang pair must point at each other.
     if (!html.includes(`href="${page.alt}"`)) failHere(`${page.file}: no link to the ${page.lang === 'en' ? 'Spanish' : 'English'} version`);
-    // Every page offers a demo and a free start; the demo link carries its topic.
-    if (!/href="[^"]*topic=demo/.test(html)) failHere(`${page.file}: no "Book a demo" link with topic=demo`);
+    // Every page offers a call and a free start; the call link carries its topic.
+    if (!/href="[^"]*topic=call/.test(html)) failHere(`${page.file}: no "Book a call" link with topic=call`);
   }
   verifyCoachStyles({ root: join(dist, '..'), fail: failHere });
   if (!problems) console.log(`verify-dist: ${coachPages.length} platform coach pages ok (SEO, hreflang pair, claims guard, alt text, Floodlight structure)`);

@@ -10,6 +10,7 @@ import { engagePages, verifyEngagePages } from './lib/engage-verify.mjs';
 import { verifyCutover } from './lib/cutover-verify.mjs';
 import { verifyLegalVerbatim } from './lib/legal-verbatim.mjs';
 import { verifyApiPages } from './lib/api-verify.mjs';
+import { verifyNoDemoWording } from './lib/no-demo-wording.mjs';
 import { verifySolutions } from './lib/verify-solutions.mjs';
 import { verifySolutionsFloodlight } from './lib/solutions-floodlight-verify.mjs';
 import { verifyHomeClaims, verifyHomeMedia, verifyHomeSelectors, verifyHomeVideos } from './lib/home-verify.mjs';
@@ -104,6 +105,7 @@ if (!existsSync(join(dist, 'sitemap-index.xml'))) fail('sitemap-index.xml: missi
 verifyCoachPages({ dist, fail });
 verifyCutover({ dist, fail });
 verifyLegalVerbatim({ dist, fail });
+verifyNoDemoWording({ dist, fail });
 
 // Budgets from DESIGN.md section 7: hero photos 180 KB, videos 1.5 MB, per delivered file.
 const assets = join(dist, '_astro');

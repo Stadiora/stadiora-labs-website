@@ -17,13 +17,6 @@
   top: 50%;
   transform: translate(-50%, -50%);
 }
-.eg-live__frame .badge-demo {
-  position: absolute;
-  left: 16px;
-  top: 16px;
-  bottom: auto;
-  z-index: 7;
-}
 .eg-time {
   display: block;
   margin-top: 2px;
@@ -126,7 +119,7 @@
   animation-play-state: paused;
 }
 
-/* four ways: tilt tiles with flat mini demos */
+/* four ways: tilt tiles with flat mini mock-ups */
 .eg-bento {
   grid-template-columns: repeat(12, minmax(0, 1fr));
   grid-auto-rows: auto;

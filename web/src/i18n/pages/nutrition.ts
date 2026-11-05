@@ -1,4 +1,4 @@
-// Copy for /platform/nutrition/ (DESIGN-2 section 1). Fictional demo data only.
+// Copy for /platform/nutrition/ (DESIGN-2 section 1). Fictional data only.
 import type { Locale } from '../index';
 import type { PageMeta } from './coach-common';
 
@@ -36,7 +36,7 @@ const en = {
       { title: 'Week', line: 'See the week at a glance, not every meal.' },
     ],
     plan: {
-      title: 'Meal plan · Sprint group (Demo)',
+      title: 'Meal plan · Sprint group',
       meta: '2,600 kcal · Protein 140 g',
       meals: [
         { name: 'Breakfast', food: 'Oats, berries, Greek yogurt', kcal: '780 kcal' },
@@ -56,7 +56,7 @@ const en = {
       snap: 'Snap a meal',
     },
     week: {
-      title: 'Valeria (Demo) · this week',
+      title: 'Valeria · this week',
       meta: 'Protein on target 5 of 7 days',
       days: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
       values: [172, 142, 156, 98, 158, 164, 104],
@@ -114,7 +114,7 @@ const es: NutritionCopy = {
       { title: 'Semana', line: 'Mira la semana de un vistazo, no cada comida.' },
     ],
     plan: {
-      title: 'Plan de comidas · Grupo de velocidad (Demo)',
+      title: 'Plan de comidas · Grupo de velocidad',
       meta: '2.600 kcal · Proteína 140 g',
       meals: [
         { name: 'Desayuno', food: 'Avena, frutos rojos, yogur griego', kcal: '780 kcal' },
@@ -134,7 +134,7 @@ const es: NutritionCopy = {
       snap: 'Foto de comida',
     },
     week: {
-      title: 'Valeria (Demo) · esta semana',
+      title: 'Valeria · esta semana',
       meta: 'Proteína en la meta 5 de 7 días',
       days: ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'],
       values: [172, 142, 156, 98, 158, 164, 104],

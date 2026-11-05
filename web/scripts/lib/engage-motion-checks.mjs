@@ -324,7 +324,7 @@ export async function engageMotionChecks({ open, check, sleep, settle, metrics }
       check(group, `${label}: the planner stage animates while it plays (${bars} running animations)`, bars >= 3, String(bars));
     }
 
-    // Branded: the app preview cycles through the example brands.
+    // Branded: the app mock-up cycles through the example brands.
     if (p.slug === 'custom-branded-apps') {
       await page.evaluate(() => document.querySelector('[data-morph]').scrollIntoView({ block: 'center', behavior: 'instant' }));
       await page.mouse.move(2, 2);

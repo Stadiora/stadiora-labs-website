@@ -11,6 +11,7 @@ npm run dev        # http://localhost:4321
 npm run build      # static output in dist/
 npm run check      # astro check (types and templates)
 npm run verify     # asserts the built pages: SEO tags, hreflang, OG, no placeholders, budgets, Jekyll exclusion
+node scripts/no-demo-wording-battery.mjs # after a build, on a clean committed tree: wording mutations through npm run verify
 npm run cutover-checks   # Playwright: redirects without JS, the 404, every carried page loads, the investor pages and cards carry an active noindex, the API footer links land, the lead form (EN and ES); `-- --shots <dir>` saves screenshots
 npm run evidence   # needs a build; Playwright screenshots, interaction checks and measured budgets in .evidence/
 node scripts/evidence.mjs --coach-only   # just the Platform Coach pages, EN and ES (see below); add --checks-only to skip screenshots
@@ -40,6 +41,14 @@ node scripts/evidence.mjs --engage-motion-only --checks-only # just the Platform
   The approved post-submit status (EN and ES) is written out in `scripts/lib/contact-contract.mjs`, independent of
   `src/i18n/pages/contact.ts`; verify and evidence compare the page with it word for word, so editing that copy means
   editing the contract too.
+- The shipped-wording guard (`scripts/lib/no-demo-wording.mjs`, run by `npm run verify`) scans text files and file names in
+  `dist/` for `demo`, `demostraci`, `preview`, `vista previa` and `[preview]`, case-insensitively. Only the exact whole words
+  `demonstrated`, `demostrar`, `demostrado` and `demostró` are tolerated. Its sole code exemption is one `{demo:'call'}`
+  literal (single, double or backtick quotes) inside the inline contact-form module's script content in each of
+  `contact/index.html` and `es/contact/index.html`. Visible text, attributes, comments, noscript content, other pages and
+  all bundles remain scanned; there is no POST wire-value exemption. The battery asserts each copied-dist edit by content
+  and hash, requires failures from the wording guard itself, retains legal-word/identity controls, records the clean head,
+  and writes `.evidence/no-demo-wording-battery.json`.
 - Solutions, Resources, About and Contact in Floodlight (DESIGN-4 section 6): every page runs on `src/layouts/SolutionsPage.astro`
   (the foundation, the motion kit and `src/styles/solutions/solutions.css`; everything in the lane is prefixed `sx-`). The hero is
   `src/components/solutions/SxHero.astro` (impact, mesh, orbits, display H1; the Schools and Coaches swap line is one sentence for a
@@ -93,11 +102,11 @@ node scripts/evidence.mjs --engage-motion-only --checks-only # just the Platform
 - Platform pages (`src/pages/{,es/}platform/{messaging,guardian-portal,teams,custom-branded-apps,integrations}/`): thin
   wrappers around `src/components/engage/*Page.astro`; all copy is in `src/i18n/pages/engage.ts` (EN and ES, ES typed against EN).
   Every claim on them is backed by Aria code, see the PR's claims table. `scripts/lib/engage-verify.mjs` (run by `npm run verify`)
-  fails the build on an unbacked claim, a user or customer count, a competitor name, "all wearables", a demo call to action that
-  does not go to `/contact/?topic=demo` (or "Talk to us" to `?topic=question`), or an internal link that does not resolve.
+  fails the build on an unbacked claim, a user or customer count, a competitor name, "all wearables", a call-to-action link that
+  does not go to `/contact/?topic=call` (or "Talk to us" to `?topic=question`), or an internal link that does not resolve.
   The link guard (`scripts/lib/engage-links.mjs`) checks every internal href on the ten pages against `dist/`, the legacy pages
   carried in `public/` (resolved against `dist/`) and the element ids it points at. Routes that other open PRs own (`pendingRoutes`: the coach pages, help) are an explicit list and are printed as `pending` by `npm run verify`, never passed
-  silently; a typo of one of them fails. Delete an entry when its PR has merged. A `/contact/` link in the page body must carry `?topic=demo` or `?topic=question`; the footer and nav link to the plain page. `scripts/lib/engage-checks.mjs` (run by
+  silently; a typo of one of them fails. Delete an entry when its PR has merged. A `/contact/` link in the page body must carry `?topic=call` or `?topic=question`; the footer and nav link to the plain page. `scripts/lib/engage-checks.mjs` (run by
   `evidence`) covers overflow and clipped text (`clip-probe.mjs`) at 390/1024/1280/1440, WCAG AA in both themes, alt text,
   heading order, the live Messaging phone and the Guardian child switcher (tab ARIA, click and arrow keys) and that Teams and
   `/pricing/` show the same schools price for the same visitor (`?region=us|latam`, ten time zones, a missing one). The clip
@@ -150,7 +159,7 @@ node scripts/evidence.mjs --engage-motion-only --checks-only # just the Platform
   `node scripts/clips/render.mjs` from `scripts/clips/stages/*.html` (stage HTML over the photos in `scripts/clips/src/`; needs
   Playwright and ffmpeg). Never use the clips with words in the picture (`pillar-*`, `ai-demo`, `planner-demo`) on these pages.
 - Coach guards: `scripts/lib/platform-coach-verify.mjs` (run by `npm run verify`) fails the build on an unbacked claim, a competitor
-  name, a missing "estimates" or "not a medical check" footnote, a broken hreflang pair or a missing demo link;
+  name, a missing "estimates" or "not a medical check" footnote, a broken hreflang pair or a missing call link;
   `scripts/lib/platform-coach-floodlight.mjs` (called from it) fails on a page without the dark hero, mesh, orbits, a dark stage, the
   `night-stadium` closing band, its own moving hero clip, an opening ¿ or ¡ in Spanish, a stage host without `data-cf-stage` or an
   `data-ap-within` that points nowhere, and on a coach stylesheet without its no-JS, reduced-motion and stage-pause rules.
@@ -225,7 +234,7 @@ files are compared while the root `index.html` still exists; delete the legacy r
 - Markup guards read tags with `scripts/lib/html-scan.mjs`, which skips comments and script/style text: a `<meta name="robots">` inside
   a comment is not active, so it does not count as noindex.
 - Redirect stubs (meta refresh, canonical, no script): `team.html` to `/about/`, `team-es.html` to `/es/about/`,
-  `index-es.html` to `/es/`, `index-preview.html` to `/`. They are out of the sitemap.
+  `index-es.html` to `/es/`. They are out of the sitemap.
 - `src/pages/404.astro`: one bilingual page (GitHub Pages cannot pick a language per path), noindex, no canonical.
 - Lead form (`lead-magnet*.html`): without a Web3Forms key it opens the visitor's email app (mailto) and says so with the approved
   wording, and never claims success. With a key it reports success only for `response.ok` and `success === true`; anything else

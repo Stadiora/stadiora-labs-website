@@ -32,7 +32,7 @@ const fx = solutionsFx[locale];
     title={c.title}
     lead={c.sub}
     swap={fx.swap.schools}
-    primary={{ label: k.bookSchoolDemo, href: contactHref(locale, 'demo') }}
+    primary={{ label: k.bookSchoolCall, href: contactHref(locale, 'call') }}
     secondary={{ label: k.seePricing, href: hrefFor('pricing', locale) }}
   >
     <Conveyor variant="mini" blocks={schoolsConveyor.blocks} laneA={schoolsConveyor.laneA} laneB={schoolsConveyor.laneB} />
@@ -50,7 +50,7 @@ const fx = solutionsFx[locale];
         </p>
         <div class="strip__actions">
           <a class="link link-arrow" href={hrefFor('pricing', locale)}>{c.pricing.link}<Icon name="arrow-right" /></a>
-          <a class="btn btn--primary btn--lg" href={contactHref(locale, 'demo')}>{c.pricing.cta}</a>
+          <a class="btn btn--primary btn--lg" href={contactHref(locale, 'call')}>{c.pricing.cta}</a>
         </div>
       </div>
     </div>
@@ -59,7 +59,7 @@ const fx = solutionsFx[locale];
   <FinalNight
     title={k.ctaTitle}
     actions={[
-      { label: k.bookSchoolDemo, href: contactHref(locale, 'demo') },
+      { label: k.bookSchoolCall, href: contactHref(locale, 'call') },
       { label: k.seePricing, href: hrefFor('pricing', locale) },
     ]}
   />

@@ -1,4 +1,4 @@
-// Four pillars: kit autotabs drives the tabs and clips; this adds the open text panel, the accent colour and the live demo
+// Four pillars: kit autotabs drives the tabs and clips; this adds the open text panel, the accent colour and the live
 // cards drawn over each (text-free) clip. The cards' timelines are one group on the tab clock: they restart whenever a
 // tab starts and run, pause and settle with the tabs. The markup is the finished frame.
 import { $, $$, autotabs, group, isReduced, tl, type Frame } from '../motion/kit';

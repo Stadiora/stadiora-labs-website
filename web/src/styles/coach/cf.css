@@ -191,16 +191,6 @@ html:not(.js) .cf-page .rv-mask {
 .cf-sec--alt {
   background: var(--surface);
 }
-.cf-demo {
-  margin-top: 18px;
-  font: 500 12px/1.4 var(--f-mono);
-  letter-spacing: 0.06em;
-  color: var(--ink-3);
-  text-align: center;
-}
-.impact .cf-demo {
-  color: var(--ink-2);
-}
 
 /* A product panel inside a dark stage: follows the page theme (white in light, navy in dark). */
 .cf-panel {
@@ -280,7 +270,7 @@ html:not(.js) .cf-page .rv-mask {
   }
 }
 @media (max-width: 640px) {
-  /* The demo badge wraps to two lines here; a square frame keeps the floating chips and the badge apart. */
+  /* A square frame keeps the floating chips apart at this width. */
   .cf-frame {
     aspect-ratio: 1 / 1;
   }
