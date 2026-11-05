@@ -284,6 +284,25 @@ const M = [
     at: { file: 'scripts/lib/page-contrast-checks.mjs', needle: 'every painted text node meets AA over its glyph pixels' },
   },
   {
+    id: 'scrub-fade-on-heading',
+    what: 'B3 bypass: the mid-scrub var(--ink) backdrop plus data-scrub-fade on the stationary .dw-head must still fail',
+    edits: [
+      { file: 'src/styles/api.css', find: '.dw-head{padding-top', replace: '.dw-sticky::before{content:"";position:absolute;inset:0;z-index:2;background:var(--ink);opacity:clamp(0,calc(1 - (var(--q) - .5) * (var(--q) - .5) * 400),1)}\n.dw-head{padding-top' },
+      { file: 'src/components/api/ApiDifference.astro', find: '<div class="wrap dw-head">', replace: '<div class="wrap dw-head" data-scrub-fade>' },
+    ],
+    runner: 'contrast',
+    expect: /\[page-contrast\] api-en 1440 light: every painted text node meets AA over its glyph pixels/,
+    at: { file: 'scripts/lib/page-contrast-checks.mjs', needle: 'every painted text node meets AA over its glyph pixels' },
+  },
+  {
+    id: 'scrub-fade-on-heading-legible',
+    what: 'A stray data-scrub-fade on the stationary .dw-head fails even without the B3 backdrop payload',
+    edits: [{ file: 'src/components/api/ApiDifference.astro', find: '<div class="wrap dw-head">', replace: '<div class="wrap dw-head" data-scrub-fade>' }],
+    runner: 'contrast',
+    expect: /\[page-contrast\] api-en 1440 light: every painted text node meets AA over its glyph pixels.*div\.wrap\.dw-head.*data-scrub-fade/,
+    at: { file: 'scripts/lib/page-contrast-checks.mjs', needle: 'every painted text node meets AA over its glyph pixels' },
+  },
+  {
     id: 'deco-on-note',
     what: 'B4 (reviewer): data-decorative on the real .sp-note with its ink set to #5BA9C9',
     edits: [
