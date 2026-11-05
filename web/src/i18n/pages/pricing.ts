@@ -237,7 +237,7 @@ export const es: PricingCopy = {
       name: 'Escuelas e instituciones',
       line: 'Tarifas educativas para secundarias, departamentos y universidades',
       sub: 'Todos los entrenadores del programa incluidos.',
-      cta: 'Agenda una llamada para tu colegio',
+      cta: 'Agenda una llamada escolar',
       checks: ['Panel de administración', 'Portal de tutores', 'Consentimiento para menores'],
     },
     federations: {
@@ -347,6 +347,6 @@ export const es: PricingCopy = {
     title: ['Listos cuando', 'empiece tu temporada.'],
     lead: 'Empieza gratis con un entrenador y hasta {athletes} atletas. Sin tarjeta.',
     coach: 'Empieza como entrenador',
-    call: 'Agenda una llamada para tu colegio',
+    call: 'Agenda una llamada escolar',
   },
 };

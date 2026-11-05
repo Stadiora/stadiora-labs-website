@@ -27,7 +27,7 @@ export const common: Pair<{
     seePricing: 'Ver precios',
     startFree: 'Empieza gratis',
     bookCall: 'Agenda una llamada',
-    bookSchoolCall: 'Agenda una llamada para tu colegio',
+    bookSchoolCall: 'Agenda una llamada escolar',
     talkToUs: 'Habla con nosotros',
     eyebrowSolutions: 'Soluciones',
     ctaTitle: 'Listos cuando empiece tu temporada.',

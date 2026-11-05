@@ -288,7 +288,7 @@ export const engageEs: EngageDict = {
   common: {
     startFree: 'Empieza gratis',
     bookCall: 'Agenda una llamada',
-    bookSchoolCall: 'Agenda una llamada para tu colegio',
+    bookSchoolCall: 'Agenda una llamada escolar',
     talkToUs: 'Habla con nosotros',
     seePricing: 'Ver precios',
     alsoTitle: 'También en Aria',
@@ -368,7 +368,7 @@ export const engageEs: EngageDict = {
     eyebrow: 'Portal de tutores',
     title: title('', 'Mantén a las familias', ' al tanto.'),
     sub: 'Aria for Families muestra a los padres la semana de su hijo, los mensajes del coach y los formularios por firmar. En el navegador, sin instalar nada.',
-    ctaPrimary: 'Agenda una llamada para tu colegio',
+    ctaPrimary: 'Agenda una llamada escolar',
     ctaSecondary: 'Mira cómo funciona',
     photoAlt:
       'Una madre y su hijo adolescente miran juntos su teléfono en la mesa de la cocina con luz de lámpara, con una mochila en la silla.',

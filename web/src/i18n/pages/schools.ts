@@ -89,7 +89,7 @@ const es: SchoolsCopy = {
     lead: 'Precios para educación:',
     text: ' colegios desde {price}/mes para {athletes} atletas',
     link: 'Ver precios',
-    cta: 'Agenda una llamada para tu colegio',
+    cta: 'Agenda una llamada escolar',
   },
 };
 

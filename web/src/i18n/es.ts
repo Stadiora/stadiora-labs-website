@@ -255,7 +255,7 @@ export const es: Dict = {
     title: 'Listos cuando empiece tu temporada.',
     download: 'Descarga la app para atletas',
     coach: 'Empieza como coach',
-    school: 'Agenda una llamada para tu colegio',
+    school: 'Agenda una llamada escolar',
     sheetTitle: 'Descarga Run with Aria',
     sheetBody: 'La app para atletas se descarga gratis en iOS y Android.',
     sheetIos: 'Descargar para iOS',

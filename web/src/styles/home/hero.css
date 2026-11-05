@@ -528,7 +528,7 @@
     display: none;
   }
   .hero-ctas .btn {
-    flex: 1;
+    flex: 1 1 auto;
   }
   .hero-cv {
     height: 380px;
