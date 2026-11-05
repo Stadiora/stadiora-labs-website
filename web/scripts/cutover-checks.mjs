@@ -226,8 +226,9 @@ for (const [path, { locale, again }] of Object.entries(copy)) {
       };
     });
     await page.locator('.email-row button').click();
-    await page.waitForFunction(() => Boolean(window.__hungContact));
-    await page.clock.runFor(14999);
+    await page.clock.runFor(1);
+    const beforeDeadline = await page.evaluate(() => window.__hungContact.started + 14999 - Date.now());
+    await page.clock.runFor(beforeDeadline);
     check('lead-form', t('a never-settling fetch remains pending until the 15 s deadline'), await page.locator('.email-row button').isDisabled() && !(await page.evaluate(() => window.__hungContact.aborted)));
     await page.clock.runFor(1);
     const hung = await page.evaluate(() => window.__hungContact);
@@ -236,6 +237,7 @@ for (const [path, { locale, again }] of Object.entries(copy)) {
     check('lead-form', t('a never-settling fetch is aborted at 15 s with localized failure, direct links and retry'), hung.aborted && hung.elapsed === 15000 && retry && again.test(await page.locator('.email-row button').innerText()) && status.length > 20 && findDeliveryClaims(status, locale).length === 0 && JSON.stringify(await statusLinks(page)) === JSON.stringify(directLinks) && !(await visible(page, '#email-success')), JSON.stringify({ hung, retry, status }));
     if (retry) {
       await page.locator('.email-row button').click();
+      await page.clock.runFor(1);
       await page.locator('#email-success').waitFor({ state: 'visible', timeout: 3000 });
     }
     check('lead-form', t('retry after a timed-out request can succeed on 202'), retry && posts.length === 1 && await visible(page, '#email-success'));
