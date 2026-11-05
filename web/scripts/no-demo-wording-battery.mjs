@@ -1,3 +1,4 @@
+// Mutation battery for the shipped-wording guard. After a build, on a clean committed tree: `node scripts/no-demo-wording-battery.mjs`
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { spawnSync } from 'node:child_process';
@@ -34,6 +35,9 @@ const home = 'index.html';
 const pricing = 'pricing/index.html';
 const esPricing = 'es/pricing/index.html';
 const contact = 'contact/index.html';
+const esContact = 'es/contact/index.html';
+const lead = 'lead-magnet.html';
+const esLead = 'lead-magnet-es.html';
 const cases = [
   { name: 'Demo in title', file: home, needle: '<title>', insert: '<title>Demo ', match: 'Demo' },
   { name: '[PREVIEW] in title', file: home, needle: '<title>', insert: '<title>[PREVIEW] ', match: '[PREVIEW]' },
@@ -58,6 +62,35 @@ const cases = [
   { name: 'Alias in commented-out script', file: contact, html: '<!-- <script type="module">const alias={demo:"call"};document.querySelector("[data-contact-form]");</script> -->', match: 'demo' },
   { name: 'Alias in script-shaped data attribute', file: contact, html: '<p data-code=\'<script type="module">const alias={demo:"call"};document.querySelector("[data-contact-form]");</script>\'>Contact</p>', match: 'demo' },
   { name: 'Alias in unrelated _astro JS', file: '_astro/wording-canary.js', content: 'const alias={demo:"call"};document.querySelector("[data-contact-form]");', match: 'demo' },
+  { name: "Contact wire site as visible text", file: contact, html: '<p>{topic:l?`demo`:`question`,name:</p>', match: 'demo' },
+  { name: 'Contact wire site in an attribute', file: contact, html: "<p data-wire='{topic:l?\"demo\":\"question\",name:'>Contact</p>", match: 'demo' },
+  { name: 'Contact wire site in noscript', file: contact, html: '<noscript>{topic:l?`demo`:`question`,name:</noscript>', match: 'demo' },
+  { name: 'Contact wire site in script nested in noscript', file: contact, html: '<noscript><script type="module">const y={topic:l?`demo`:`question`,name:1};document.querySelector("[data-contact-form]");</script></noscript>', match: 'demo' },
+  { name: 'Contact wire site in commented-out script', file: contact, html: '<!-- <script type="module">const y={topic:l?`demo`:`question`,name:1};document.querySelector("[data-contact-form]");</script> -->', match: 'demo' },
+  { name: 'Contact wire site in script-shaped data attribute', file: contact, html: '<p data-code=\'<script type="module">const y={topic:l?"demo":"question",name:1};document.querySelector("[data-contact-form]");</script>\'>Contact</p>', match: 'demo' },
+  { name: 'Contact wire site in a second contact script', file: contact, html: '<script type="module">const y={topic:l?`demo`:`question`,name:1};document.querySelector("[data-contact-form]");</script>', match: 'demo' },
+  { name: 'Contact wire site in a contact script without the form module', file: contact, html: '<script type="module">const y={topic:l?`demo`:`question`,name:1};</script>', match: 'demo' },
+  { name: 'Contact wire site in a non-module script on contact', file: contact, html: '<script>const y={topic:l?`demo`:`question`,name:1};document.querySelector("[data-contact-form]");</script>', match: 'demo' },
+  { name: 'Contact wire site in script on another page', file: pricing, html: '<script type="module">const y={topic:l?`demo`:`question`,name:1};</script>', match: 'demo' },
+  { name: 'Contact wire site in unrelated _astro JS', file: '_astro/wording-canary.js', content: 'const y={topic:l?`demo`:`question`,name:1};document.querySelector("[data-contact-form]");', match: 'demo' },
+  { name: 'Real contact site loses its shape (else branch demo)', file: contact, needle: '?`demo`:`question`', insert: '?`demo`:`demo`', match: 'demo' },
+  { name: 'Real contact site gets a key between topic and name', file: esContact, needle: '`question`,name:', insert: '`question`,x:`demo`,name:', match: 'demo' },
+  { name: "Visible topic: 'demo' on ES contact", file: esContact, html: "<p>topic: 'demo'</p>", match: 'demo' },
+  { name: 'Lead wire site as visible text (EN)', file: lead, html: "<p>{topic: 'demo', name: 'Early access request'</p>", match: 'demo' },
+  { name: 'Lead wire site as visible text (ES)', file: esLead, html: "<p>{topic: 'demo', name: 'Early access request'</p>", match: 'demo' },
+  { name: 'Lead wire site in an attribute', file: lead, html: '<p data-wire="{topic: \'demo\', name: \'Early access request\'">Lead</p>', match: 'demo' },
+  { name: 'Lead wire site in noscript', file: esLead, html: "<noscript>{topic: 'demo', name: 'Early access request'</noscript>", match: 'demo' },
+  { name: 'Lead wire site in commented-out script', file: lead, html: "<!-- <script>const b={topic: 'demo', name: 'Early access request'};</script> -->", match: 'demo' },
+  { name: 'Lead wire site in a second lead script', file: lead, html: "<script>const b={topic: 'demo', name: 'Early access request'};</script>", match: 'demo' },
+  { name: 'Lead wire site in a script on the contact page', file: contact, html: "<script type=\"module\">const b={topic: 'demo', name: 'Early access request'};document.querySelector(\"[data-contact-form]\");</script>", match: 'demo' },
+  { name: 'Lead wire site in a script on another page', file: pricing, html: "<script>const b={topic: 'demo', name: 'Early access request'};</script>", match: 'demo' },
+  { name: 'Lead wire site in unrelated _astro JS', file: '_astro/wording-canary.js', content: "const b={topic: 'demo', name: 'Early access request'};", match: 'demo' },
+  { name: 'Real lead site gets a key between topic and name', file: lead, needle: "topic: 'demo',\n    name: 'Early access request',", insert: "topic: 'demo',\n    role: 'coach',\n    name: 'Early access request',", match: 'demo' },
+  { name: 'Real lead site with another name', file: esLead, needle: "name: 'Early access request',", insert: "name: 'Demo request',", match: 'Demo' },
+  { name: 'Another topic: demo in the lead script', file: lead, html: "<script>const other={topic: 'demo', role: 'coach'};</script>", match: 'demo' },
+  { name: 'Demo in visible text of lead page (EN)', file: lead, html: '<p>Request a Demo</p>', match: 'Demo' },
+  { name: 'Demo in visible text of lead page (ES)', file: esLead, html: '<p>Solicitar una demo</p>', match: 'demo' },
+  { name: 'Demo in the lead button text', file: lead, needle: '>Book a call</button>', insert: '>Book a Demo</button>', match: 'Demo' },
   { name: 'demonstrate is not a legal-word exemption', file: pricing, html: '<p>demonstrate</p>', match: 'demo' },
   { name: 'demonstrated suffix is not a whole word', file: pricing, html: '<p>demonstratedness</p>', match: 'demo' },
   { name: 'demostrado prefix is not a whole word', file: esPricing, html: '<p>predemostrado</p>', match: 'demo' },
@@ -65,6 +98,7 @@ const cases = [
   { name: 'control: demostrado in ES text', file: esPricing, html: '<p>demostrado</p>', green: true },
   { name: 'control: demostrar and demostró', file: esPricing, html: '<p>demostrar demostró</p>', green: true },
   { name: 'control: clean-tree identity', green: true },
+  { name: 'control: exactly 6 exempt sites (contact alias and wire, lead wire, EN and ES)', green: true, allowlisted: 6 },
 ];
 
 const scratch = mkdtempSync(join(tmpdir(), 'r57-wording-'));
@@ -96,6 +130,11 @@ try {
         assert.notEqual(editedHash, hash(before ?? ''), `${test.name}: unchanged hash`);
       } else {
         assert.equal(treeHash(copy), identity, 'Identity control must be unchanged');
+        if (test.allowlisted) {
+          const scan = run('node', ['scripts/lib/no-demo-wording.mjs', copy]);
+          assert.equal(scan.status, 0, scan.stderr);
+          assert.match(scan.stdout, new RegExp(`ok \\(${test.allowlisted} allowlisted matches\\)`), scan.stdout);
+        }
       }
       const verified = run('npm', ['run', 'verify'], { ...process.env, DIST_DIR: copy });
       const output = verified.stdout + verified.stderr;
