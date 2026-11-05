@@ -426,33 +426,10 @@
   color: #93a0b6;
   max-width: 13ch;
 }
+/* the logo marquee itself (rows, pace, hover, reduced motion) is the shared LogoMarquee; the band only sizes its slot */
 .hero-logos {
-  --dur: 38s;
   flex: 1;
   min-width: 0;
-}
-.hero-logos .marquee-track {
-  align-items: center;
-}
-.hero-logos-set {
-  display: flex;
-  align-items: center;
-  gap: 76px;
-  padding-right: 76px;
-}
-.hero-logos img {
-  display: block;
-  height: var(--lh, 34px);
-  width: auto;
-  flex: none;
-  opacity: 0.72;
-  transition:
-    opacity 200ms,
-    transform 300ms var(--e-out);
-}
-.hero-logos img:hover {
-  opacity: 1;
-  transform: scale(1.06);
 }
 
 /* Spanish words run about 25% longer: the same fit, a smaller size */
@@ -561,13 +538,6 @@
   .hero-cp small {
     font-size: 9.5px;
   }
-  .hero-logos-set {
-    gap: 44px;
-    padding-right: 44px;
-  }
-  .hero-logos img {
-    height: calc(var(--lh, 34px) * 0.8);
-  }
 }
 
 /* reduced motion: the first word and the first block stay put; the logos become a wrapped row */
@@ -590,15 +560,6 @@
       --band-h: 210px;
     }
   }
-  .hero-logos-set {
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 18px 44px;
-    padding-right: 0;
-  }
-  .hero-logos img {
-    opacity: 0.85;
-  }
 }
 @media (prefers-reduced-motion: reduce) and (max-width: 640px) {
   .hero {
@@ -609,7 +570,7 @@
     align-items: flex-start;
     gap: 14px;
   }
-  .hero-logos-set {
+  .hero-logos .logo-marquee-set {
     gap: 14px 30px;
     justify-content: flex-start;
   }

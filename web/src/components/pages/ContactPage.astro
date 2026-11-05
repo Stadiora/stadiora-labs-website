@@ -8,7 +8,7 @@ import { contact } from '../../i18n/pages/contact';
 import { altFor, common } from '../../i18n/pages/common';
 import { site } from '../../data/site';
 import { hrefFor } from '../../data/nav';
-import type { Locale } from '../../i18n';
+import { useDict, type Locale } from '../../i18n';
 
 interface Props {
   locale: Locale;
@@ -16,14 +16,13 @@ interface Props {
 const { locale } = Astro.props;
 const c = contact[locale];
 const k = common[locale];
+const area = useDict(locale).footer.regions;
 const f = c.fields;
-const mailPayload = JSON.stringify({
-  to: site.email,
-  callSubject: c.mail.callSubject,
-  questionSubject: c.mail.questionSubject,
-  labels: c.mail.labels,
-  opening: c.opening,
-});
+const sendPayload = JSON.stringify(c.send);
+const regions = [
+  { key: 'us', label: area.us, who: site.contacts.us },
+  { key: 'latam', label: area.latam, who: site.contacts.latam },
+] as const;
 ---
 
 <SolutionsPage locale={locale} path="/contact/" title={c.meta.title} description={c.meta.description}>
@@ -34,11 +33,10 @@ const mailPayload = JSON.stringify({
       <form
         class="form sx-form"
         id="contact-form"
-        action={`mailto:${site.email}`}
-        method="post"
-        enctype="text/plain"
         data-contact-form
-        data-mail={mailPayload}
+        data-endpoint={site.contactApi}
+        data-locale={locale}
+        data-send={sendPayload}
         data-err-name={c.errors.name}
         data-err-email={c.errors.email}
         data-err-role={c.errors.role}
@@ -58,44 +56,48 @@ const mailPayload = JSON.stringify({
         <div class="form__grid">
           <div class="field">
             <label for="f-name">{f.name.label}</label>
-            <input id="f-name" name="name" type="text" autocomplete="name" placeholder={f.name.placeholder} required aria-describedby="e-name" />
+            <input id="f-name" name="name" type="text" maxlength="120" autocomplete="name" placeholder={f.name.placeholder} required aria-describedby="e-name" />
             <p class="field__error" id="e-name" hidden></p>
           </div>
           <div class="field">
             <label for="f-email">{f.email.label}</label>
-            <input id="f-email" name="email" type="email" autocomplete="email" inputmode="email" placeholder={f.email.placeholder} required aria-describedby="e-email" />
+            <input id="f-email" name="email" type="email" maxlength="254" autocomplete="email" inputmode="email" placeholder={f.email.placeholder} required aria-describedby="e-email" />
             <p class="field__error" id="e-email" hidden></p>
           </div>
           <div class="field">
             <label for="f-role">{f.role.label}</label>
             <select id="f-role" name="role" required aria-describedby="e-role">
               <option value="" selected disabled>{f.role.placeholder}</option>
-              {f.role.options.map((o) => <option value={o.label}>{o.label}</option>)}
+              {f.role.options.map((o) => <option value={o.value}>{o.label}</option>)}
             </select>
             <p class="field__error" id="e-role" hidden></p>
           </div>
           <div class="field">
             <label for="f-org">{f.org.label}</label>
-            <input id="f-org" name="organization" type="text" autocomplete="organization" placeholder={f.org.placeholder} />
+            <input id="f-org" name="organization" type="text" maxlength="160" autocomplete="organization" placeholder={f.org.placeholder} />
           </div>
           <div class="field field--wide only-call" data-call-only>
             <label for="f-athletes">{f.athletes.label}</label>
             <select id="f-athletes" name="athletes">
               <option value="" selected>{f.athletes.placeholder}</option>
-              {f.athletes.options.map((o) => <option value={o}>{o}</option>)}
+              {f.athletes.options.map((o) => <option value={o.value}>{o.label}</option>)}
             </select>
+          </div>
+          <div class="hp" inert>
+            <label for="f-website">Website</label>
+            <input id="f-website" name="website" type="text" tabindex="-1" autocomplete="off" />
           </div>
           <div class="field field--wide">
             <label for="f-message">
               <span class="for-call">{f.message.call}</span>
               <span class="for-question">{f.message.question}</span>
             </label>
-            <textarea id="f-message" name="message" rows="4" placeholder={f.message.placeholder}></textarea>
+            <textarea id="f-message" name="message" rows="4" maxlength="4000" placeholder={f.message.placeholder}></textarea>
           </div>
         </div>
 
         <div class="form__actions">
-          <button class="btn btn--primary btn--lg form__submit" type="submit">
+          <button class="btn btn--primary btn--lg form__submit" type="submit" disabled>
             <span class="for-call">{c.submit.call}</span>
             <span class="for-question">{c.submit.question}</span>
           </button>
@@ -107,8 +109,15 @@ const mailPayload = JSON.stringify({
           {c.note}{' '}
           <a class="link" href={hrefFor('privacy', locale)}>{c.privacy}</a>
         </p>
-        <p class="form__note form__note--mail">{c.mailtoNote}</p>
+        <noscript><p class="form__note form__note--mail">{c.send.noscript}</p></noscript>
         <p class="form__status" role="status" aria-live="polite" data-status></p>
+        <template data-fallback>
+          <span class="form__fallback">
+            <a href={`mailto:${site.contacts.us.email}`}>{site.contacts.us.email}</a>{' · '}
+            <a href={`mailto:${site.contacts.latam.email}`}>{site.contacts.latam.email}</a>{' · '}
+            <a href={site.contacts.latam.whatsapp} target="_blank" rel="noopener noreferrer">{c.chat.whatsapp} {site.contacts.latam.phone}</a>
+          </span>
+        </template>
       </form>
 
       <aside class="contact__side" aria-label={c.chat.title} data-section data-sx-contact>
@@ -122,21 +131,30 @@ const mailPayload = JSON.stringify({
         <div class="chat impact" id="chat">
           <h2 class="chat__title">{c.chat.title}</h2>
           <ul class="chat__list">
-            <li>
-              <a class="chat__row" href={site.whatsappUrl} target="_blank" rel="noopener noreferrer">
-                <svg class="chat__icon" viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                  <path d="M3 21l1.7-5A8.5 8.5 0 1 1 8 19.3L3 21z" />
-                  <path d="M9 9.2c0 3.2 2.6 5.8 5.8 5.8l1.1-1.4-1.9-1-.9.7c-.9-.4-1.7-1.2-2.1-2.1l.7-.9-1-1.9L9 9.2z" />
-                </svg>
-                <span><strong>{c.chat.whatsapp}</strong> · <span class="num">{site.whatsappLabel}</span></span>
-              </a>
-            </li>
-            <li>
-              <a class="chat__row" href={`mailto:${site.email}`}>
-                <Icon name="mail" size={32} class="chat__icon" />
-                <span><strong>{c.chat.email}</strong> · {site.email}</span>
-              </a>
-            </li>
+            {
+              regions.map((r) => (
+                <li class="chat__region" data-contact-region={r.key}>
+                  <p class="chat__rlabel"><span>{r.label}</span> · {r.who.name}</p>
+                  <a class="chat__row" href={`mailto:${r.who.email}`}>
+                    <Icon name="mail" size={28} class="chat__icon" />
+                    <span>{r.who.email}</span>
+                  </a>
+                  <a class="chat__row" href={`tel:${r.who.tel}`}>
+                    <Icon name="phone" size={28} class="chat__icon" />
+                    <span class="num">{r.who.phone}</span>
+                  </a>
+                  {'whatsapp' in r.who && (
+                    <a class="chat__row" href={r.who.whatsapp} target="_blank" rel="noopener noreferrer">
+                      <svg class="chat__icon" viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M3 21l1.7-5A8.5 8.5 0 1 1 8 19.3L3 21z" />
+                        <path d="M9 9.2c0 3.2 2.6 5.8 5.8 5.8l1.1-1.4-1.9-1-.9.7c-.9-.4-1.7-1.2-2.1-2.1l.7-.9-1-1.9L9 9.2z" />
+                      </svg>
+                      <span><strong>{c.chat.whatsapp}</strong></span>
+                    </a>
+                  )}
+                </li>
+              ))
+            }
           </ul>
         </div>
       </aside>
@@ -334,6 +352,14 @@ const mailPayload = JSON.stringify({
   .form__note--mail {
     margin-top: 4px;
   }
+  /* The honeypot: out of sight, out of the tab order and inert; only a bot fills it. */
+  .hp {
+    position: absolute;
+    left: -10000px;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+  }
   .form__status {
     display: flex;
     align-items: center;
@@ -356,8 +382,36 @@ const mailPayload = JSON.stringify({
     background: var(--cyan);
     box-shadow: 0 0 0 4px rgb(0 190 243 / 0.2);
   }
+  .form__status[data-state='fail'] {
+    border-color: var(--amber-ink);
+  }
+  .form__status[data-state='fail']::before {
+    background: var(--amber-ink);
+    box-shadow: 0 0 0 4px color-mix(in srgb, var(--amber-ink) 25%, transparent);
+  }
+  .form__status[data-state='busy']::before {
+    animation: sxPulse 1s ease-in-out infinite alternate;
+  }
+  .form__msg {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+  .form__fallback {
+    display: block;
+    margin-top: 6px;
+  }
+  .form__fallback a {
+    color: inherit;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
   .form__status:empty {
     display: none;
+  }
+  @keyframes sxPulse {
+    to {
+      opacity: 0.35;
+    }
   }
 
   /* Topic-driven parts use :has() so the page still behaves with JavaScript off. */
@@ -431,15 +485,31 @@ const mailPayload = JSON.stringify({
   .chat__list {
     margin-top: 12px;
   }
-  .chat__list li + li {
+  .chat__region {
+    padding-block: 14px;
+  }
+  .chat__region + .chat__region {
     border-top: 1px solid rgb(255 255 255 / 0.14);
+  }
+  .chat__rlabel {
+    margin-bottom: 2px;
+    color: #fff;
+    font-size: 18px;
+    font-weight: 600;
+  }
+  .chat__rlabel span {
+    color: #8d99ae;
+    font-family: var(--f-mono);
+    font-size: 12px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
   }
   .chat__row {
     display: flex;
     align-items: center;
-    gap: 20px;
+    gap: 16px;
     min-height: 44px;
-    padding-block: 18px;
+    padding-block: 6px;
     color: #fff;
     font-size: 18px;
     text-decoration: none;

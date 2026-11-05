@@ -6,7 +6,7 @@ import AboutWindow from '../solutions/AboutWindow.astro';
 import PersonCard from '../company/PersonCard.astro';
 import { about } from '../../i18n/pages/about';
 import { altFor } from '../../i18n/pages/common';
-import { clientLogos } from '../../data/logos';
+import LogoMarquee from '../ui/LogoMarquee.astro';
 import { useDict, type Locale } from '../../i18n';
 import { hrefFor } from '../../data/nav';
 import { investorsHref } from '../../lib/links';
@@ -17,7 +17,6 @@ interface Props {
 const { locale } = Astro.props;
 const c = about[locale];
 const t = useDict(locale);
-const logos = clientLogos;
 const icons = {
   science: 'M9 3h6M10 3v6.2L4.6 18.4A2 2 0 0 0 6.3 21.4h11.4a2 2 0 0 0 1.7-3L14 9.2V3M7.5 15h9',
   access: 'M4 20V13M10 20V9M16 20V5M22 20H2',
@@ -97,16 +96,7 @@ const missionText = missionRest.join(': ');
         <p id="partners-label">{t.logos.label}</p>
         <p class="sx-partners__num num d">{t.logos.count}</p>
       </div>
-      <ul class="sx-partners__list" aria-label={t.logos.listLabel}>
-        {
-          logos.map((logo) => (
-            <li style={`--lh:${logo.h}px`}>
-              <img class="only-light" src={`/logos/${logo.slug}-mono-dark.${logo.ext}`} alt={logo.name} width={Math.round((logo.h * logo.width) / logo.height)} height={logo.h} loading="lazy" decoding="async" />
-              <img class="only-dark" src={`/logos/${logo.slug}-mono-light.${logo.ext}`} alt={logo.name} width={Math.round((logo.h * logo.width) / logo.height)} height={logo.h} loading="lazy" decoding="async" />
-            </li>
-          ))
-        }
-      </ul>
+      <LogoMarquee class="sx-partners__list" surface="theme" host label={t.logos.listLabel} />
     </div>
   </section>
 

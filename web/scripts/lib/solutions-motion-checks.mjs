@@ -107,7 +107,7 @@ const scopePoint = (si) => {
 
 const focusIn = (si) => {
   const scope = document.querySelectorAll('[data-ap-scope]')[si];
-  const el = [...scope.querySelectorAll('a[href], button, input, select, textarea, [tabindex]')].find((e) => e.tabIndex >= 0 && !e.disabled && e.getClientRects().length > 0);
+  const el = [scope, ...scope.querySelectorAll('a[href], button, input, select, textarea, [tabindex]')].find((e) => e.tabIndex >= 0 && !e.disabled && !e.closest('[inert]') && e.getClientRects().length > 0);
   if (!el) return false;
   el.focus({ preventScroll: true });
   return document.activeElement === el;
@@ -150,7 +150,7 @@ const looseLoops = (chromeSel) => [
 
 const moved = (a, b) => [...new Set([...Object.keys(a), ...Object.keys(b)])].filter((k) => a[k] !== b[k]);
 
-export async function solutionsMotionChecks({ open, check, sleep, settle, metrics = {}, only = process.env.SOLUTIONS_MOTION_ONLY }) {
+export async function solutionsMotionChecks({ open, check, sleep, settle, metrics = {}, only = process.env.SOLUTIONS_MOTION_ONLY, requireMarqueeFocus = false }) {
   const pool = async (items, size, fn) => {
     const queue = [...items];
     await Promise.all(
@@ -174,6 +174,7 @@ export async function solutionsMotionChecks({ open, check, sleep, settle, metric
         await park();
       };
       const scopes = await page.evaluate(() => [...document.querySelectorAll('[data-ap-scope]')].map((_, i) => i));
+      let marqueeFocusCases = 0;
       check('solutions-motion', `${tag}: the page has pause scopes to measure`, scopes.length > 0, `${scopes.length} scopes`);
 
       for (const si of scopes) {
@@ -218,12 +219,12 @@ export async function solutionsMotionChecks({ open, check, sleep, settle, metric
           const b = await take();
           return { keys: new Set([...Object.keys(a), ...Object.keys(b)]).size, moved: moved(a, b) };
         };
-        const still = async (cond, state, lead) => {
+        const still = async (cond, state, lead, group = 'solutions-motion') => {
           const s = await waitState(state);
-          check('solutions-motion', `${label}: ${cond} puts every autoplayer of the unit in ${state}`, s.ok, s.ok ? `${s.s.length} hosts` : s.s.join(', '));
+          check(group, `${label}: ${cond} puts every autoplayer of the unit in ${state}`, s.ok, s.ok ? `${s.s.length} hosts` : s.s.join(', '));
           await sleep(lead);
           const m = await measure();
-          check('solutions-motion', `${label}: ${cond} stops everything in it (loops, in-flight transitions, timers, clips)`, m.moved.length === 0, m.moved.length ? `still moving: ${m.moved.slice(0, 6).join('; ')}` : `${m.keys} rendered values held still for ${interval} ms`);
+          check(group, `${label}: ${cond} stops everything in it (loops, in-flight transitions, timers, clips)`, m.moved.length === 0, m.moved.length ? `still moving: ${m.moved.slice(0, 6).join('; ')}` : `${m.keys} rendered values held still for ${interval} ms`);
         };
 
         // positive control: the unit runs and moves with no pointer and no focus
@@ -243,9 +244,17 @@ export async function solutionsMotionChecks({ open, check, sleep, settle, metric
         check('solutions-motion', `${label}: moves again once the pointer leaves`, back1.moved.length > 0, `moving: ${back1.moved.slice(0, 4).join('; ') || 'none'}`);
 
         // keyboard focus inside the scope
-        if (await page.evaluate(focusIn, si)) {
-          await still('keyboard focus inside the scope', 'off/focus', 900);
+        const marquee = await page.evaluate((s) => document.querySelectorAll('[data-ap-scope]')[s].matches('[data-logo-marquee]'), si);
+        const focused = await page.evaluate(focusIn, si);
+        if (marquee) check('logo-marquee', `${label}: the keyboard focus case executes`, focused);
+        if (focused) {
+          const group = marquee ? 'logo-marquee' : 'solutions-motion';
+          await still('keyboard focus inside the scope', 'off/focus', 900, group);
           await rest();
+          const resumed = await waitState('on/');
+          const back = await measure();
+          check(group, `${label}: moves again after keyboard focus leaves`, resumed.ok && back.moved.length > 0, `moving: ${back.moved.slice(0, 4).join('; ') || 'none'}`);
+          if (marquee) marqueeFocusCases++;
         }
 
         // scrolled out of view
@@ -266,6 +275,7 @@ export async function solutionsMotionChecks({ open, check, sleep, settle, metric
         metrics[`solutions-motion-${tag}-${si}`] = { values: run.keys, moving: run.moved.length };
       }
 
+      if (requireMarqueeFocus) check('logo-marquee', `${tag}: the required marquee keyboard focus case ran`, marqueeFocusCases > 0, `${marqueeFocusCases} cases`);
       const loose = await page.evaluate(looseLoops, chrome);
       check('solutions-motion', `${tag}: every endless loop in the page content sits inside an autoplayer host (or is shared decoration)`, loose.length === 0, loose.length ? `outside any host: ${loose.join(', ')}` : 'none outside');
     } catch (e) {

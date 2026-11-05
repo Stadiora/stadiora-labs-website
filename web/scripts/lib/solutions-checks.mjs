@@ -1,7 +1,6 @@
 // Evidence checks and screenshots for the solutions, resources and company pages (schools, coaches, clubs,
 // athletes, case studies, about, contact; EN and ES). Called from evidence.mjs with its page opener and recorders.
 import { mkdir } from 'node:fs/promises';
-import { CONTACT_EMAIL, findDeliveryClaims, statusText } from './contact-contract.mjs';
 import { solutionsPriceChecks } from './solutions-price-checks.mjs';
 
 const pages = [
@@ -287,78 +286,6 @@ export async function solutionsChecks({ open, settle: settleRaw, check, sleep, m
       count === 12 && one === 1 && two === 1 && secondOpen && afterEsc === 0 && focusBack && afterOutside === 0 && afterClose === 0,
       JSON.stringify({ count, one, two, secondOpen, afterEsc, focusBack, afterOutside, afterClose }),
     );
-    await page.context().close();
-  }
-
-  // ---------------------------------------------------------- contact: topic, validation, mailto, no fake success
-  for (const locale of ['en', 'es']) {
-    const base = localized(locale, '/contact/');
-    const watchMail = () => {
-      window.__mail = null;
-      window.navigation?.addEventListener('navigate', (e) => {
-        if (e.destination.url.startsWith('mailto:')) window.__mail = e.destination.url;
-      });
-    };
-
-    const topic = await open({ width: 1440, height: 900, reduced: true }, `${base}?topic=question`);
-    const qState = await topic.evaluate(() => ({
-      question: document.querySelector('#topic-question').checked,
-      athletesDisabled: document.querySelector('#f-athletes').disabled,
-      callOnlyHidden: document.querySelector('[data-call-only]').hidden,
-    }));
-    await topic.locator('#topic-call').check();
-    const dState = await topic.evaluate(() => ({ call: document.querySelector('#topic-call').checked, athletesDisabled: document.querySelector('#f-athletes').disabled, url: location.search }));
-    check('solutions-contact', `${locale} contact: ?topic=question preselects the question topic and hides the athletes field; switching back restores it`, qState.question && qState.athletesDisabled && qState.callOnlyHidden && dState.call && !dState.athletesDisabled && /topic=call/.test(dState.url), JSON.stringify({ qState, dState }));
-    await topic.context().close();
-
-    const page = await open({ width: 1440, height: 900, reduced: true, init: watchMail }, base);
-    await settle(page);
-    await page.locator('#contact-form button[type="submit"]').click();
-    const errors = await page.evaluate(() => ({
-      shown: ['e-name', 'e-email', 'e-role'].map((id) => {
-        const e = document.getElementById(id);
-        return !e.hidden && e.textContent.trim().length > 3;
-      }),
-      focused: document.activeElement?.id,
-      invalid: ['f-name', 'f-email', 'f-role'].map((id) => document.getElementById(id).getAttribute('aria-invalid')),
-      mail: window.__mail,
-      status: document.querySelector('[data-status]').textContent.trim(),
-    }));
-    check('solutions-contact', `${locale} contact: empty submit shows three field errors tied by aria-describedby, focuses the first, opens nothing and shows no status`, errors.shown.every(Boolean) && errors.focused === 'f-name' && errors.invalid.every((v) => v === 'true') && !errors.mail && errors.status === '', JSON.stringify(errors));
-    await page.screenshot({ path: `${shotsDir}interaction-contact-errors-${locale}.jpg`, type: 'jpeg', quality: 82 });
-
-    await page.fill('#f-name', 'Ana López');
-    await page.fill('#f-email', 'not-an-email');
-    await page.selectOption('#f-role', { index: 1 });
-    await page.locator('#contact-form button[type="submit"]').click();
-    const badEmail = await page.evaluate(() => ({ email: !document.getElementById('e-email').hidden, name: document.getElementById('e-name').hidden, focused: document.activeElement?.id, mail: window.__mail, status: document.querySelector('[data-status]').textContent.trim() }));
-    check('solutions-contact', `${locale} contact: an invalid email is rejected on its own, does not open the mail app and shows no status`, badEmail.email && badEmail.name && badEmail.focused === 'f-email' && !badEmail.mail && badEmail.status === '', JSON.stringify(badEmail));
-
-    await page.fill('#f-email', 'ana@escuela.example');
-    await page.fill('#f-org', 'Colegio Norte');
-    await page.fill('#f-message', 'Quiero una llamada para 3 equipos.');
-    await page.locator('#contact-form button[type="submit"]').click();
-    await sleep(250);
-    const sent = await page.evaluate(() => ({ mail: window.__mail, status: document.querySelector('[data-status]').textContent.trim(), body: document.body.innerText }));
-    const mail = sent.mail ? new URL(sent.mail) : null;
-    const body = mail ? decodeURIComponent(mail.search.match(/body=([^&]*)/)?.[1] ?? '') : '';
-    const subject = mail ? decodeURIComponent(mail.search.match(/subject=([^&]*)/)?.[1] ?? '') : '';
-    check(
-      'solutions-contact',
-      `${locale} contact: a valid submit builds a mailto: to ${CONTACT_EMAIL} with name, email, role, organization and message`,
-      mail?.protocol === 'mailto:' && mail.pathname === CONTACT_EMAIL && /Ana López/.test(body) && /ana@escuela\.example/.test(body) && /Colegio Norte/.test(body) && /3 equipos/.test(body) && /Ana López/.test(subject),
-      JSON.stringify({ mail: sent.mail?.slice(0, 120) }),
-    );
-    // The status is compared with the approved text from contact-contract.mjs, not with the page's own copy file,
-    // so a changed status fails here even when it reads like a normal sentence.
-    check(
-      'solutions-contact',
-      `${locale} contact: the post-submit status is exactly the approved text (email app opened, nothing claimed as sent)`,
-      sent.status === statusText(locale),
-      JSON.stringify({ expected: statusText(locale), status: sent.status }),
-    );
-    const claims = findDeliveryClaims(sent.body, locale);
-    check('solutions-contact', `${locale} contact: after a valid submit the page claims no receipt, delivery or reply time`, claims.length === 0, JSON.stringify({ claims }));
     await page.context().close();
   }
 

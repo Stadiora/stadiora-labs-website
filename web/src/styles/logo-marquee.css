@@ -1,0 +1,59 @@
+/* Customers and partners logo marquee, shared by the home hero band and the About partners strip (components/ui/LogoMarquee.astro).
+   The motion itself (.marquee, .marquee-track, pause on hover and focus, hidden tab, reduced motion) comes from floodlight.css;
+   offscreen it pauses with the [data-section] that holds it. */
+.logo-marquee {
+  /* Nine logos: 38 s was the pace for six, so the loop is longer by the same ratio and the speed stays the same. */
+  --dur: 62s;
+  /* The hover lift would be cut by the marquee's overflow clip without room above and below the tallest mark. */
+  padding-block: 8px;
+}
+.logo-marquee .marquee-track {
+  align-items: center;
+}
+.logo-marquee-set {
+  display: flex;
+  align-items: center;
+  gap: 76px;
+  padding-right: 76px;
+}
+.logo-marquee img {
+  height: var(--lh, 34px);
+  width: auto;
+  max-width: none;
+  flex: none;
+  opacity: 0.72;
+  transition:
+    opacity 200ms,
+    transform 300ms var(--e-out);
+}
+.logo-marquee img:hover {
+  opacity: 1;
+  transform: scale(1.06);
+}
+
+/* the pause host reports hover, focus, offscreen and a hidden tab as data-ap="off" */
+.logo-marquee[data-ap='off'] .marquee-track {
+  animation-play-state: paused;
+}
+
+@media (max-width: 640px) {
+  .logo-marquee-set {
+    gap: 44px;
+    padding-right: 44px;
+  }
+  .logo-marquee img {
+    height: calc(var(--lh, 34px) * 0.8);
+  }
+}
+/* reduced motion: a static wrapped row, with the repeated copy hidden by the .marquee rules */
+@media (prefers-reduced-motion: reduce) {
+  .logo-marquee-set {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 18px 44px;
+    padding-right: 0;
+  }
+  .logo-marquee img {
+    opacity: 0.85;
+  }
+}

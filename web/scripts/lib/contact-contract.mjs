@@ -1,23 +1,48 @@
-// The honest-contact contract, written out here on purpose and NOT imported from src/i18n/pages/contact.ts.
-// Nothing is delivered from the contact page: a valid submit only opens the visitor's email app with the message
-// filled in. If the app copy is edited, these literals must be edited too, so the change is reviewed twice.
-// Used by verify-solutions.mjs (built HTML) and solutions-checks.mjs (the page in Chromium).
+// The honest-contact contract, written out here on purpose and NOT imported from src/ (site.ts, the copy files or the form
+// script). If the endpoint, the roles, a phone number or the wording of the success state changes in the app, these literals
+// must change too, so the change is reviewed twice.
+// Source of truth for the endpoint: Stadiora/Aria PR #16610 (app-backend/server/routes/websiteContact.ts, docs/api/website-contact.md).
+// Used by verify-solutions.mjs and cutover-verify.mjs (built HTML), solutions-checks.mjs, solutions-floodlight-checks.mjs
+// and cutover-checks.mjs (the pages in Chromium, with the network intercepted: nothing is ever really sent).
 
-export const CONTACT_EMAIL = 'anthony@stadioralabs.com';
+export const CONTACT_ENDPOINT = 'https://api.runwitharia.com/api/public/website-contact';
 
-// The only post-submit status text. "{email}" is replaced with CONTACT_EMAIL when the form is submitted.
-export const approvedOpening = {
-  en: 'Opening your email app. If nothing opens, write to {email}.',
-  es: 'Abriendo tu app de correo. Si no se abre, escribe a {email}.',
+// Request body: exactly these keys, plus the optional organization and athletes when the visitor filled them.
+export const requiredKeys = ['topic', 'name', 'email', 'role', 'message', 'locale', 'page', 'website', 'startedAt'];
+export const optionalKeys = ['organization', 'athletes'];
+// The endpoint's topic enum is fixed (backend, out of scope). The page's topics are `call` and `question`; the form maps
+// `call` to the enum value below at the one place it builds the body, and the browser checks assert that exact wire value.
+export const wireTopic = { call: 'demo', question: 'question' };
+export const topics = Object.values(wireTopic);
+export const roles = ['coach', 'athletic-director', 'school-admin', 'club-academy', 'gym', 'athlete', 'other'];
+export const athleteRanges = ['1-10', '11-25', '26-100', '100-250', '250-1000', '1000+'];
+// The endpoint rejects a post made less than this long after startedAt (the moment the form opened).
+export const MIN_FILL_MS = 3000;
+
+// Both regions, on the Contact page, in the footer and on connect.html.
+export const contacts = {
+  us: { name: 'Ian Rowe', email: 'ian@stadioralabs.com', tel: '+18592859529', phone: '+1 859 285 9529' },
+  latam: { name: 'Anthony Rugama', email: 'anthony@stadioralabs.com', tel: '+50660419069', phone: '+506 6041-9069', whatsapp: 'https://wa.me/50660419069' },
+};
+export const contactHrefs = [
+  `mailto:${contacts.us.email}`,
+  `tel:${contacts.us.tel}`,
+  `mailto:${contacts.latam.email}`,
+  `tel:${contacts.latam.tel}`,
+  contacts.latam.whatsapp,
+];
+
+// The hrefs from contactHrefs that the given HTML does not carry.
+export const missingContactHrefs = (html, hrefs = contactHrefs) => hrefs.filter((h) => !html.includes(`href="${h}"`));
+
+// The only status text that may claim a message went out. It appears after a 202 and nowhere else.
+export const approvedSuccess = {
+  en: 'Your message was sent. Thank you, we will reply to the email you gave.',
+  es: 'Tu mensaje fue enviado. Gracias, te responderemos al correo que indicaste.',
 };
 
-// The only other sentence about sending. It says the opposite of a delivery claim, so it is stripped before scanning.
-export const approvedNote = {
-  en: 'Sending opens your email app with your message ready. Nothing is sent from this page.',
-  es: 'Al enviar se abre tu app de correo con el mensaje listo. Desde esta página no se envía nada.',
-};
-
-export const statusText = (locale) => approvedOpening[locale].replace('{email}', CONTACT_EMAIL);
+// The lead-magnet quiz keeps its own success panel; it too appears only after a 202.
+export const leadSuccess = { en: /on the list/i, es: /en la lista/i };
 
 // Phrases that claim a message was received, delivered or will be answered. English first, then Spanish
 // (accented and unaccented spellings, because the page may drop accents).
@@ -44,9 +69,9 @@ export const deliveryClaims = [
   [/\bcon [eé]xito|\bexitosamente\b/i, 'a success state (Spanish)'],
 ];
 
-// Removes the approved sentences, then lists every delivery claim left in the text.
+// Removes the approved success sentence, then lists every delivery claim left in the text.
 export function findDeliveryClaims(text, locale) {
   let rest = text.replace(/\s+/g, ' ');
-  for (const sentence of [approvedNote[locale], statusText(locale), approvedOpening[locale]]) rest = rest.replaceAll(sentence, ' ');
+  rest = rest.replaceAll(approvedSuccess[locale], ' ');
   return deliveryClaims.filter(([re]) => re.test(rest)).map(([, what]) => what);
 }

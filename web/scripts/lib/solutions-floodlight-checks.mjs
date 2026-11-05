@@ -5,10 +5,9 @@
 //   - nothing that moves keeps moving under reduced motion, and the hero loops stop on hover;
 //   - solutions-motion-checks.mjs measures the rendered movement of every autoplayer unit under hover, focus, offscreen and a hidden tab;
 //   - the About "A" window, the clubs feed, the athletes morph and the coaches clip move, and rest on their still frame;
-//   - the contact topic thumb glides, the submit burst is decoration and the status text stays the approved one;
+//   - the contact topic thumb glides, the submit burst is decoration;
 //   - no text is cut off by a clipping ancestor.
 import { clipProbe } from './clip-probe.mjs';
-import { statusText } from './contact-contract.mjs';
 import { solutionsMotionChecks } from './solutions-motion-checks.mjs';
 import { solutionsPixelContrastChecks } from './solutions-pixel-contrast.mjs';
 
@@ -242,74 +241,6 @@ export async function solutionsFloodlightChecks({ open, settle: settleRaw, check
       m0.role === 'img' && m0.named && m0.glyph !== 'none' && m0.dot !== 'none' && m0.pos !== m1.pos && r.glyph === 'none' && r.dot === 'none',
       JSON.stringify({ m0, m1, r }),
     );
-  }
-
-  // ---------------------------------------------------------- contact: spring thumb, burst, honest status
-  for (const locale of ['en', 'es']) {
-    const path = localized(locale, '/contact/');
-    const watchMail = () => {
-      window.__mail = null;
-      window.navigation?.addEventListener('navigate', (e) => {
-        if (e.destination.url.startsWith('mailto:')) window.__mail = e.destination.url;
-      });
-    };
-    const thumb = (page) => page.evaluate(() => new DOMMatrix(getComputedStyle(document.querySelector('.seg'), '::after').transform).m41);
-    const fill = async (page) => {
-      await page.fill('#f-name', 'Ana López');
-      await page.fill('#f-email', 'ana@escuela.example');
-      await page.selectOption('#f-role', { index: 1 });
-      await page.locator('#contact-form button[type="submit"]').click();
-    };
-
-    const mo = await open({ width: 1440, height: 900, init: watchMail }, path);
-    await settle(mo);
-    const t0 = await thumb(mo);
-    await mo.locator('#topic-question').check();
-    await sleep(900);
-    const t1 = await thumb(mo);
-    await mo.locator('#topic-call').check();
-    await sleep(900);
-    const t2 = await thumb(mo);
-    check('solutions-floodlight', `${locale} contact: the topic thumb glides to the second option and back`, Math.abs(t0) < 1 && t1 > 40 && Math.abs(t2) < 1, JSON.stringify({ t0, t1, t2 }));
-
-    await fill(mo);
-    await sleep(250);
-    const burst = await mo.evaluate(() => {
-      const b = document.querySelector('.sx-burst');
-      const dot = b?.querySelector('i');
-      return {
-        go: b?.classList.contains('go'),
-        anim: dot ? getComputedStyle(dot).animationName : '',
-        text: b?.textContent.trim(),
-        hidden: b?.getAttribute('aria-hidden') === 'true',
-        status: document.querySelector('[data-status]').textContent.trim(),
-        mail: window.__mail?.startsWith('mailto:'),
-      };
-    });
-    check(
-      'solutions-floodlight',
-      `${locale} contact: a valid submit bursts the dots, the burst carries no words and the status is exactly the approved text`,
-      burst.go && burst.anim === 'sxBurst' && burst.text === '' && burst.hidden && burst.status === statusText(locale) && burst.mail,
-      JSON.stringify({ burst, expected: statusText(locale) }),
-    );
-    await mo.context().close();
-
-    const rm = await open({ width: 1440, height: 900, reduced: true, init: watchMail }, path);
-    await settle(rm);
-    await fill(rm);
-    await sleep(250);
-    const rmBurst = await rm.evaluate(() => ({ go: document.querySelector('.sx-burst').classList.contains('go'), status: document.querySelector('[data-status]').textContent.trim() }));
-    check('solutions-floodlight', `${locale} contact: under reduced motion there is no burst and the status still shows`, !rmBurst.go && rmBurst.status === statusText(locale), JSON.stringify(rmBurst));
-    await rm.context().close();
-
-    // An invalid submit must not burst: nothing was opened.
-    const bad = await open({ width: 1440, height: 900, init: watchMail }, path);
-    await settle(bad);
-    await bad.locator('#contact-form button[type="submit"]').click();
-    await sleep(250);
-    const badBurst = await bad.evaluate(() => ({ go: document.querySelector('.sx-burst').classList.contains('go'), status: document.querySelector('[data-status]').textContent.trim() }));
-    check('solutions-floodlight', `${locale} contact: an invalid submit does not burst and shows no status`, !badBurst.go && badBurst.status === '', JSON.stringify(badBurst));
-    await bad.context().close();
   }
 
   // ---------------------------------------------------------- rendered motion under hover, focus, offscreen and a hidden tab

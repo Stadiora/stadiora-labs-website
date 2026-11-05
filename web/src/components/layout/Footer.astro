@@ -15,6 +15,11 @@ const { locale, path = '/' } = Astro.props;
 const t = useDict(locale);
 const f = t.footer;
 
+const regions = [
+  { key: 'us', label: f.regions.us, who: site.contacts.us },
+  { key: 'latam', label: f.regions.latam, who: site.contacts.latam },
+] as const;
+
 const columns: { title: string; links: { label: string; href: string }[] }[] = [
   {
     title: f.columns.platform,
@@ -69,16 +74,31 @@ const columns: { title: string; links: { label: string; href: string }[] }[] = [
             </nav>
           ))
         }
-        <div class="footer__col">
+        <div class="footer__col footer__contact">
           <h2 class="footer__h">{f.contactLabel}</h2>
-          <ul>
-            <li>
-              <a href={`mailto:${site.email}`}>{site.email}</a>
-            </li>
-            <li>
-              <a href={site.whatsappUrl} rel="noopener">{f.whatsapp} {site.whatsappLabel}</a>
-            </li>
-          </ul>
+          <div class="footer__regions">
+            {
+              regions.map((r) => (
+                <ul class="footer__region" aria-label={`${r.label}, ${r.who.name}`} data-contact-region={r.key}>
+                  <li class="footer__rname">
+                    <span>{r.label}</span> · {r.who.name}
+                  </li>
+                  <li>
+                    <a href={`mailto:${r.who.email}`}>{r.who.email}</a>
+                  </li>
+                  <li>
+                    <a href={`tel:${r.who.tel}`}>{r.who.phone}</a>
+                    {'whatsapp' in r.who && (
+                      <>
+                        {' · '}
+                        <a href={r.who.whatsapp} rel="noopener" target="_blank">{f.whatsapp}</a>
+                      </>
+                    )}
+                  </li>
+                </ul>
+              ))
+            }
+          </div>
         </div>
       </div>
     </div>
@@ -171,6 +191,35 @@ const columns: { title: string; links: { label: string; href: string }[] }[] = [
     text-decoration-color: var(--cyan);
     text-decoration-thickness: 2px;
     text-underline-offset: 5px;
+  }
+  .footer__regions {
+    display: grid;
+    gap: 20px;
+  }
+  .footer__region {
+    display: grid;
+    gap: 2px;
+  }
+  .footer__region li {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    column-gap: 8px;
+    color: var(--band-ink-2);
+    font-size: 16px;
+  }
+  .footer__rname {
+    min-height: 28px;
+    color: var(--band-ink);
+    font-weight: 600;
+  }
+  .footer__rname span {
+    color: #8d99ae;
+    font-family: var(--f-mono);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
   }
   .footer__bottom {
     display: flex;

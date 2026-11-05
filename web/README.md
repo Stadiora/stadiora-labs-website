@@ -37,18 +37,42 @@ node scripts/evidence.mjs --engage-motion-only --checks-only # just the Platform
   Their price teasers come from `src/data/prices.ts` and `src/lib/region.ts` (the same table and detector as `/pricing/`, nothing is copied). The HTML ships the US price, so no-JS visitors see it; the script swaps in the LatAm price. The evidence run checks each teaser against `/pricing/` for `?region=us`, `?region=latam` and the time zones in between.
 - Case studies: the production page is an honest "coming soon" state, noindex and out of the sitemap. Placeholder cards and a
   sample story page render only under `npm run dev`, and the build never emits them.
-- Contact has no form endpoint yet: a valid submit opens the visitor's email app (mailto) and never claims a message was sent.
-  The approved post-submit status (EN and ES) is written out in `scripts/lib/contact-contract.mjs`, independent of
-  `src/i18n/pages/contact.ts`; verify and evidence compare the page with it word for word, so editing that copy means
-  editing the contract too.
+- Contact posts to the live endpoint `POST https://api.runwitharia.com/api/public/website-contact` (Aria app-backend; contract in
+  Stadiora/Aria PR #16610; CORS allows only stadioralabs.com and www). The page shows "sent" only on a 202; a 400, a 429, a 503, any
+  other status and a network failure each show their own message plus the direct email and WhatsApp links. Every post carries the
+  honeypot (`website`, empty) and `startedAt`, and waits out the endpoint's 3 s minimum fill time. The endpoint, roles, contacts and
+  the approved "sent" sentence (EN and ES) are written out in `scripts/lib/contact-contract.mjs`, independent of `src/`; verify and
+  evidence compare the page with it, so editing that copy means editing the contract too. The browser checks intercept the endpoint
+  (`scripts/lib/contact-route.mjs`): no test sends real email. `node scripts/evidence.mjs --contact-only` runs just those checks.
+- Both regions are listed on Contact, in the footer and on `public/connect.html` (US: Ian Rowe; LatAm: Anthony Rugama, WhatsApp). The data is
+  in `src/data/site.ts` (`contacts`), also used by Organization JSON-LD for both public emails and phones with US/Latin America areas.
+- Both quiz locales abort requests after 15 seconds (the same deadline as Contact), show the localized failure/direct contacts and
+  restore retry. Cutover checks hold a fetch pending until its AbortSignal fires, assert the exact deadline and independently stated
+  EN/ES failure sentences, and exercise a successful retry. M38/M39 change only AbortError copy to the wrong locale.
+- `node scripts/mutation-prove-contact.mjs` (clean tree only) breaks each contact rule in the source, rebuilds, and proves the gate that
+  protects it fails on the intended assertion; it prints the table with the head SHA.
+  Set `EVIDENCE_DIR` to separate artifact directories when running independent evidence jobs concurrently.
+- The customers and partners marks move in one shared marquee, `src/components/ui/LogoMarquee.astro` (`src/styles/logo-marquee.css`): the
+  home hero band (always on the dark stage) and the About partners strip (`surface="theme"`, own pause host through
+  `src/scripts/logo-marquee.ts`). `node scripts/evidence.mjs --logos-only` guards both (two seamless sets, theme variants, no clipped
+  mark, movement, reduced motion) and the About pause scopes, requiring rendered focus stillness and resumption after blur even when
+  the scope itself is the only keyboard target; the mutation battery covers it as M32 to M34 and M37.
 - The shipped-wording guard (`scripts/lib/no-demo-wording.mjs`, run by `npm run verify`) scans text files and file names in
   `dist/` for `demo`, `demostraci`, `preview`, `vista previa` and `[preview]`, case-insensitively. Only the exact whole words
-  `demonstrated`, `demostrar`, `demostrado` and `demostró` are tolerated. Its sole code exemption is one `{demo:'call'}`
-  literal (single, double or backtick quotes) inside the inline contact-form module's script content in each of
-  `contact/index.html` and `es/contact/index.html`. Visible text, attributes, comments, noscript content, other pages and
-  all bundles remain scanned; there is no POST wire-value exemption. The battery asserts each copied-dist edit by content
-  and hash, requires failures from the wording guard itself, retains legal-word/identity controls, records the clean head,
-  and writes `.evidence/no-demo-wording-battery.json`.
+  `demonstrated`, `demostrar`, `demostrado` and `demostró` are tolerated. Its only code exemptions are three exact literals, each
+  in a `<script>` element found by the tag scanner (never in text, attributes, comments or `<noscript>`): the `{demo:'call'}` alias
+  and the topic-enum site `{topic: <ident> ? 'demo' : 'question', name:` in the inline contact-form module of each of
+  `contact/index.html` and `es/contact/index.html`, and `{topic: 'demo', name: 'Early access request'` in the inline script of each of
+  `lead-magnet.html` and `lead-magnet-es.html`. The endpoint accepts only `topic` `demo` or `question` (backend, out of scope), so
+  the page's `call` topic is mapped to `demo` where the body is built; everywhere else the topic is `call` (`#topic-call`,
+  `data-call-only`, `?topic=call`; `?topic=demo` stays a silent alias). Other pages and all bundles remain scanned. The battery asserts each
+  copied-dist edit by content and hash, requires failures from the wording guard itself, retains legal-word/identity controls,
+  records the clean head, and writes `.evidence/no-demo-wording-battery.json`. Each wire exemption pins one exact contiguous block,
+  exactly once per file and inside its request script: the lead `const body` declaration through `body: JSON.stringify(body)`,
+  or the stable minified contact serializer through its wire object and `await r(a,y)` request call. The legacy alias entry is unchanged.
+  Missing sites, site-swaps and complete-statement/shadow-block relocations fail independently of the global count.
+  **NOT COVERED:** this is a text match against one exact block, not proof of data flow. Runtime composition, for example by
+  `String.fromCharCode`, remains outside the static scan.
 - Solutions, Resources, About and Contact in Floodlight (DESIGN-4 section 6): every page runs on `src/layouts/SolutionsPage.astro`
   (the foundation, the motion kit and `src/styles/solutions/solutions.css`; everything in the lane is prefixed `sx-`). The hero is
   `src/components/solutions/SxHero.astro` (impact, mesh, orbits, display H1; the Schools and Coaches swap line is one sentence for a
@@ -57,7 +81,7 @@ node scripts/evidence.mjs --engage-motion-only --checks-only # just the Platform
   `src/scripts/solutions/` (`index.ts` starts them, then the kit): `swap.ts` (hero word swap), `feed.ts` (clubs team feed),
   `morph.ts` (athletes app morph), `contact.ts` (topic thumb, submit burst). Each one only animates away from the finished still
   frame, uses `autoplayer()` (so it stops on hover, focus, off screen, in a hidden tab and under reduced motion) and never writes
-  copy: the contact burst is ten decorative dots, and the status text still comes only from `contact-contract.mjs`.
+  copy: the contact burst is ten decorative dots that fire only after a 202, and the status text is checked against `contact-contract.mjs`.
   The Coaches hero clip is `public/solutions/media/sx-coaches.{webm,mp4,webp}` (lane clips are named `sx-*`, carry no words, and
   follow the clip markup and budget above; the home clips `night-stadium`, `ai-bg`, `engage-bg`, `tile-chalk`, `tile-hurdler`
   and `reel` are the only other text-free clips, and the `pillar-*` clips have titles baked in, so a page may not use them).
@@ -236,9 +260,8 @@ files are compared while the root `index.html` still exists; delete the legacy r
 - Redirect stubs (meta refresh, canonical, no script): `team.html` to `/about/`, `team-es.html` to `/es/about/`,
   `index-es.html` to `/es/`. They are out of the sitemap.
 - `src/pages/404.astro`: one bilingual page (GitHub Pages cannot pick a language per path), noindex, no canonical.
-- Lead form (`lead-magnet*.html`): without a Web3Forms key it opens the visitor's email app (mailto) and says so with the approved
-  wording, and never claims success. With a key it reports success only for `response.ok` and `success === true`; anything else
-  shows an error and a usable button. Set `WEB3FORMS_KEY` in both files when a key exists.
+- Lead form (`lead-magnet*.html`): posts to the same contact endpoint (topic `demo`, the endpoint's enum value; role from the quiz path, honeypot and `startedAt`,
+  3 s wait). "On the list" shows only on a 202; any other answer keeps a usable button and shows a message with the direct contacts.
 - SEO: canonical and hreflang on the carried pages that have a pair, per-type OG cards (`public/og/{home,platform,solutions,pricing,company}-{en,es}.png`,
   rendered by `node scripts/og.mjs`), and a sitemap that lists every indexable page and none of the noindex, redirect or 404 pages.
 - Deploy: `.github/workflows/pages-deploy.yml` builds, verifies and deploys `web/dist`. Both jobs run only while the repository

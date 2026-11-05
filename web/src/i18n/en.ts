@@ -284,6 +284,7 @@ export const en = {
     contactLabel: 'Contact',
     email: 'Email',
     whatsapp: 'WhatsApp',
+    regions: { us: 'United States', latam: 'Latin America' },
     privacy: 'Privacy',
     terms: 'Terms',
     rights: '© 2026 Stadiora Labs',

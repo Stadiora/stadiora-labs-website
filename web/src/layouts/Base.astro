@@ -42,9 +42,15 @@ const jsonLd = {
   url: site.origin,
   logo: abs('/logos/stadiora-labs.png'),
   sameAs: [site.linkedin],
-  contactPoint: [
-    { '@type': 'ContactPoint', contactType: 'sales', email: site.email, availableLanguage: ['en', 'es'] },
-  ],
+  contactPoint: Object.entries(site.contacts).map(([region, contact]) => ({
+    '@type': 'ContactPoint',
+    contactType: 'sales',
+    name: contact.name,
+    email: contact.email,
+    telephone: contact.tel,
+    areaServed: region === 'us' ? 'US' : 'Latin America',
+    availableLanguage: ['en', 'es'],
+  })),
 };
 ---
 

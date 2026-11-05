@@ -1,5 +1,6 @@
 // Copy for /contact/ (DESIGN-2.md section 14, DECISIONS #16). EN and ES.
-// There is no form endpoint yet, so sending opens the visitor's email app. The copy says so plainly.
+// The form posts to the live endpoint (site.contactApi). Success shows only on a 202; every other outcome has its own message.
+// The role and athletes values are the endpoint's enums; the labels are what the visitor reads.
 const en = {
   meta: {
     title: 'Contact | Let’s talk | Stadiora Labs',
@@ -18,10 +19,10 @@ const en = {
       options: [
         { value: 'coach', label: 'Coach' },
         { value: 'athletic-director', label: 'Athletic director' },
+        { value: 'school-admin', label: 'School administrator' },
         { value: 'club-academy', label: 'Club or academy' },
-        { value: 'gym-studio', label: 'Gym or studio' },
-        { value: 'nutrition-coach', label: 'Nutrition coach' },
-        { value: 'athlete-parent', label: 'Athlete or parent' },
+        { value: 'gym', label: 'Gym or studio' },
+        { value: 'athlete', label: 'Athlete or parent' },
         { value: 'other', label: 'Other' },
       ],
     },
@@ -29,7 +30,14 @@ const en = {
     athletes: {
       label: 'Number of athletes',
       placeholder: 'Choose a range',
-      options: ['1 to 10', '11 to 25', '26 to 100', '100 to 250', '250 to 1,000', 'More than 1,000'],
+      options: [
+        { value: '1-10', label: '1 to 10' },
+        { value: '11-25', label: '11 to 25' },
+        { value: '26-100', label: '26 to 100' },
+        { value: '100-250', label: '100 to 250' },
+        { value: '250-1000', label: '250 to 1,000' },
+        { value: '1000+', label: 'More than 1,000' },
+      ],
     },
     message: { call: 'What would you like to talk about?', question: 'Your question', placeholder: 'Tell us about your program' },
   },
@@ -41,14 +49,16 @@ const en = {
   submit: { call: 'Send request', question: 'Send' },
   note: 'We only use this to reply to you.',
   privacy: 'Privacy',
-  mailtoNote: 'Sending opens your email app with your message ready. Nothing is sent from this page.',
-  opening: 'Opening your email app. If nothing opens, write to {email}.',
-  mail: {
-    callSubject: 'Call request from {name}',
-    questionSubject: 'Question from {name}',
-    labels: { name: 'Name', email: 'Email', role: 'Role', org: 'Organization', athletes: 'Number of athletes' },
+  // One message per outcome. The three failure messages end in a colon: the direct email and WhatsApp links follow them.
+  send: {
+    busy: 'Sending…',
+    ok: 'Your message was sent. Thank you, we will reply to the email you gave.',
+    invalid: 'We could not accept that. Check your details and try again, or reach us directly:',
+    limited: 'Too many messages from this connection for now. Try again in a little while, or reach us directly:',
+    unavailable: 'We could not send your message right now. Try again, or reach us directly:',
+    noscript: 'This form needs JavaScript. To reach us directly, use the details on this page.',
   },
-  chat: { title: 'Prefer to chat?', whatsapp: 'WhatsApp', email: 'Email' },
+  chat: { title: 'Reach us directly', whatsapp: 'WhatsApp', email: 'Email' },
 };
 
 export type ContactCopy = typeof en;
@@ -71,10 +81,10 @@ const es: ContactCopy = {
       options: [
         { value: 'coach', label: 'Entrenador' },
         { value: 'athletic-director', label: 'Director deportivo' },
+        { value: 'school-admin', label: 'Administrador escolar' },
         { value: 'club-academy', label: 'Club o academia' },
-        { value: 'gym-studio', label: 'Gimnasio o estudio' },
-        { value: 'nutrition-coach', label: 'Entrenador de nutrición' },
-        { value: 'athlete-parent', label: 'Atleta o padre/madre' },
+        { value: 'gym', label: 'Gimnasio o estudio' },
+        { value: 'athlete', label: 'Atleta o padre/madre' },
         { value: 'other', label: 'Otro' },
       ],
     },
@@ -82,7 +92,14 @@ const es: ContactCopy = {
     athletes: {
       label: 'Número de atletas',
       placeholder: 'Elige un rango',
-      options: ['1 a 10', '11 a 25', '26 a 100', '100 a 250', '250 a 1.000', 'Más de 1.000'],
+      options: [
+        { value: '1-10', label: '1 a 10' },
+        { value: '11-25', label: '11 a 25' },
+        { value: '26-100', label: '26 a 100' },
+        { value: '100-250', label: '100 a 250' },
+        { value: '250-1000', label: '250 a 1.000' },
+        { value: '1000+', label: 'Más de 1.000' },
+      ],
     },
     message: { call: 'De qué te gustaría hablar?', question: 'Tu pregunta', placeholder: 'Cuéntanos sobre tu programa' },
   },
@@ -94,14 +111,15 @@ const es: ContactCopy = {
   submit: { call: 'Enviar solicitud', question: 'Enviar' },
   note: 'Solo usamos esto para responderte.',
   privacy: 'Privacidad',
-  mailtoNote: 'Al enviar se abre tu app de correo con el mensaje listo. Desde esta página no se envía nada.',
-  opening: 'Abriendo tu app de correo. Si no se abre, escribe a {email}.',
-  mail: {
-    callSubject: 'Solicitud de llamada de {name}',
-    questionSubject: 'Pregunta de {name}',
-    labels: { name: 'Nombre', email: 'Correo', role: 'Rol', org: 'Organización', athletes: 'Número de atletas' },
+  send: {
+    busy: 'Enviando…',
+    ok: 'Tu mensaje fue enviado. Gracias, te responderemos al correo que indicaste.',
+    invalid: 'No pudimos aceptarlo. Revisa tus datos e inténtalo de nuevo, o escríbenos directamente:',
+    limited: 'Demasiados mensajes desde esta conexión por ahora. Inténtalo de nuevo en un rato, o escríbenos directamente:',
+    unavailable: 'No pudimos enviar tu mensaje ahora. Inténtalo de nuevo, o escríbenos directamente:',
+    noscript: 'Este formulario necesita JavaScript. Para escribirnos directamente, usa los datos de esta página.',
   },
-  chat: { title: 'Prefieres chatear?', whatsapp: 'WhatsApp', email: 'Correo' },
+  chat: { title: 'Escríbenos directamente', whatsapp: 'WhatsApp', email: 'Correo' },
 };
 
 export const contact: { en: ContactCopy; es: ContactCopy } = { en, es };
