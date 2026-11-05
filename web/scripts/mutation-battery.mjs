@@ -242,7 +242,7 @@ const M = [
   // ---- round 2: fixes for the round-1 review (B1-B5, A1, A2)
   {
     id: 'fit-badge-nowrap',
-    what: 'B1: the Spanish demo badge inherits white-space:nowrap again on the phone',
+    what: 'B1: the Spanish notice badge inherits white-space:nowrap again on the phone',
     edits: [{ file: 'src/styles/api.css', find: 'display:inline-block;margin-top:16px;white-space:normal}', replace: 'display:inline-block;margin-top:16px}' }],
     runner: 'fit',
     expect: /\[api-hero-fit\] es 390px: the hero stack and every box in it sit inside their/,

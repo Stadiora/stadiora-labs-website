@@ -15,7 +15,7 @@ export const en = {
     join: 'Join the early access list',
     how: 'See how it will work',
     honest: 'Not available to outside developers yet',
-    badge: 'Demo data · design sketch, not a live API',
+    badge: 'Design sketch, not a live API yet',
     stats: ['Planned capabilities', 'Sport. No lock-in.', 'Proprietary hardware required', 'Output. A decision.'],
     statsAny: 'Any',
   },
@@ -68,7 +68,7 @@ export const en = {
     h2: ['Six capabilities.', 'One intelligence layer.'],
     lead: 'Every capability is planned on the same sport-science-validated method behind Aria, Aria for Coaches and Aria 12. None of it is callable by outside developers yet.',
     planned: 'Planned',
-    note: 'Demo data · every capability is planned',
+    note: 'Every capability is planned',
     tiers: ['Full', 'Modified', 'Recovery', 'Unavailable'],
     items: [
       {
@@ -185,7 +185,7 @@ export const en = {
     eyebrow: 'Use cases',
     h2: ['Built for', 'builders.'],
     lead: 'Any product that touches athlete performance, team management or fitness will be able to embed Aria Intelligence and return decisions instead of data.',
-    badge: 'Demo data · planned outputs',
+    badge: 'Planned outputs',
     rows: [
       {
         h: 'Fitness & training apps',
@@ -224,7 +224,7 @@ export const en = {
       { k: 'Signal → decision', t: 'Ease off today', s: 'Heart rate variability −6.2 vs normal.' },
       { k: 'Return to play', s: 'Stage 3 of 5 · staff review next' },
       { k: 'What happened → what to do', t: 'Cap sprint volume at 60%', s: 'Three high-load days in a row.' },
-      { k: 'U16 squad (Demo)', t: '3 athletes to review first', s: 'Sorted by the attention queue.' },
+      { k: 'U16 squad', t: '3 athletes to review first', s: 'Sorted by the attention queue.' },
     ],
   },
   final: {
@@ -253,7 +253,7 @@ export const es: ApiCopy = {
     join: 'Sumarme al acceso anticipado',
     how: 'Ver cómo funcionará',
     honest: 'Todavía no disponible para desarrolladores externos',
-    badge: 'Datos de demostración · boceto de diseño, no es una API en vivo',
+    badge: 'Boceto de diseño, aún no es una API en vivo',
     stats: ['Capacidades planificadas', 'Deporte. Sin ataduras.', 'Hardware propio requerido', 'Salida. Una decisión.'],
     statsAny: 'Cualquier',
   },
@@ -306,7 +306,7 @@ export const es: ApiCopy = {
     h2: ['Seis capacidades.', 'Una capa de inteligencia.'],
     lead: 'Cada capacidad está planificada sobre el mismo método validado por ciencia deportiva que usan Aria, Aria for Coaches y Aria 12. Nada de esto se puede llamar desde fuera todavía.',
     planned: 'Planificado',
-    note: 'Datos de demostración · todas las capacidades son planificadas',
+    note: 'Todas las capacidades son planificadas',
     tiers: ['Completo', 'Modificado', 'Recuperación', 'No disponible'],
     items: [
       {
@@ -429,7 +429,7 @@ export const es: ApiCopy = {
     eyebrow: 'Casos de uso',
     h2: ['Construido para', 'creadores.'],
     lead: 'Cualquier producto que toque el rendimiento de atletas, la gestión de equipos o el fitness podrá integrar Aria Intelligence y devolver decisiones en lugar de datos.',
-    badge: 'Datos de demostración · salidas planificadas',
+    badge: 'Salidas planificadas',
     rows: [
       {
         h: 'Apps de fitness y entrenamiento',
@@ -468,7 +468,7 @@ export const es: ApiCopy = {
       { k: 'Señal → decisión', t: 'Baja la intensidad hoy', s: 'Variabilidad cardiaca −6.2 frente a lo normal.' },
       { k: 'Retorno al juego', s: 'Etapa 3 de 5 · sigue la revisión del staff' },
       { k: 'Qué pasó → qué hacer', t: 'Volumen de sprint al 60%', s: 'Tres días seguidos de carga alta.' },
-      { k: 'Sub-16 (Demo)', t: '3 atletas para revisar primero', s: 'Ordenados por la cola de atención.' },
+      { k: 'Sub-16', t: '3 atletas para revisar primero', s: 'Ordenados por la cola de atención.' },
     ],
   },
   final: {

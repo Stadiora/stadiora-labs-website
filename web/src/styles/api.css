@@ -60,8 +60,9 @@
 .dec-foot{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:14px;padding-top:12px;border-top:1px solid #E3E9F1;font-size:13px;font-weight:600;color:#047857}
 .dec-foot > span:first-child{display:inline-flex;align-items:center;gap:8px}
 .dec-foot .mono{font-size:11px;color:#5B6678;font-weight:500}
-.api-page .badge-demo{background:rgba(4,10,26,.9);color:#E2E8F0}
-.eng-host .badge-demo{left:50%;right:auto;bottom:-58px;transform:translateX(-50%);white-space:nowrap}
+.badge-plan{position:absolute;z-index:5;left:18px;bottom:16px;font:500 11px/1 var(--f-mono);letter-spacing:.08em;color:rgba(255,255,255,.75);background:rgba(4,10,26,.55);padding:7px 10px;border-radius:8px;backdrop-filter:blur(8px)}
+.api-page .badge-plan{background:rgba(4,10,26,.9);color:#E2E8F0}
+.eng-host .badge-plan{left:50%;right:auto;bottom:-58px;transform:translateX(-50%);white-space:nowrap}
 
 /* ---------- 2. Data → decision (scroll-scrubbed) ---------- */
 .dw{background:var(--bg)}
@@ -317,7 +318,7 @@
 .mini-steps{display:flex;gap:6px;margin-top:10px}
 .mini-steps i{width:34px;height:8px;border-radius:4px;background:#E8EDF4}
 .mini-steps i.d{background:#8B5CF6}
-.uc-media .badge-demo{z-index:6}
+.uc-media .badge-plan{z-index:6}
 
 /* ---------- 8. Final ---------- */
 .final .eyebrow{margin-bottom:22px}
@@ -388,7 +389,7 @@
   .dec-r{max-width:none}
   .dec-flags span{font-size:12px}
   .dec-foot{flex-wrap:wrap}
-  .eng-host .badge-demo{position:relative;left:auto;bottom:auto;transform:none;display:inline-block;margin-top:16px;white-space:normal}
+  .eng-host .badge-plan{position:relative;left:auto;bottom:auto;transform:none;display:inline-block;margin-top:16px;white-space:normal}
 }
 
 /* ---------- Reduced motion: settled frames, no pins, no loops ---------- */
