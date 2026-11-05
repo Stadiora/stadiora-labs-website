@@ -15,12 +15,18 @@ export function initSports() {
   let i = 0;
 
   const spans = (t: string, cls: string) =>
-    [...t].map((c, j) => `<span class="ch ${cls}" style="--j:${j}">${c === ' ' ? '&nbsp;' : c.replace('&', '&amp;')}</span>`).join('');
+    [...t].map((c, j) => {
+      const span = document.createElement('span');
+      span.className = `ch ${cls}`;
+      span.setAttribute('style', `--j:${j}`);
+      span.textContent = c === ' ' ? '\u00a0' : c;
+      return span;
+    });
   const set = (n: number, anim: boolean) => {
     i = n;
     chips.forEach((c, k) => c.classList.toggle('on', k === i));
     idx.textContent = `${String(i + 1).padStart(2, '0')} / ${total}`;
-    word.innerHTML = spans(W[i], anim ? 'sp-in' : '');
+    word.replaceChildren(...spans(W[i], anim ? 'sp-in' : ''));
   };
   set(0, false);
 

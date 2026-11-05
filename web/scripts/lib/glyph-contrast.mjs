@@ -91,10 +91,15 @@ export const collectFn = ({ scope }) => {
     return true;
   };
   const label = (e) => `${e.tagName.toLowerCase()}${e.className && typeof e.className === 'string' ? `.${e.className.trim().split(/\s+/).slice(0, 2).join('.')}` : ''}`;
+  const FADE = '.dw-sticky[data-scrub] > :is(.dw-card, .dw-caption)[data-scrub-fade][aria-hidden="true"]';
   const nodes = [];
+  let id = 0;
+  // An unexpected marker fails even if it is empty, hidden or outside this viewport.
+  for (const fade of document.querySelectorAll('[data-scrub-fade]')) {
+    if (!fade.matches(FADE)) nodes.push({ id: id++, text: '[data-scrub-fade]', sel: label(fade), scrubFade: true, rects: [] });
+  }
   const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
   const range = document.createRange();
-  let id = 0;
   for (let n = walker.nextNode(); n; n = walker.nextNode()) {
     const text = n.textContent.replace(/\s+/g, ' ').trim();
     const e = n.parentElement;
@@ -108,10 +113,9 @@ export const collectFn = ({ scope }) => {
       if (deco.matches(':is(.dw-field, .footer__wordmark)[data-decorative][aria-hidden="true"]')) continue;
       bad = true;
     }
-    // A scroll-scrubbed scene is judged on every frame. Only the parts that fade or move through the scrub, marked
-    // data-scrub-fade, are judged at its two ends (q = 0 and q = 1); the frames between are a move, not a state.
+    // Only the reviewed aria-hidden card and caption are judged at the scrub's two ends; stationary text is never exempt.
     const fade = e.closest('[data-scrub-fade]');
-    if (fade) {
+    if (fade?.matches(FADE)) {
       const scrub = fade.closest('[data-scrub]');
       const q = scrub ? parseFloat(scrub.style.getPropertyValue('--q')) : NaN;
       if (q > 0.02 && q < 0.98) continue;
@@ -219,7 +223,7 @@ export const analyzeFn = async ({ shots, nodes, w, h }) => {
         }
       }
     }
-    out.push({ id: node.id, text: node.text, sel: node.sel, size: node.size, large: node.large, clip: node.clip, deco: node.deco, painted: core > 0, core, min: core ? min : null, worst });
+    out.push({ id: node.id, text: node.text, sel: node.sel, size: node.size, large: node.large, clip: node.clip, deco: node.deco, scrubFade: node.scrubFade, painted: core > 0, core, min: core ? min : null, worst });
   }
   return out;
 };
@@ -249,9 +253,10 @@ export async function measure(page, decoder, { scope = null } = {}) {
 export function fold(acc, rows, tag) {
   for (const r of rows) {
     const key = `${r.sel}|${r.text}`;
-    const cur = acc.get(key) ?? { deco: false, text: r.text, sel: r.sel, need: r.large ? 3 : 4.5, min: Infinity, painted: false, at: '', worst: null, samples: 0 };
+    const cur = acc.get(key) ?? { deco: false, scrubFade: false, text: r.text, sel: r.sel, need: r.large ? 3 : 4.5, min: Infinity, painted: false, at: '', worst: null, samples: 0 };
     cur.samples++;
     cur.deco ||= !!r.deco;
+    cur.scrubFade ||= !!r.scrubFade;
     if (r.painted) {
       cur.painted = true;
       if (r.min < cur.min) {
@@ -267,10 +272,10 @@ export function fold(acc, rows, tag) {
 export const verdict = (acc) => {
   const all = [...acc.values()];
   const painted = all.filter((r) => r.painted);
-  const low = painted.filter((r) => !r.deco && r.min < r.need - 0.005).sort((a, b) => a.min / a.need - b.min / b.need);
-  // Text under any data-decorative element other than the two reviewed decorations fails whatever its contrast.
-  const fails = [...low, ...all.filter((r) => r.deco)];
+  const low = painted.filter((r) => !r.deco && !r.scrubFade && r.min < r.need - 0.005).sort((a, b) => a.min / a.need - b.min / b.need);
+  // Unexpected opt-out markers fail regardless of their contrast or whether they paint.
+  const fails = [...low, ...all.filter((r) => r.deco || r.scrubFade)];
   return { nodes: all.length, painted: painted.length, unpainted: all.length - painted.length, fails, lowest: painted.length ? Math.min(...painted.map((r) => r.min / r.need)) : 0 };
 };
 
-export const describe = (r) => r.deco ? `"${r.text}" (${r.sel}) sits under data-decorative but is not one of the two reviewed aria-hidden decorations (.dw-field, .footer__wordmark)` : `"${r.text}" (${r.sel}) ${r.min.toFixed(2)}:1 < ${r.need}:1 at ${r.at}, letter rgb(${r.worst?.fg}) on rgb(${r.worst?.bg})`;
+export const describe = (r) => r.scrubFade ? `(${r.sel}) has data-scrub-fade but is not one of the two reviewed aria-hidden fading surfaces (.dw-card, .dw-caption) inside .dw-sticky[data-scrub]` : r.deco ? `"${r.text}" (${r.sel}) sits under data-decorative but is not one of the two reviewed aria-hidden decorations (.dw-field, .footer__wordmark)` : `"${r.text}" (${r.sel}) ${r.min.toFixed(2)}:1 < ${r.need}:1 at ${r.at}, letter rgb(${r.worst?.fg}) on rgb(${r.worst?.bg})`;

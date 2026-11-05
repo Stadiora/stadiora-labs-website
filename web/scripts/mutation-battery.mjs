@@ -522,7 +522,7 @@ for (const m of selected) {
 }
 rmSync(scratch, { recursive: true, force: true });
 
-const esc = (s) => String(s).replace(/\|/g, '\\|');
+const esc = (s) => String(s).replace(/\\/g, '\\\\').replace(/\|/g, '\\|');
 const table = [
   `Head: \`${head}\``,
   '',

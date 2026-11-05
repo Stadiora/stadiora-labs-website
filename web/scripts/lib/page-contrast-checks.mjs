@@ -4,8 +4,9 @@
 //     Where a loop, a gradient heading, a video or the hero's script timeline is in view, it is seeked to four phases first.
 //   - A node's verdict is the minimum over all its samples. Nothing is skipped for sitting on an image, a video or a gradient.
 //     Only two kinds of text are not judged: the two reviewed aria-hidden decorations (the footer watermark and the wall of raw
-//     numbers; any other data-decorative text is judged and fails), and the parts of the scroll-scrubbed wall that fade or move
-//     through the scrub (marked data-scrub-fade) between its two ends. Its stationary eyebrow and heading are judged on every
+//     numbers; any other data-decorative text is judged and fails), and the reviewed aria-hidden .dw-card and .dw-caption
+//     directly inside .dw-sticky[data-scrub], marked data-scrub-fade, between its two ends. Any other data-scrub-fade marker
+//     fails by element name, even without painted text. The stationary eyebrow and heading are judged on every
 //     frame, and the scene is scanned at a stop for every 0.05 of the wall's --q (data-scrub-pin), so a state lasting 0.1 of --q or more cannot be stepped over.
 //   - Canaries: a word over a band that is ~1:1 for a few glyph pixels, a gradient heading faded into its backdrop and small grey
 //     text must all FAIL, and a legible control must pass. This is what stops the oracle from being quietly loosened.
