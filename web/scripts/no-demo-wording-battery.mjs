@@ -115,7 +115,7 @@ const cases = [
     }, match: 'demo' },
     { name: `Missing designated lead body (${file})`, file, needle: "topic: 'demo',", insert: 'topic: String.fromCharCode(100, 101, 109, 111),', match: 'lead POST body' },
     { name: `Lead request binding missing (${file})`, file, needle: 'fetch(CONTACT_API, {', insert: 'fetch(String(CONTACT_API), {', match: 'lead POST body' },
-    { name: `Duplicate designated lead body (${file})`, file, edit: (text) => { const body = /  const body = \{[\s\S]*?\n  \};/.exec(text)?.[0]; assert.ok(body); return replaceOnce(text, body, `${body}\n${body}`); }, match: 'lead POST body' },
+    { name: `Duplicate lead declaration before the designated block (${file})`, file, edit: (text) => { const body = /  const body = \{[\s\S]*?\n  \};/.exec(text)?.[0]; assert.ok(body); return replaceOnce(text, body, `${body}\n${body}`); }, match: 'demo' },
   ]),
   ...[contact, esContact].flatMap((file) => [
     { name: `Contact alias site-swap (${file})`, file, edit: (text) => replaceOnce(text, '{demo:`call`}', '{[String.fromCharCode(100,101,109,111)]:`call`}').replace('</body>', '<script type="module">const marker={demo:"call"};document.querySelector("[data-contact-form]");</script></body>'), match: 'demo' },
