@@ -1,6 +1,6 @@
 // Sitewide guard for the "a mouse never pauses anything" contract, on every page of the build: every sitemap URL (Astro
 // pages, EN and ES) plus every page of web/public that ships as plain HTML (the legacy connect, investors, lead-magnet,
-// team, privacy, terms and API pages, and the two personal folders). Two probes per page:
+// team, privacy, terms and API pages, and the two personal folders). Three probes per page:
 //  1. Styles: `document.styleSheets` is walked rule by rule (media, supports, layer, container and nested rules included)
 //     and the RESOLVED declaration is read from the CSSOM, so `animation: x 1s paused` and `animation-play-state: paused`
 //     are both caught. A rule whose selector mentions :hover, or :focus-within (focus by mouse click would pause it),
@@ -10,13 +10,25 @@
 //  2. Pointer: a real mouse (page.mouse) is moved over the centre of the visible part of every running animation host
 //     (`[data-ap]`) and of every `[data-ap-scope]`. No host that ran before may flip to data-ap="off", and no host may
 //     report data-ap-why="hover".
-// A third probe drives src/scripts/tabs.ts (a tab group with auto-advance) on the Teams and clubs pages, which ship none.
+//  3. CSS animation clocks: document.getAnimations(), including non-kit legacy pages. Sample at most 24 distinct running
+//     CSS-animation targets per page, in document order, and all their running CSS animations. Park a real mouse on each
+//     target or its nearest pointer-reachable ancestor. Across 500 ms, playState must stay running, computed duration and
+//     playbackRate must not change, and currentTime must advance at wall-clock * playbackRate (25% or 60 ms tolerance).
+//     Every page with running CSS animations must have a nonzero measured sample. Report totals, over-bound targets,
+//     unreachable targets (hidden, off-viewport or occluded), and animations that finish before sampling. Finite animations
+//     with <=650 ms remaining are reported, not measured, to avoid mistaking their natural end for a hover pause.
+// Additional probes drive same-element keyboard modality on Home, Guardian and Messaging (EN/ES), and src/scripts/tabs.ts
+// auto-advance on Teams and clubs (no shipped page enables it).
 // Real counts are asserted at the end (rules inspected, rules that set a play state, hosts and scopes hovered), so a
 // probe that matches nothing cannot pass.
+// NOT COVERED: CSS targets beyond the 24-target bound or unreachable by pointer; finite animations ending before a full
+// sample; animations created only after discovery; motion between samples; JS-driven non-WAAPI motion on non-kit pages.
+// The kit pointer sweep proves flags, not rendered motion; the dedicated motion guards own rendered kit coverage.
 import { readdir, readFile } from 'node:fs/promises';
 import { join, relative } from 'node:path';
 
 const GROUP = 'no-hover-pause';
+const CSS_TARGET_LIMIT = 24;
 
 export async function distPages(distDir) {
   const found = [];
@@ -116,6 +128,78 @@ const states = () =>
     why: e.getAttribute('data-ap-why') ?? '',
   }));
 
+async function cssPointerProbe(page, sleep) {
+  const found = await page.evaluate(() => {
+    const groups = new Map();
+    for (const a of document.getAnimations()) {
+      if (!(a instanceof CSSAnimation) || a.playState !== 'running' || !(a.effect?.target instanceof Element)) continue;
+      const target = a.effect.target;
+      if (!groups.has(target)) groups.set(target, []);
+      groups.get(target).push(a);
+    }
+    window.__nhpCss = [...groups].map(([target, animations]) => ({ target, animations }));
+    return window.__nhpCss.length;
+  });
+  const out = { found, sampled: 0, animations: 0, beyondBound: Math.max(0, found - CSS_TARGET_LIMIT), unreachable: [], ended: [], failures: [] };
+  const read = (i) => {
+    const { animations } = window.__nhpCss[i];
+    return animations.map((a) => ({
+      name: `${a.animationName}${a.effect?.pseudoElement ?? ''}`,
+      state: a.playState, duration: a.effect?.getComputedTiming().duration,
+      end: a.effect?.getComputedTiming().endTime, rate: a.playbackRate,
+      time: Number(a.currentTime ?? 0), wall: performance.now(),
+    }));
+  };
+  for (let i = 0; i < Math.min(found, CSS_TARGET_LIMIT); i++) {
+    await page.mouse.move(2, 2);
+    const target = await page.evaluate((i) => {
+      const { target } = window.__nhpCss[i];
+      const label = `${target.tagName.toLowerCase()}.${String(target.getAttribute('class') ?? '').trim().split(/\s+/)[0]}`;
+      const r = target.getBoundingClientRect();
+      const x0 = Math.max(0, r.left), x1 = Math.min(innerWidth, r.right);
+      const y0 = Math.max(0, r.top), y1 = Math.min(innerHeight, r.bottom);
+      if (!target.getClientRects().length || getComputedStyle(target).visibility === 'hidden' || x1 - x0 < 2 || y1 - y0 < 2) return { label, reason: 'hidden or off-viewport' };
+      for (let ancestor = target; ancestor; ancestor = ancestor.parentElement) {
+        for (const [fx, fy] of [[0.5, 0.5], [0.2, 0.2], [0.8, 0.8], [0.2, 0.8], [0.8, 0.2]]) {
+          const x = x0 + (x1 - x0) * fx, y = y0 + (y1 - y0) * fy;
+          const hit = document.elementFromPoint(x, y);
+          if (hit && ancestor.contains(hit) && getComputedStyle(ancestor).pointerEvents !== 'none') return { label, x, y };
+        }
+      }
+      return { label, reason: 'occluded or no pointer-reachable ancestor' };
+    }, i);
+    if (target.reason) {
+      out.unreachable.push(`${target.label}: ${target.reason}`);
+      continue;
+    }
+    await page.evaluate(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))));
+    const before = await page.evaluate(read, i);
+    const live = before.flatMap((a, k) => a.state === 'running' && (a.end - a.time) / Math.max(a.rate, 0.001) > 650 ? [k] : []);
+    for (let k = 0; k < before.length; k++) if (!live.includes(k)) out.ended.push(`${target.label} ${before[k].name}: ${before[k].state}, ended or <=650 ms left`);
+    if (!live.length) continue;
+    await page.mouse.move(target.x, target.y);
+    await page.evaluate(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))));
+    const parked = await page.evaluate(read, i);
+    await sleep(500);
+    const after = await page.evaluate(read, i);
+    out.sampled++;
+    out.animations += live.length;
+    for (const k of live) {
+      const a = before[k], b = parked[k], c = after[k];
+      const elapsed = c.wall - b.wall, advanced = c.time - b.time;
+      const expected = elapsed * a.rate;
+      const bad = [];
+      if (b.state !== 'running' || c.state !== 'running') bad.push(`playState ${a.state} -> ${b.state} -> ${c.state}`);
+      if (b.duration !== a.duration || c.duration !== a.duration) bad.push(`duration ${a.duration} -> ${b.duration} -> ${c.duration}`);
+      if (b.rate !== a.rate || c.rate !== a.rate) bad.push(`playbackRate ${a.rate} -> ${b.rate} -> ${c.rate}`);
+      if (!(advanced > 0) || Math.abs(advanced - expected) > Math.max(60, Math.abs(expected) * 0.25)) bad.push(`clock advanced ${advanced.toFixed(1)} ms / ${elapsed.toFixed(1)} ms wall at rate ${a.rate}`);
+      if (bad.length) out.failures.push(`${target.label} ${a.name}: ${bad.join(', ')}`);
+    }
+  }
+  await page.mouse.move(2, 2);
+  return { ...out, unreachableCount: out.unreachable.length, endedAnimations: out.ended.length };
+}
+
 // src/scripts/tabs.ts auto-advances only for a [data-tabs-auto] host and no shipped page sets one, so the probe switches it on
 // before the script runs (an init script) and drives it with a real mouse and with keyboard focus.
 const tabsInit = () => {
@@ -133,6 +217,8 @@ const selectedTab = (page) =>
 async function keyboardTabsProbe({ page, path, check, sleep }) {
   const root = page.locator('[data-autotabs]').first();
   const tab = root.locator('[role="tab"]').nth(1);
+  const centre = () => root.evaluate((e) => e.scrollIntoView({ block: 'center', behavior: 'instant' }));
+  await centre();
   await tab.click();
   await sleep(350);
   const take = () => root.evaluate((e) => ({
@@ -150,11 +236,13 @@ async function keyboardTabsProbe({ page, path, check, sleep }) {
   check(GROUP, `${path}: a key on the mouse-focused tab holds rendered progress and selection still`, await tab.evaluate((e) => e === document.activeElement && e.matches(':focus-visible')) && !(await changes()));
   // Leave the entire pause scope with real Tab events, not blur(), then observe the progress again.
   for (let k = 0; k < 40 && await root.evaluate((e) => e.contains(document.activeElement)); k++) await page.keyboard.press('Tab');
-  await tab.scrollIntoViewIfNeeded();
+  // Let the browser finish scrolling to the new focus before restoring the scene's visibility.
+  await sleep(700);
+  await centre();
   await sleep(350);
   const outside = !(await root.evaluate((e) => e.contains(document.activeElement)));
   const resumed = await changes();
-  check(GROUP, `${path}: Tab away from the mouse-then-keyboard tab resumes rendered progress`, outside && resumed, await root.evaluate((e) => `outside=${!e.contains(document.activeElement)}, ${e.dataset.ap}/${e.dataset.apWhy ?? ''}, active=${document.activeElement?.tagName}.${document.activeElement?.className}`));
+  check(GROUP, `${path}: Tab away from the mouse-then-keyboard tab resumes rendered progress`, outside && resumed, await root.evaluate((e) => `outside=${!e.contains(document.activeElement)}, ${e.dataset.ap}/${e.dataset.apWhy ?? ''}`));
   await tab.click();
   await page.keyboard.press('Enter');
   await sleep(150);
@@ -216,6 +304,8 @@ async function tabsProbe({ open, sleep, path }) {
   await page.mouse.click(again.x + again.width / 2, again.y + again.height / 2);
   await page.keyboard.press('Shift');
   for (let k = 0; k < 40 && await page.locator('[data-tabs]').evaluate((e) => e.contains(document.activeElement)); k++) await page.keyboard.press('Tab');
+  await page.locator('[data-tabs]').evaluate((e) => e.scrollIntoView({ block: 'center', behavior: 'instant' }));
+  await sleep(300);
   out.tabAway = await changesIn(2200);
   if (out.tabAway < 1) errors.push('Tab away from the mouse-then-keyboard tab did not resume the cycle');
   await page.mouse.move(2, 2);
@@ -237,6 +327,7 @@ export async function noHoverPauseChecks({ open, check, sleep, metrics, distDir,
   const whyFails = [];
   const errors = [];
   const perPage = {};
+  const css = {};
 
   for (const path of pages) {
     if (stubs.has(path)) {
@@ -263,6 +354,7 @@ export async function noHoverPauseChecks({ open, check, sleep, metrics, distDir,
       for (const o of style.offenders) styleFails.push(`${path}: ${o}`);
       for (const u of style.unreadable) styleFails.push(`${path}: stylesheet ${u} cannot be read, so it cannot be checked`);
       for (const i of style.inline) styleFails.push(`${path}: inline ${i} touches an animation`);
+      css[path] = await cssPointerProbe(page, sleep);
 
       const list = await page.evaluate(targets);
       const hosts = list.filter((t) => t.host).length;
@@ -325,8 +417,15 @@ export async function noHoverPauseChecks({ open, check, sleep, metrics, distDir,
   check(GROUP, 'stylesheets: the walk read real rules (rules inspected, play-state rules and :hover rules all non-zero)', (only ? totals.rules > 0 : totals.rules > 20000 && totals.withPlayState >= 100 && totals.hoverRules >= 1000), `${totals.sheets} sheets, ${totals.rules} rules, ${totals.withPlayState} set a play state, ${totals.hoverRules} mention :hover`);
   check(GROUP, 'pointer: with the mouse over every running animation host and every [data-ap-scope], no host flips to data-ap="off"', hoverFails.length === 0, fmt(hoverFails));
   check(GROUP, 'pointer: no host reports data-ap-why=hover', whyFails.length === 0, fmt(whyFails));
-  check(GROUP, 'pointer: the probe hovered real hosts (hosts, scopes and pointer placements all non-zero)', only ? totals.hovered > 0 : totals.hosts >= 150 && totals.scopes >= 120 && totals.hovered >= 200 && totals.held >= 350, `${totals.hosts} hosts, ${totals.scopes} scopes, ${totals.hovered} placements, ${totals.held} running hosts re-read after each`);
+  const cssFailures = Object.entries(css).flatMap(([path, r]) => r.failures.map((f) => `${path}: ${f}`));
+  const cssEmpty = Object.entries(css).filter(([, r]) => r.found > 0 && r.sampled === 0).map(([path]) => path);
+  const cssSamples = Object.values(css).reduce((n, r) => n + r.sampled, 0);
+  const cssUnreachable = Object.values(css).reduce((n, r) => n + r.unreachableCount, 0);
+  const cssEnded = Object.values(css).reduce((n, r) => n + r.endedAnimations, 0);
+  check(GROUP, 'CSS pointer: sampled animations keep running at unchanged duration, playbackRate and wall-clock rate under a real parked mouse', cssFailures.length === 0, fmt(cssFailures));
+  check(GROUP, 'CSS pointer: every page with running CSS animations has a nonzero measured sample', cssEmpty.length === 0 && Object.keys(css).length === totals.pages - totals.stubs, `${cssSamples} measured targets, ${cssUnreachable} unreachable, ${cssEnded} ended/ending animations, bound ${CSS_TARGET_LIMIT}/page${cssEmpty.length ? `; no sample: ${cssEmpty.join(', ')}` : ''}`);
+  check(GROUP, 'pointer: the probe hovered real hosts (hosts, scopes and pointer placements all non-zero)', only ? totals.hovered > 0 || cssSamples > 0 : totals.hosts >= 150 && totals.scopes >= 120 && totals.hovered >= 200 && totals.held >= 350, `${totals.hosts} hosts, ${totals.scopes} scopes, ${totals.hovered} placements, ${totals.held} running hosts re-read after each`);
   check(GROUP, 'tabs.ts auto-advance: a parked mouse and a mouse click never stop the cycle, a clicked tab keeps its full dwell, keyboard focus holds it', tabErrors.length === 0 && tabRuns.length === tabPaths.length && (only ? true : tabRuns.length === 2), fmt(tabErrors) || tabRuns.map((r) => `${r.path}: ${r.tabs} tabs, ${r.control}/${r.hover}/${r.afterClick} changes (control/parked/after click), ${r.keyboard} under keyboard focus`).join('; '));
   check(GROUP, 'pointer: every host and scope had a visible part to put the pointer on', totals.idle.length === 0, fmt(totals.idle));
-  metrics['no-hover-pause'] = { pages: totals.pages, tabs: tabRuns, ...Object.fromEntries(Object.entries(totals).filter(([k]) => k !== 'idle' && k !== 'pages')), perPage };
+  metrics['no-hover-pause'] = { pages: totals.pages, tabs: tabRuns, cssTargetLimit: CSS_TARGET_LIMIT, css, ...Object.fromEntries(Object.entries(totals).filter(([k]) => k !== 'idle' && k !== 'pages')), perPage };
 }

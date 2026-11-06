@@ -37,6 +37,7 @@ const RUNNERS = {
   // the sitewide no-hover-pause guard, narrowed to the pages that carry the mutated code
   'nhp-home': { args: ['scripts/evidence.mjs', '--no-hover-pause-only', '--checks-only'], env: { NHP_PAGES: '/' }, failLine: /^FAIL\s+(.+)$/gm },
   'nhp-focus': { args: ['scripts/evidence.mjs', '--no-hover-pause-only', '--checks-only'], env: { NHP_PAGES: '/,/es/,/platform/guardian-portal/,/es/platform/guardian-portal/,/platform/messaging/,/es/platform/messaging/' }, failLine: /^FAIL\s+(.+)$/gm },
+  'nhp-legacy': { args: ['scripts/evidence.mjs', '--no-hover-pause-only', '--checks-only'], env: { NHP_PAGES: '/lead-magnet.html' }, failLine: /^FAIL\s+(.+)$/gm },
   'nhp-about': { args: ['scripts/evidence.mjs', '--no-hover-pause-only', '--checks-only'], env: { NHP_PAGES: '/about/' }, failLine: /^FAIL\s+(.+)$/gm },
   'nhp-pricing': { args: ['scripts/evidence.mjs', '--no-hover-pause-only', '--checks-only'], env: { NHP_PAGES: '/pricing/' }, failLine: /^FAIL\s+(.+)$/gm },
   'nhp-api': { args: ['scripts/evidence.mjs', '--no-hover-pause-only', '--checks-only'], env: { NHP_PAGES: '/api.html' }, failLine: /^FAIL\s+(.+)$/gm },
@@ -548,6 +549,29 @@ const M = [
     runner: 'nhp-teams',
     expect: /a key on the mouse-focused tab did not hold the cycle/,
     at: { file: 'scripts/lib/no-hover-pause-checks.mjs', needle: 'tabs.ts auto-advance' },
+  },
+  {
+    id: 'hover-legacy-duration',
+    what: 'Legacy lead-magnet: reviewer payload .hero-badge:hover .dot { animation-duration: 999999s !important; }',
+    edits: [{ file: 'public/lead-magnet.html', find: '  .hero-badge .dot {', replace: '  .hero-badge:hover .dot { animation-duration: 999999s !important; }\n  .hero-badge .dot {' }],
+    runner: 'nhp-legacy',
+    expect: /CSS pointer: sampled animations keep running at unchanged duration.*duration 1800 -> 999999000/,
+    at: { file: 'scripts/lib/no-hover-pause-checks.mjs', needle: "'CSS pointer: sampled animations keep running at unchanged duration" },
+  },
+  {
+    id: 'hover-legacy-descendant-pause',
+    what: 'Legacy lead-magnet: a hovered ancestor pauses its CSS-animated descendant',
+    edits: [{ file: 'public/lead-magnet.html', find: '  .hero-badge .dot {', replace: '  .hero-badge:hover .dot { animation-play-state: paused !important; }\n  .hero-badge .dot {' }],
+    runner: 'nhp-legacy',
+    expect: /CSS pointer: sampled animations keep running at unchanged duration.*playState running -> paused/,
+    at: { file: 'scripts/lib/no-hover-pause-checks.mjs', needle: "'CSS pointer: sampled animations keep running at unchanged duration" },
+  },
+  {
+    id: 'identity-control-legacy',
+    what: 'CONTROL: legacy lead-magnet comment edit leaves the measured pulse running under the pointer',
+    identity: true,
+    edits: [{ file: 'public/lead-magnet.html', find: '  .hero-badge .dot {', replace: '  /* identity control: no effect */\n  .hero-badge .dot {' }],
+    runner: 'nhp-legacy',
   },
   {
     id: 'identity-control-nhp',
