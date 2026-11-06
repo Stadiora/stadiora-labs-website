@@ -30,14 +30,16 @@ in both languages, and injects auto mode on Teams and clubs to cover the standal
 
 The sitewide guard also measures CSS animations obtained from `document.getAnimations()` on legacy/non-kit pages.
 It samples at most **24 distinct running CSS-animation targets per page**, all their running animations, with a real
-mouse on the target or its nearest pointer-reachable ancestor. Across 500 ms it requires running play state, unchanged
-computed duration/playback rate, and clock advancement within 25% or 60 ms of wall-clock time times playback rate.
+mouse on the target or its nearest pointer-reachable ancestor. Before each baseline it resets the pointer outside the
+viewport and fails if `html` or `body` still matches `:hover`, so ancestor hover is not already active at the reset point.
+Across 500 ms it requires running play state, unchanged computed duration/playback rate, and clock advancement within
+25% or 60 ms of wall-clock time times playback rate.
 Every page with running CSS animations needs a nonzero sample. Metrics report unreachable targets, targets beyond the
 bound, and finite animations ending before measurement (<=650 ms remaining).
 **NOT COVERED:** those reported targets/finite animations, animations created after discovery, motion between samples,
 and non-WAAPI JavaScript motion on non-kit pages. The separate kit pointer sweep checks flags; dedicated motion guards
-measure rendered kit behavior. The mutation battery includes the legacy `999999s` hover slowdown, descendant hover pause,
-and a behavior-neutral legacy control.
+measure rendered kit behavior. The mutation battery includes the legacy `999999s` slowdowns under `.hero-badge:hover`
+and `body:hover`, descendant hover pause, and a behavior-neutral legacy control.
 
 - Pages: `/` and `/pricing/` (EN), `/es/` and `/es/pricing/` (ES). Copy lives in `src/i18n/{en,es}.ts`; `es.ts` is typed against `en.ts`, so `astro check` flags a missing key. Page copy lives in `src/i18n/pages/` (`pricing.ts`: EN and ES typed together).
 - Pricing: one typed table holds every number: `src/data/prices.ts` (bands, education, add-ons, Free, the annual percentage; the annual figure is stored too). Page copy holds `{tokens}` and never a digit; `src/lib/template.ts` fills them. The region comes from the browser time zone (`src/lib/region.ts`, an allow-list of LatAm zones; Puerto Rico and anything unknown are US); `?region=latam` or `?region=us` overrides it for testing. US prices are in the HTML; LatAm prices exist only in the script bundle, so a US visitor never has them in the DOM. If the pricing script does not arrive within 2.5 s the page shows its fallback (`data-fallback`, not `data-ready`): US, monthly, 100 athletes, controls, switches and the estimate hidden, a note, every "More info" panel open. Without JavaScript at all the page looks the same. To change a price, edit `prices.ts`, then the oracle in `scripts/lib/pricing-oracle.mjs`, which holds the numbers typed in by hand (`npm run verify` and the evidence run both fail until the two agree).

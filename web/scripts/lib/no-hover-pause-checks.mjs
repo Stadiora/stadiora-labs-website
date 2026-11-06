@@ -12,7 +12,9 @@
 //     report data-ap-why="hover".
 //  3. CSS animation clocks: document.getAnimations(), including non-kit legacy pages. Sample at most 24 distinct running
 //     CSS-animation targets per page, in document order, and all their running CSS animations. Park a real mouse on each
-//     target or its nearest pointer-reachable ancestor. Across 500 ms, playState must stay running, computed duration and
+//     target or its nearest pointer-reachable ancestor. Before each baseline, reset outside the viewport and require
+//     neither html nor body to match :hover, so ancestor hover cannot already affect the baseline. Across 500 ms,
+//     playState must stay running, computed duration and
 //     playbackRate must not change, and currentTime must advance at wall-clock * playbackRate (25% or 60 ms tolerance).
 //     Every page with running CSS animations must have a nonzero measured sample. Report totals, over-bound targets,
 //     unreachable targets (hidden, off-viewport or occluded), and animations that finish before sampling. Finite animations
@@ -128,6 +130,13 @@ const states = () =>
     why: e.getAttribute('data-ap-why') ?? '',
   }));
 
+async function resetPointer(page) {
+  await page.mouse.move(-1, -1);
+  if (await page.evaluate(() => document.querySelector('html:hover, body:hover') !== null)) {
+    throw new Error('pointer reset outside the viewport left html or body matching :hover');
+  }
+}
+
 async function cssPointerProbe(page, sleep) {
   const found = await page.evaluate(() => {
     const groups = new Map();
@@ -151,7 +160,7 @@ async function cssPointerProbe(page, sleep) {
     }));
   };
   for (let i = 0; i < Math.min(found, CSS_TARGET_LIMIT); i++) {
-    await page.mouse.move(2, 2);
+    await resetPointer(page);
     const target = await page.evaluate((i) => {
       const { target } = window.__nhpCss[i];
       const label = `${target.tagName.toLowerCase()}.${String(target.getAttribute('class') ?? '').trim().split(/\s+/)[0]}`;
@@ -196,7 +205,7 @@ async function cssPointerProbe(page, sleep) {
       if (bad.length) out.failures.push(`${target.label} ${a.name}: ${bad.join(', ')}`);
     }
   }
-  await page.mouse.move(2, 2);
+  await resetPointer(page);
   return { ...out, unreachableCount: out.unreachable.length, endedAnimations: out.ended.length };
 }
 
@@ -308,7 +317,7 @@ async function tabsProbe({ open, sleep, path }) {
   await sleep(300);
   out.tabAway = await changesIn(2200);
   if (out.tabAway < 1) errors.push('Tab away from the mouse-then-keyboard tab did not resume the cycle');
-  await page.mouse.move(2, 2);
+  await resetPointer(page);
   await page.keyboard.press('Shift');
   await page.locator('[data-tabs] [role="tab"]').first().focus();
   await sleep(300);
@@ -368,7 +377,7 @@ export async function noHoverPauseChecks({ open, check, sleep, metrics, distDir,
           totals.idle.push(`${path} ${t.label}: no visible part to put the pointer on`);
           continue;
         }
-        await page.mouse.move(2, 2);
+        await resetPointer(page);
         // a running host is on before the pointer arrives; the ones that are not (paused for another reason) are not the subject
         // the scroll above retriggers every host's visibility observer: read the states once they stop changing
         let before = [];
@@ -393,7 +402,7 @@ export async function noHoverPauseChecks({ open, check, sleep, metrics, distDir,
         }
         totals.held += running.size;
       }
-      await page.mouse.move(2, 2);
+      await resetPointer(page);
       totals.hovered += hovered;
       perPage[path] = { hosts, scopes, hovered, rules: style.rules, playStateRules: style.withPlayState };
       if (['/', '/es/', '/platform/guardian-portal/', '/es/platform/guardian-portal/', '/platform/messaging/', '/es/platform/messaging/'].includes(path)) {
