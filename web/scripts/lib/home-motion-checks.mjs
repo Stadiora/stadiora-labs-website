@@ -3,17 +3,17 @@
 // The flag checks in home-checks.mjs read the kit's own bookkeeping (`data-ap="off"`). A flag can say "off" while the code
 // underneath keeps running (a cancelled-too-late requestAnimationFrame, a CSS loop nobody told about the hidden tab, a video
 // that was never paused), so the guards here MEASURE what moves instead: DOM mutations, animation clocks, element poses,
-// video currentTime, canvas pixels and the selected tab, while the pointer is over a scene, focus is inside it, it is
-// offscreen and the tab is hidden. Each measurement has a control (the same host visibly moving a moment earlier) so a
-// silent probe cannot pass.
+// video currentTime, canvas pixels and the selected tab. A mouse pointer resting over a scene or clicking in it must change
+// none of that (the scene keeps moving); keyboard focus inside it, being offscreen and a hidden tab must stop all of it.
+// Each measurement has a control (the same host visibly moving a moment earlier) so a silent probe cannot pass.
 //
 // Groups (HOME_ONLY): "autoplay" (behaviour meter), "hidden-tab" (CSS loops against a hidden tab), "flip" (reduced
-// motion switched on mid-scene), "hero-hover" (the hero under the pointer, at a fixed phase of its cycle), "iris" (the CTA ring turns, by pixel diff). HOME_HOSTS=hero,pil-grid narrows the meter to hosts whose label contains one of them.
+// motion switched on mid-scene), "hero-pointer" (the hero under the pointer, at a fixed phase of its cycle), "iris" (the CTA ring turns, by pixel diff). HOME_HOSTS=hero,pil-grid narrows the meter to hosts whose label contains one of them.
 
 // ---- in-page functions (serialised into the page, so they must stay self-contained)
 
 // Start counting everything that moves inside the host. Read it back with meterRead. With `cssLoops` false the CSS keyframe
-// loops (ambient decoration) are not counted, see the note on hover and focus in motionChecks.
+// loops (ambient decoration) are not counted, see the note on pointer and focus in motionChecks.
 const meterStart = ({ i, cssLoops = true }) => {
   window.__meter?.stop();
   const host = document.querySelector(`[data-ap-i="${i}"]`);
@@ -224,7 +224,7 @@ const irisDiff = async ({ a, b, box }) => {
 
 const motionOn = () => document.querySelectorAll('[data-ap="on"]').length;
 
-// ---- hero hover: the pointer is put over the headline in the middle of a step, never at a random phase of the cycle.
+// ---- hero under the pointer: the pointer is put over the headline in the middle of a step, never at a random phase of the cycle.
 // Resolves the moment the word swap has started (the conveyor, the zoom, the word and the toast are all in flight).
 const heroStepStarted = () =>
   new Promise((resolve) => {
@@ -254,8 +254,14 @@ const heroFingerprint = () => {
 
 // ---- the guards
 
+// A host state as hostState reports it ("off/hover") written the way the attributes read.
+export const apState = (s) => {
+  const [ap, why] = s.split('/');
+  return why ? `data-ap=${ap} data-ap-why=${why}` : `data-ap=${ap}`;
+};
+
 export async function motionChecks({ open, check, sleep, metrics, on, pathFor, helpers }) {
-  const { tagHosts, hostState, scopePoint, restPoint, focusIn, blurAll, centreHost, awayFromHost } = helpers;
+  const { tagHosts, hostState, scopePoint, clickPoint, selectedTab, restPoint, focusIn, blurAll, centreHost, awayFromHost } = helpers;
 
   const waitState = async (page, i, want, ms = 2500) => {
     const t0 = Date.now();
@@ -266,6 +272,16 @@ export async function motionChecks({ open, check, sleep, metrics, on, pathFor, h
       await sleep(120);
     }
     return { ok: false, s };
+  };
+  const holdState = async (page, i, want, ms) => {
+    const t0 = Date.now();
+    let s = want;
+    while (Date.now() - t0 < ms) {
+      s = await page.evaluate(hostState, i);
+      if (s !== want) return { ok: false, s };
+      await sleep(120);
+    }
+    return { ok: true, s };
   };
   const pool = async (items, size, fn) => {
     const queue = [...items];
@@ -284,10 +300,11 @@ export async function motionChecks({ open, check, sleep, metrics, on, pathFor, h
       document.dispatchEvent(new Event('visibilitychange'));
     }, hidden);
 
-  // ------------------------------------------------------------ A. behaviour meter: every autoplayer, four ways of pausing it
-  // Hover and focus pause what the autoplayer drives: its timers, frame loops, timelines, clips, canvases and tab progress.
-  // The CSS keyframe loops (hero colour wash, orbit lines, status dots, the CTA ring) are decoration that keeps running
-  // under the pointer by design; the marquees have their own :hover rule (measured in the marquee group). Offscreen and
+  // ------------------------------------------------------------ A. behaviour meter: every autoplayer, a pointer that must not stop it, three ways of pausing it
+  // A pointer resting over the scene and a mouse click in it (a tab click included) must leave everything running: timers,
+  // frame loops, timelines, clips, canvases and tab progress keep moving, and the CSS keyframe loops with them. Keyboard
+  // focus pauses what the autoplayer drives (its timers, frame loops, timelines, clips, canvases and tab progress) but not
+  // the CSS keyframe loops (hero colour wash, orbit lines, status dots, the CTA ring), which are decoration; offscreen and
   // hidden stop everything, CSS loops included, so those two windows count them.
   if (on('autoplay')) {
     const probe = await open({ width: 1440, height: 900 }, '/');
@@ -296,7 +313,8 @@ export async function motionChecks({ open, check, sleep, metrics, on, pathFor, h
     await probe.context().close();
     const wanted = process.env.HOME_HOSTS?.split(',');
     const hosts = wanted ? all.filter((h) => wanted.some((w) => h.label.includes(w))) : all;
-    const problems = { control: [], hover: [], focus: [], offscreen: [], hidden: [], resume: [] };
+    const problems = { control: [], hover: [], click: [], focus: [], offscreen: [], hidden: [], resume: [] };
+    const probed = { hover: 0, click: 0, tabs: 0, clickSkipped: [], loopOnly: [] };
     let measuredSeconds = 0;
     let focusSkipped = 0;
     const notShown = [];
@@ -312,9 +330,13 @@ export async function motionChecks({ open, check, sleep, metrics, on, pathFor, h
         const settleMs = 1800;
         const oneShot = ONE_SHOT.some((l) => h.label.includes(l));
 
-        // Wait for the host to show activity (up to 9 s); returns the evidence.
-        const activity = async (ms = 9000) => {
-          await page.evaluate(meterStart, { i: h.i });
+        // A clip lives in one tab's panel. Tabs now keep cycling while the pointer rests or clicks, so wait until its panel is the selected one
+        // before measuring or pausing it (a clip on an unselected tab is hidden and cannot move).
+        const shown = () => page.waitForFunction((i) => !document.querySelector(`[data-ap-i="${i}"]`).closest('[data-panel]:not(.on)'), h.i, { timeout: 40000, polling: 200 }).catch(() => {});
+        // Wait for the host to show activity (up to 9 s); returns the evidence. `cssLoops` false looks only at what the autoplayer drives.
+        const activity = async (ms = 9000, cssLoops = true) => {
+          await shown();
+          await page.evaluate(meterStart, { i: h.i, cssLoops });
           const t0 = Date.now();
           let r = { n: 0, why: [] };
           while (Date.now() - t0 < ms) {
@@ -327,10 +349,10 @@ export async function motionChecks({ open, check, sleep, metrics, on, pathFor, h
         };
         // After a pause has settled, nothing may move for the whole window.
         const still = async (cond) => {
-          if (cond === 'hover' || cond === 'focus') await page.evaluate(settled, { i: h.i, cap: 4000, quiet: 400 });
+          if (cond === 'focus') await page.evaluate(settled, { i: h.i, cap: 7500, quiet: 400 });
           else await sleep(settleMs);
           await page.evaluate(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))));
-          await page.evaluate(meterStart, { i: h.i, cssLoops: !(cond === 'hover' || cond === 'focus') });
+          await page.evaluate(meterStart, { i: h.i, cssLoops: cond !== 'focus' });
           await sleep(win);
           const r = await page.evaluate(meterRead);
           await page.evaluate(meterStop);
@@ -341,6 +363,17 @@ export async function motionChecks({ open, check, sleep, metrics, on, pathFor, h
           const back = await waitState(page, h.i, 'on/', 2000);
           const r = back.ok && !oneShot ? await activity() : { n: 1, why: [] };
           if (!back.ok || !r.n) problems.resume.push(`${h.label} after ${cond} (${back.ok ? 'no activity' : back.s})`);
+        };
+        // The pointer (resting or clicking) must not have stopped it: state stays on and the same meter still sees it move. What the
+        // autoplayer itself drives has to move when it moved without the pointer (`strict`); a host whose only motion is CSS loops is held to those.
+        const keepsMoving = async (where, strict, bucket) => {
+          const held = await holdState(page, h.i, 'on/', 1200);
+          if (!held.ok) {
+            problems[bucket].push(`${h.label}: paused ${where} (${apState(held.s)})`);
+            return;
+          }
+          const r = oneShot ? { n: 1 } : await activity(9000, !strict);
+          if (!r.n) problems[bucket].push(`${h.label}: frozen ${where} (nothing moved, changed, played or advanced in 9 s${strict ? '' : ', CSS loops included'})`);
         };
 
         await page.evaluate(centreHost, h.i);
@@ -360,17 +393,45 @@ export async function motionChecks({ open, check, sleep, metrics, on, pathFor, h
           return;
         }
 
+        // Does the host move when only what the autoplayer drives is counted? Decides what the pointer probes hold it to.
+        const strict = (await activity(9000, false)).n > 0;
+        if (!strict) probed.loopOnly.push(h.label);
+
         const pt = await page.evaluate(scopePoint, h.i);
         if (pt) {
           await page.mouse.move(pt.x, pt.y);
-          const s = await waitState(page, h.i, 'off/hover', 1500);
-          if (!s.ok) problems.hover.push(`${h.label}: state ${s.s}`);
-          else await still('hover');
+          probed.hover++;
+          await keepsMoving('under the pointer', strict, 'hover');
+          const cp = await page.evaluate(clickPoint, h.i);
+          if (!cp) probed.clickSkipped.push(h.label);
+          else {
+            const url = page.url();
+            await page.mouse.click(cp.x, cp.y);
+            probed.click++;
+            if (cp.tab >= 0) {
+              probed.tabs++;
+              await sleep(150);
+              const sel = await page.evaluate(selectedTab, h.i);
+              if (sel !== cp.tab) problems.click.push(`${h.label}: a mouse click on tab ${cp.tab} left tab ${sel} selected`);
+              else if (tabWindow) {
+                // The clicked tab gets its dwell time: half of it later the cycle has not moved on yet.
+                await sleep(Math.round(tabWindow / 2));
+                const still = await page.evaluate(selectedTab, h.i);
+                if (still !== cp.tab) problems.click.push(`${h.label}: tab ${cp.tab} was clicked but the cycle moved on to tab ${still} within ${Math.round(tabWindow / 2)} ms (it needs its full ${tabWindow} ms)`);
+              }
+            }
+            await keepsMoving(`after a mouse click${cp.tab >= 0 ? ' on a tab' : ''}`, strict, 'click');
+            if (page.url() !== url) problems.click.push(`${h.label}: the click left the page (${page.url()})`);
+          }
           const rest = await page.evaluate(restPoint, h.i);
           await page.mouse.move(rest.x, rest.y);
-          await resumes('hover');
+          await keepsMoving('after the pointer left', strict, 'hover');
+          await page.evaluate(blurAll);
         } else problems.hover.push(`${h.label}: no hoverable point`);
 
+        // :focus-visible matches a script focus() only after a keyboard event: a key press first makes this a keyboard user tabbing in.
+        await page.keyboard.press('Shift');
+        await shown();
         if (await page.evaluate(focusIn, h.i)) {
           const s = await waitState(page, h.i, 'off/focus', 1500);
           if (!s.ok) problems.focus.push(`${h.label}: state ${s.s}`);
@@ -379,6 +440,7 @@ export async function motionChecks({ open, check, sleep, metrics, on, pathFor, h
           await resumes('focus');
         } else focusSkipped++;
 
+        await shown();
         await page.evaluate(awayFromHost, h.i);
         const away = await waitState(page, h.i, 'off/offscreen', 2500);
         if (!away.ok) problems.offscreen.push(`${h.label}: state ${away.s}`);
@@ -386,6 +448,7 @@ export async function motionChecks({ open, check, sleep, metrics, on, pathFor, h
         await page.evaluate(centreHost, h.i);
         await resumes('offscreen');
 
+        await shown();
         await setHidden(page, true);
         const hid = await waitState(page, h.i, 'off/hidden', 1500);
         if (!hid.ok) problems.hidden.push(`${h.label}: state ${hid.s}`);
@@ -402,67 +465,118 @@ export async function motionChecks({ open, check, sleep, metrics, on, pathFor, h
     const n = hosts.length;
     check('autoplay', `behaviour: every autoplayer visibly moves while it is running (${n} hosts measured)`, (n >= 20 || wanted) && problems.control.length === 0, problems.control.join('; ') || `${n - notShown.length} hosts${notShown.length ? `; ${notShown.length} clips on unselected tabs are hidden and left to their tab list` : ''}`);
     check('autoplay', 'behaviour: every autoplayer shows activity again after each pause (measured, not the data-ap flag)', problems.resume.length === 0, problems.resume.join('; '));
+    check('autoplay', `behaviour: everything inside an autoplayer keeps moving, changing, playing and advancing while the pointer is over it (data-ap stays on; ${probed.hover} hosts probed, ${probed.loopOnly.length} of them held to their CSS loops only)`, problems.hover.length === 0 && (probed.hover >= 15 || wanted), problems.hover.join('; ') || `${probed.hover} hosts`);
+    check('autoplay', `behaviour: everything inside an autoplayer keeps moving after a mouse click in it, and a click on a tab selects it (${probed.click} hosts clicked, ${probed.tabs} on a tab; at least 15 and 1 expected)`, problems.click.length === 0 && ((probed.click >= 15 && probed.tabs >= 1) || wanted), `${problems.click.join('; ') || `${probed.click} hosts clicked`}${probed.clickSkipped.length ? ` [no safe click point: ${probed.clickSkipped.join(', ')}]` : ''}`);
     for (const [cond, text] of [
-      ['hover', 'the pointer is over it'],
       ['focus', 'keyboard focus is inside it'],
       ['offscreen', 'it is scrolled offscreen'],
       ['hidden', 'the tab is hidden'],
     ]) {
       check('autoplay', `behaviour: nothing inside an autoplayer moves, changes, plays or advances for a full window while ${text}`, problems[cond].length === 0, problems[cond].join('; ') || `${n} hosts${cond === 'focus' ? `, ${n - focusSkipped} with a focusable control` : ''}`);
     }
-    metrics['behaviour'] = { hosts: n, secondsMeasuredWhilePaused: Math.round(measuredSeconds), hostsWithoutFocusableControl: focusSkipped, clipsOnUnselectedTabs: notShown.length };
+    metrics['behaviour'] = { hosts: n, hoverProbed: probed.hover, clicked: probed.click, tabsClicked: probed.tabs, loopOnlyHosts: probed.loopOnly.length, secondsMeasuredWhilePaused: Math.round(measuredSeconds), hostsWithoutFocusableControl: focusSkipped, clipsOnUnselectedTabs: notShown.length };
   }
 
   // ------------------------------------------------------------ A2. the hero under the pointer, at a fixed phase
-  // A pointer on the headline has to stop everything in the hero, including what a step has already started (the 7 s zoom of
-  // the big photo, the conveyor, the word, the toast, the parallax) and every keyframe loop. The probe waits for the swap
-  // to start, puts the pointer over the headline at once, waits for the hover state and two frames, and then compares the whole
-  // subtree (computed pose, text, animation clocks) over three samples. A control makes sure transitions were really in flight.
-  if (on('hero-hover')) {
+  // A pointer anywhere over the hero, the headline included, stops nothing: not what a step has already started (the 7 s zoom of
+  // the big photo, the conveyor, the word, the toast, the parallax) and not a keyframe loop. The probe waits for the swap to
+  // start, puts the pointer over the headline at once, waits two frames, and then follows the whole subtree (computed pose, text,
+  // animation clocks, the word, the conveyor's pointer parallax) over four samples while the pointer keeps moving across the copy,
+  // for the same 4.4 s the pause used to be measured over. A control makes sure transitions were really in flight. Then a mouse
+  // click on the headline and one on the lead must leave it running, and so must the pointer leaving.
+  if (on('hero-pointer')) {
     const page = await open({ width: 1440, height: 900 }, '/');
     try {
       await page.mouse.move(2, 2);
-      const point = await page.evaluate(() => {
-        const r = document.querySelector('[data-hero-copy] h1').getBoundingClientRect();
-        return { x: r.left + Math.min(40, r.width / 2), y: r.top + r.height / 2 };
+      const points = await page.evaluate(() => {
+        const h1 = document.querySelector('[data-hero-copy] h1').getBoundingClientRect();
+        const copy = document.querySelector('[data-hero-copy]').getBoundingClientRect();
+        const lead = document.querySelector('[data-hero-copy] .lead').getBoundingClientRect();
+        const a = { x: h1.left + Math.min(40, h1.width / 2), y: h1.top + h1.height / 2 };
+        return { a, b: { x: copy.right - 40, y: a.y + 40 }, lead: { x: lead.left + Math.min(40, lead.width / 2), y: lead.top + lead.height / 2 } };
       });
       await page.waitForFunction(() => document.querySelector('#hero').dataset.ap === 'on');
       await page.evaluate(heroStepStarted);
       const inFlight = await page.evaluate(heroInFlight);
-      await page.mouse.move(point.x, point.y);
-      await page.waitForFunction(() => document.querySelector('#hero').dataset.apWhy === 'hover');
-      await page.evaluate(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))));
-      const word = () => page.evaluate(() => document.querySelector('[data-hero-word][data-active]')?.getAttribute('data-word-index'));
-      const w0 = await word();
-      const samples = [await page.evaluate(heroFingerprint)];
+      // Every state the hero's autoplayer takes from here on that is not a plain "on".
+      await page.evaluate(() => {
+        const hero = document.querySelector('#hero');
+        window.__heroPaused = new Set();
+        const note = () => {
+          if (hero.dataset.ap !== 'on' || hero.dataset.apWhy) window.__heroPaused.add(`data-ap=${hero.dataset.ap}${hero.dataset.apWhy ? ` data-ap-why=${hero.dataset.apWhy}` : ''}`);
+        };
+        new MutationObserver(note).observe(hero, { attributes: true, attributeFilter: ['data-ap', 'data-ap-why'] });
+        window.__heroNote = note;
+        note();
+      });
+      const frames = () => page.evaluate(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))));
+      const read = () =>
+        page.evaluate(() => ({
+          word: document.querySelector('[data-hero-word][data-active]')?.getAttribute('data-word-index'),
+          cvx: document.querySelector('[data-hero-cv]').style.getPropertyValue('--cvx'),
+        }));
+      // From a fingerprint, wait up to `ms` for the word to change and the animation clocks to move; both have to happen while the autoplayer stays on.
+      const advances = async (from, ms) => {
+        await page.evaluate(() => {
+          window.__heroPaused.clear();
+          window.__heroNote();
+        });
+        const t0 = Date.now();
+        let r = { word: from.word, clocks: false };
+        while (Date.now() - t0 < ms && !(r.word !== from.word && r.clocks)) {
+          await sleep(150);
+          const now = await page.evaluate(heroFingerprint);
+          r = { word: (await read()).word, clocks: now.clocks !== from.fp.clocks };
+        }
+        return { wordMoved: r.word !== from.word, clocks: r.clocks, paused: await page.evaluate(() => [...window.__heroPaused]) };
+      };
+      const snapshot = async () => ({ ...(await read()), fp: await page.evaluate(heroFingerprint) });
+
+      await page.mouse.move(points.a.x, points.a.y);
+      await frames();
+      const samples = [await snapshot()];
+      const cvx = [samples[0].cvx];
       await sleep(1500);
-      samples.push(await page.evaluate(heroFingerprint));
-      await page.mouse.move(point.x + 24, point.y + 18, { steps: 6 });
-      await page.mouse.move(point.x - 16, point.y + 40, { steps: 6 });
-      await sleep(1500);
-      samples.push(await page.evaluate(heroFingerprint));
+      samples.push(await snapshot());
+      await page.mouse.move(points.b.x, points.b.y, { steps: 8 });
+      await frames();
+      cvx.push((await read()).cvx);
+      await page.mouse.move(points.a.x + 24, points.a.y + 18, { steps: 6 });
       await sleep(1400);
-      samples.push(await page.evaluate(heroFingerprint));
-      const moved = [];
-      for (let k = 1; k < samples.length; k++) {
-        const [a, b] = [samples[0], samples[k]];
-        if (a.count !== b.count) moved.push(`sample ${k}: ${a.count} -> ${b.count} animations`);
-        else if (a.clocks !== b.clocks) moved.push(`sample ${k}: animation clocks advanced`);
-        for (let j = 0; j < Math.min(a.out.length, b.out.length); j++) if (a.out[j].v !== b.out[j].v) moved.push(`sample ${k}: ${a.out[j].key} ${a.out[j].v.split('|').slice(0, 3).join(' ')} -> ${b.out[j].v.split('|').slice(0, 3).join(' ')}`);
+      samples.push(await snapshot());
+      await sleep(1400);
+      samples.push(await snapshot());
+      const problems = [];
+      const paused = await page.evaluate(() => [...window.__heroPaused]);
+      if (paused.length) problems.push(`paused under the pointer (${paused.join(', ')})`);
+      const words = new Set(samples.map((x) => x.word));
+      if (words.size < 2) problems.push(`the word stayed on index ${samples[0].word} for 4.4 s`);
+      for (let k = 1; k < samples.length; k++) if (samples[k].fp.clocks === samples[k - 1].fp.clocks) problems.push(`animation clocks did not advance between sample ${k - 1} and ${k}`);
+      const [first, last] = [samples[0].fp, samples[samples.length - 1].fp];
+      let changed = 0;
+      for (let j = 0; j < Math.min(first.out.length, last.out.length); j++) if (first.out[j].v !== last.out[j].v) changed++;
+      if (changed < 1) problems.push('no element in the hero changed pose or text');
+      const dx = Math.abs(parseFloat(cvx[1]) - parseFloat(cvx[0]));
+      if (!(dx > 0.2)) problems.push(`the conveyor parallax did not follow the pointer (--cvx ${cvx[0] || 'unset'} -> ${cvx[1] || 'unset'})`);
+      check('hero-pointer', 'the pointer lands in the middle of a step: transitions and animations are in flight at that moment (control)', inFlight.length >= 3, `${inFlight.length} in flight: ${[...new Set(inFlight)].join(', ')}`);
+      check('hero-pointer', 'hero under the pointer keeps running for 4.4 s of pointer movement over the headline (data-ap stays on, the word changes, animation clocks and poses advance, the parallax follows)', problems.length === 0, problems.slice(0, 4).join(' ; ') || `${first.out.length} elements, ${words.size} words, ${changed} elements changed, parallax ${dx.toFixed(1)}px`);
+
+      const clickProblems = [];
+      for (const [name, pt] of [['the headline', points.a], ['the lead', points.lead]]) {
+        await page.mouse.click(pt.x, pt.y);
+        await frames();
+        const r = await advances(await snapshot(), 4500);
+        if (!r.wordMoved) clickProblems.push(`the word stopped after a click on ${name}`);
+        if (!r.clocks) clickProblems.push(`animation clocks stopped after a click on ${name}`);
+        if (r.paused.length) clickProblems.push(`paused after a click on ${name} (${r.paused.join(', ')})`);
       }
-      check('hero-hover', 'the pointer lands in the middle of a step: transitions and animations are in flight at that moment (control)', inFlight.length >= 3, `${inFlight.length} in flight: ${[...new Set(inFlight)].join(', ')}`);
-      check('hero-hover', 'under the pointer nothing in the hero moves, changes or advances for 4.4 s of pointer movement (poses, text, every animation clock, the parallax)', moved.length === 0 && (await word()) === w0, moved.slice(0, 4).join(' ; ') || `${samples[0].out.length} elements, ${samples[0].count} animations held`);
+      check('hero-pointer', 'a mouse click on the headline and on the lead leaves the hero running (data-ap stays on, the word keeps changing, clocks keep advancing)', clickProblems.length === 0, clickProblems.join(' ; ') || '2 clicks, hero kept running');
+
       await page.mouse.move(2, 2);
-      await page.waitForFunction(() => document.querySelector('#hero').dataset.ap === 'on');
-      const resumed = await page
-        .waitForFunction((before) => {
-          const hero = document.querySelector('#hero');
-          return hero.getAnimations({ subtree: true }).map((a) => `${Math.round(Number(a.currentTime ?? 0))}`).join(',') !== before;
-        }, samples[0].clocks, { timeout: 4000 })
-        .then(() => true, () => false);
-      const w1 = await page.waitForFunction((from) => document.querySelector('[data-hero-word][data-active]')?.getAttribute('data-word-index') !== from, w0, { timeout: 6000 }).then(() => true, () => false);
-      check('hero-hover', 'when the pointer leaves, the held transitions carry on and the word cycle runs again', resumed && w1, `clocks advanced ${resumed}, next word ${w1}`);
-      check('runtime', 'no console errors or page errors during the hero hover probe', page.problems.length === 0, page.problems.join(' | '));
+      await frames();
+      const left = await advances(await snapshot(), 4500);
+      check('hero-pointer', 'still running after the pointer leaves the hero (the word changes, clocks advance, data-ap on)', left.wordMoved && left.clocks && left.paused.length === 0, `word moved ${left.wordMoved}, clocks advanced ${left.clocks}${left.paused.length ? `, ${left.paused.join(', ')}` : ''}`);
+      check('runtime', 'no console errors or page errors during the hero pointer probe', page.problems.length === 0, page.problems.join(' | '));
     } finally {
       await page.context().close();
     }

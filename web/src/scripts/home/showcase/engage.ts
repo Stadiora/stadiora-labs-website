@@ -1,6 +1,6 @@
 // Engage panel (DESIGN-4 M16): four phone scenes (chat, feed, broadcast, announcement) behind auto-advancing
 // tabs. Each scene is a 7.6 s set of paused, once-only timelines that share one autoplayer with the tabs, so
-// hover, focus, offscreen and hidden-tab pause both together. Counters animate the registered `--n` integer
+// keyboard focus, offscreen and hidden-tab pause both together. Counters animate the registered `--n` integer
 // (shown by a CSS counter) so they pause with everything else. The still markup is the finished scene.
 import { $, $$, autoplayer, autotabs, isReduced, onMotionChange, tl, type Frame } from '../../motion/kit';
 
@@ -75,7 +75,7 @@ export function initEngage() {
       ...build[kind](s),
       tl(bubble ?? null, DUR, f([0, { [O]: 0, translate: '0 20px', scale: 0.85 }], [1.8, {}], [2.4, { [O]: 1, translate: '0 0', scale: 1 }, SP], [DUR, {}]), once),
     ].filter((a): a is Animation => !!a);
-    // Not running (hovered, offscreen): show the finished scene; resuming restarts it in step with the tab clock.
+    // Not running (keyboard focus, offscreen): show the finished scene; resuming restarts it in step with the tab clock.
     if (ap?.running) anims.forEach((a) => a.play());
     else anims.forEach((a) => (a.currentTime = DUR * 1000));
   };

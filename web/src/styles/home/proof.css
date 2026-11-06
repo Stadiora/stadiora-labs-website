@@ -26,9 +26,8 @@
   padding-right: 60px;
   white-space: nowrap;
 }
-/* the drifting outline text cannot be hovered (it sits behind the card), so the whole section pauses it */
-.proof:hover .proof-bg .marquee-track,
-.proof:focus-within .proof-bg .marquee-track {
+/* the drifting outline text sits behind the card and cannot take focus, so keyboard focus anywhere in the section pauses it */
+.proof:has(:focus-visible) .proof-bg .marquee-track {
   animation-play-state: paused;
 }
 .proof-wrap {

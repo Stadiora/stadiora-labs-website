@@ -1,7 +1,8 @@
 // WAI-ARIA tabs with a sliding lane indicator, optional auto-advance and a pause control.
 // Markup contract: [data-tabs] > [role=tablist] > [role=tab][aria-controls] + .tabs__lane;
 // panels are the elements the tabs control. The active panel gets [data-active]; the others are inert.
-// Auto-advance ([data-tabs-auto]=ms) stops for good after the first interaction.
+// Auto-advance ([data-tabs-auto]=ms) stops for good after the first keyboard interaction and while keyboard focus is
+// inside; a mouse pointer (hover or click) never pauses it: a click selects the tab and the cycle carries on from it.
 const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
 
 function init(root: HTMLElement) {
@@ -19,7 +20,6 @@ function init(root: HTMLElement) {
   );
   let timer = 0;
   let inView = false;
-  let hovering = false;
   let focusWithin = false;
   let interacted = false;
   let userPaused = false;
@@ -59,7 +59,7 @@ function init(root: HTMLElement) {
   };
   const schedule = () => {
     stop();
-    if (!delay || reduced.matches || interacted || userPaused || !inView || hovering || focusWithin) return;
+    if (!delay || reduced.matches || interacted || userPaused || !inView || focusWithin) return;
     timer = window.setTimeout(() => {
       select(index + 1);
       schedule();
@@ -74,9 +74,11 @@ function init(root: HTMLElement) {
   };
 
   tabs.forEach((tab, i) => {
-    tab.addEventListener('click', () => {
-      interact();
+    tab.addEventListener('click', (event) => {
+      // detail 0 is a keyboard activation (Enter, Space): that still takes the cycle over for good
+      if (!event.detail) interact();
       select(i);
+      schedule();
     });
   });
 
@@ -94,18 +96,24 @@ function init(root: HTMLElement) {
     select(keys[key], true);
   });
 
-  root.addEventListener('pointerenter', (e) => {
-    if ((e as PointerEvent).pointerType !== 'mouse') return;
-    hovering = true;
-    stop();
+  // Only keyboard focus pauses: a mouse click leaves focus on the tab it hit, which must not freeze the cycle.
+  root.addEventListener('focusin', (e) => {
+    focusWithin = (e.target as Element).matches(':focus-visible');
+    if (focusWithin) stop();
+    else schedule();
   });
-  root.addEventListener('pointerleave', () => {
-    hovering = false;
-    schedule();
+  root.addEventListener('keydown', () => {
+    window.setTimeout(() => {
+      const active = document.activeElement;
+      focusWithin = active instanceof Element && root.contains(active) && active.matches(':focus-visible');
+      if (focusWithin) stop();
+      else schedule();
+    }, 0);
   });
-  root.addEventListener('focusin', () => {
-    focusWithin = true;
-    stop();
+  root.addEventListener('pointerdown', (e) => {
+    const active = document.activeElement;
+    // Refocus a keyboard-visible control natively so both CSS and the timer return to mouse mode.
+    if (e.pointerType === 'mouse' && active instanceof HTMLElement && e.target instanceof Node && active.contains(e.target) && active.matches(':focus-visible')) active.blur();
   });
   root.addEventListener('focusout', (e) => {
     if (root.contains((e as FocusEvent).relatedTarget as Node | null)) return;

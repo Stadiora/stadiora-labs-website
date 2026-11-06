@@ -1,6 +1,6 @@
 // The code sample types itself: request → sending → response. One requestAnimationFrame loop, owned by the kit's
-// autoplayer: it is cancelled (not just ignored) while the block is off screen, hovered, focused, in a hidden tab or
-// under reduced motion. Reduced motion, and any manual tab click, show both samples complete.
+// autoplayer: it is cancelled (not just ignored) while the block is off screen, under keyboard focus, in a hidden tab or
+// under reduced motion. Reduced motion, and a keyboard-activated tab, show both samples complete; a mouse click on a tab selects it and the typing carries on from there.
 import { $, $$, autoplayer, isReduced, onMotionChange } from '../motion/kit';
 
 type Tok = [string, string];
@@ -133,7 +133,15 @@ export function initCode() {
   show('req');
 
   tabs.forEach((t, i) => {
-    t.addEventListener('click', () => {
+    t.addEventListener('click', (e) => {
+      // A mouse click selects the tab and the typing carries on from the start of its phase; a keyboard activation takes over for good.
+      if (!manual && e.detail > 0) {
+        el = t.dataset.ct === 'res' ? 0.6 + tReq + 0.5 + tSend : 0.6;
+        prevPhase = '';
+        box.classList.remove('is-sending');
+        step(0);
+        return;
+      }
       manual = true;
       stop();
       full();

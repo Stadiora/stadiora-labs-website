@@ -1,6 +1,6 @@
 // Hero (DESIGN-4 M3 + M4): the word swap and the photo conveyor step together; the side lanes loop in CSS.
 // The page ships the first word and the whole conveyor as HTML; this only positions the centre lane, builds the
-// next words and steps them. One autoplayer (host #hero, hover/focus on the copy) starts and stops the cycle. While it is
+// next words and steps them. One autoplayer (host #hero, keyboard focus on the copy) starts and stops the cycle. While it is
 // off nothing in the hero moves: the step's timeouts are held, and every transition and Web Animation in flight is paused
 // where it is (CSS keyframes are held by hero.css), then both carry on from there.
 import { $, $$, autoplayer, isReduced, onMotionChange } from '../motion/kit';

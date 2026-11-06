@@ -183,7 +183,7 @@
     transform: translateY(-33.3333%);
   }
 }
-/* every keyframe in the hero holds still while the autoplayer is off (hover, focus, offscreen, hidden tab, reduced motion);
+/* every keyframe in the hero holds still while the autoplayer is off (keyboard focus, offscreen, hidden tab, reduced motion);
    hero.ts holds the transitions and Web Animations the same way */
 #hero[data-ap='off'],
 #hero[data-ap='off'] *,

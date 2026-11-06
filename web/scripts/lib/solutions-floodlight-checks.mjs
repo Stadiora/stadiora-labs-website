@@ -2,8 +2,8 @@
 // Called from evidence.mjs after solutions-checks.mjs, which keeps layout, contrast, targets, forms and the screenshots.
 // This file proves the motion contract and the Floodlight anatomy in Chromium:
 //   - the hero, the stage and the final are on the dark stage with the display face, in both locales;
-//   - nothing that moves keeps moving under reduced motion, and the hero loops stop on hover;
-//   - solutions-motion-checks.mjs measures the rendered movement of every autoplayer unit under hover, focus, offscreen and a hidden tab;
+//   - nothing that moves keeps moving under reduced motion, and the hero swap line keeps running under the pointer and after a click;
+//   - solutions-motion-checks.mjs measures the rendered movement of every autoplayer unit under the pointer and a click (keeps moving), keyboard focus, offscreen and a hidden tab (stops);
 //   - the About "A" window, the clubs feed, the athletes morph and the coaches clip move, and rest on their still frame;
 //   - the contact topic thumb glides, the submit burst is decoration;
 //   - no text is cut off by a clipping ancestor.
@@ -97,7 +97,7 @@ export async function solutionsFloodlightChecks({ open, settle: settleRaw, check
     check('solutions-floodlight', `${label}: no text is cut off at 1440 and 390 px`, cuts.length === 0, cuts.join(' | ') || `${checked} text boxes checked`);
   }
 
-  // ---------------------------------------------------------- hero word swap: moves, rests under reduced motion, stops on hover
+  // ---------------------------------------------------------- hero word swap: moves, rests under reduced motion, keeps moving under the pointer and after a click
   for (const [name, path] of [
     ['schools', '/solutions/schools/'],
     ['coaches', '/solutions/coaches/'],
@@ -122,14 +122,31 @@ export async function solutionsFloodlightChecks({ open, settle: settleRaw, check
     const on = await mo.evaluate(() => document.querySelector('[data-sx-hero]').dataset.ap);
     check('solutions-floodlight', `${name}: with motion allowed the swap line changes word and the autoplayer is on`, w0 !== w1 && on === 'on', JSON.stringify({ w0, w1, on }));
 
+    const state = () => mo.evaluate(() => ({ ap: document.querySelector('[data-sx-hero]').dataset.ap, why: document.querySelector('[data-sx-hero]').dataset.apWhy ?? '' }));
     const box = await mo.locator('[data-sx-copy] .sx-h1').boundingBox();
     await mo.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
     await sleep(500);
     const h0 = await word(mo);
-    const hover = await mo.evaluate(() => ({ ap: document.querySelector('[data-sx-hero]').dataset.ap, why: document.querySelector('[data-sx-hero]').dataset.apWhy }));
-    await sleep(3600);
+    const hover = await state();
+    await sleep(3800);
     const h1 = await word(mo);
-    check('solutions-floodlight', `${name}: hovering the hero copy pauses the swap line (autoplayer off, hover)`, h0 === h1 && hover.ap === 'off' && hover.why === 'hover', JSON.stringify({ h0, h1, hover }));
+    check('solutions-floodlight', `${name}: the swap line keeps changing word with the mouse over the hero copy (autoplayer stays on, no data-ap-why)`, h0 !== h1 && hover.ap === 'on' && hover.why === '', JSON.stringify({ h0, h1, hover, ...(hover.why === 'hover' ? { paused: 'under the pointer (data-ap-why=hover)' } : {}) }));
+
+    // a mouse click on the copy (the heading is not a control, so the click lands on the text and leaves no focus behind)
+    await mo.mouse.click(box.x + box.width / 2, box.y + box.height / 2);
+    await sleep(500);
+    const c0 = await word(mo);
+    const clicked = await state();
+    await sleep(3800);
+    const c1 = await word(mo);
+    check('solutions-floodlight', `${name}: a mouse click on the hero copy does not stop the swap line (autoplayer stays on, no data-ap-why)`, c0 !== c1 && clicked.ap === 'on' && clicked.why === '', JSON.stringify({ c0, c1, clicked }));
+
+    await mo.mouse.move(2, 2);
+    await sleep(500);
+    const l0 = await word(mo);
+    await sleep(3800);
+    const l1 = await word(mo);
+    check('solutions-floodlight', `${name}: the swap line is still changing word after the pointer leaves the hero copy`, l0 !== l1, JSON.stringify({ l0, l1 }));
     await mo.context().close();
   }
 
@@ -243,7 +260,7 @@ export async function solutionsFloodlightChecks({ open, settle: settleRaw, check
     );
   }
 
-  // ---------------------------------------------------------- rendered motion under hover, focus, offscreen and a hidden tab
+  // ---------------------------------------------------------- rendered motion under the pointer and a click, focus, offscreen and a hidden tab
   await solutionsMotionChecks({ open, settle, check, sleep });
 
   // ---------------------------------------------------------- contrast measured on the composited pixels, at rest and in motion

@@ -30,9 +30,11 @@ export async function coachAiContrastChecks({ open, check, sleep, settle }) {
       await settle(page);
       const host = page.locator('[data-tl-host="ai"]');
       await host.scrollIntoViewIfNeeded();
-      // The pointer parks the autoplayer, so the paused animations are not restarted while they are measured.
-      const box = await host.boundingBox();
-      await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+      // A hidden tab parks the autoplayer (a mouse pointer does not), so the paused animations are not restarted while they are measured.
+      await page.evaluate(() => {
+        Object.defineProperty(document, 'hidden', { configurable: true, get: () => true });
+        document.dispatchEvent(new Event('visibilitychange'));
+      });
       await sleep(400);
       const total = await page.evaluate(() =>
         Math.max(0, ...document.getAnimations().filter((a) => a.effect?.target && document.querySelector('[data-tl-host="ai"]').contains(a.effect.target)).map((a) => Number(a.effect.getTiming().duration)).filter(Number.isFinite)),

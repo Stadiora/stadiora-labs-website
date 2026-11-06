@@ -1,6 +1,6 @@
 // FROM / TO word swaps in the "for every coach" heading (DESIGN-4 M13). Each list cycles on its own clock
-// (the second row is offset) through an autoplayer, so hovering or focusing the heading, scrolling away
-// or hiding the tab stops it. The words are stacked in one grid cell, so no measuring is needed.
+// (the second row is offset) through an autoplayer, so keyboard focus on the heading, scrolling away
+// or hiding the tab stops it (a mouse pointer never does). The words are stacked in one grid cell, so no measuring is needed.
 import { $, $$, autoplayer, onMotionChange } from '../../motion/kit';
 
 export function initSwaps() {

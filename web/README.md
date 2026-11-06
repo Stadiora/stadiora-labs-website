@@ -19,7 +19,27 @@ node scripts/evidence.mjs --nav-only   # just the header checks: geometry 1025 t
 node scripts/evidence.mjs --pricing-only   # just /pricing/ and /es/pricing/: prices, region, the live estimate, the motion (odometer in the accessibility tree, the estimate loop, the iris ring), reveals, fallback, layout, contrast, tab walk; add --checks-only to skip the screenshots, and --pricing-group=estimate (data, region, prices, behaviour, reveals, estimate, motion, fallback, layout, contrast, links) to run one group, e.g. in a loop to look for flakes
 node scripts/evidence.mjs --engage-only # just the Platform page checks and motion guards, EN and ES (see below); add --checks-only to skip screenshots
 node scripts/evidence.mjs --engage-motion-only --checks-only # just the Platform motion guards; ENGAGE_ONLY=teams,integrations narrows the pages
+node scripts/evidence.mjs --no-hover-pause-only --checks-only # sitewide pointer guard; NHP_PAGES=/,/es/ narrows pages
 ```
+
+Keyboard-visible focus pauses motion even when a key is pressed on an already mouse-focused control (no new `focusin`).
+Tabbing out resumes it. A further mouse click on the same control returns to mouse mode, clears the CSS focus indicator
+and resumes motion; programmatic focus after a mouse click does not pause. The standalone `tabs.ts` keyboard-activation
+takeover remains permanent. The sitewide guard measures progress and selection on Home, Guardian Portal and Messaging
+in both languages, and injects auto mode on Teams and clubs to cover the standalone tab timer.
+
+The sitewide guard also measures CSS animations obtained from `document.getAnimations()` on legacy/non-kit pages.
+It samples at most **24 distinct running CSS-animation targets per page**, all their running animations, with a real
+mouse on the target or its nearest pointer-reachable ancestor. Before each baseline it resets the pointer outside the
+viewport and fails if `html` or `body` still matches `:hover`, so ancestor hover is not already active at the reset point.
+Across 500 ms it requires running play state, unchanged computed duration/playback rate, and clock advancement within
+25% or 60 ms of wall-clock time times playback rate.
+Every page with running CSS animations needs a nonzero sample. Metrics report unreachable targets, targets beyond the
+bound, and finite animations ending before measurement (<=650 ms remaining).
+**NOT COVERED:** those reported targets/finite animations, animations created after discovery, motion between samples,
+and non-WAAPI JavaScript motion on non-kit pages. The separate kit pointer sweep checks flags; dedicated motion guards
+measure rendered kit behavior. The mutation battery includes the legacy `999999s` slowdowns under `.hero-badge:hover`
+and `body:hover`, descendant hover pause, and a behavior-neutral legacy control.
 
 - Pages: `/` and `/pricing/` (EN), `/es/` and `/es/pricing/` (ES). Copy lives in `src/i18n/{en,es}.ts`; `es.ts` is typed against `en.ts`, so `astro check` flags a missing key. Page copy lives in `src/i18n/pages/` (`pricing.ts`: EN and ES typed together).
 - Pricing: one typed table holds every number: `src/data/prices.ts` (bands, education, add-ons, Free, the annual percentage; the annual figure is stored too). Page copy holds `{tokens}` and never a digit; `src/lib/template.ts` fills them. The region comes from the browser time zone (`src/lib/region.ts`, an allow-list of LatAm zones; Puerto Rico and anything unknown are US); `?region=latam` or `?region=us` overrides it for testing. US prices are in the HTML; LatAm prices exist only in the script bundle, so a US visitor never has them in the DOM. If the pricing script does not arrive within 2.5 s the page shows its fallback (`data-fallback`, not `data-ready`): US, monthly, 100 athletes, controls, switches and the estimate hidden, a note, every "More info" panel open. Without JavaScript at all the page looks the same. To change a price, edit `prices.ts`, then the oracle in `scripts/lib/pricing-oracle.mjs`, which holds the numbers typed in by hand (`npm run verify` and the evidence run both fail until the two agree).
@@ -80,7 +100,7 @@ node scripts/evidence.mjs --engage-motion-only --checks-only # just the Platform
   the dark footer. Copy for the added strings is in `src/i18n/pages/solutions-fx.ts` (EN and ES). Page scripts are in
   `src/scripts/solutions/` (`index.ts` starts them, then the kit): `swap.ts` (hero word swap), `feed.ts` (clubs team feed),
   `morph.ts` (athletes app morph), `contact.ts` (topic thumb, submit burst). Each one only animates away from the finished still
-  frame, uses `autoplayer()` (so it stops on hover, focus, off screen, in a hidden tab and under reduced motion) and never writes
+  frame, uses `autoplayer()` (so it stops on keyboard focus, off screen, in a hidden tab and under reduced motion, never under the mouse) and never writes
   copy: the contact burst is ten decorative dots that fire only after a 202, and the status text is checked against `contact-contract.mjs`.
   The Coaches hero clip is `public/solutions/media/sx-coaches.{webm,mp4,webp}` (lane clips are named `sx-*`, carry no words, and
   follow the clip markup and budget above; the home clips `night-stadium`, `ai-bg`, `engage-bg`, `tile-chalk`, `tile-hurdler`
@@ -96,10 +116,10 @@ node scripts/evidence.mjs --engage-motion-only --checks-only # just the Platform
   poster kept, and the final MP4 swapped for `ai-bg`, each of which must make `npm run verify` exit 1.
   `scripts/lib/solutions-floodlight-checks.mjs` (run by `evidence`) drives Chromium: the
   Floodlight anatomy in the light theme, text cut off by a clipping ancestor at 390 and 1440 (`clip-probe.mjs`), the swap line
-  moving, resting under reduced motion and pausing on hover, the coaches clip, the clubs feed, the athletes morph, the About "A"
+  moving, resting under reduced motion and keeping on moving under the pointer, the coaches clip, the clubs feed, the athletes morph, the About "A"
   window and the contact thumb, burst and approved status text. It also runs two measuring modules, both on rendered pixels:
-  `solutions-motion-checks.mjs` samples the transforms, boxes and clip times of every hover scope (the hero, conveyors, stages,
-  morph, feed) while it runs, while the pointer is over it, while focus is inside it, offscreen and in a hidden tab (a flag is
+  `solutions-motion-checks.mjs` samples the transforms, boxes and clip times of every pause scope (the hero, conveyors, stages,
+  morph, feed) while it runs, while the pointer is over it or clicks it (it keeps moving), while keyboard focus is inside it (it holds still), offscreen and in a hidden tab (a flag is
   never read, so a CSS override that keeps a conveyor moving fails), and `solutions-pixel-contrast.mjs` takes five photographs
   (real ink, hidden, black, white, and isolated black text on white). It compares sampled glyph interiors with the hidden-ink
   backdrop, using 4.5:1 or 3:1 for large text. The configured cases are 390/1440, EN/ES and light/dark, with reduced-motion stills,
@@ -145,14 +165,14 @@ node scripts/evidence.mjs --engage-motion-only --checks-only # just the Platform
   action on the `night-stadium` clip. Styles are `src/styles/engage/{base,messaging,guardian,teams,branded,integrations}.css`
   (`eg-` prefixed classes; the foundation and home CSS stay untouched) and scripts `src/scripts/engage/*.ts`. Everything that moves
   goes through the motion kit (`src/scripts/motion/kit.ts`: `autoplayer`, `autotabs`, `group`, `tl`), so it starts on screen, pauses
-  on hover, focus, off screen and in a hidden tab, and is a finished still under reduced motion. No clip with words baked into the
+  on keyboard focus, off screen and in a hidden tab (never under the mouse), and is a finished still under reduced motion. No clip with words baked into the
   picture is used (`pillar-*` and `planner-demo` stay on the home); the demo UIs are HTML. `scripts/lib/engage-motion-checks.mjs`
-  guards all of that: the Floodlight frame, text-free clips, every autoplayer (start, off screen, hover, focus, resume), a hidden tab,
+  guards all of that: the Floodlight frame, text-free clips, every autoplayer (start, off screen, keeps running under the pointer and a click, keyboard focus, resume), a hidden tab,
   the live reduced-motion flip, finished stills, the tab sets rotating, the Teams rail and the planner, the Branded morph and the
   Integrations chips. `engage-movement-checks.mjs` (called from it) checks real movement, not `data-ap` flags: for every autoplayer it
   takes the clocks of the animations and transitions in its scope, its text and markup and the time of its clips, and requires that
-  nothing advances for 1.4 s after a pause (pointer, focus, off screen, hidden tab, reduced motion switched on mid-run) and that it
-  moves again afterwards; the Branded morph must also settle on one brand under reduced motion at any point of a swap. The page chrome
+  nothing advances for 1.4 s after a pause (keyboard focus, off screen, hidden tab, reduced motion switched on mid-run) and that it
+  moves again afterwards, and that a mouse pointer or click over it stops nothing; the Branded morph must also settle on one brand under reduced motion at any point of a swap. The page chrome
   that is not an autoplayer (`.mesh`, `.orbits`, `.grad-text`) is out of scope, as in the Coach guard. `.rv-mask` elements never get `.in` (an IntersectionObserver ignores an element whose own clip-path hides it),
   so a reveal that clips an element observes a wrapper `.rv` and clips its child.
   Prices on these pages are not typed into the copy: the Teams schools teaser and the Branded add-on line are rendered from
@@ -176,8 +196,8 @@ node scripts/evidence.mjs --engage-motion-only --checks-only # just the Platform
   product-screen styles stay in `src/styles/coach.css`. Scripts: `src/scripts/coach/index.ts` (imported by `CoachHero`) starts the AI
   demo and the motion kit, and `stages.ts` runs the kit's `autoplayer()` on every `[data-cf-stage]` host. A hidden tab pauses every loop
   through the kit's `html.tab-hidden`. Add new coach motion as CSS keyframes inside a `[data-cf-stage]` (hero frame, accordion root,
-  scan stage, programs send stage, open `StepFlow`): `cf.css` pauses everything in it while its `data-ap` is `off` (hover, focus, off
-  screen, reduced motion). An accordion's backdrop clip carries `data-ap-within="#<id>-acc"`, so the accordion buttons pause the clip
+  scan stage, programs send stage, open `StepFlow`): `cf.css` pauses everything in it while its `data-ap` is `off` (keyboard focus, off
+  screen, hidden tab, reduced motion). An accordion's backdrop clip carries `data-ap-within="#<id>-acc"`, so keyboard focus on the accordion buttons pauses the clip
   too. Other coach motion goes through the kit's `.rv`, `.lines`, `.count` and `[data-depth]`/`[data-tilt]`.
 - Coach clips are `public/home/media/coach-{programs,nutrition,readiness,powerlab}.{webm,mp4,webp}`: text-free, rendered by
   `node scripts/clips/render.mjs` from `scripts/clips/stages/*.html` (stage HTML over the photos in `scripts/clips/src/`; needs
@@ -195,13 +215,18 @@ node scripts/evidence.mjs --engage-motion-only --checks-only # just the Platform
   exclusions: the AI demo stage is measured at rest and, by `coach-contrast-checks.mjs`, at 17 frames of its 12 s timeline plus a
   canary that must be caught), alt text, heading order, the keyboard walk, the accordion and hover-reveal behaviour, the count-up,
   the motion contract (no endless CSS loop far off screen, none in a hidden tab, none under reduced motion, and, by
-  `coach-motion-checks.mjs`, every moving stage and accordion clip held still under the pointer and under keyboard focus and moving
+  `coach-motion-checks.mjs`, every moving stage and accordion clip moving under the pointer and after a click, held still under keyboard focus and moving
   again afterwards) and a no-JavaScript render.
 - Motion library: `src/scripts/motion/kit.ts` (small TypeScript, no dependencies). Anything that moves on its own is an `autoplayer()`
   (or a `group()`, `autotabs()` or a `video[data-clip]`, which use it): it runs only while on screen, with the tab visible, with no
-  pointer hovering and no focus inside its scope, and never under `prefers-reduced-motion`. It mirrors its state to `data-ap`
-  (`on`/`off`) and `data-ap-why` (`reduced`, `hidden`, `offscreen`, `hover`, `focus`), and marks the hover/focus element with
-  `data-ap-scope`; the guards read those attributes. Markup is server-rendered in its finished state; the base CSS is the still frame
+  keyboard focus inside its scope, and never under `prefers-reduced-motion`. A mouse pointer, hovering or clicking, never pauses
+  anything (a click that leaves focus on a tab must not freeze it, so focus pauses only when it is `:focus-visible`, in script
+  `el.matches(':focus-visible')` on `focusin`, in CSS `:focus-visible` or `:has(:focus-visible)`, never `:focus-within`).
+  It mirrors its state to `data-ap` (`on`/`off`) and `data-ap-why` (`reduced`, `hidden`, `offscreen`, `focus`), and marks the
+  keyboard-focus element with `data-ap-scope`; the guards read those attributes. `scripts/lib/no-hover-pause-checks.mjs` (run by
+  `evidence`, alone with `--no-hover-pause-only`) walks the resolved stylesheets of every page, EN and ES, legacy pages included,
+  and fails any `:hover` or `:focus-within` rule that resolves `animation-play-state: paused`, then puts a real mouse over every
+  running host and scope and fails if one flips to `data-ap="off"`. Markup is server-rendered in its finished state; the base CSS is the still frame
   and JS only animates. Reduced motion: no autoplay, no loops, posters instead of clips, smooth scrolling off.
 - Home page (`src/components/home/Home.astro`): hero, AI program, pillars, brand strip, showcase, proof and final reel, EN and ES.
   Copy is in `src/i18n/pages/home-*.ts`, section styles in `src/styles/home/`, section scripts in `src/scripts/home/` (entry `index.ts`).

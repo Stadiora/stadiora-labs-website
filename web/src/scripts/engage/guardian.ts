@@ -1,6 +1,6 @@
 // Guardian page: a hero stage that cycles three family cards over the clip, and the "what families see" phone
 // whose child switcher is an autotabs set. Switching plays that child's screen in (card by card, then the
-// form stamp). Everything pauses together on hover, focus, offscreen and hidden tab; the markup is the
+// form stamp). Everything pauses together on keyboard focus, offscreen and hidden tab; the markup is the
 // finished screen, which is what reduced motion shows.
 import { $, $$, autoplayer, autotabs, group, isReduced, startKit, tl, type Frame } from '../motion/kit';
 

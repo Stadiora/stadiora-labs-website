@@ -1,6 +1,7 @@
 // Floodlight motion guards for the five Platform pages (R57 VB-3). Everything that moves on its own goes through the
 // motion kit, which mirrors its state to `data-ap` ("on" | "off") and `data-ap-why` ("reduced" | "hidden" |
-// "offscreen" | "hover" | "focus"). These guards read that contract, so a stage that animates without the kit fails.
+// "offscreen" | "focus"). A mouse pointer over a stage, or a mouse click on it, never pauses it; keyboard focus does. These guards
+// read that contract, so a stage that animates without the kit fails.
 // The helpers mirror home-checks.mjs (kept local so this lane never edits the home lane's file).
 // Called from evidence.mjs with its page opener and recorder.
 
@@ -57,24 +58,30 @@ const hostState = (i) => {
   return h ? `${h.dataset.ap}/${h.dataset.apWhy ?? ''}` : 'missing';
 };
 
-// A point inside the host's scope that is visible and really belongs to it.
-const scopePoint = (i) => {
+// A point inside the host's scope that is visible and really belongs to it. Quiet means it sits on no control, so a click there
+// cannot navigate or select anything; a click point may sit on a tabindex scope (a mouse click that leaves focus there must not
+// pause), a hover point may sit anywhere in the scope.
+const quietPoint = ({ i, click }) => {
   const scope = (() => { const h = document.querySelector(`[data-ap-i="${i}"]`); return (h.dataset.apWithin && document.querySelector(h.dataset.apWithin)) || h.closest('[data-ap-scope]') || h.querySelector('[data-ap-scope]') || h; })();
+  const control = click ? 'a, button, [role="tab"], input, select, textarea, summary, label' : 'a, button, [role="tab"], [tabindex]:not([tabindex="-1"]), input, select, textarea';
   const r = scope.getBoundingClientRect();
   const x0 = Math.max(r.left, 0);
   const x1 = Math.min(r.right, innerWidth);
   const y0 = Math.max(r.top, 0);
   const y1 = Math.min(r.bottom, innerHeight);
   if (x1 <= x0 || y1 <= y0) return null;
+  let any = null;
   for (const fy of [0.5, 0.25, 0.75, 0.1, 0.9]) {
     for (const fx of [0.5, 0.25, 0.75, 0.1, 0.9]) {
       const x = x0 + (x1 - x0) * fx;
       const y = y0 + (y1 - y0) * fy;
       const hit = document.elementFromPoint(x, y);
-      if (hit && scope.contains(hit)) return { x, y };
+      if (!hit || !scope.contains(hit)) continue;
+      if (!hit.closest(control)) return { x, y, quiet: true };
+      any ??= { x, y, quiet: false };
     }
   }
-  return null;
+  return any;
 };
 
 const restPoint = (i) => {
@@ -114,6 +121,21 @@ export async function engageMotionChecks({ open, check, sleep, settle, metrics }
       await sleep(120);
     }
     return { ok: false, s };
+  };
+
+  // Polls for `ms`: '' while the host stays in state `want`, else the first other state seen.
+  const holdsState = async (page, i, want, ms) => {
+    const t0 = Date.now();
+    while (Date.now() - t0 < ms) {
+      const s = await page.evaluate(hostState, i);
+      if (s !== want) return s;
+      await sleep(100);
+    }
+    return '';
+  };
+  const readable = (st) => {
+    const [ap, why] = st.split('/');
+    return `data-ap=${ap}${why ? ` data-ap-why=${why}` : ''}`;
   };
 
   // ENGAGE_ONLY=teams,integrations runs just those pages (used to mutation-prove one guard quickly).
@@ -158,7 +180,7 @@ export async function engageMotionChecks({ open, check, sleep, settle, metrics }
       await page.context().close();
     }
 
-    // ------------------------------------------------------------ 2. every autoplayer: starts on screen, pauses off screen, under the pointer and on focus
+    // ------------------------------------------------------------ 2. every autoplayer: starts on screen, pauses off screen and on keyboard focus, keeps running under the pointer and after a click
     {
       const page = await open({ width: 1440, height: 900 }, pathFor(p.slug, 'en'));
       await page.mouse.move(2, 2);
@@ -167,7 +189,8 @@ export async function engageMotionChecks({ open, check, sleep, settle, metrics }
       const videos = await page.evaluate(() => document.querySelectorAll('video[data-clip]').length);
       check(group, `${label}: the page registers its autoplayers through the kit (${hosts.length} found, at least ${p.hosts} expected)`, hosts.length >= p.hosts, hosts.map((h) => h.label).join(' | '));
       check(group, `${label}: every clip is an autoplayer host`, hosts.filter((h) => h.isVideo).length === videos && videos >= 1, `${hosts.filter((h) => h.isVideo).length} of ${videos} clips`);
-      const problems = { start: [], offscreen: [], hover: [], focus: [], resume: [], noFocusable: [] };
+      const problems = { start: [], offscreen: [], hover: [], click: [], focus: [], resume: [], noFocusable: [] };
+      const probed = { hover: 0, click: 0 };
       for (const h of hosts) {
         await page.evaluate(awayFromHost, h.i);
         const off = await waitState(page, h.i, 'off/offscreen');
@@ -178,16 +201,15 @@ export async function engageMotionChecks({ open, check, sleep, settle, metrics }
           problems.start.push(`${h.label} (${on.s})`);
           continue;
         }
-        const pt = await page.evaluate(scopePoint, h.i);
-        if (!pt) problems.hover.push(`${h.label} (no hoverable point)`);
+        const pt = await page.evaluate(quietPoint, { i: h.i, click: false });
+        if (!pt) problems.hover.push(`${h.label}: no point in its scope to park the pointer on`);
         else {
+          probed.hover++;
           await page.mouse.move(pt.x, pt.y);
-          const hov = await waitState(page, h.i, 'off/hover', 1200);
-          if (!hov.ok) problems.hover.push(`${h.label} (${hov.s})`);
+          const bad = await holdsState(page, h.i, 'on/', 1200);
+          if (bad) problems.hover.push(`${h.label}: paused under the pointer (${readable(bad)})`);
           const rest = await page.evaluate(restPoint, h.i);
           await page.mouse.move(rest.x, rest.y);
-          const back = await waitState(page, h.i, 'on/', 1200);
-          if (!back.ok) problems.resume.push(`${h.label} after hover (${back.s})`);
         }
         if (!(await page.evaluate(focusIn, h.i))) problems.noFocusable.push(h.label);
         else {
@@ -198,11 +220,30 @@ export async function engageMotionChecks({ open, check, sleep, settle, metrics }
           if (!back.ok) problems.resume.push(`${h.label} after focus (${back.s})`);
         }
       }
+      // A mouse click in the scope (focus left there by the mouse, not by the keyboard) must not stop it either.
+      const clickSkipped = [];
+      for (const h of hosts) {
+        await page.evaluate(centreHost, h.i);
+        if (!(await waitState(page, h.i, 'on/')).ok) continue;
+        const pt = await page.evaluate(quietPoint, { i: h.i, click: true });
+        if (!pt?.quiet) {
+          clickSkipped.push(h.label);
+          continue;
+        }
+        probed.click++;
+        await page.mouse.click(pt.x, pt.y);
+        const bad = await holdsState(page, h.i, 'on/', 1200);
+        if (bad) problems.click.push(`${h.label}: stopped by a mouse click (${readable(bad)})`);
+        const rest = await page.evaluate(restPoint, h.i);
+        await page.mouse.move(rest.x, rest.y);
+        await page.evaluate(blurAll);
+      }
       check(group, `${label}: every autoplayer starts once it is on screen`, problems.start.length === 0, problems.start.join('; '));
       check(group, `${label}: every autoplayer pauses when it leaves the screen`, problems.offscreen.length === 0, problems.offscreen.join('; '));
-      check(group, `${label}: every autoplayer pauses under the pointer (data-ap-why=hover) and resumes when it leaves`, problems.hover.length === 0 && problems.resume.length === 0, [...problems.hover, ...problems.resume].join('; '));
-      check(group, `${label}: every autoplayer pauses while keyboard focus is inside its scope (data-ap-why=focus) and resumes on blur`, problems.focus.length === 0, `${problems.focus.join('; ')}${problems.noFocusable.length ? ` [${problems.noFocusable.length} decorative hosts have no focusable control: ${problems.noFocusable.join(', ')}]` : ''}`);
-      metrics[`autoplayers-${label}`] = { hosts: hosts.length, clips: videos, withoutFocusableScope: problems.noFocusable.length };
+      check(group, `${label}: every autoplayer keeps running under the pointer (data-ap stays on, no data-ap-why=hover; ${probed.hover} of ${hosts.length} hosts probed)`, problems.hover.length === 0 && probed.hover >= p.hosts, problems.hover.join('; ') || `only ${probed.hover} hosts probed, at least ${p.hosts} expected`);
+      check(group, `${label}: every autoplayer keeps running after a mouse click in its scope (data-ap stays on; ${probed.click} of ${hosts.length} hosts clicked)`, problems.click.length === 0 && probed.click >= p.hosts, problems.click.join('; ') || `only ${probed.click} hosts had a quiet point to click, at least ${p.hosts} expected: ${clickSkipped.join(', ')}`);
+      check(group, `${label}: every autoplayer pauses while keyboard focus is inside its scope (data-ap-why=focus) and resumes on blur`, problems.focus.length === 0 && problems.resume.length === 0, `${[...problems.focus, ...problems.resume].join('; ')}${problems.noFocusable.length ? ` [${problems.noFocusable.length} decorative hosts have no focusable control: ${problems.noFocusable.join(', ')}]` : ''}`);
+      metrics[`autoplayers-${label}`] = { hosts: hosts.length, clips: videos, hoverProbed: probed.hover, clicked: probed.click, withoutFocusableScope: problems.noFocusable.length };
 
       // A hidden tab pauses everything, and coming back resumes what is on screen.
       await page.evaluate(() => scrollTo(0, 0));
@@ -237,7 +278,7 @@ export async function engageMotionChecks({ open, check, sleep, settle, metrics }
     }
 
     // ------------------------------------------------------------ 2b. the same pauses, judged by what actually moves (not by data-ap)
-    await engageMovementChecks({ open, check, sleep, settle }, { slug: p.slug, path: pathFor(p.slug, 'en') });
+    await engageMovementChecks({ open, check, sleep, settle }, { slug: p.slug, path: pathFor(p.slug, 'en'), hosts: p.hosts });
 
     // ------------------------------------------------------------ 3. reduced motion: no autoplay, no loops, finished stills
     for (const lang of ['en', 'es']) {
@@ -288,10 +329,39 @@ export async function engageMotionChecks({ open, check, sleep, settle, metrics }
         const b = await sel();
         const panels = await page.evaluate((i) => [...document.querySelectorAll(`[data-at-i="${i}"] [data-panel]`)].filter((x) => x.classList.contains('on') || x.hasAttribute('data-active')).length, s.i);
         check(group, `${label}: tab set ${s.i + 1} rotates by itself (tab ${a + 1} -> ${b + 1} after ${(s.at + 1500) / 1000} s) with one active panel`, a !== b && panels === 1, `${panels} active panels`);
+
+        // Pointer parked over the set (on a tab, the control the user reaches for): the rotation carries on, data-ap stays on.
+        const tabBox = (k) => page.evaluate(([i, k]) => {
+          const r = document.querySelectorAll(`[data-at-i="${i}"] [role="tab"]`)[k].getBoundingClientRect();
+          return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
+        }, [s.i, k]);
+        const apState = () => page.evaluate((i) => { const r = document.querySelector(`[data-at-i="${i}"]`); return `${r.dataset.ap}/${r.dataset.apWhy ?? ''}`; }, s.i);
+        const over = await tabBox(await sel());
+        await page.mouse.move(over.x, over.y);
+        const h0 = await sel();
+        await sleep(s.at + 1500);
+        const h1 = await sel();
+        const hoverState = await apState();
+        check(group, `${label}: tab set ${s.i + 1} keeps rotating with the pointer parked on its selected tab (tab ${h0 + 1} -> ${h1 + 1} after ${(s.at + 1500) / 1000} s, data-ap stays on)`, h0 !== h1 && hoverState === 'on/', `${hoverState}, tab ${h0 + 1} -> ${h1 + 1}`);
+
+        // A mouse click on a tab selects it, the cycle continues from it, and the selected tab gets its full dwell.
+        const count = sets.find((x) => x.i === s.i).tabs;
+        const target = ((await sel()) + 2) % count;
+        const c = await tabBox(target);
+        await page.mouse.click(c.x, c.y);
+        await sleep(300);
+        const picked = await sel();
+        const clickState = await apState();
+        await sleep(s.at * 0.6);
+        const held = await sel();
+        await sleep(s.at * 0.4 + 1500);
+        const next = await sel();
+        check(group, `${label}: tab set ${s.i + 1}: a mouse click selects tab ${target + 1}, keeps data-ap on, holds it for its full dwell (${s.at / 1000} s) and the cycle continues from it to tab ${((target + 1) % count) + 1}`, picked === target && held === target && next === (target + 1) % count && clickState === 'on/', `selected ${picked + 1}, after 0.6 dwell ${held + 1}, after dwell ${next + 1}, ${clickState}`);
+        await page.mouse.move(2, 2);
       }
     }
 
-    // Marquee: the Teams rail moves, stops under the pointer, and its duplicate set is hidden from assistive tech.
+    // Marquee: the Teams rail moves, keeps moving under the pointer and after a click, and its duplicate set is hidden from assistive tech.
     if (p.slug === 'teams') {
       const x = () => page.evaluate(() => document.querySelector('.marquee-track').getBoundingClientRect().left);
       await page.evaluate(() => document.querySelector('.marquee').scrollIntoView({ block: 'center', behavior: 'instant' }));
@@ -307,9 +377,16 @@ export async function engageMotionChecks({ open, check, sleep, settle, metrics }
       await page.mouse.move(box.x, box.y);
       await sleep(300);
       const c = await x();
-      await sleep(1000);
+      await sleep(1200);
       const d = await x();
-      check(group, `${label}: the schools rail stops under the pointer`, Math.abs(d - c) < 0.5, `${(d - c).toFixed(2)}px in 1 s`);
+      const hoverPaused = await page.evaluate(() => [...document.querySelectorAll('[data-ap-why="hover"]')].length);
+      check(group, `${label}: the schools rail keeps moving under the pointer (${(d - c).toFixed(1)}px in 1.2 s)`, Math.abs(d - c) >= 4 && hoverPaused === 0, `the rail stood still under the pointer: ${(d - c).toFixed(2)}px in 1.2 s, ${hoverPaused} hosts with data-ap-why=hover`);
+      await page.mouse.click(box.x, box.y);
+      await sleep(300);
+      const e = await x();
+      await sleep(1200);
+      const f = await x();
+      check(group, `${label}: the schools rail keeps moving after a mouse click on it (${(f - e).toFixed(1)}px in 1.2 s)`, Math.abs(f - e) >= 4, `the rail stood still after the click: ${(f - e).toFixed(2)}px in 1.2 s`);
       await page.mouse.move(2, 2);
       const dup = await page.evaluate(() => {
         const tracks = [...document.querySelectorAll('.marquee-track > *')];

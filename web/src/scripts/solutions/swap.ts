@@ -2,13 +2,13 @@
 // pattern under the sx- prefix: the swap line cycles its words, and where a centre conveyor lane exists it steps
 // one block per word. The server-rendered state is word 1 (the still frame); nothing here runs under reduced motion.
 // Every timer runs on the kit autoplayer's clock (ap.later) and the conveyor's transitions are held by it, so one pause
-// (hover, focus, offscreen, hidden tab) stops the words, the lanes and the photos together.
+// (keyboard focus, offscreen, hidden tab) stops the words, the lanes and the photos together.
 import { $, $$, autoplayer, isReduced, type Autoplayer } from '../motion/kit';
 
 const CYCLE_MS = 2800;
 const EASE = 'cubic-bezier(0.2, 0.7, 0.2, 1)';
 // What a pause holds: the centre conveyor's transitions (step, Ken Burns, tile fades, parallax). What it settles: the
-// word slot and its letters, so a headline the pointer rests on is never left half blurred.
+// word slot and its letters, so a headline held by keyboard focus is never left half blurred.
 const FREEZE = { hold: '.sx-cv, .sx-cv *', settle: '.sx-slot, .sx-slot *' };
 
 function buildWord(word: string, index: number): HTMLElement {
@@ -52,7 +52,7 @@ function initHeroSwap(hero: HTMLElement) {
     return;
   }
   if (!swap || !slot) {
-    // a conveyor without a swap (clubs) only loops in CSS; the autoplayer still pauses it on hover, focus, offscreen and hidden tabs
+    // a conveyor without a swap (clubs) only loops in CSS; the autoplayer still pauses it on keyboard focus, offscreen and hidden tabs
     if (cv) autoplayer(hero, { within: copy, play: () => {}, pause: () => {}, freeze: FREEZE });
     return;
   }

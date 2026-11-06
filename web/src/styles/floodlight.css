@@ -87,7 +87,7 @@ html.js .lines.in > span > span{transform:none}
 /* 6.4 marquee */
 .marquee{--dur:40s;position:relative;overflow:hidden;-webkit-mask:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent);mask:linear-gradient(90deg,transparent,#000 8%,#000 92%,transparent)}
 .marquee-track{display:flex;width:max-content;animation:marq var(--dur) linear infinite}
-.marquee:hover .marquee-track,.marquee:focus-within .marquee-track{animation-play-state:paused}
+.marquee:has(:focus-visible) .marquee-track{animation-play-state:paused}
 @keyframes marq{to{transform:translateX(-50%)}}
 
 /* 6.5 auto-advancing tabs with progress bars. The kit (autotabs) owns the fill: it writes the bar's transform from its own

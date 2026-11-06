@@ -2,8 +2,9 @@
 // Every number is read from what is rendered, in Chromium, at 1440 and 390, light and dark:
 //   - two sets, the second aria-hidden and inert with empty alt text, the same marks in the same order (a seamless loop:
 //     the track is exactly two set widths and the keyframes move it by half);
-//   - the strip moves on its own and stops under the pointer; offscreen, hidden-tab and keyboard pauses of the About
-//     instance are measured by solutions-motion-checks.mjs, which this file runs for /about/ when called with `pauses`;
+//   - the strip moves on its own and keeps moving under the pointer and after a click on it (a pointer never pauses it);
+//     the pointer, click, offscreen, hidden-tab and keyboard behaviour of the About instance is measured by
+//     solutions-motion-checks.mjs, which this file runs for /about/ when called with `pauses`;
 //   - theme-correct marks (About follows the page theme, the home band is always on the dark stage);
 //   - no mark is clipped: every visible mark sits inside the marquee box, and the marquee inside its section;
 //   - reduced motion: no animation, a static row that wraps, the repeated copy gone and nothing wider than the strip.
@@ -60,7 +61,7 @@ const missing = { width: 0, aria: null, inert: false, shownSet: false, names: []
 export async function logoMarqueeChecks({ open, settle, check, sleep, pauses = true }) {
   const group = 'logo-marquee';
   const left = (page, sel) => page.evaluate((s) => document.querySelector(`${s} .marquee-track`).getBoundingClientRect().left, sel);
-  // A fresh context has no pointer, so nothing is hovered until the hover check moves one onto the strip.
+  // A fresh context has no pointer, so nothing is under it until the pointer check moves one onto the strip.
 
   for (const t of targets) {
     for (const scheme of t.schemes) {
@@ -98,12 +99,25 @@ export async function logoMarqueeChecks({ open, settle, check, sleep, pauses = t
               const r = document.querySelector(s).getBoundingClientRect();
               return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
             }, t.sel);
+            const ap = () => page.evaluate((sel) => {
+              const h = document.querySelector(sel).closest('[data-ap]');
+              return { ap: h?.dataset.ap ?? 'no host', why: h?.dataset.apWhy ?? '' };
+            }, t.sel);
+            const travels = async () => {
+              const c = await left(page, t.sel);
+              await sleep(1000);
+              return Math.abs((await left(page, t.sel)) - c);
+            };
             await page.mouse.move(bx.x, bx.y);
             await sleep(300);
-            const c = await left(page, t.sel);
-            await sleep(1000);
-            const d = await left(page, t.sel);
-            check(group, `${tag}: the strip stops under the pointer`, Math.abs(d - c) < 0.5, `${(d - c).toFixed(2)}px in 1 s`);
+            const under = await ap();
+            const dUnder = await travels();
+            check(group, `${tag}: the strip keeps moving under the pointer (data-ap stays on)`, dUnder >= 2 && under.ap === 'on' && under.why === '', `${dUnder.toFixed(2)}px in 1 s ${JSON.stringify(under)}${under.why === 'hover' ? ' paused under the pointer (data-ap-why=hover)' : dUnder < 2 ? ' held still under the pointer' : ''}`);
+            await page.mouse.click(bx.x, bx.y);
+            await sleep(300);
+            const clicked = await ap();
+            const dClick = await travels();
+            check(group, `${tag}: the strip keeps moving after a click on it (data-ap stays on)`, dClick >= 2 && clicked.ap === 'on' && clicked.why === '', `${dClick.toFixed(2)}px in 1 s ${JSON.stringify(clicked)}${dClick < 2 ? ' held still after the click' : ''}`);
           }
         } catch (e) {
           check(group, `${tag}: the probe ran to the end`, false, String(e.stack ?? e).split('\n').slice(0, 3).join(' | '));
@@ -131,6 +145,6 @@ export async function logoMarqueeChecks({ open, settle, check, sleep, pauses = t
     }
   }
 
-  // Hover, keyboard focus, offscreen and hidden-tab pauses of the About instance, measured on rendered values.
+  // Pointer and click (keeps moving), keyboard focus, offscreen and hidden-tab pauses (stops) of the About instance, measured on rendered values.
   if (pauses) await solutionsMotionChecks({ open, settle, check, sleep, only: 'en/about/', requireMarqueeFocus: true });
 }

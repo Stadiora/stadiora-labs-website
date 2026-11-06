@@ -1,6 +1,6 @@
 // Athletes hero morph: the white-label phone puts on each athlete app in turn (colour, mark, name, photo, today's
-// session and status), the side phones and the label list follow. One autoplayer on the phone; hovering or focusing
-// the stage pauses it. The server-rendered state is the first app, which is also the reduced-motion state.
+// session and status), the side phones and the label list follow. One autoplayer on the phone; keyboard focus inside
+// the stage pauses it (a mouse pointer never does). The server-rendered state is the first app, which is also the reduced-motion state.
 import { $, $$, autoplayer, scramble, type Autoplayer } from '../motion/kit';
 
 interface Brand {

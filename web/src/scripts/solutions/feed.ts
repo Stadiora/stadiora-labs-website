@@ -1,6 +1,6 @@
 // The clubs team-feed phone: the finished feed is the markup; this loops a short 8 s story over it (announcement,
 // fixture, availability), one clock per squad, and follows the squad tabs so the phone always shows the squad on
-// screen. It plays only while the phone is in view and not hovered or focused (the kit autoplayer).
+// screen. It plays only while the phone is in view and keyboard focus is elsewhere (the kit autoplayer).
 import { $, $$, group, tl, type Frame } from '../motion/kit';
 
 const DUR = 8;

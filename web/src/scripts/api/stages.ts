@@ -1,6 +1,6 @@
 // Pause controller for the page's own CSS loops (floating numbers, card visuals, the hub orbits, the live dot). Each moving
 // stage is one unit carrying data-api-stage. The kit's autoplayer decides for the whole unit when it may run and mirrors that
-// to data-ap on it; api.css pauses every loop inside while data-ap is "off": hovered or focused, off screen, in a hidden tab,
+// to data-ap on it; api.css pauses every loop inside while data-ap is "off": keyboard focus, off screen, in a hidden tab,
 // or reduced motion. Stages that also run script (engine, code, sports, use cases) set data-ap through their own autoplayer.
 import { $$, autoplayer } from '../motion/kit';
 

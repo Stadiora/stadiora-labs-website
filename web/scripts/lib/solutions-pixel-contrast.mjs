@@ -452,7 +452,8 @@ async function sweepLettering(page, tag, scheme, width, { check, sleep, metrics,
 }
 
 // Reduced motion shows the first app only, so the other apps are reached through the real autoplayer: wait until the label list
-// shows app k, then hover the stage (which finishes the reveal and the name scramble) and photograph the hero.
+// shows app k, then hold it with a hidden tab (the kit's pause that finishes the reveal and the name scramble; a pointer over
+// the stage pauses nothing) and photograph the hero.
 async function stepMorph(page, tag, scheme, width, { check, sleep, metrics, group }) {
   const apps = await page.locator('[data-sx-ap-labels] [data-ap-lab]').count();
   const hero = await page.evaluate(() => {
@@ -464,15 +465,23 @@ async function stepMorph(page, tag, scheme, width, { check, sleep, metrics, grou
   let worst = Infinity;
   let stepped = 0;
   for (let k = 1; k < apps; k++) {
+    await page.evaluate(() => {
+      Object.defineProperty(document, 'hidden', { configurable: true, get: () => false });
+      Object.defineProperty(document, 'visibilityState', { configurable: true, get: () => 'visible' });
+      document.dispatchEvent(new Event('visibilitychange'));
+    });
     await page.mouse.move(1, 1);
     await page.evaluate(() => document.querySelector('[data-sx-morph]').scrollIntoView({ block: 'center' }));
     await page.waitForFunction((n) => document.querySelectorAll('[data-sx-ap-labels] [data-ap-lab]')[n]?.classList.contains('on'), k, { timeout: 20000, polling: 'raf' });
-    const box = await page.locator('[data-sx-morph]').boundingBox();
-    await page.mouse.move(Math.round(box.x + box.width / 2), Math.round(box.y + box.height / 2));
+    await page.evaluate(() => {
+      Object.defineProperty(document, 'hidden', { configurable: true, get: () => true });
+      Object.defineProperty(document, 'visibilityState', { configurable: true, get: () => 'hidden' });
+      document.dispatchEvent(new Event('visibilitychange'));
+    });
     await sleep(1200);
     const held = await page.evaluate((n) => document.querySelectorAll('[data-sx-ap-labels] [data-ap-lab]')[n]?.classList.contains('on'), k);
     if (!held) {
-      bad.push({ text: `app ${k} did not hold while hovered`, size: 0, weight: 0, score: 0, large: false, path: 'morph' });
+      bad.push({ text: `app ${k} did not hold while the tab was hidden`, size: 0, weight: 0, score: 0, large: false, path: 'morph' });
       continue;
     }
     stepped++;
