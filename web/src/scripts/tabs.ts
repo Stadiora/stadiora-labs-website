@@ -102,6 +102,19 @@ function init(root: HTMLElement) {
     if (focusWithin) stop();
     else schedule();
   });
+  root.addEventListener('keydown', () => {
+    window.setTimeout(() => {
+      const active = document.activeElement;
+      focusWithin = active instanceof Element && root.contains(active) && active.matches(':focus-visible');
+      if (focusWithin) stop();
+      else schedule();
+    }, 0);
+  });
+  root.addEventListener('pointerdown', (e) => {
+    const active = document.activeElement;
+    // Refocus a keyboard-visible control natively so both CSS and the timer return to mouse mode.
+    if (e.pointerType === 'mouse' && active instanceof HTMLElement && e.target instanceof Node && active.contains(e.target) && active.matches(':focus-visible')) active.blur();
+  });
   root.addEventListener('focusout', (e) => {
     if (root.contains((e as FocusEvent).relatedTarget as Node | null)) return;
     focusWithin = false;

@@ -129,6 +129,43 @@ const selectedTab = (page) =>
     return t.findIndex((e) => e.getAttribute('aria-selected') === 'true');
   });
 
+// Exercise the modality change without moving focus: focusin alone cannot observe this.
+async function keyboardTabsProbe({ page, path, check, sleep }) {
+  const root = page.locator('[data-autotabs]').first();
+  const tab = root.locator('[role="tab"]').nth(1);
+  await tab.click();
+  await sleep(350);
+  const take = () => root.evaluate((e) => ({
+    selected: [...e.querySelectorAll('[role="tab"]')].map((t) => t.getAttribute('aria-selected')),
+    bars: [...e.querySelectorAll('.at-bar i')].map((b) => getComputedStyle(b).transform),
+  }));
+  const changes = async () => {
+    const before = await take();
+    await sleep(1400);
+    return JSON.stringify(before) !== JSON.stringify(await take());
+  };
+  check(GROUP, `${path}: mouse-clicked tab keeps rendered progress moving`, !(await tab.evaluate((e) => e.matches(':focus-visible'))) && await changes());
+  await page.keyboard.press('Enter');
+  await sleep(150);
+  check(GROUP, `${path}: a key on the mouse-focused tab holds rendered progress and selection still`, await tab.evaluate((e) => e === document.activeElement && e.matches(':focus-visible')) && !(await changes()));
+  // Leave the entire pause scope with real Tab events, not blur(), then observe the progress again.
+  for (let k = 0; k < 40 && await root.evaluate((e) => e.contains(document.activeElement)); k++) await page.keyboard.press('Tab');
+  await tab.scrollIntoViewIfNeeded();
+  await sleep(350);
+  const outside = !(await root.evaluate((e) => e.contains(document.activeElement)));
+  const resumed = await changes();
+  check(GROUP, `${path}: Tab away from the mouse-then-keyboard tab resumes rendered progress`, outside && resumed, await root.evaluate((e) => `outside=${!e.contains(document.activeElement)}, ${e.dataset.ap}/${e.dataset.apWhy ?? ''}, active=${document.activeElement?.tagName}.${document.activeElement?.className}`));
+  await tab.click();
+  await page.keyboard.press('Enter');
+  await sleep(150);
+  await tab.click();
+  await sleep(150);
+  check(GROUP, `${path}: another mouse click on the same keyboard-visible tab resumes and clears its focus indicator`, await tab.evaluate((e) => e === document.activeElement && !e.matches(':focus-visible')) && await changes());
+  await root.locator('[role="tab"]').first().focus();
+  await sleep(150);
+  check(GROUP, `${path}: programmatic focus after a mouse click keeps rendered progress moving`, !(await root.locator('[role="tab"]').first().evaluate((e) => e.matches(':focus-visible'))) && await changes());
+}
+
 async function tabsProbe({ open, sleep, path }) {
   const page = await open({ width: 1440, height: 900, init: tabsInit }, path);
   const out = { path, tabs: await page.evaluate(() => document.querySelectorAll('[data-tabs] [role="tab"]').length), auto: await page.evaluate(() => Number(document.querySelector('[data-tabs]')?.dataset.tabsAuto ?? 0)) };
@@ -166,6 +203,21 @@ async function tabsProbe({ open, sleep, path }) {
   if ((await selectedTab(page)) !== target) errors.push('the clicked tab did not keep its full dwell (the cycle skipped it within 1.05 s of a 1.5 s dwell)');
   out.afterClick = await changesIn(4200);
   if (out.afterClick < 1) errors.push('the cycle stopped after a mouse click on a tab');
+  const same = await tabBox(await selectedTab(page));
+  await page.mouse.click(same.x + same.width / 2, same.y + same.height / 2);
+  await page.keyboard.press('Shift');
+  await sleep(150);
+  out.sameFocus = await changesIn(2200);
+  if (out.sameFocus !== 0) errors.push('a key on the mouse-focused tab did not hold the cycle');
+  await page.mouse.click(same.x + same.width / 2, same.y + same.height / 2);
+  out.sameClick = await changesIn(2200);
+  if (out.sameClick < 1) errors.push('another mouse click on the same keyboard-visible tab did not resume the cycle');
+  const again = await tabBox(await selectedTab(page));
+  await page.mouse.click(again.x + again.width / 2, again.y + again.height / 2);
+  await page.keyboard.press('Shift');
+  for (let k = 0; k < 40 && await page.locator('[data-tabs]').evaluate((e) => e.contains(document.activeElement)); k++) await page.keyboard.press('Tab');
+  out.tabAway = await changesIn(2200);
+  if (out.tabAway < 1) errors.push('Tab away from the mouse-then-keyboard tab did not resume the cycle');
   await page.mouse.move(2, 2);
   await page.keyboard.press('Shift');
   await page.locator('[data-tabs] [role="tab"]').first().focus();
@@ -252,6 +304,9 @@ export async function noHoverPauseChecks({ open, check, sleep, metrics, distDir,
       await page.mouse.move(2, 2);
       totals.hovered += hovered;
       perPage[path] = { hosts, scopes, hovered, rules: style.rules, playStateRules: style.withPlayState };
+      if (['/', '/es/', '/platform/guardian-portal/', '/es/platform/guardian-portal/', '/platform/messaging/', '/es/platform/messaging/'].includes(path)) {
+        await keyboardTabsProbe({ page, path, check, sleep });
+      }
     } catch (e) {
       errors.push(`${path}: the probe could not finish: ${String(e.message).split('\n')[0]}`);
     }

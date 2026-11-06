@@ -173,6 +173,19 @@ export function autoplayer(host: HTMLElement, opts: AutoplayerOptions): Autoplay
     seen.focus = (e.target as Element).matches(':focus-visible');
     refresh();
   });
+  within.addEventListener('keydown', () => {
+    // The browser can make the already-focused control :focus-visible without sending focusin.
+    window.setTimeout(() => {
+      const active = document.activeElement;
+      seen.focus = active instanceof Element && within.contains(active) && active.matches(':focus-visible');
+      refresh();
+    }, 0);
+  });
+  within.addEventListener('pointerdown', (e) => {
+    const active = document.activeElement;
+    // Chromium retains :focus-visible on a re-click. Let the native mouse action refocus it in mouse mode.
+    if (e.pointerType === 'mouse' && active instanceof HTMLElement && e.target instanceof Node && active.contains(e.target) && active.matches(':focus-visible')) active.blur();
+  });
   within.addEventListener('focusout', (e) => {
     if (e.relatedTarget instanceof Node && within.contains(e.relatedTarget)) return;
     seen.focus = false;

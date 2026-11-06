@@ -36,6 +36,7 @@ const RUNNERS = {
   'motion-code': { args: ['scripts/evidence.mjs', '--api-motion-only', '--checks-only'], env: { API_MOTION_STAGE: 'en:code' }, failLine: /^FAIL\s+(.+)$/gm },
   // the sitewide no-hover-pause guard, narrowed to the pages that carry the mutated code
   'nhp-home': { args: ['scripts/evidence.mjs', '--no-hover-pause-only', '--checks-only'], env: { NHP_PAGES: '/' }, failLine: /^FAIL\s+(.+)$/gm },
+  'nhp-focus': { args: ['scripts/evidence.mjs', '--no-hover-pause-only', '--checks-only'], env: { NHP_PAGES: '/,/es/,/platform/guardian-portal/,/es/platform/guardian-portal/,/platform/messaging/,/es/platform/messaging/' }, failLine: /^FAIL\s+(.+)$/gm },
   'nhp-about': { args: ['scripts/evidence.mjs', '--no-hover-pause-only', '--checks-only'], env: { NHP_PAGES: '/about/' }, failLine: /^FAIL\s+(.+)$/gm },
   'nhp-pricing': { args: ['scripts/evidence.mjs', '--no-hover-pause-only', '--checks-only'], env: { NHP_PAGES: '/pricing/' }, failLine: /^FAIL\s+(.+)$/gm },
   'nhp-api': { args: ['scripts/evidence.mjs', '--no-hover-pause-only', '--checks-only'], env: { NHP_PAGES: '/api.html' }, failLine: /^FAIL\s+(.+)$/gm },
@@ -531,6 +532,22 @@ const M = [
       { runner: 'nhp-api', expect: /pointer: with the mouse over every running animation host and every \[data-ap-scope\], no host flips to data-ap="off"/, at: { file: 'scripts/lib/no-hover-pause-checks.mjs', needle: 'pointer: with the mouse over every running animation host' } },
       { runner: 'motion-code', expect: /\[api-motion\] en code#\d+: mouse over it keeps everything in it moving/, at: { file: 'scripts/lib/api-motion-checks.mjs', needle: 'mouse over it keeps everything in it moving' } },
     ],
+  },
+  {
+    id: 'focus-same-element-keydown',
+    what: 'kit.ts: remove keydown re-evaluation on an already mouse-focused tab (home, Guardian and Messaging, EN/ES)',
+    edits: [{ file: 'src/scripts/motion/kit.ts', find: "within.addEventListener('keydown', () => {", replace: "within.addEventListener('unused-keydown', () => {" }],
+    runner: 'nhp-focus',
+    expect: /a key on the mouse-focused tab holds rendered progress and selection still/,
+    at: { file: 'scripts/lib/no-hover-pause-checks.mjs', needle: 'a key on the mouse-focused tab holds rendered progress and selection still' },
+  },
+  {
+    id: 'focus-same-element-keydown-tabs',
+    what: 'tabs.ts: remove keydown re-evaluation on an already mouse-focused tab',
+    edits: [{ file: 'src/scripts/tabs.ts', find: "root.addEventListener('keydown', () => {", replace: "root.addEventListener('unused-keydown', () => {" }],
+    runner: 'nhp-teams',
+    expect: /a key on the mouse-focused tab did not hold the cycle/,
+    at: { file: 'scripts/lib/no-hover-pause-checks.mjs', needle: 'tabs.ts auto-advance' },
   },
   {
     id: 'identity-control-nhp',

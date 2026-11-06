@@ -19,7 +19,14 @@ node scripts/evidence.mjs --nav-only   # just the header checks: geometry 1025 t
 node scripts/evidence.mjs --pricing-only   # just /pricing/ and /es/pricing/: prices, region, the live estimate, the motion (odometer in the accessibility tree, the estimate loop, the iris ring), reveals, fallback, layout, contrast, tab walk; add --checks-only to skip the screenshots, and --pricing-group=estimate (data, region, prices, behaviour, reveals, estimate, motion, fallback, layout, contrast, links) to run one group, e.g. in a loop to look for flakes
 node scripts/evidence.mjs --engage-only # just the Platform page checks and motion guards, EN and ES (see below); add --checks-only to skip screenshots
 node scripts/evidence.mjs --engage-motion-only --checks-only # just the Platform motion guards; ENGAGE_ONLY=teams,integrations narrows the pages
+node scripts/evidence.mjs --no-hover-pause-only --checks-only # sitewide pointer guard; NHP_PAGES=/,/es/ narrows pages
 ```
+
+Keyboard-visible focus pauses motion even when a key is pressed on an already mouse-focused control (no new `focusin`).
+Tabbing out resumes it. A further mouse click on the same control returns to mouse mode, clears the CSS focus indicator
+and resumes motion; programmatic focus after a mouse click does not pause. The standalone `tabs.ts` keyboard-activation
+takeover remains permanent. The sitewide guard measures progress and selection on Home, Guardian Portal and Messaging
+in both languages, and injects auto mode on Teams and clubs to cover the standalone tab timer.
 
 - Pages: `/` and `/pricing/` (EN), `/es/` and `/es/pricing/` (ES). Copy lives in `src/i18n/{en,es}.ts`; `es.ts` is typed against `en.ts`, so `astro check` flags a missing key. Page copy lives in `src/i18n/pages/` (`pricing.ts`: EN and ES typed together).
 - Pricing: one typed table holds every number: `src/data/prices.ts` (bands, education, add-ons, Free, the annual percentage; the annual figure is stored too). Page copy holds `{tokens}` and never a digit; `src/lib/template.ts` fills them. The region comes from the browser time zone (`src/lib/region.ts`, an allow-list of LatAm zones; Puerto Rico and anything unknown are US); `?region=latam` or `?region=us` overrides it for testing. US prices are in the HTML; LatAm prices exist only in the script bundle, so a US visitor never has them in the DOM. If the pricing script does not arrive within 2.5 s the page shows its fallback (`data-fallback`, not `data-ready`): US, monthly, 100 athletes, controls, switches and the estimate hidden, a note, every "More info" panel open. Without JavaScript at all the page looks the same. To change a price, edit `prices.ts`, then the oracle in `scripts/lib/pricing-oracle.mjs`, which holds the numbers typed in by hand (`npm run verify` and the evidence run both fail until the two agree).
