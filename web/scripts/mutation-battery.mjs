@@ -559,6 +559,14 @@ const M = [
     at: { file: 'scripts/lib/no-hover-pause-checks.mjs', needle: "'CSS pointer: sampled animations keep running at unchanged duration" },
   },
   {
+    id: 'hover-legacy-body-duration',
+    what: 'Legacy lead-magnet: reviewer payload body:hover .hero-badge .dot { animation-duration: 999999s !important; }',
+    edits: [{ file: 'public/lead-magnet.html', find: '  .hero-badge .dot {', replace: '  body:hover .hero-badge .dot { animation-duration: 999999s !important; }\n  .hero-badge .dot {' }],
+    runner: 'nhp-legacy',
+    expect: /CSS pointer: sampled animations keep running at unchanged duration.*duration 1800 -> 999999000 -> 999999000/,
+    at: { file: 'scripts/lib/no-hover-pause-checks.mjs', needle: "'CSS pointer: sampled animations keep running at unchanged duration" },
+  },
+  {
     id: 'hover-legacy-descendant-pause',
     what: 'Legacy lead-magnet: a hovered ancestor pauses its CSS-animated descendant',
     edits: [{ file: 'public/lead-magnet.html', find: '  .hero-badge .dot {', replace: '  .hero-badge:hover .dot { animation-play-state: paused !important; }\n  .hero-badge .dot {' }],
