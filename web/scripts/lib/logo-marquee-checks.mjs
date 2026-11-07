@@ -10,6 +10,9 @@
 //   - reduced motion: no animation, a static row that wraps, the repeated copy gone and nothing wider than the strip.
 import { solutionsMotionChecks } from './solutions-motion-checks.mjs';
 
+// The marks the strip is meant to show. Stated here, not read from data/logos.ts, so dropping one by accident still fails.
+const LOGO_COUNT = 8;
+
 const targets = [
   { id: 'home', label: 'home hero', path: '/', sel: '#hero .logo-marquee', themed: false, schemes: ['light'] },
   { id: 'about', label: 'about partners', path: '/about/', sel: '.sx-partners .logo-marquee', themed: true, schemes: ['light', 'dark'] },
@@ -74,10 +77,10 @@ export async function logoMarqueeChecks({ open, settle, check, sleep, pauses = t
           await sleep(900);
           const p = await page.evaluate(probe, t.sel);
           const [a, b = missing] = p.sets;
-          check(group, `${tag}: two sets, the second aria-hidden, inert and without alt text`, p.sets.length === 2 && a.aria === null && b.aria === 'true' && b.inert && b.names.every((n) => n === '') && a.names.length >= 9 && a.names.every((n) => n), JSON.stringify({ sets: p.sets.length, a: a.names.length, b: b.names.length }));
+          check(group, `${tag}: two sets, the second aria-hidden, inert and without alt text`, p.sets.length === 2 && a.aria === null && b.aria === 'true' && b.inert && b.names.every((n) => n === '') && a.names.length === LOGO_COUNT && a.names.every((n) => n), JSON.stringify({ sets: p.sets.length, a: a.names.length, b: b.names.length }));
           check(group, `${tag}: the second set repeats the first mark for mark, so the loop is seamless (set widths ${a.width.toFixed(1)} and ${b.width.toFixed(1)}, track ${p.track.width.toFixed(1)})`, JSON.stringify(a.marks) === JSON.stringify(b.marks) && Math.abs(a.width - b.width) < 1 && Math.abs(p.track.width - (a.width + b.width)) < 1 && p.track.animation === 'marq' && p.track.count === 'infinite', JSON.stringify({ aw: a.width, bw: b.width, track: p.track }));
           const want = t.themed ? (scheme === 'light' ? 'dark' : 'light') : 'light';
-          check(group, `${tag}: every visible mark is the ${want === 'dark' ? 'dark' : 'light'} variant ${t.themed ? 'for this theme' : '(the band is always dark)'}, loaded`, a.variants.length >= 9 && b.variants.length === a.variants.length && [...a.variants, ...b.variants].every((v) => v === want) && a.broken === 0 && b.broken === 0, JSON.stringify({ a: a.variants, broken: a.broken }));
+          check(group, `${tag}: every visible mark is the ${want === 'dark' ? 'dark' : 'light'} variant ${t.themed ? 'for this theme' : '(the band is always dark)'}, loaded`, a.variants.length === LOGO_COUNT && b.variants.length === a.variants.length && [...a.variants, ...b.variants].every((v) => v === want) && a.broken === 0 && b.broken === 0, JSON.stringify({ a: a.variants, broken: a.broken }));
           check(group, `${tag}: no mark is clipped (every one inside the marquee box, which sits inside its section)`, a.outside.length === 0 && b.outside.length === 0 && a.tooSmall === 0 && p.inSection, JSON.stringify({ outside: [...a.outside, ...b.outside], inSection: p.inSection, box: p.box }));
           check(group, `${tag}: no horizontal scroll`, p.overflowX <= 0, `${p.overflowX}px`);
 
@@ -136,7 +139,7 @@ export async function logoMarqueeChecks({ open, settle, check, sleep, pauses = t
         await sleep(400);
         const p = await page.evaluate(probe, t.sel);
         const [a, b = missing] = p.sets;
-        check(group, `${tag}: a static wrapped row, no animation, no repeated copy, nothing clipped or wider than the strip`, p.track.animation === 'none' && p.track.wrap === 'wrap' && p.setWrap === 'wrap' && !b.shownSet && a.names.length >= 9 && a.outside.length === 0 && a.width <= p.box.w + 1 && p.overflowX <= 0, JSON.stringify({ track: p.track, setWrap: p.setWrap, secondShown: b.shownSet, marks: a.names.length, outside: a.outside, setW: a.width, boxW: p.box.w }));
+        check(group, `${tag}: a static wrapped row, no animation, no repeated copy, nothing clipped or wider than the strip`, p.track.animation === 'none' && p.track.wrap === 'wrap' && p.setWrap === 'wrap' && !b.shownSet && a.names.length === LOGO_COUNT && a.outside.length === 0 && a.width <= p.box.w + 1 && p.overflowX <= 0, JSON.stringify({ track: p.track, setWrap: p.setWrap, secondShown: b.shownSet, marks: a.names.length, outside: a.outside, setW: a.width, boxW: p.box.w }));
       } catch (e) {
         check(group, `${tag}: the probe ran to the end`, false, String(e.stack ?? e).split('\n').slice(0, 3).join(' | '));
       } finally {
