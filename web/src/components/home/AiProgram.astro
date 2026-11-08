@@ -117,7 +117,13 @@ const avatars = [
 
           <div class="ai-ask" data-el="ask">
             <span class="hd">✦ {s.askBadge}</span>
-            <div class="orb" data-el="orb"><i class="halo"></i></div>
+            <div class="ai-mark" data-el="orb" aria-hidden="true">
+              <i class="halo"></i>
+              <span class="mk">
+                <img src="/home/img/aria-mark.png" alt="" width="405" height="600" decoding="async" />
+                <i class="sheen"></i>
+              </span>
+            </div>
             <h4>{s.askTitle}</h4>
             <p>{s.askText}</p>
             <div class="ai-input">
