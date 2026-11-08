@@ -362,7 +362,6 @@ const en: ShowcaseCopy = {
     brands: [
       { n: 'Run with Aria', m: 'R', c: '#00BEF3', i: 'A1-athletes-sprinter-800', status: 'iOS and Android' },
       { n: 'Aria 12', m: '12', c: '#34D399', i: 'hero3-soccer-academies-big-800', status: 'Coming soon' },
-      { n: 'Lift with Aria', m: 'L', c: '#8B5CF6', i: 'hero5-gyms-and-studios-big-800', status: 'Coming soon' },
       { n: 'FitMG', m: 'FM', c: '#FF4D5E', i: 'bd-jumper-flare-800', status: 'Android · iOS beta' },
       { n: 'Your app here', m: '★', c: '#0B1730', i: 'night-huddle-800' },
     ],
@@ -635,7 +634,6 @@ const es: ShowcaseCopy = {
     brands: [
       { n: 'Run with Aria', m: 'R', c: '#00BEF3', i: 'A1-athletes-sprinter-800', status: 'iOS y Android' },
       { n: 'Aria 12', m: '12', c: '#34D399', i: 'hero3-soccer-academies-big-800', status: 'Próximamente' },
-      { n: 'Lift with Aria', m: 'L', c: '#8B5CF6', i: 'hero5-gyms-and-studios-big-800', status: 'Próximamente' },
       { n: 'FitMG', m: 'FM', c: '#FF4D5E', i: 'bd-jumper-flare-800', status: 'Android · iOS beta' },
       { n: 'Tu app aquí', m: '★', c: '#0B1730', i: 'night-huddle-800' },
     ],

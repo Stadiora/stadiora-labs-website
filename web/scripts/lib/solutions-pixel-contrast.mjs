@@ -328,7 +328,7 @@ const CANARY = `
 
 // ---------------------------------------------------------------- moving backdrops and lettering
 // Reduced motion renders one frame. Three things move in the real page: the mesh blobs drift behind the heroes, gradient lettering
-// sweeps its colours (gradShift), and the athlete morph wears four apps in turn. Those are photographed in more frames.
+// sweeps its colours (gradShift), and the athlete morph wears three apps in turn. Those are photographed in more frames.
 const PHASES = [0, 0.25, 0.5, 0.75, 0.97];
 
 // Parks every endless CSS animation at one phase of its own cycle (the gradient letters all together, the others spread out so the

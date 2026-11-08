@@ -281,6 +281,20 @@
   margin-top: clamp(32px, 4vw, 56px);
 }
 
+@media (max-width: 720px) {
+  /* three icons share one row, spread edge to edge */
+  .eg-same__icons {
+    flex-wrap: nowrap;
+    gap: 12px;
+    width: 100%;
+  }
+  .eg-same__icons li {
+    flex: 1 1 0;
+    width: auto;
+    min-width: 0;
+  }
+}
+
 @media (max-width: 1080px) {
   .eg-bh {
     min-height: 560px;

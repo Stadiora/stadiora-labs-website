@@ -264,11 +264,11 @@ export async function engageChecks({ open, check, shot, sleep, settle, checksOnl
       await page.context().close();
     }
 
-    // Branded: the fan shows the four apps.
+    // Branded: the fan shows the three apps.
     if (on('custom-branded-apps')) {
       const page = await open({ width: 1440, height: 900 }, `${base}/platform/custom-branded-apps/`);
       const apps = await page.evaluate(() => [...document.querySelectorAll('.fan__item')].map((li) => li.querySelector('.bp__name')?.textContent?.trim()));
-      check(group, `${lang}/branded: four named example apps in the fan`, apps.length === 4 && apps.every(Boolean), apps.join(' | '));
+      check(group, `${lang}/branded: the fan shows Run with Aria, Aria 12 and FitMG, in that order`, JSON.stringify(apps) === JSON.stringify(['Run with Aria', 'Aria 12', 'FitMG']), apps.join(' | '));
       await page.context().close();
     }
   }

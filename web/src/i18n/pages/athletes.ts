@@ -1,10 +1,10 @@
 // Copy for /solutions/athletes/ (DESIGN-2.md section 11). EN and ES.
-// App names and statuses match the nav (en.ts / es.ts): Aria 12 and Lift with Aria are not released.
+// App names and statuses match the nav (en.ts / es.ts): Aria 12 is not released.
 const en = {
   meta: {
     title: 'Athlete apps | Stadiora Labs',
     description:
-      'An app for the way you train. Free to download. Connect with your coach when you are ready. Run with Aria, Aria 12, Lift with Aria and FitMG.',
+      'An app for the way you train. Free to download. Connect with your coach when you are ready. Run with Aria, Aria 12 and FitMG.',
   },
   eyebrow: 'For athletes',
   titleBefore: 'An app for the way you ',
@@ -17,7 +17,6 @@ const en = {
   apps: [
     { id: 'run', name: 'Run with Aria', status: 'iOS and Android', live: true, slot: 'a1-athletes-sprinter', today: 'Today', date: 'Mon, Apr 22', items: [{ title: 'Track workout', sub: 'Speed development', meta: '6 × 200 m' }, { title: 'Warm up', sub: 'Completed', done: true }] },
     { id: 'aria12', name: 'Aria 12', status: 'Coming soon', live: false, slot: 'a2-athletes-dribbling', today: 'Today', date: 'Mon, Apr 22', items: [{ title: 'Team training', sub: 'Technical session', meta: '90 min' }, { title: 'Skills', sub: 'Dribbling and passing' }] },
-    { id: 'lift', name: 'Lift with Aria', status: 'Coming soon', live: false, slot: 'a3-athletes-row', today: 'Today', date: 'Mon, Apr 22', items: [{ title: 'Strength', sub: 'Upper body', meta: '45 min' }, { title: 'Warm up', sub: '5 min' }] },
     { id: 'fitmg', name: 'FitMG', status: 'Android · iOS beta', live: true, slot: 'a4-athletes-cable', today: 'Today', date: 'Mon, Apr 22', items: [{ title: 'Full body', sub: 'Strength and mobility', meta: '40 min' }, { title: 'Mobility', sub: '10 min' }] },
   ],
   every: {
@@ -38,7 +37,7 @@ const es: AthletesCopy = {
   meta: {
     title: 'Apps para atletas | Stadiora Labs',
     description:
-      'Una app para tu forma de entrenar. Descarga gratis. Conéctate con tu entrenador cuando quieras. Run with Aria, Aria 12, Lift with Aria y FitMG.',
+      'Una app para tu forma de entrenar. Descarga gratis. Conéctate con tu entrenador cuando quieras. Run with Aria, Aria 12 y FitMG.',
   },
   eyebrow: 'Para atletas',
   titleBefore: 'Una app para tu forma de ',
@@ -51,7 +50,6 @@ const es: AthletesCopy = {
   apps: [
     { id: 'run', name: 'Run with Aria', status: 'iOS y Android', live: true, slot: 'a1-athletes-sprinter', today: 'Hoy', date: 'Lun, 22 abr', items: [{ title: 'Entrenamiento de pista', sub: 'Desarrollo de velocidad', meta: '6 × 200 m' }, { title: 'Calentamiento', sub: 'Completado', done: true }] },
     { id: 'aria12', name: 'Aria 12', status: 'Próximamente', live: false, slot: 'a2-athletes-dribbling', today: 'Hoy', date: 'Lun, 22 abr', items: [{ title: 'Entrenamiento de equipo', sub: 'Sesión técnica', meta: '90 min' }, { title: 'Habilidades', sub: 'Regate y pase' }] },
-    { id: 'lift', name: 'Lift with Aria', status: 'Próximamente', live: false, slot: 'a3-athletes-row', today: 'Hoy', date: 'Lun, 22 abr', items: [{ title: 'Fuerza', sub: 'Tren superior', meta: '45 min' }, { title: 'Calentamiento', sub: '5 min' }] },
     { id: 'fitmg', name: 'FitMG', status: 'Android · iOS beta', live: true, slot: 'a4-athletes-cable', today: 'Hoy', date: 'Lun, 22 abr', items: [{ title: 'Cuerpo completo', sub: 'Fuerza y movilidad', meta: '40 min' }, { title: 'Movilidad', sub: '10 min' }] },
   ],
   every: {

@@ -687,6 +687,7 @@ html:not(.js) .sx-page .rv-mask {
 }
 .sx-aplab {
   display: flex;
+  flex: 1 1 auto;
   flex-direction: column;
   gap: 2px;
   padding: 12px 16px;
@@ -720,7 +721,7 @@ html:not(.js) .sx-page .rv-mask {
 /* athletes: the apps grid and the "in every app" stage */
 .sx-apps__grid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 20px;
 }
 .sx-every {
@@ -1023,9 +1024,17 @@ html:not(.js) .sx-page .rv-mask {
   .sx-cv {
     height: clamp(380px, 70vw, 520px);
   }
-  .sx-apps__grid,
   .sx-every {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  /* two across, the third centred under them */
+  .sx-apps__grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .sx-apps__grid > * {
+    flex: 0 0 calc(50% - 10px);
   }
   .sx-a {
     width: min(100%, 440px);
@@ -1062,7 +1071,9 @@ html:not(.js) .sx-page .rv-mask {
   .sx-hero__cta .btn {
     flex: 1 1 100%;
   }
-  .sx-apps__grid,
+  .sx-apps__grid > * {
+    flex-basis: 100%;
+  }
   .sx-team__grid {
     grid-template-columns: minmax(0, 1fr);
   }

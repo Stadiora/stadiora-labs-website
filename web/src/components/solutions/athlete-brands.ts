@@ -11,6 +11,5 @@ export interface AthleteBrand {
 export const athleteBrands: Record<string, AthleteBrand> = {
   run: { c: '#00BEF3', f: '#08132B', m: 'R', img: 'A1-athletes-sprinter-800' },
   aria12: { c: '#34D399', f: '#08132B', m: '12', img: 'hero3-soccer-academies-big-800' },
-  lift: { c: '#8B5CF6', f: '#FFFFFF', m: 'L', img: 'hero5-gyms-and-studios-big-800' },
   fitmg: { c: '#FF4D5E', f: '#08132B', m: 'FM', img: 'bd-jumper-flare-800' },
 };

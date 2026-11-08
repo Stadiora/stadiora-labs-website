@@ -72,7 +72,6 @@ export const es: Dict = {
     apps: {
       run: { name: 'Run with Aria', status: 'iOS y Android' },
       aria12: { name: 'Aria 12', status: 'Próximamente' },
-      lift: { name: 'Lift with Aria', status: 'Próximamente' },
       fitmg: { name: 'FitMG', status: 'Android · iOS beta' },
     },
   },
@@ -236,7 +235,6 @@ export const es: Dict = {
       today: 'Hoy',
       run: { title: 'Entrenamiento en pista', session: '6 × 800 m', note: 'a 3:25 a 3:30', cta: 'Iniciar sesión' },
       aria12: { title: 'Sesión de hoy', session: 'Entrenamiento técnico', note: 'Control de balón · Juego reducido', cta: 'Iniciar sesión' },
-      lift: { title: 'Fuerza de tren inferior', rows: ['Sentadilla', 'Peso muerto rumano', 'Zancada caminando'], sets: ['4 × 6', '3 × 8', '3 × 10'] },
       fitmg: { title: 'Entrenamiento de hoy', rows: ['Press de banca', 'Dominadas', 'Remo con mancuerna', 'Plancha'], sets: ['4 × 6', '3 × 8', '3 × 10', '3 × 45 s'] },
     },
   },

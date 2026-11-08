@@ -20,7 +20,6 @@ export const resourceItems: ItemId[] = ['caseStudies', 'api'];
 export const appLinks = [
   { key: 'run', href: site.stores.runIos, hrefAlt: site.stores.runAndroid, live: true },
   { key: 'aria12', href: null, hrefAlt: null, live: false },
-  { key: 'lift', href: null, hrefAlt: null, live: false },
   { key: 'fitmg', href: site.stores.fitmgAndroid, hrefAlt: site.stores.fitmgIosBeta, live: true },
 ] as const;
 

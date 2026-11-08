@@ -218,7 +218,7 @@ export const engageEn = {
     sub: 'Your name, logo and colours on an app built on the same platform as ours.',
     ctaPrimary: 'Talk to us',
     ctaSecondary: 'See pricing',
-    fanLabel: 'Four apps built on one platform',
+    fanLabel: 'Three apps built on one platform',
     makeTitle: 'What you can make yours',
     makeItems: [
       { icon: 'pencil', label: 'App name' },
@@ -501,7 +501,7 @@ export const engageEs: EngageDict = {
     sub: 'Tu nombre, tu logo y tus colores en una app que usa la misma plataforma que la nuestra.',
     ctaPrimary: 'Habla con nosotros',
     ctaSecondary: 'Ver precios',
-    fanLabel: 'Cuatro apps sobre una sola plataforma',
+    fanLabel: 'Tres apps sobre una sola plataforma',
     makeTitle: 'Lo que puedes hacer tuyo',
     makeItems: [
       { icon: 'pencil', label: 'Nombre de la app' },
