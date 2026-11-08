@@ -636,7 +636,7 @@ const M = [
     edits: [{ file: 'src/i18n/pages/schools.ts', find: "lead: 'Priced by number of athletes.',", replace: "lead: 'Education pricing:'," }],
     runners: [
       { runner: 'verify', expect: /solutions\/schools\/index\.html: .*(education|number of athletes)/i, at: { file: 'scripts/lib/verify-solutions.mjs', needle: 'by number of athletes' } },
-      { runner: 'solprice', expect: /(education|school).*(copy|text|teaser|page)|(copy|text|teaser|page).*(education|school)/i, at: { file: 'scripts/lib/solutions-price-checks.mjs', needle: 'number of athletes' } },
+      { runner: 'solprice', expect: /\[solutions-region\] \/solutions\/schools\/: no education rate or schools plan, and the price is said to go by number of athletes/, at: { file: 'scripts/lib/solutions-price-checks.mjs', needle: 'no education rate or schools plan, and the price is said to go by number of athletes' } },
     ],
   },
   {
