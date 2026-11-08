@@ -1,9 +1,9 @@
 // The one price table for the whole site. Every amount, count and percentage shown on /pricing comes from
 // here, and so do the "from" prices that other pages teaser (see `prices` at the bottom). Translations hold
 // words and {tokens}, never numbers. Nothing is computed from a formula.
-// Sources: epic Stadiora/Aria#16544 (Core bands, education rates, add-ons) and DECISIONS #3 to #5
-// (Free tier, Performance prices, LatAm education rates). Annual is 10% off, rounded down to a whole
-// dollar per month; the yearly total is that monthly figure times 12. All prices are USD.
+// Sources: epic Stadiora/Aria#16544 (Core bands, add-ons) and DECISIONS #3 to #5
+// (Free tier, Performance prices). Annual is 10% off, rounded down to a whole dollar per month;
+// the yearly total is that monthly figure times 12. All prices are USD.
 // Region detection lives in src/lib/region.ts.
 // Only type-level syntax here (no runtime imports): the evidence and verify scripts load this file directly.
 
@@ -50,29 +50,8 @@ export const bands: Record<Region, readonly Band[]> = {
   ],
 };
 
-export interface EducationRate {
-  key: 'highSchool' | 'department' | 'college';
-  athletes: number;
-  /** USD per month. */
-  monthly: number;
-}
-
-/** Education rates for Schools and institutions. Every coach in the program is included. */
-export const education: Record<Region, readonly EducationRate[]> = {
-  us: [
-    { key: 'highSchool', athletes: 100, monthly: 99 },
-    { key: 'department', athletes: 250, monthly: 149 },
-    { key: 'college', athletes: 500, monthly: 299 },
-  ],
-  latam: [
-    { key: 'highSchool', athletes: 100, monthly: 69 },
-    { key: 'department', athletes: 250, monthly: 99 },
-    { key: 'college', athletes: 500, monthly: 199 },
-  ],
-};
-
 export const addOns = {
-  /** USD per month for each coach beyond the ones included. Does not apply to Schools plans. */
+  /** USD per month for each coach beyond the ones included. */
   extraCoach: { us: 20, latam: 10 } satisfies Record<Region, number>,
   /** Custom-branded app: USD per month plus a one-time setup fee. Same in both regions. */
   brandedApp: { monthly: 99, setup: 499 },
@@ -100,8 +79,6 @@ export function usd(amount: number): string {
 export const prices = {
   /** Core at the smallest size. */
   coreFrom: { us: bands.us[0].core.monthly, latam: bands.latam[0].core.monthly },
-  /** Schools and institutions, high-school rate. */
-  highSchool: { us: education.us[0].monthly, latam: education.latam[0].monthly },
 } as const;
 
 export type PriceKey = keyof typeof prices;

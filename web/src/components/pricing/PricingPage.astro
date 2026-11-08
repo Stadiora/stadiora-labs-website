@@ -28,7 +28,6 @@ const strings = JSON.stringify({
   core: copy.plans.core.name,
   performance: copy.plans.performance.name,
   free: copy.plans.free.name,
-  schools: copy.plans.schools.name,
   federations: copy.plans.federations.name,
   federationsPrice: copy.plans.federations.price,
   creditsPrice: copy.addons.credits.price,
@@ -42,12 +41,11 @@ const strings = JSON.stringify({
     free: copy.plans.free.cta,
     core: copy.plans.core.cta,
     performance: copy.plans.performance.cta,
-    schools: copy.plans.schools.cta,
     federations: copy.plans.federations.cta,
   },
   links: { ...links, federations: links.talk },
 });
-const plans = ['free', 'core', 'performance', 'schools', 'federations'] as const;
+const plans = ['free', 'core', 'performance', 'federations'] as const;
 ---
 
 <div class="pricing" data-pricing data-region="us" data-billing="monthly" data-athletes={defaultBand} data-strings={strings}>

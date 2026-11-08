@@ -4,12 +4,12 @@
 // `data-ready` goes on only after every part below has started. If this module never runs or throws, the
 // inline failsafe in PricingPage.astro marks the page `data-fallback` instead: the controls, switches and estimate
 // stay hidden and every reveal is open, so nothing on screen depends on a script that did not run.
-import { addOns, athleteBands, bandFor, defaultBand, education, free, usd, type Billing, type Region } from '../data/prices';
+import { addOns, athleteBands, bandFor, defaultBand, free, usd, type Billing, type Region } from '../data/prices';
 import { detectRegion } from '../lib/region';
 import { fill } from '../lib/template';
 import { autoplayer, isReduced, startKit } from './motion/kit';
 
-type PlanKey = 'free' | 'core' | 'performance' | 'schools' | 'federations';
+type PlanKey = 'free' | 'core' | 'performance' | 'federations';
 
 interface Strings {
   billedMonthly: string;
@@ -21,26 +21,22 @@ interface Strings {
   core: string;
   performance: string;
   free: string;
-  schools: string;
   federations: string;
   federationsPrice: string;
   creditsName: string;
   creditsPrice: string;
   appName: string;
-  coachUnavailable: { free: string; schools: string; federations: string };
+  coachUnavailable: { free: string; federations: string };
   valueText: string;
   coachesLabel: string;
   estimate: {
     perMonth: string;
-    fromPerMonth: string;
     custom: string;
     plusCredits: string;
     yearly: string;
-    schoolsRow: string;
     planRow: string;
     coachRow: string;
     live: string;
-    liveFrom: string;
     liveCustom: string;
     liveSetup: string;
     liveCredits: string;
@@ -211,7 +207,7 @@ function initPrices(host: HTMLElement): void {
     }
   }
 
-  function planRow(band: ReturnType<typeof bandFor>): { row: Row; amount: number; from: boolean; custom: boolean } {
+  function planRow(band: ReturnType<typeof bandFor>): { row: Row; amount: number; custom: boolean } {
     const perMonth = (monthly: number, yearly: number) => (billing === 'annual' ? yearly : monthly);
     if (plan === 'core' || plan === 'performance') {
       const price = band[plan];
@@ -223,23 +219,13 @@ function initPrices(host: HTMLElement): void {
           value: `${usd(amount)}${strings.unit}${billing === 'annual' ? ` (${est.yearly})` : ''}`,
         },
         amount,
-        from: false,
-        custom: false,
-      };
-    }
-    if (plan === 'schools') {
-      const amount = Math.min(...education[region].map((r) => r.monthly));
-      return {
-        row: { key: 'plan', label: est.schoolsRow, value: `${usd(amount)}${strings.unit}` },
-        amount,
-        from: true,
         custom: false,
       };
     }
     if (plan === 'federations') {
-      return { row: { key: 'plan', label: strings.federations, value: strings.federationsPrice }, amount: 0, from: false, custom: true };
+      return { row: { key: 'plan', label: strings.federations, value: strings.federationsPrice }, amount: 0, custom: true };
     }
-    return { row: { key: 'plan', label: strings.free, value: `${usd(free.monthly)}${strings.unit}` }, amount: free.monthly, from: false, custom: false };
+    return { row: { key: 'plan', label: strings.free, value: `${usd(free.monthly)}${strings.unit}` }, amount: free.monthly, custom: false };
   }
 
   function renderEstimate(animate: boolean, announce: boolean): void {
@@ -262,7 +248,7 @@ function initPrices(host: HTMLElement): void {
 
     renderLines(rows, animate);
     const totalText = base.custom ? strings.federationsPrice : usd(sum);
-    const label = base.custom ? est.custom : base.from ? est.fromPerMonth : est.perMonth;
+    const label = base.custom ? est.custom : est.perMonth;
     setText(totalLabel, aiOn ? `${label} ${est.plusCredits}` : label);
     setNumber(total, totalText, animate);
     if (setupRow) setupRow.hidden = !appOn;
@@ -271,8 +257,6 @@ function initPrices(host: HTMLElement): void {
     if (estCta) {
       estCta.href = strings.links[plan];
       estCta.textContent = strings.cta[plan];
-      if (plan === 'schools') estCta.rel = 'noopener';
-      else estCta.removeAttribute('rel');
     }
 
     if (animate && totalText !== lastTotal && !isReduced()) {
@@ -288,7 +272,7 @@ function initPrices(host: HTMLElement): void {
       const parts = [
         base.custom
           ? fill(est.liveCustom, { plan: strings[plan] })
-          : fill(base.from ? est.liveFrom : est.live, { plan: strings[plan], amount }),
+          : fill(est.live, { plan: strings[plan], amount }),
       ];
       if (appOn) parts.push(fill(est.liveSetup, { setup: usd(addOns.brandedApp.setup) }));
       if (aiOn) parts.push(est.liveCredits);
@@ -305,7 +289,7 @@ function initPrices(host: HTMLElement): void {
       coachSwitch.closest<HTMLElement>('.addon')?.setAttribute('data-on', String(on));
     }
     if (coachNote) {
-      const reason = plan === 'free' || plan === 'schools' || plan === 'federations' ? strings.coachUnavailable[plan] : '';
+      const reason = plan === 'free' || plan === 'federations' ? strings.coachUnavailable[plan] : '';
       coachNote.textContent = reason;
       coachNote.hidden = allowed;
     }
@@ -358,12 +342,7 @@ function initPrices(host: HTMLElement): void {
       );
     }
 
-    // Education rates and the extra-coach price follow the region only, never the toggle.
-    const rates = education[region];
-    setText(host.querySelector('[data-schools-from]'), usd(Math.min(...rates.map((r) => r.monthly))));
-    for (const rate of rates) {
-      setText(host.querySelector(`[data-edu-rate="${rate.key}"]`), usd(rate.monthly));
-    }
+    // The extra-coach price follows the region only, never the toggle.
     for (const el of host.querySelectorAll('[data-extra-coach]')) {
       setText(el, usd(addOns.extraCoach[region]));
     }

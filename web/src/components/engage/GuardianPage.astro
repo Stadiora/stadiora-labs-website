@@ -129,14 +129,8 @@ const coachInitial = (coach: string) => coach.split(' ')[1][0];
 
 <section class="eg-price" aria-label={g.pricing.title}>
   <div class="wrap eg-price__row">
-    <div>
-      <h2 class="t-title rv">{g.pricing.title}</h2>
-      <p class="lead rv" style="--i:1">{g.pricing.body}</p>
-    </div>
-    <div class="eg-price__links rv" style="--i:2">
-      <a class="eg-link" href={hrefFor('pricing', locale)}>{g.pricing.see}<EIcon name="arrow-right" size={18} /></a>
-      <a class="eg-link" href={contactHref(locale, 'question')}>{g.pricing.talk}<EIcon name="arrow-right" size={18} /></a>
-    </div>
+    <h2 class="t-title rv">{g.pricing.title}</h2>
+    <a class="eg-link rv" style="--i:1" href={hrefFor('pricing', locale)}>{g.pricing.see}<EIcon name="arrow-right" size={18} /></a>
   </div>
 </section>
 

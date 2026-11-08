@@ -1,5 +1,5 @@
 ---
-import { bands, education, prices, usd, type PriceKey } from '../../data/prices';
+import { bands, prices, usd, type PriceKey } from '../../data/prices';
 import { segments } from '../../lib/template';
 
 interface Props {
@@ -12,7 +12,6 @@ const { price, text } = Astro.props;
 // The athlete count each starting price is quoted for, read from the same table, so copy never holds a digit.
 const athletes: Record<PriceKey, number> = {
   coreFrom: bands.us[0].athletes,
-  highSchool: education.us[0].athletes,
 };
 ---
 

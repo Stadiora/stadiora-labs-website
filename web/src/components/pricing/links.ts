@@ -11,7 +11,7 @@ export function pricingLinks(locale: Locale) {
     free: site.signUp,
     core: site.signUp,
     performance: site.signUp,
-    schools: site.booking,
+    call: site.booking,
     talk: hrefFor('contact', locale),
   } as const;
 }

@@ -1,18 +1,18 @@
 // Teams page: a skeleton planner loops behind the school workspace card (no text, just bars painting in), and
-// the school price follows the visitor's region. The HTML always holds the US rate; the swap uses the same table
+// the Core "from" price (the same athlete-based price for every team) follows the visitor's region. The HTML always holds the US rate; the swap uses the same table
 // and region detection as /pricing.
 import { $, $$, group, startKit, tl, type Frame } from '../motion/kit';
-import { education, usd } from '../../data/prices';
+import { bands, prices, usd } from '../../data/prices';
 import { detectRegion } from '../../lib/region';
 
 const O = 'opacity';
 const T = 'transform';
 const f = (...a: Frame[]) => a;
 
-const rate = education[detectRegion(window.location.search)].find((r) => r.key === 'highSchool');
-const text: Record<string, string> = rate ? { price: usd(rate.monthly), athletes: String(rate.athletes) } : {};
-$$<HTMLElement>('[data-school]').forEach((el) => {
-  const value = text[el.dataset.school ?? ''];
+const region = detectRegion(window.location.search);
+const text: Record<string, string> = { price: usd(prices.coreFrom[region]), athletes: String(bands[region][0].athletes) };
+$$<HTMLElement>('[data-core-from]').forEach((el) => {
+  const value = text[el.dataset.coreFrom ?? ''];
   if (value) el.textContent = value;
 });
 
