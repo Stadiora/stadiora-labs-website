@@ -1,8 +1,9 @@
-// Evidence: the price teasers on the solutions pages (high-school rate on Schools, Core "from" price on Coaches and
-// Clubs) show what /pricing shows, for every way a region can be chosen: browser time zone and ?region=.
+// Evidence: the price teasers on the solutions pages (Core "from" price on Schools, Coaches and Clubs: pricing goes by athlete
+// count only, so a school sees the same price as everyone) show what /pricing shows, for every way a region can be chosen:
+// browser time zone and ?region=.
 // Expected amounts come from pricing-oracle.mjs (typed by hand), not from src/data/prices.ts, so the table, the
 // teaser and /pricing are three independent witnesses.
-import { EDU, ORACLE, fmt, sizes } from './pricing-oracle.mjs';
+import { ORACLE, fmt, removedTextProblems, sizes } from './pricing-oracle.mjs';
 
 const localized = (locale, path) => (locale === 'es' ? `/es${path}` : path);
 
@@ -24,10 +25,10 @@ const cases = [
   ['America/Mexico_City', '?region=Us', null],
 ];
 
-// Core "from" is quoted for the smallest size on /pricing; the high-school rate for the school size shown in its table.
+// Core "from" is quoted for the smallest size on /pricing.
 const CORE_SIZE = 25;
 const teasers = [
-  { name: 'schools', path: '/solutions/schools/', key: 'highSchool', want: (region) => fmt(EDU[region][0]) },
+  { name: 'schools', path: '/solutions/schools/', key: 'coreFrom', want: (region) => fmt(ORACLE[region][CORE_SIZE][1]) },
   { name: 'coaches', path: '/solutions/coaches/', key: 'coreFrom', want: (region) => fmt(ORACLE[region][CORE_SIZE][1]) },
   { name: 'clubs', path: '/solutions/teams-and-clubs/', key: 'coreFrom', want: (region) => fmt(ORACLE[region][CORE_SIZE][1]) },
 ];
@@ -43,9 +44,7 @@ const readPricing = () => ({
   region: document.querySelector('[data-pricing]')?.dataset.region ?? null,
   coreAthletes: document.querySelector('[data-pricing]')?.dataset.athletes ?? null,
   core: document.querySelector('[data-amount="core"]')?.textContent.trim() ?? null,
-  schoolsFrom: document.querySelector('[data-schools-from]')?.textContent.trim() ?? null,
-  highSchool: document.querySelector('[data-edu-rate="highSchool"]')?.textContent.trim() ?? null,
-  highSchoolAthletes: document.querySelector('[data-edu-rate="highSchool"]')?.previousElementSibling?.textContent.trim() ?? null,
+  removed: document.querySelectorAll('[data-schools-from], [data-edu-rate], .pcard--schools').length,
 });
 
 const hasCount = (line, price, count) => new RegExp(`(^|\\D)${count}(\\D|$)`).test(line.replace(price, ' '));
@@ -66,26 +65,36 @@ export async function solutionsPriceChecks({ open, check }) {
         const page = await open({ width: 1440, height: 900, timezoneId }, `${localized(locale, t.path)}${search}`);
         const found = (await page.evaluate(readTeaser)).filter((x) => x.key === t.key);
         await page.context().close();
-        const want = t.key === 'highSchool' ? pricing.highSchool : pricing.core;
-        const wantCount = t.key === 'highSchool' ? pricing.highSchoolAthletes : pricing.coreAthletes;
+        const want = pricing.core;
+        const wantCount = pricing.coreAthletes;
         if (found.length !== 1) bad[t.name].push(`${label}: ${found.length} ${t.key} teasers`);
         for (const f of found) {
           if (f.price !== want) bad[t.name].push(`${label}: teaser ${f.price}, /pricing ${want}`);
           if (t.name !== 'clubs' && !hasCount(f.line, f.price, wantCount)) bad[t.name].push(`${label}: teaser line "${f.line}" does not state ${wantCount} athletes`);
           if (f.price !== t.want(region)) bad[t.name].push(`${label}: teaser ${f.price}, expected ${t.want(region)} for ${region}`);
         }
-        if (t.key === 'highSchool' && pricing.schoolsFrom !== pricing.highSchool) bad[t.name].push(`${label}: /pricing Schools card ${pricing.schoolsFrom} differs from its high-school row ${pricing.highSchool}`);
+        if (pricing.removed) bad[t.name].push(`${label}: /pricing still has a schools card or an education rate (${pricing.removed})`);
         if (expected && pricing.region !== expected) bad[t.name].push(`${label}: /pricing picked ${pricing.region}, expected ${expected}`);
       }
     }
     for (const t of teasers) {
       check(
         'solutions-region',
-        `${localized(locale, t.path)}: the ${t.key === 'highSchool' ? 'high-school' : 'Core from'} teaser equals /pricing's for ${cases.length} region inputs (time zones, ?region=us, ?region=latam, odd casing)`,
+        `${localized(locale, t.path)}: the Core from teaser equals /pricing's for ${cases.length} region inputs (time zones, ?region=us, ?region=latam, odd casing)`,
         bad[t.name].length === 0,
         bad[t.name].slice(0, 3).join('; '),
       );
     }
+  }
+
+  // The Schools page is about what schools get, not a plan: it says the price goes by athletes and names no education rate or schools plan.
+  for (const locale of ['en', 'es']) {
+    const page = await open({ width: 1440, height: 900 }, localized(locale, '/solutions/schools/'));
+    const body = await page.evaluate(() => document.body.innerText);
+    await page.context().close();
+    const bad = removedTextProblems(body, localized(locale, '/solutions/schools/'));
+    if (!/by (the )?number of athletes|según el número de atletas/i.test(body)) bad.push('does not say the price goes by number of athletes');
+    check('solutions-region', `${localized(locale, '/solutions/schools/')}: no education rate or schools plan, and the price is said to go by number of athletes`, bad.length === 0, bad.slice(0, 2).join('; '));
   }
 
   // No JavaScript: the server renders the US price, and the LatAm price is not in the HTML at all.

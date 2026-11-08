@@ -5,7 +5,7 @@ import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { checkLinks } from './engage-links.mjs';
 import { verifyEngageMedia } from './engage-media-guard.mjs';
-import { BRANDED, EDU, fmt } from './pricing-oracle.mjs';
+import { BRANDED, ORACLE, fmt } from './pricing-oracle.mjs';
 
 const copySource = fileURLToPath(new URL('../../src/i18n/pages/engage.ts', import.meta.url));
 
@@ -117,11 +117,24 @@ export function verifyEngagePages({ dist, fail, pending = new Map() }) {
       if (!addon.includes(fmt(BRANDED.monthly)) || !addon.includes(fmt(BRANDED.setup))) fail(`${page.file}: the add-on line "${addon.trim()}" does not show ${fmt(BRANDED.monthly)} monthly and ${fmt(BRANDED.setup)} setup`);
     }
     if (page.slug === 'teams') {
-      const price = text(html.match(/<strong\b[^>]*\bdata-school="price"[^>]*>([\s\S]*?)<\/strong>/)?.[1] ?? '').trim();
-      const athletes = text(html.match(/<span\b[^>]*\bdata-school="athletes"[^>]*>([\s\S]*?)<\/span>/)?.[1] ?? '').trim();
-      if (price !== fmt(EDU.us[0])) fail(`${page.file}: the schools price in the HTML is "${price}", expected the US high-school rate ${fmt(EDU.us[0])}`);
-      if (athletes !== '100') fail(`${page.file}: the schools teaser shows "${athletes}" athletes, expected 100`);
-      if (copy.includes(fmt(EDU.latam[0]))) fail(`${page.file}: the LatAm schools price ${fmt(EDU.latam[0])} is in the HTML; it belongs in the script bundle only`);
+      // The teaser is the Core "from" price (smallest size) for every school and team: pricing goes by athlete count only.
+      const price = text(html.match(/<strong\b[^>]*\bdata-core-from="price"[^>]*>([\s\S]*?)<\/strong>/)?.[1] ?? '').trim();
+      const athletes = text(html.match(/<span\b[^>]*\bdata-core-from="athletes"[^>]*>([\s\S]*?)<\/span>/)?.[1] ?? '').trim();
+      if (price !== fmt(ORACLE.us[25][1])) fail(`${page.file}: the teaser price in the HTML is "${price}", expected the US Core from price ${fmt(ORACLE.us[25][1])}`);
+      if (athletes !== '25') fail(`${page.file}: the teaser shows "${athletes}" athletes, expected 25`);
+      if (copy.includes(fmt(ORACLE.latam[25][1]))) fail(`${page.file}: the LatAm Core from price ${fmt(ORACLE.latam[25][1])} is in the HTML; it belongs in the script bundle only`);
+      if (!/by (the )?number of athletes|según el número de atletas/i.test(text(html.match(/<section\b[^>]*aria-labelledby="schools-title"[\s\S]*?<\/section>/)?.[0] ?? ''))) fail(`${page.file}: the teaser does not say the price goes by number of athletes`);
+    }
+    if (page.slug === 'guardian-portal') {
+      // Aria for Families is part of the same two plans as everything else; no clause sends clubs or academies to "talk to us" for it.
+      const block = text(html.match(/<section\b[^>]*class="eg-price"[\s\S]*?<\/section>/)?.[0] ?? '');
+      if (!/included in Core and Performance|incluido en Core y Performance/i.test(block)) fail(`${page.file}: the pricing block does not say Aria for Families is included in Core and Performance ("${block.trim()}")`);
+      if (/clubs and academies|clubes y academias|talk to us|habla con nosotros/i.test(block)) fail(`${page.file}: the pricing block still sets clubs and academies apart or sends them to "talk to us" ("${block.trim()}")`);
+      for (const line of page.lang === 'es'
+        ? ['Los tutores dan el consentimiento por los menores', 'Los atletas eligen qué ve cada coach', 'Los administradores no pueden anular el consentimiento']
+        : ['Guardians give consent for minors', 'Athletes choose what each coach sees', 'Admins can’t override consent']) {
+        if (!copy.includes(line)) fail(`${page.file}: the consent promise "${line}" is missing`);
+      }
     }
 
     for (const m of html.matchAll(/<img\b[^>]*>/g)) {

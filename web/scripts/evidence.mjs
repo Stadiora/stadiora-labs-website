@@ -10,6 +10,7 @@
 //   node scripts/evidence.mjs --home-only      (the home guards only: structure, autoplayers, reduced motion, marquees, hero words, clipping, contrast)
 //   node scripts/evidence.mjs --api-only       (the API page, EN and ES: pause, reduced motion and glyph-pixel contrast of the API and legal pages)
 //   node scripts/evidence.mjs --no-hover-pause-only   (every page, EN and ES, legacy pages included: no :hover or :focus-within pause in any resolved style, and a real mouse over every animation host pauses nothing; NHP_PAGES=/pricing/,/es/ narrows the pages)
+//   node scripts/evidence.mjs --solutions-price-only   (just the price teasers on the Schools, Coaches and Clubs pages against /pricing, in every region case)
 // Output goes to EVIDENCE_DIR or web/.evidence/ (git-ignored): PNGs plus summary.json. Exit code 1 when a check fails.
 import { mkdir, readdir, readFile, rm, stat, writeFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
@@ -31,6 +32,7 @@ import { noHoverPauseChecks } from './lib/no-hover-pause-checks.mjs';
 import { pricingChecks } from './lib/pricing-checks.mjs';
 import { platformCoachChecks } from './lib/platform-coach-checks.mjs';
 import { solutionsChecks } from './lib/solutions-checks.mjs';
+import { solutionsPriceChecks } from './lib/solutions-price-checks.mjs';
 import { solutionsFloodlightChecks } from './lib/solutions-floodlight-checks.mjs';
 import { serve } from './lib/static-server.mjs';
 
@@ -47,6 +49,7 @@ const contactOnly = process.argv.includes('--contact-only');
 const logosOnly = process.argv.includes('--logos-only');
 const apiOnly = process.argv.includes('--api-only');
 const noHoverPauseOnly = process.argv.includes('--no-hover-pause-only');
+const solutionsPriceOnly = process.argv.includes('--solutions-price-only');
 
 await rm(outDir, { recursive: true, force: true });
 await mkdir(outDir, { recursive: true });
@@ -149,6 +152,12 @@ if (logosOnly) {
 const noHoverPauseRun = () => noHoverPauseChecks({ open, check, sleep, metrics, distDir, only: process.env.NHP_PAGES?.split(',').filter(Boolean) });
 if (noHoverPauseOnly) {
   await noHoverPauseRun();
+  await finish();
+}
+
+// The price teasers on the solutions pages. `--solutions-price-only` runs just this (the mutation battery uses it).
+if (solutionsPriceOnly) {
+  await solutionsPriceChecks({ open, check });
   await finish();
 }
 
