@@ -1,4 +1,4 @@
-// Custom-branded apps: the hero phone re-skins through Your Gym and the four apps (colour, mark, name, photo)
+// Custom-branded apps: the hero phone re-skins through Your Gym and the three apps (colour, mark, name, photo)
 // while the side phones and chips follow. One autoplayer on the phone, paused by keyboard focus, offscreen and a
 // hidden tab: a pause holds the swap that is in flight (the reveal, the chip pulses, the name scramble) and the
 // countdown to the next one, and resuming carries on from there. The markup is the first brand, which is what

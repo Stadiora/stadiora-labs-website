@@ -70,7 +70,6 @@ export const en = {
     apps: {
       run: { name: 'Run with Aria', status: 'iOS and Android' },
       aria12: { name: 'Aria 12', status: 'Coming soon' },
-      lift: { name: 'Lift with Aria', status: 'Coming soon' },
       fitmg: { name: 'FitMG', status: 'Android · iOS beta' },
     },
   },
@@ -234,7 +233,6 @@ export const en = {
       today: 'Today',
       run: { title: 'Track workout', session: '6 × 800 m', note: '@ 3:25 to 3:30', cta: 'Start session' },
       aria12: { title: "Today's session", session: 'Technical training', note: 'Ball control · Small sided', cta: 'Start session' },
-      lift: { title: 'Lower body strength', rows: ['Back squat', 'RDL', 'Walking lunge'], sets: ['4 × 6', '3 × 8', '3 × 10'] },
       fitmg: { title: "Today's workout", rows: ['Bench press', 'Pull ups', 'Dumbbell row', 'Plank'], sets: ['4 × 6', '3 × 8', '3 × 10', '3 × 45 s'] },
     },
   },

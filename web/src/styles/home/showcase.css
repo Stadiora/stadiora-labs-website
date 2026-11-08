@@ -265,6 +265,7 @@
 .app-scr .hl{height:110px;border-radius:16px;margin-top:12px;background-color:rgba(255,255,255,.2);background-image:var(--img);background-size:cover;background-position:center}
 .ap-labels{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin:28px 0 0;padding:0;list-style:none}
 .ap-lab{display:flex;flex-direction:column;gap:4px;padding:14px 16px;border-radius:16px;border:1px solid var(--panel-line);transition:border-color 300ms,background-color 300ms}
+.ap-lab:last-child:nth-child(odd){grid-column:1/-1}
 .ap-lab.on{border-color:transparent;background:var(--surface)}
 .ap-lab b{font-size:15px;display:flex;align-items:center;gap:8px}
 .ap-lab b i{width:10px;height:10px;border-radius:3px;background:var(--bc);flex:none}

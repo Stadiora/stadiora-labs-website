@@ -21,7 +21,6 @@ const brand = athleteBrands[app.id];
 const icons: Record<string, string> = {
   run: '/apps/run-with-aria.webp',
   aria12: '/apps/aria-12.webp',
-  lift: '/apps/lift-with-aria.webp',
   fitmg: '/apps/fitmg.webp',
 };
 const stores: Record<string, { ios?: string; android?: string; beta?: string }> = {
@@ -33,7 +32,6 @@ const links = stores[app.id] ?? {};
 const tint: Record<string, string> = {
   run: 'var(--cyan-tint)',
   aria12: 'rgb(52 211 153 / 0.22)',
-  lift: 'rgb(251 113 133 / 0.22)',
   fitmg: 'rgb(245 158 11 / 0.22)',
 };
 ---

@@ -7,7 +7,6 @@ import Photo from '../ui/Photo.astro';
 import Icon from '../ui/Icon.astro';
 import runIcon from '../../assets/apps/app-run.webp';
 import aria12Icon from '../../assets/apps/app-aria12.webp';
-import liftIcon from '../../assets/apps/app-lift.webp';
 import fitmgIcon from '../../assets/apps/app-fitmg.webp';
 
 interface Props {
@@ -17,8 +16,8 @@ const { locale } = Astro.props;
 const t = useDict(locale);
 const a = t.apps;
 const names = t.nav.apps;
-const apps = ['run', 'aria12', 'lift', 'fitmg'] as const;
-const icons = { run: runIcon, aria12: aria12Icon, lift: liftIcon, fitmg: fitmgIcon };
+const apps = ['run', 'aria12', 'fitmg'] as const;
+const icons = { run: runIcon, aria12: aria12Icon, fitmg: fitmgIcon };
 const nav = ['activity', 'run', 'chat', 'menu'] as const;
 
 // Availability text is split so each store word becomes a link; "Coming soon" has none.
@@ -33,7 +32,6 @@ function parts(key: (typeof apps)[number]) {
 const heroPhotos = {
   run: { slot: 'p1-training', pos: '18% 55%' },
   aria12: { slot: 'h2-academies-tile-sq', pos: '50% 80%' },
-  lift: { slot: 'h5-gyms-big', pos: '50% 36%' },
 } as const;
 const thumbs = [
   { slot: 'h5-gyms-tile-sq', pos: '60% 40%' },
@@ -77,19 +75,6 @@ const thumbs = [
                   <span class="bp__cta">{a.screen.aria12.cta}</span>
                 </>
               )}
-              {key === 'lift' && (
-                <>
-                  <p class="bp__strong">{a.screen.lift.title}</p>
-                  <ul class="bp__list">
-                    {a.screen.lift.rows.map((row, n) => (
-                      <li>
-                        <span>{row}</span>
-                        <span class="num">{a.screen.lift.sets[n]}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </>
-              )}
               {key === 'fitmg' && (
                 <>
                   <p class="bp__strong">{a.screen.fitmg.title}</p>
@@ -131,21 +116,22 @@ const thumbs = [
 <style>
   .fan {
     display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: clamp(10px, 1.6vw, 24px);
     align-items: start;
+    max-width: 860px;
+    margin-inline: auto;
   }
   .fan__item {
     min-width: 0;
     text-align: center;
   }
-  /* A gentle fan: the middle phones sit a touch lower. */
-  .fan__item:nth-child(2),
-  .fan__item:nth-child(3) {
+  /* A gentle fan: the middle phone sits a touch lower. */
+  .fan__item:nth-child(2) {
     margin-top: 10px;
   }
   .fan__item :global(.fan__phone) {
-    --phone-w: clamp(132px, 11.4vw, 176px);
+    --phone-w: clamp(132px, 15vw, 192px);
     margin-inline: auto;
   }
   .fan__name {
@@ -182,7 +168,7 @@ const thumbs = [
     text-underline-offset: 3px;
   }
 
-  /* Four branded screens drawn in HTML. Each brand keeps its own palette in both themes. */
+  /* Three branded screens drawn in HTML. Each brand keeps its own palette in both themes. */
   .bp {
     display: flex;
     flex: 1;
@@ -304,12 +290,6 @@ const thumbs = [
     --accent: #15803d;
     --on: #ffffff;
   }
-  .bp--lift {
-    --hdr: #ff5a3c;
-    --hdr-ink: #08132b;
-    --accent: #ff5a3c;
-    --on: #08132b;
-  }
   .bp--fitmg {
     --hdr: #0a0a0a;
     --accent: #e11d2e;
@@ -319,12 +299,17 @@ const thumbs = [
   }
 
   @media (max-width: 720px) {
+    /* two across, the third centred under them */
     .fan {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      row-gap: 32px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 32px 10px;
     }
-    .fan__item:nth-child(2),
-    .fan__item:nth-child(3) {
+    .fan__item {
+      flex: 0 0 calc(50% - 5px);
+    }
+    .fan__item:nth-child(2) {
       margin-top: 0;
     }
     .fan__item :global(.fan__phone) {

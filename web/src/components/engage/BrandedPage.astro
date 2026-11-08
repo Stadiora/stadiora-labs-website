@@ -16,7 +16,6 @@ import BrandPhones from './BrandPhones.astro';
 import EIcon from './EIcon.astro';
 import runIcon from '../../assets/apps/app-run.webp';
 import aria12Icon from '../../assets/apps/app-aria12.webp';
-import liftIcon from '../../assets/apps/app-lift.webp';
 import fitmgIcon from '../../assets/apps/app-fitmg.webp';
 
 interface Props {
@@ -32,16 +31,14 @@ const pricing = hrefFor('pricing', locale);
 const same = [
   { key: 'run', src: runIcon },
   { key: 'aria12', src: aria12Icon },
-  { key: 'lift', src: liftIcon },
   { key: 'fitmg', src: fitmgIcon },
 ] as const;
-// The morphing phone re-skins through Your Gym and the four apps. Colours are deep enough for white type (AA).
+// The morphing phone re-skins through Your Gym and the three apps. Colours are deep enough for white type (AA).
 const img = (id: string) => `url(/home/img/${id}.webp)`;
 const brands = [
   { n: b.gym.name, m: b.gym.mark, c: '#0b1f4a', i: img('night-huddle-800') },
   { n: t.nav.apps.run.name, m: 'R', c: '#006f9c', i: img('A1-athletes-sprinter-800') },
   { n: t.nav.apps.aria12.name, m: '12', c: '#047857', i: img('hero3-soccer-academies-big-800') },
-  { n: t.nav.apps.lift.name, m: 'L', c: '#6d28d9', i: img('hero5-gyms-and-studios-big-800') },
   { n: t.nav.apps.fitmg.name, m: 'FM', c: '#c81e3a', i: img('bd-jumper-flare-800') },
 ];
 const first = brands[0];
