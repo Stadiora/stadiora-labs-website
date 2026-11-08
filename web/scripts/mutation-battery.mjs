@@ -591,7 +591,7 @@ const M = [
     runners: [
       { runner: 'verify', expect: /no schools plan or education rate in the build: pricing\/index\.html: still has `data-plan="schools"`/, at: { file: 'scripts/lib/pricing-verify.mjs', needle: 'no schools plan or education rate in the build: ${p}' } },
       { runner: 'verify', expect: /pricing\/index\.html: the plan cards are \[free,core,performance,federations,schools\]/, at: { file: 'scripts/lib/pricing-verify.mjs', needle: 'the plan cards are [' } },
-      { runner: 'pricing-prices', expect: /the four plan cards \(free, core, performance, federations\)/, at: { file: 'scripts/lib/pricing-checks.mjs', needle: "'the four plan cards (free, core, performance, federations)" } },
+      { runner: 'pricing-prices', expect: /the four plan cards \(free, core, performance, federations\)/, at: { file: 'scripts/lib/pricing-checks.mjs', needle: '`the four plan cards (' } },
       { runner: 'pricing-layout', expect: /four cards balanced/, at: { file: 'scripts/lib/pricing-checks.mjs', needle: 'four cards balanced in rows of' } },
     ],
   },
@@ -618,7 +618,7 @@ const M = [
     }],
     runners: [
       { runner: 'verify', expect: /no schools plan or education rate in the build: pricing\/index\.html: still has `data-edu-rate`/, at: { file: 'scripts/lib/pricing-verify.mjs', needle: 'no schools plan or education rate in the build: ${p}' } },
-      { runner: 'pricing-prices', expect: /the four plan cards \(free, core, performance, federations\)/, at: { file: 'scripts/lib/pricing-checks.mjs', needle: "'the four plan cards (free, core, performance, federations)" } },
+      { runner: 'pricing-prices', expect: /the four plan cards \(free, core, performance, federations\)/, at: { file: 'scripts/lib/pricing-checks.mjs', needle: '`the four plan cards (' } },
     ],
   },
   {
