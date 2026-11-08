@@ -7,7 +7,7 @@ import { contrastProbe } from './contrast.mjs';
 import { engageA11yChecks } from './engage-a11y-checks.mjs';
 import { engageHeadingContrast } from './engage-heading-contrast.mjs';
 import { engagePages } from './engage-verify.mjs';
-import { EDU, fmt } from './pricing-oracle.mjs';
+import { ORACLE, fmt } from './pricing-oracle.mjs';
 
 const widths = [390, 1024, 1280, 1440];
 // Every page carries a live demo (a phone, a panel, an orbit) that loses its minimum width between the four
@@ -195,17 +195,22 @@ export async function engageChecks({ open, check, shot, sleep, settle, checksOnl
     }
 
     // Teams and Pricing read the same price table and region code (src/data/prices.ts, src/lib/region.ts), so for the
-    // same visitor they must show the same schools price. Expected values come from the hand-typed oracle, not the table.
+    // same visitor the Teams teaser (Core from, for the smallest size) must equal Core at that size on Pricing. A school pays by
+    // athlete count like everyone else, so Pricing has no schools or education price to match. Expected values come from the
+    // hand-typed oracle, not the table.
     if (on('teams')) {
       const read = async (path, { timezoneId, init } = {}) => {
         const page = await open({ width: 1440, height: 900, timezoneId, init }, path);
         const teams = path.includes('/platform/teams/');
-        if (!teams) await page.waitForSelector('[data-pricing][data-ready]', { state: 'attached', timeout: 4000 }).catch(() => {});
+        if (!teams) {
+          await page.waitForSelector('[data-pricing][data-ready]', { state: 'attached', timeout: 4000 }).catch(() => {});
+          await page.locator('input[data-athletes]').fill('0');
+        }
         const got = await page.evaluate((isTeams) => {
           const text = (sel) => document.querySelector(sel)?.textContent?.trim() ?? null;
           return isTeams
-            ? { price: text('[data-school="price"]'), athletes: text('[data-school="athletes"]') }
-            : { price: text('[data-edu-rate="highSchool"]'), from: text('[data-schools-from]') };
+            ? { price: text('[data-core-from="price"]'), athletes: text('[data-core-from="athletes"]') }
+            : { price: text('[data-amount="core"]'), athletes: document.querySelector('[data-pricing]')?.dataset.athletes ?? null, removed: document.querySelectorAll('[data-schools-from], [data-edu-rate], .pcard--schools').length };
         }, teams);
         if (!checksOnly && teams && path.endsWith('?region=latam')) {
           const box = await page.locator('section[aria-labelledby="schools-title"]').boundingBox();
@@ -236,11 +241,11 @@ export async function engageChecks({ open, check, shot, sleep, settle, checksOnl
         ].map(([zone, region]) => [`${zone} time zone`, region, { timezoneId: zone }]),
       ];
       for (const [name, region, { query = '', ...visitor }] of cases) {
-        const want = fmt(EDU[region][0]);
+        const want = fmt(ORACLE[region][25][1]);
         const teams = await read(`${base}/platform/teams/${query}`, visitor);
         const pricing = await read(`${base}/pricing/${query}`, visitor);
-        const ok = teams.price === want && pricing.price === want && pricing.from === want && teams.athletes === '100';
-        check(group, `${lang}: Teams and Pricing both show the ${region === 'us' ? 'US' : 'LatAm'} schools price ${want} for ${name}`, ok, JSON.stringify({ teams, pricing }));
+        const ok = teams.price === want && pricing.price === want && teams.athletes === '25' && pricing.athletes === '25' && pricing.removed === 0;
+        check(group, `${lang}: Teams and Pricing both show the ${region === 'us' ? 'US' : 'LatAm'} Core from price ${want} for 25 athletes for ${name}, and Pricing has no schools or education price`, ok, JSON.stringify({ teams, pricing }));
       }
     }
 

@@ -5,12 +5,11 @@
 // and every expected sentence from the copy files, so a wrong edit to the table, the estimate script or the copy fails.
 import { en, es } from '../../src/i18n/pages/pricing.ts';
 import { fill } from '../../src/lib/template.ts';
-import { BRANDED, EDU, EXTRA_COACH, ORACLE, annual, estimateOracle, fmt, sizes } from './pricing-oracle.mjs';
+import { BRANDED, EXTRA_COACH, ORACLE, PLANS, annual, estimateOracle, fmt, sizes } from './pricing-oracle.mjs';
 
 const copyFor = { en, es };
 const paths = { en: '/pricing/', es: '/es/pricing/' };
 const MAX_COACHES = 20;
-const PLANS = ['free', 'core', 'performance', 'schools', 'federations'];
 const sw = { coach: '.sw[data-sw="coach"]', app: '.sw[data-sw="app"]', ai: '.sw[data-sw="ai"]' };
 
 /** What the panel, the switches, the stepper and the plan buttons should show for a state. */
@@ -30,16 +29,15 @@ export function expectedView({ locale, region, st }) {
     const plain = st.plan === 'core' ? core : perf;
     const amount = st.billing === 'annual' ? annual(plain) : plain;
     rows.push(['plan', fill(e.planRow, { plan: name, athletes: athletes.toLocaleString('en-US') }), `${fmt(amount)}${unit}${st.billing === 'annual' ? ` (${e.yearly})` : ''}`]);
-  } else if (st.plan === 'schools') rows.push(['plan', e.schoolsRow, `${fmt(Math.min(...EDU[region]))}${unit}`]);
-  else if (st.plan === 'federations') rows.push(['plan', name, copy.plans.federations.price]);
+  } else if (st.plan === 'federations') rows.push(['plan', name, copy.plans.federations.price]);
   else rows.push(['plan', name, `${fmt(0)}${unit}`]);
   if (coachCount > 0) rows.push(['coach', fill(e.coachRow, { qty: String(coachCount) }), `${fmt(EXTRA_COACH[region] * coachCount)}${unit}`]);
   if (st.appOn) rows.push(['app', copy.addons.brandedApp.name, `${fmt(BRANDED.monthly)}${unit}`]);
   if (st.aiOn) rows.push(['ai', copy.addons.credits.name, copy.addons.credits.price]);
 
-  const label = t.custom ? e.custom : t.from ? e.fromPerMonth : e.perMonth;
+  const label = t.custom ? e.custom : e.perMonth;
   const live = [
-    t.custom ? fill(e.liveCustom, { plan: name }) : fill(t.from ? e.liveFrom : e.live, { plan: name, amount: t.monthly.toLocaleString('en-US') }),
+    t.custom ? fill(e.liveCustom, { plan: name }) : fill(e.live, { plan: name, amount: t.monthly.toLocaleString('en-US') }),
     st.appOn ? fill(e.liveSetup, { setup: fmt(BRANDED.setup) }) : null,
     st.aiOn ? e.liveCredits : null,
   ]
@@ -293,12 +291,10 @@ export async function estimateChecks({ open, close, check, sleep, out }) {
     if (got.stepDisabled[0] !== 'true') bad.push('the - button is not aria-disabled at one');
     await act.step(1);
     await act.step(1);
-    await act.plan('schools');
-    got = await page.evaluate(readView);
-    if (!got.coach.disabled || got.coach.checked !== 'false') bad.push(`on Schools the coach switch is ${JSON.stringify(got.coach)}, want off and disabled`);
-    if (!got.note) bad.push('Schools shows no reason for the disabled coach switch');
-    if (got.rows.some((r) => r[0] === 'coach')) bad.push('Schools still lists an extra-coach row');
-    if (got.total !== fmt(Math.min(...EDU.us)) || got.totalLabel !== en.estimate.fromPerMonth) bad.push(`Schools total ${got.total} (${got.totalLabel}), want ${fmt(Math.min(...EDU.us))} from`);
+    // The plan picker offers exactly the four plans (typed in oracle PLANS), and no schools plan to pick.
+    const offered = await page.evaluate(() => [...document.querySelectorAll('.pcard__use[data-use]')].map((b) => b.dataset.use));
+    if (offered.join() !== PLANS.join()) bad.push(`the plan picker offers [${offered}], want [${PLANS}]`);
+    if (await page.locator('[data-use="schools"], .pcard--schools').count()) bad.push('a Schools plan is still on the page');
     await act.plan('performance');
     got = await page.evaluate(readView);
     if (got.coach.checked !== 'true' || got.qty !== '3') bad.push(`back on Performance the coach switch is ${got.coach.checked} at ${got.qty}, want it remembered: on at 3`);
@@ -327,7 +323,7 @@ export async function estimateChecks({ open, close, check, sleep, out }) {
     await act.billing('annual');
     got = await page.evaluate(readView);
     if (got.app.checked !== 'true' || got.coach.checked !== 'true' || got.ai.checked !== 'true' || got.qty !== '3') bad.push(`moving the slider and billing reset the choices: ${JSON.stringify({ app: got.app.checked, coach: got.coach.checked, ai: got.ai.checked, qty: got.qty })}`);
-    check('pricing/estimate', 'coaches stop at 1 and 20, the coach switch is off on Free, Schools and Federations and is remembered, credits show words not a number, the slider and billing keep the choices', bad.length === 0, bad.slice(0, 4).join('; '));
+    check('pricing/estimate', 'coaches stop at 1 and 20, the coach switch is off on Free and Federations and is remembered, credits show words not a number, the slider and billing keep the choices', bad.length === 0, bad.slice(0, 4).join('; '));
     check('pricing/estimate', 'the estimate flow logged no console errors', page.problems.length === 0, page.problems.slice(0, 2).join('; '));
     await close(page);
   }

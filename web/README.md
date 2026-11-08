@@ -20,6 +20,7 @@ node scripts/evidence.mjs --pricing-only   # just /pricing/ and /es/pricing/: pr
 node scripts/evidence.mjs --engage-only # just the Platform page checks and motion guards, EN and ES (see below); add --checks-only to skip screenshots
 node scripts/evidence.mjs --engage-motion-only --checks-only # just the Platform motion guards; ENGAGE_ONLY=teams,integrations narrows the pages
 node scripts/evidence.mjs --no-hover-pause-only --checks-only # sitewide pointer guard; NHP_PAGES=/,/es/ narrows pages
+node scripts/evidence.mjs --solutions-price-only --checks-only # just the price teasers on Schools, Coaches and Clubs against /pricing, every region case
 ```
 
 Keyboard-visible focus pauses motion even when a key is pressed on an already mouse-focused control (no new `focusin`).
@@ -42,7 +43,7 @@ measure rendered kit behavior. The mutation battery includes the legacy `999999s
 and `body:hover`, descendant hover pause, and a behavior-neutral legacy control.
 
 - Pages: `/` and `/pricing/` (EN), `/es/` and `/es/pricing/` (ES). Copy lives in `src/i18n/{en,es}.ts`; `es.ts` is typed against `en.ts`, so `astro check` flags a missing key. Page copy lives in `src/i18n/pages/` (`pricing.ts`: EN and ES typed together).
-- Pricing: one typed table holds every number: `src/data/prices.ts` (bands, education, add-ons, Free, the annual percentage; the annual figure is stored too). Page copy holds `{tokens}` and never a digit; `src/lib/template.ts` fills them. The region comes from the browser time zone (`src/lib/region.ts`, an allow-list of LatAm zones; Puerto Rico and anything unknown are US); `?region=latam` or `?region=us` overrides it for testing. US prices are in the HTML; LatAm prices exist only in the script bundle, so a US visitor never has them in the DOM. If the pricing script does not arrive within 2.5 s the page shows its fallback (`data-fallback`, not `data-ready`): US, monthly, 100 athletes, controls, switches and the estimate hidden, a note, every "More info" panel open. Without JavaScript at all the page looks the same. To change a price, edit `prices.ts`, then the oracle in `scripts/lib/pricing-oracle.mjs`, which holds the numbers typed in by hand (`npm run verify` and the evidence run both fail until the two agree).
+- Pricing: one typed table holds every number: `src/data/prices.ts` (bands, add-ons, Free, the annual percentage; the annual figure is stored too). Pricing goes by athlete count only: there is no education or school rate, and the plans are Free, Core, Performance and Federations, typed in the oracle as `PLANS`. Page copy holds `{tokens}` and never a digit; `src/lib/template.ts` fills them. The region comes from the browser time zone (`src/lib/region.ts`, an allow-list of LatAm zones; Puerto Rico and anything unknown are US); `?region=latam` or `?region=us` overrides it for testing. US prices are in the HTML; LatAm prices exist only in the script bundle, so a US visitor never has them in the DOM. If the pricing script does not arrive within 2.5 s the page shows its fallback (`data-fallback`, not `data-ready`): US, monthly, 100 athletes, controls, switches and the estimate hidden, a note, every "More info" panel open. Without JavaScript at all the page looks the same. To change a price, edit `prices.ts`, then the oracle in `scripts/lib/pricing-oracle.mjs`, which holds the numbers typed in by hand (`npm run verify` and the evidence run both fail until the two agree).
 - Prices on other pages (home teaser, solutions, company): import from the shared modules instead of copying numbers or zone lists.
 
   ```ts
@@ -175,8 +176,8 @@ and `body:hover`, descendant hover pause, and a behavior-neutral legacy control.
   moves again afterwards, and that a mouse pointer or click over it stops nothing; the Branded morph must also settle on one brand under reduced motion at any point of a swap. The page chrome
   that is not an autoplayer (`.mesh`, `.orbits`, `.grad-text`) is out of scope, as in the Coach guard. `.rv-mask` elements never get `.in` (an IntersectionObserver ignores an element whose own clip-path hides it),
   so a reveal that clips an element observes a wrapper `.rv` and clips its child.
-  Prices on these pages are not typed into the copy: the Teams schools teaser and the Branded add-on line are rendered from
-  `src/data/prices.ts` (`education`, `addOns`) with `{tokens}` in `engage.ts`, and the Teams script picks the region with
+  Prices on these pages are not typed into the copy: the Teams schools teaser (the Core "from" price) and the Branded add-on line are rendered from
+  `src/data/prices.ts` (`prices.coreFrom`, `addOns`) with `{tokens}` in `engage.ts`, and the Teams script picks the region with
   `detectRegion` from `src/lib/region.ts`, the same two modules `/pricing/` uses. `npm run verify` fails on a dollar amount in
   `engage.ts`, and on a rendered price that disagrees with the oracle in `scripts/lib/pricing-oracle.mjs`.
 

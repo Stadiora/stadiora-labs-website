@@ -15,7 +15,7 @@ import { en, es } from '../../src/i18n/pages/pricing.ts';
 import { contrastProbe } from './contrast.mjs';
 import { estimateChecks } from './pricing-estimate-checks.mjs';
 import { motionChecks } from './pricing-motion-checks.mjs';
-import { ANNUAL_PERCENT, BRANDED, DEFAULT_BAND, EDU, EXTRA_COACH, FREE, ORACLE, annual, brandedFromText, copyProblems, everyAmount, fmt, sharedAmounts, sizes, tableProblems } from './pricing-oracle.mjs';
+import { ANNUAL_PERCENT, BRANDED, DEFAULT_BAND, EXTRA_COACH, FREE, ORACLE, PLANS, annual, brandedFromText, copyProblems, everyAmount, fmt, removedTextProblems, sharedAmounts, sizes, tableProblems } from './pricing-oracle.mjs';
 
 const { athleteBands } = table;
 const copyFor = { en, es };
@@ -29,7 +29,7 @@ function expectedState(region, billing, n, locale) {
   const per = (m) => (billing === 'annual' ? annual(m) : m);
   const billed = (m) => (billing === 'annual' ? fill(copy.price.billedYearly, { total: fmt(annual(m) * 12) }) : copy.price.billedMonthly);
   const meta = fill(copy.price.meta, { athletes: n.toLocaleString('en-US'), coaches: String(coaches) });
-  const allowed = new Set([...sharedAmounts, per(core), per(perf), ...EDU[region], EXTRA_COACH[region]]);
+  const allowed = new Set([...sharedAmounts, per(core), per(perf), EXTRA_COACH[region]]);
   if (billing === 'annual') allowed.add(annual(core) * 12).add(annual(perf) * 12);
   return {
     core: fmt(per(core)),
@@ -38,8 +38,6 @@ function expectedState(region, billing, n, locale) {
     performanceMeta: meta,
     coreBilled: billed(core),
     performanceBilled: billed(perf),
-    schools: fmt(Math.min(...EDU[region])),
-    edu: EDU[region].map(fmt),
     extra: fmt(EXTRA_COACH[region]),
     allowed,
   };
@@ -68,8 +66,10 @@ const readState = () => {
     performanceMeta: text('.pcard--performance [data-meta]'),
     coreBilled: text('.pcard--core [data-billed]'),
     performanceBilled: text('.pcard--performance [data-billed]'),
-    schools: text('[data-schools-from]'),
-    edu: ['highSchool', 'department', 'college'].map((k) => text(`[data-edu-rate="${k}"]`)),
+    // The cards in page order, and any trace of the schools card or an education rate (both must be empty).
+    plans: [...document.querySelectorAll('.pcard[data-plan]')].map((e) => e.dataset.plan),
+    pickerPlans: [...document.querySelectorAll('[data-use]')].map((e) => e.dataset.use),
+    removed: document.querySelectorAll('[data-schools-from], [data-edu-rate], [data-plan="schools"], [data-use="schools"], .pcard--schools, #education-rates, [aria-controls="education-rates"]').length,
     extra: [...document.querySelectorAll('[data-extra-coach]')].map((e) => e.textContent.trim()),
     live: text('[data-live]'),
     fallback: root.hasAttribute('data-fallback'),
@@ -174,10 +174,23 @@ const readLayout = () => {
     }
   }
   if (vw > 720 && misaligned.length) problems.push(`rows not aligned: ${[...new Set(misaligned)].join(', ')}`);
+  // Four cards are laid out as a whole: 4 in a row, 2 and 2, or 1 under 1. No orphan, no hole, every row filling the grid.
+  const counts = [...rows.values()].map((r) => r.length);
+  if (cards.length !== 4) problems.push(`${cards.length} plan cards on screen, want 4`);
+  else if (!['4', '2,2', '1,1,1,1'].includes(counts.join())) problems.push(`plan cards laid out in rows of ${counts.join(',')}: an orphan or a hole`);
+  const grid = document.querySelector('.plans')?.getBoundingClientRect();
+  if (grid) {
+    for (const row of rows.values()) {
+      const lefts = row.map((c) => c.getBoundingClientRect().left);
+      const rights = row.map((c) => c.getBoundingClientRect().right);
+      if (Math.min(...lefts) > grid.left + 1.5 || Math.max(...rights) < grid.right - 1.5) problems.push('a row of plan cards does not fill the grid (a hole at one side)');
+    }
+    if (new Set(rects.map((r) => Math.round(r.width))).size > 1) problems.push('plan cards differ in width');
+  }
   const sameWidth = vw <= 720 ? new Set(rects.map((r) => Math.round(r.width))).size : 1;
   if (sameWidth > 1) problems.push('phone cards differ in width');
   const cta = [...document.querySelectorAll('.pcard a.btn')].map((b) => Math.round(b.getBoundingClientRect().height));
-  return { problems, cards: cards.length, ctaHeights: cta };
+  return { problems, cards: cards.length, ctaHeights: cta, rows: counts.join() };
 };
 
 // Text contrast comes from the shared foundation probe (./contrast.mjs). It skips text over gradients and images, so
@@ -423,7 +436,7 @@ export async function pricingChecks({ browser, server, outDir, check, metrics, s
   // ------------------------------------------------------------ 1. the price table and the copy against the oracle
   if (run('data')) {
     const bad = tableProblems(table);
-    check('pricing/data', 'price table matches the epic and DECISIONS oracle (both regions, annual, yearly, education, add-ons, Free, annual percentage)', bad.length === 0, bad.join('; '));
+    check('pricing/data', 'price table matches the epic and DECISIONS oracle (both regions, annual, yearly, add-ons, Free, annual percentage) and holds no education rate or school price', bad.length === 0, bad.join('; '));
     const copyBad = copyProblems({ en, es });
     check('pricing/data', 'copy holds words and {tokens}, never numbers or amounts; en and es use the same tokens', copyBad.length === 0, copyBad.slice(0, 4).join('; '));
   }
@@ -495,6 +508,8 @@ export async function pricingChecks({ browser, server, outDir, check, metrics, s
       for (const region of ['us', 'latam']) {
         const page = await open(`${paths[locale]}?region=${region}`);
         const other = region === 'us' ? 'latam' : 'us';
+        const bodyText = await page.evaluate(() => [...document.body.querySelectorAll('*')].filter((e) => !['SCRIPT', 'STYLE', 'NOSCRIPT'].includes(e.tagName) && e.children.length === 0).map((e) => e.textContent).join('\n'));
+        for (const p of removedTextProblems(bodyText, `${locale}/${region}`)) wrong.push(p);
         const foreign = [...everyAmount(other)].filter((v) => !everyAmount(region).has(v) && !sharedAmounts.has(v));
         for (const billing of ['monthly', 'annual']) {
           for (const size of sizes) {
@@ -503,10 +518,11 @@ export async function pricingChecks({ browser, server, outDir, check, metrics, s
             const want = expectedState(region, billing, size, locale);
             n++;
             const tag = `${locale}/${region}/${billing}/${size}`;
-            for (const key of ['core', 'performance', 'coreMeta', 'performanceMeta', 'coreBilled', 'performanceBilled', 'schools']) {
+            for (const key of ['core', 'performance', 'coreMeta', 'performanceMeta', 'coreBilled', 'performanceBilled']) {
               if (got[key] !== want[key]) wrong.push(`${tag} ${key}: "${got[key]}" want "${want[key]}"`);
             }
-            if (got.edu.join() !== want.edu.join()) wrong.push(`${tag} education ${got.edu}`);
+            if (got.plans.join() !== PLANS.join()) wrong.push(`${tag} plan cards [${got.plans}], want [${PLANS}]`);
+            if (got.removed) wrong.push(`${tag} ${got.removed} leftover schools or education elements`);
             if (got.extra.length !== 2 || got.extra.some((e) => e !== want.extra)) wrong.push(`${tag} extra coach ${got.extra}`);
             // Add-ons: every amount read where it shows. Monthly and setup are told apart by their marker and by the
             // words beside them, in the strip and in the More info panel, so swapping or editing one of them fails here.
@@ -532,7 +548,7 @@ export async function pricingChecks({ browser, server, outDir, check, metrics, s
         await close(page);
       }
     }
-    check('pricing/prices', `Core and Performance price, meta, billed line, Schools from, education, extra coach (${n} states: en/es x us/latam x monthly/annual x 6 sizes)`, wrong.length === 0, wrong.slice(0, 4).join('; '));
+    check('pricing/prices', `the four plan cards (${PLANS.join(', ')}), Core and Performance price, meta, billed line, extra coach, no schools card or education rate (${n} states: en/es x us/latam x monthly/annual x 6 sizes)`, wrong.length === 0, wrong.slice(0, 4).join('; '));
     check('pricing/addons', `custom-branded app: ${fmt(BRANDED.monthly)} is the monthly fee and ${fmt(BRANDED.setup)} the setup fee, each at its own place in the strip and the More info panel (marker and wording; ${n} states: en/es x us/latam x monthly/annual x 6 sizes)`, addonWrong.length === 0, addonWrong.slice(0, 3).join('; '));
     check('pricing/addons', `extra coach: the price in the strip and in the More info panel is ${fmt(EXTRA_COACH.us)} (US) or ${fmt(EXTRA_COACH.latam)} (LatAm), both places, every state`, addonWrong.every((w) => !/extra coach/.test(w)) && wrong.every((w) => !/extra coach/.test(w)));
     check('pricing/prices', `Free card shows ${fmt(FREE.monthly)} with ${FREE.coaches} coach and ${FREE.athletes} athletes, and the annual saving reads ${ANNUAL_PERCENT}%, from the table in every state`, freeWrong.length === 0, freeWrong.slice(0, 3).join('; '));
@@ -585,11 +601,11 @@ export async function pricingChecks({ browser, server, outDir, check, metrics, s
     const afterRadio = await page.evaluate(() => document.activeElement.matches('input[data-athletes]'));
     check('pricing/behaviour', 'Tab goes from the billing radios to the roster slider', afterRadio);
     const order = [];
-    for (let i = 0; i < 11; i++) {
+    for (let i = 0; i < 8; i++) {
       await page.keyboard.press('Tab');
       order.push(await page.evaluate(() => `${document.activeElement.tagName[0]}:${document.activeElement.getAttribute('aria-describedby') ?? document.activeElement.getAttribute('aria-controls')}`));
     }
-    check('pricing/behaviour', 'Tab then visits each plan card in order: its button, "Use this plan", with the education rates button before Schools "Use this plan"', order.join() === 'A:plan-free,B:plan-free,A:plan-core,B:plan-core,A:plan-performance,B:plan-performance,A:plan-schools,B:education-rates,B:plan-schools,A:plan-federations,B:plan-federations', order.join());
+    check('pricing/behaviour', 'Tab then visits each of the four plan cards in order: its button, then "Use this plan" (no Schools card, no education rates button)', order.join() === 'A:plan-free,B:plan-free,A:plan-core,B:plan-core,A:plan-performance,B:plan-performance,A:plan-federations,B:plan-federations', order.join());
     await close(page);
 
     const calm = await open(paths.en, { reduced: true });
@@ -666,7 +682,7 @@ export async function pricingChecks({ browser, server, outDir, check, metrics, s
       const bad = [];
       const page = await open(`${paths.en}?region=latam`, { width, height, mobile });
       const start = await reveals(page);
-      if (start.length !== 11) bad.push(`${start.length} reveal buttons, want 11`);
+      if (start.length !== 10) bad.push(`${start.length} reveal buttons, want 10`);
       for (const r of start) {
         if (r.expanded !== 'false' || r.shown || !r.hidden) bad.push(`${r.id}: not collapsed and hidden at start`);
       }
@@ -701,7 +717,7 @@ export async function pricingChecks({ browser, server, outDir, check, metrics, s
         now = (await reveals(page)).find((r) => r.id === id);
         if (now.expanded !== 'false' || now.shown) bad.push(`${id}: a second click does not close it`);
       }
-      check('pricing/reveals', `${label}px: all 11 "More info" and FAQ buttons start collapsed and open and close on Enter, Space and click, keep focus, move the page scroll lock nowhere, and open no other panel`, bad.length === 0, bad.slice(0, 4).join('; '));
+      check('pricing/reveals', `${label}px: all 10 "More info" and FAQ buttons start collapsed and open and close on Enter, Space and click, keep focus, move the page scroll lock nowhere, and open no other panel`, bad.length === 0, bad.slice(0, 4).join('; '));
       check('pricing/reveals', `${label}px: the page stayed clean (no console errors)`, page.problems.length === 0, page.problems.slice(0, 2).join('; '));
       await close(page);
     }
@@ -710,7 +726,7 @@ export async function pricingChecks({ browser, server, outDir, check, metrics, s
   // ------------------------------------------------------------ 5b. reveals stay in step with their buttons under any order of toggling
   // The old dialogs had a reviewed race (close, move on, press Enter, the first one reopened). Reveals have no event
   // queue to race with, but a handler that keeps its own state could still drift from the DOM, so: a seeded random
-  // walk over all 11 buttons, mouse and keyboard mixed, checking after every step against a model of what should be open.
+  // walk over all 10 buttons, mouse and keyboard mixed, checking after every step against a model of what should be open.
   if (run('reveals')) {
     const bad = [];
     const page = await open(`${paths.en}?region=latam`, { reduced: false });
@@ -740,7 +756,7 @@ export async function pricingChecks({ browser, server, outDir, check, metrics, s
       }
     }
     out.revealSteps = steps;
-    check('pricing/reveals', `${steps} random toggles over the 11 reveal buttons (click, Enter, Space) leave every panel and aria-expanded matching the model`, bad.length === 0, bad.slice(0, 3).join('; '));
+    check('pricing/reveals', `${steps} random toggles over the 10 reveal buttons (click, Enter, Space) leave every panel and aria-expanded matching the model`, bad.length === 0, bad.slice(0, 3).join('; '));
     check('pricing/reveals', 'the random walk stayed clean (no console errors)', page.problems.length === 0, page.problems.slice(0, 2).join('; '));
     await close(page);
   }
@@ -761,10 +777,10 @@ export async function pricingChecks({ browser, server, outDir, check, metrics, s
       const want = expectedState('us', 'monthly', DEFAULT_BAND, 'en');
       if (!got.fallback) bad.push('data-fallback is not set');
       if (got.ready) bad.push('data-ready is set although the script never ran');
-      for (const key of ['core', 'performance', 'coreMeta', 'performanceMeta', 'coreBilled', 'performanceBilled', 'schools']) {
+      for (const key of ['core', 'performance', 'coreMeta', 'performanceMeta', 'coreBilled', 'performanceBilled']) {
         if (got[key] !== want[key]) bad.push(`${key}: "${got[key]}" want "${want[key]}"`);
       }
-      if (got.edu.join() !== want.edu.join()) bad.push(`education ${got.edu}`);
+      if (got.plans.join() !== PLANS.join() || got.removed) bad.push(`plan cards [${got.plans}] (want [${PLANS}]) and ${got.removed} leftover schools or education elements`);
       const view = await page.evaluate(() => {
         const shown = (sel) => {
           const e = document.querySelector(sel);
@@ -793,7 +809,7 @@ export async function pricingChecks({ browser, server, outDir, check, metrics, s
       if (view.noteText !== noteWant) bad.push(`note reads "${view.noteText}", want "${noteWant}"`);
       if (view.triggers) bad.push(`${view.triggers} button(s) that would do nothing are still on screen`);
       if (view.estimate) bad.push('the live estimate is on screen with no script to drive it');
-      if (view.panelsOpen !== view.panels || view.panels !== 11) bad.push(`More info and FAQ content is not inline (${view.panelsOpen} of ${view.panels} panels, want 11)`);
+      if (view.panelsOpen !== view.panels || view.panels !== 10) bad.push(`More info and FAQ content is not inline (${view.panelsOpen} of ${view.panels} panels, want 10)`);
       if (view.faqText !== 7) bad.push(`${view.faqText} of 7 FAQ questions show as plain text`);
       if (view.brandedFee !== fmt(BRANDED.monthly)) bad.push(`inline branded fee "${view.brandedFee}"`);
       // Tab through the page: every stop is on screen, and none is a control the fallback hides.
@@ -833,7 +849,9 @@ export async function pricingChecks({ browser, server, outDir, check, metrics, s
   // ------------------------------------------------------------ 6. layout: no overflow, no overlap
   if (run('layout')) {
     const worstCoreCta = {};
-    for (const width of [390, 1024, 1280, 1440]) {
+    // Typed by hand: phone is one column, tablet two by two, desktop and wide one row of four; the breakpoints sit at 720/721 and 1199/1200.
+    const wantRows = (width) => (width <= 720 ? '1,1,1,1' : width < 1200 ? '2,2' : '4');
+    for (const width of [390, 720, 721, 768, 1024, 1199, 1200, 1280, 1440, 1920]) {
       const bad = [];
       let loaded = 0;
       for (const locale of ['en', 'es']) {
@@ -844,14 +862,15 @@ export async function pricingChecks({ browser, server, outDir, check, metrics, s
             await sleep(60);
             const r = await page.evaluate(readLayout);
             loaded++;
-            if (r.cards !== 5) bad.push(`${locale}/${region}/${billing}/${size}: ${r.cards} cards`);
+            if (r.cards !== 4) bad.push(`${locale}/${region}/${billing}/${size}: ${r.cards} cards`);
+            if (r.rows !== wantRows(width)) bad.push(`${locale}/${region}/${billing}/${size}: cards in rows of ${r.rows}, want ${wantRows(width)}`);
             for (const p of r.problems) bad.push(`${locale}/${region}/${billing}/${size}: ${p}`);
             worstCoreCta[`${locale}-${width}`] = Math.max(...r.ctaHeights, worstCoreCta[`${locale}-${width}`] ?? 0);
           }
           await close(page);
         }
       }
-      check('pricing/layout', `${width}px: no overflow or overlap in cards, controls and add-ons, rows aligned (${loaded} states, en/es x us/latam x default/annual-1000)`, bad.length === 0, bad.slice(0, 4).join('; '));
+      check('pricing/layout', `${width}px: no overflow or overlap in cards, controls and add-ons, four cards balanced in rows of ${wantRows(width)}, rows aligned (${loaded} states, en/es x us/latam x default/annual-1000)`, bad.length === 0, bad.slice(0, 4).join('; '));
     }
     out.tallestCta = worstCoreCta;
   }
@@ -879,7 +898,7 @@ export async function pricingChecks({ browser, server, outDir, check, metrics, s
           await page.locator('.faq__q').first().click();
           await settleReveals(page);
           await run('faq open');
-          for (const id of ['addon-extra-coach', 'addon-branded-app', 'addon-credits', 'education-rates']) {
+          for (const id of ['addon-extra-coach', 'addon-branded-app', 'addon-credits']) {
             await page.locator(`[data-reveal-btn][aria-controls="${id}"]`).first().click();
             await settleReveals(page);
             await run(id);
@@ -898,7 +917,7 @@ export async function pricingChecks({ browser, server, outDir, check, metrics, s
           await page.locator('[data-step="1"]').click();
           await page.waitForFunction(() => document.querySelectorAll('.is-rolling').length === 0, null, { timeout: 2500 }).catch(() => {});
           await run('estimate with every add-on', '.est');
-          for (const plan of ['free', 'performance', 'schools', 'federations']) {
+          for (const plan of ['free', 'core', 'performance', 'federations']) {
             await page.locator(`.pcard__use[data-use="${plan}"]`).click();
             await page.waitForFunction(() => document.querySelectorAll('.is-rolling').length === 0, null, { timeout: 2500 }).catch(() => {});
             await run(`estimate ${plan}`, '.est');
@@ -1005,7 +1024,7 @@ export async function pricingChecks({ browser, server, outDir, check, metrics, s
     }
     for (const locale of ['en', 'es']) {
       const l = links[locale];
-      check('pricing/links', `${locale}: Free, Core and Performance go to sign-up; Schools to the booking page; Federations to contact`, l.plan.free === SIGN_UP && l.plan.core === SIGN_UP && l.plan.performance === SIGN_UP && /^https:\/\/bookings\.cloud\.microsoft\//.test(l.plan.schools) && (l.plan.federations === (locale === 'es' ? '/es/contact/' : '/contact/') || l.plan.federations === '/connect.html'), JSON.stringify(l.plan));
+      check('pricing/links', `${locale}: Free, Core and Performance go to sign-up; Federations to contact; the cards are exactly ${PLANS.join(', ')}`, Object.keys(l.plan).join() === PLANS.join() && l.plan.free === SIGN_UP && l.plan.core === SIGN_UP && l.plan.performance === SIGN_UP && (l.plan.federations === (locale === 'es' ? '/es/contact/' : '/contact/') || l.plan.federations === '/connect.html'), JSON.stringify(l.plan));
     }
     check('pricing/links', 'the language switch keeps you on pricing in the other language', links.en.lang.includes('es=/es/pricing/') && links.es.lang.includes('en=/pricing/'), `${links.en.lang} | ${links.es.lang}`);
 
@@ -1022,14 +1041,14 @@ export async function pricingChecks({ browser, server, outDir, check, metrics, s
           buttons: [...document.querySelectorAll('[data-reveal-btn], .sw, .step button, .pcard__use')].filter((e) => e.getClientRects().length > 0).length,
           estimate: shown('.est'),
           panels: [...document.querySelectorAll('.reveal')].filter((p) => getComputedStyle(p).visibility !== 'hidden' && p.getBoundingClientRect().height > 4).length,
-          rates: shown('[data-edu-rate]'),
+          rates: shown('[data-edu-rate], [data-schools-from]'),
           overflow: document.documentElement.scrollWidth > document.documentElement.clientWidth + 0.5,
           faq: document.querySelectorAll('.faq__item').length,
           faqText: [...document.querySelectorAll('.faq__static')].filter((e) => e.getClientRects().length > 0).length,
           hiddenEntrances: [...document.querySelectorAll('.pricing .rv, .pricing .lines > span > span')].map((e) => parseFloat(getComputedStyle(e).opacity)).filter((o) => o < 1).length,
         };
       });
-      check('pricing/no-js', `${width}px without JavaScript: US monthly prices for 100 athletes, controls, estimate and do-nothing buttons hidden with a note, More info and FAQ content inline, every entrance visible, no overflow`, s.core === '$199' && s.performance === '$299' && !s.controls && s.note && !s.buttons && !s.estimate && s.panels === 11 && s.rates && !s.overflow && s.faq === 7 && s.faqText === 7 && s.hiddenEntrances === 0, JSON.stringify(s));
+      check('pricing/no-js', `${width}px without JavaScript: US monthly prices for 100 athletes, controls, estimate and do-nothing buttons hidden with a note, More info and FAQ content inline, every entrance visible, no overflow`, s.core === '$199' && s.performance === '$299' && !s.controls && s.note && !s.buttons && !s.estimate && s.panels === 10 && !s.rates && !s.overflow && s.faq === 7 && s.faqText === 7 && s.hiddenEntrances === 0, JSON.stringify(s));
       await close(page);
     }
   }
@@ -1079,9 +1098,6 @@ export async function pricingChecks({ browser, server, outDir, check, metrics, s
       }
       await settleReveals(page);
       await page.locator('.addons__grid').first().screenshot({ path: `${outDir}state-more-info-addons-${tag}.png` });
-      await page.locator('[data-reveal-btn][aria-controls="education-rates"]').first().click();
-      await settleReveals(page);
-      await page.locator('.plans-section').first().screenshot({ path: `${outDir}state-more-info-education-${tag}.png` });
       await close(page);
 
       page = await open(paths.en, { width, height, mobile });

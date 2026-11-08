@@ -2,11 +2,12 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { CONTACT_ENDPOINT, athleteRanges, approvedSuccess, contacts, findDeliveryClaims, missingContactHrefs, roles } from './contact-contract.mjs';
-import { EDU, FREE, ORACLE, fmt } from './pricing-oracle.mjs';
+import { FREE, ORACLE, fmt } from './pricing-oracle.mjs';
 
-// What the teasers must show for US visitors (and no-JavaScript visitors): Core from at 25 athletes, high school at 100.
-const teaserUs = { coreFrom: fmt(ORACLE.us[25][1]), highSchool: fmt(EDU.us[0]) };
-const teaserAthletes = { coreFrom: 25, highSchool: 100 };
+// What the teasers must show for US visitors (and no-JavaScript visitors): Core from at 25 athletes. Pricing goes by
+// athlete count only, so Schools quotes the same teaser as everyone and no other teaser key exists.
+const teaserUs = { coreFrom: fmt(ORACLE.us[25][1]) };
+const teaserAthletes = { coreFrom: 25 };
 
 const ORIGIN = 'https://stadioralabs.com';
 
@@ -173,6 +174,12 @@ export function verifySolutions({ dist, fail }) {
         const limits = new RegExp(`\\b${FREE.coaches} (coach|entrenador), (up to|hasta) ${FREE.athletes} (athletes|atletas)`);
         need(limits.test(pageText(html)), `Free plan line must state ${FREE.coaches} coach and ${FREE.athletes} athletes`);
         need(new RegExp(`<meta name="description" content="[^"]*${FREE.coaches} (coach|entrenador) (and up to|y hasta) ${FREE.athletes} (athletes|atletas)`).test(html), 'meta description must state the Free plan limits');
+      }
+
+      if (route.path === '/solutions/schools/') {
+        need(count(html, /data-region-price="coreFrom"/g) === 1, 'the Schools page must quote the athlete-based Core from price exactly once');
+        need(/(by|según el) (the )?(number|número) of (athletes|atletas)|según el número de atletas/i.test(pageText(html)), 'the Schools page must say the price goes by number of athletes');
+        need(/included in Core and Performance|incluido en Core y Performance/i.test(pageText(html)), 'the Schools page must say Aria for Families is included in Core and Performance');
       }
 
       if (route.path === '/solutions/schools/' && lang === 'en') {

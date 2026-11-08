@@ -40,6 +40,11 @@ const RUNNERS = {
   'nhp-legacy': { args: ['scripts/evidence.mjs', '--no-hover-pause-only', '--checks-only'], env: { NHP_PAGES: '/lead-magnet.html' }, failLine: /^FAIL\s+(.+)$/gm },
   'nhp-about': { args: ['scripts/evidence.mjs', '--no-hover-pause-only', '--checks-only'], env: { NHP_PAGES: '/about/' }, failLine: /^FAIL\s+(.+)$/gm },
   'nhp-pricing': { args: ['scripts/evidence.mjs', '--no-hover-pause-only', '--checks-only'], env: { NHP_PAGES: '/pricing/' }, failLine: /^FAIL\s+(.+)$/gm },
+  // the pricing guards, narrowed to the group that carries the assertion (the whole pricing run takes minutes)
+  'pricing-data': { args: ['scripts/evidence.mjs', '--pricing-only', '--checks-only', '--pricing-group=data'], failLine: /^FAIL\s+(.+)$/gm },
+  'pricing-prices': { args: ['scripts/evidence.mjs', '--pricing-only', '--checks-only', '--pricing-group=prices'], failLine: /^FAIL\s+(.+)$/gm },
+  'pricing-layout': { args: ['scripts/evidence.mjs', '--pricing-only', '--checks-only', '--pricing-group=layout'], failLine: /^FAIL\s+(.+)$/gm },
+  solprice: { args: ['scripts/evidence.mjs', '--solutions-price-only', '--checks-only'], failLine: /^FAIL\s+(.+)$/gm },
   'nhp-api': { args: ['scripts/evidence.mjs', '--no-hover-pause-only', '--checks-only'], env: { NHP_PAGES: '/api.html' }, failLine: /^FAIL\s+(.+)$/gm },
   'nhp-teams': { args: ['scripts/evidence.mjs', '--no-hover-pause-only', '--checks-only'], env: { NHP_PAGES: '/solutions/teams-and-clubs/' }, failLine: /^FAIL\s+(.+)$/gm },
   contrast: { args: ['scripts/evidence.mjs', '--api-contrast-only=api-en,1440,light', '--checks-only'], failLine: /^FAIL\s+(.+)$/gm },
@@ -573,6 +578,100 @@ const M = [
     runner: 'nhp-legacy',
     expect: /CSS pointer: sampled animations keep running at unchanged duration.*playState running -> paused/,
     at: { file: 'scripts/lib/no-hover-pause-checks.mjs', needle: "'CSS pointer: sampled animations keep running at unchanged duration" },
+  },
+  // ---- R57: pricing goes by athlete count only (no Schools card, no education rate, no school teaser)
+  {
+    id: 'r57-schools-card-back',
+    what: 'PricingPage.astro: a fifth "Schools and institutions" plan card put back in the plan list',
+    edits: [{
+      file: 'src/components/pricing/PricingPage.astro',
+      find: '{plans.map((plan, index) => <PlanCard plan={plan} locale={locale} copy={copy} index={index} />)}',
+      replace: '{plans.map((plan, index) => <PlanCard plan={plan} locale={locale} copy={copy} index={index} />)}\n        <li class="pcard pcard--schools" data-plan="schools"><h3 class="pcard__name">Schools and institutions</h3></li>',
+    }],
+    runners: [
+      { runner: 'verify', expect: /no schools plan or education rate in the build: pricing\/index\.html: still has `data-plan="schools"`/, at: { file: 'scripts/lib/pricing-verify.mjs', needle: 'no schools plan or education rate in the build: ${p}' } },
+      { runner: 'verify', expect: /pricing\/index\.html: the plan cards are \[free,core,performance,federations,schools\]/, at: { file: 'scripts/lib/pricing-verify.mjs', needle: 'the plan cards are [' } },
+      { runner: 'pricing-prices', expect: /the four plan cards \(free, core, performance, federations\)/, at: { file: 'scripts/lib/pricing-checks.mjs', needle: '`the four plan cards (' } },
+      { runner: 'pricing-layout', expect: /four cards balanced/, at: { file: 'scripts/lib/pricing-checks.mjs', needle: 'four cards balanced in rows of' } },
+    ],
+  },
+  {
+    id: 'r57-education-export-back',
+    what: 'prices.ts: an `education` rate table (and a highSchool rate) exported again',
+    edits: [{
+      file: 'src/data/prices.ts',
+      find: '/** The Free plan: no card, so the price is zero. */',
+      replace: "export const education = { us: [{ key: 'highSchool', athletes: 100, monthly: 99 }] };\n\n/** The Free plan: no card, so the price is zero. */",
+    }],
+    runners: [
+      { runner: 'verify', expect: /price table \(src\/data\/prices\.ts\) disagrees with the oracle.*still exports education/, at: { file: 'scripts/lib/pricing-oracle.mjs', needle: 'still exports education' } },
+      { runner: 'pricing-data', expect: /price table matches the epic and DECISIONS oracle/, at: { file: 'scripts/lib/pricing-checks.mjs', needle: 'price table matches the epic and DECISIONS oracle' } },
+    ],
+  },
+  {
+    id: 'r57-education-rate-markup-back',
+    what: 'PricingPage.astro: a `data-edu-rate` price element put back on the page',
+    edits: [{
+      file: 'src/components/pricing/PricingPage.astro',
+      find: '<p class="sr-only" role="status" aria-live="polite" data-live></p>',
+      replace: '<p class="sr-only" role="status" aria-live="polite" data-live></p>\n  <span class="sr-only" data-edu-rate="highSchool">$99</span>',
+    }],
+    runners: [
+      { runner: 'verify', expect: /no schools plan or education rate in the build: pricing\/index\.html: still has `data-edu-rate`/, at: { file: 'scripts/lib/pricing-verify.mjs', needle: 'no schools plan or education rate in the build: ${p}' } },
+      { runner: 'pricing-prices', expect: /the four plan cards \(free, core, performance, federations\)/, at: { file: 'scripts/lib/pricing-checks.mjs', needle: '`the four plan cards (' } },
+    ],
+  },
+  {
+    id: 'r57-education-copy-back',
+    what: 'pricing.ts (EN): an `education` copy block put back',
+    edits: [{ file: 'src/i18n/pages/pricing.ts', find: "  plansTitle: 'Plans',", replace: "  plansTitle: 'Plans',\n  education: { intro: 'Education rates for schools and institutions.' }," }],
+    runners: [
+      { runner: 'verify', expect: /pricing copy \(src\/i18n\/pages\/pricing\.ts\): en education\.intro: a schools or education key is still in the pricing copy/, at: { file: 'scripts/lib/pricing-oracle.mjs', needle: 'a schools or education key is still in the pricing copy' } },
+      { runner: 'pricing-data', expect: /copy holds words and \{tokens\}/, at: { file: 'scripts/lib/pricing-checks.mjs', needle: 'copy holds words and {tokens}' } },
+    ],
+  },
+  {
+    id: 'r57-schools-teaser-back',
+    what: 'schools.ts (EN): the Schools page teaser says "Education pricing:" again',
+    edits: [{ file: 'src/i18n/pages/schools.ts', find: "lead: 'Priced by number of athletes.',", replace: "lead: 'Education pricing:'," }],
+    runners: [
+      { runner: 'verify', expect: /solutions\/schools\/index\.html: .*(education|number of athletes)/i, at: { file: 'scripts/lib/verify-solutions.mjs', needle: 'by number of athletes' } },
+      { runner: 'solprice', expect: /\[solutions-region\] \/solutions\/schools\/: no education rate or schools plan, and the price is said to go by number of athletes/, at: { file: 'scripts/lib/solutions-price-checks.mjs', needle: 'no education rate or schools plan, and the price is said to go by number of athletes' } },
+    ],
+  },
+  {
+    id: 'r57-teams-teaser-back',
+    what: 'engage.ts (EN): the Teams page teaser says "High schools from {price}/mo" and "See school pricing" again',
+    edits: [{
+      file: 'src/i18n/pages/engage.ts',
+      find: "      body: 'Priced by number of athletes. Core from {price}/mo for {athletes} athletes.',\n      see: 'See pricing',",
+      replace: "      body: 'High schools from {price}/mo for {athletes} athletes.',\n      see: 'See school pricing',",
+    }],
+    runners: [
+      { runner: 'verify', expect: /platform\/teams\/index\.html: the teaser does not say the price goes by number of athletes/, at: { file: 'scripts/lib/engage-verify.mjs', needle: 'the teaser does not say the price goes by number of athletes' } },
+      { runner: 'verify', expect: /no schools plan or education rate in the build: platform\/teams\/index\.html: says school pricing/, at: { file: 'scripts/lib/pricing-verify.mjs', needle: 'no schools plan or education rate in the build: ${p}' } },
+    ],
+  },
+  {
+    id: 'r57-guardian-schools-plan-back',
+    what: 'engage.ts (EN): the Guardian page says "Included in Schools plans." again',
+    edits: [{ file: 'src/i18n/pages/engage.ts', find: "title: 'Included in Core and Performance.',", replace: "title: 'Included in Schools plans.'," }],
+    runners: [
+      { runner: 'verify', expect: /platform\/guardian-portal\/index\.html: the pricing block does not say Aria for Families is included in Core and Performance/, at: { file: 'scripts/lib/engage-verify.mjs', needle: 'the pricing block does not say Aria for Families is included' } },
+      { runner: 'verify', expect: /no schools plan or education rate in the build: platform\/guardian-portal\/index\.html: says a schools plan/, at: { file: 'scripts/lib/pricing-verify.mjs', needle: 'no schools plan or education rate in the build: ${p}' } },
+    ],
+  },
+  {
+    id: 'r57-identity-control',
+    what: 'CONTROL: comment-only edits to prices.ts, PricingPage.astro, pricing.css and schools.ts must NOT be caught by any pricing runner',
+    identity: true,
+    edits: [
+      { file: 'src/data/prices.ts', find: '// Region detection lives in src/lib/region.ts.', replace: '// Region detection lives in src/lib/region.ts.\n// identity control: no effect.' },
+      { file: 'src/components/pricing/PricingPage.astro', find: '<!-- Failsafe:', replace: '<!-- identity control: no effect. Failsafe:' },
+      { file: 'src/styles/pricing.css', find: '/* ---------- Plan cards ---------- */', replace: '/* ---------- Plan cards ---------- */\n/* identity control: no effect */' },
+      { file: 'src/i18n/pages/schools.ts', find: "link: 'See pricing',\n    cta: 'Book a call for your school',", replace: "link: 'See pricing', // identity control: no effect\n    cta: 'Book a call for your school'," },
+    ],
+    runners: [{ runner: 'verify' }, { runner: 'pricing-data' }, { runner: 'pricing-prices' }, { runner: 'pricing-layout' }, { runner: 'solprice' }],
   },
   {
     id: 'identity-control-legacy',

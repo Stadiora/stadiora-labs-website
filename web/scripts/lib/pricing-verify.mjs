@@ -2,14 +2,14 @@
 // Node type-strips the .ts imports, so the checks read the same price table and copy the page is built from, and
 // compare them with the hand-typed oracle in pricing-oracle.mjs. The numbers in the table, the copy and the built
 // HTML must all agree with the oracle, so a wrong fee fails `npm run verify` without a browser.
-import { existsSync, readFileSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import * as prices from '../../src/data/prices.ts';
 import { fill } from '../../src/lib/template.ts';
 import { en, es } from '../../src/i18n/pages/pricing.ts';
-import { BRANDED, EXTRA_COACH, FREE, ANNUAL_PERCENT, DEFAULT_BAND, brandedFromText, copyProblems, estimateOracle, fmt, tableProblems } from './pricing-oracle.mjs';
+import { BRANDED, EXTRA_COACH, FREE, ANNUAL_PERCENT, DEFAULT_BAND, PLANS, brandedFromText, copyProblems, estimateOracle, fmt, removedBuildProblems, tableProblems } from './pricing-oracle.mjs';
 
-const { addOns, bands, education } = prices;
+const { addOns, bands } = prices;
 const copyFor = { en, es };
 
 const pages = [
@@ -59,7 +59,7 @@ function inner(html, marker, end) {
 // script bundle and reach the DOM only for a visitor whose time zone is in the LatAm list.
 function latamOnlyAmounts() {
   const collect = (region) => {
-    const out = new Set([addOns.extraCoach[region], ...education[region].map((r) => r.monthly)]);
+    const out = new Set([addOns.extraCoach[region]]);
     for (const band of bands[region]) {
       for (const plan of [band.core, band.performance]) out.add(plan.monthly).add(plan.annualMonthly).add(plan.annualYearly);
     }
@@ -67,6 +67,15 @@ function latamOnlyAmounts() {
   };
   const shared = collect('us').add(addOns.brandedApp.monthly).add(addOns.brandedApp.setup);
   return [...collect('latam')].filter((n) => !shared.has(n));
+}
+
+// Every text file in the build, for the scan that no page, script or style still carries the schools plan or an education rate.
+function* builtFiles(dir) {
+  for (const entry of readdirSync(dir, { withFileTypes: true })) {
+    const full = join(dir, entry.name);
+    if (entry.isDirectory()) yield* builtFiles(full);
+    else if (/\.(?:html|js|mjs|css|json|xml|txt|webmanifest)$/.test(entry.name)) yield full;
+  }
 }
 
 export function verifyPricing(dist, report) {
@@ -81,6 +90,15 @@ export function verifyPricing(dist, report) {
     fail(`price table (src/data/prices.ts) disagrees with the oracle (scripts/lib/pricing-oracle.mjs): ${p}`);
   }
   for (const p of copyProblems({ en, es })) fail(`pricing copy (src/i18n/pages/pricing.ts): ${p}`);
+  // Pricing goes by athlete count only: nothing anywhere in the build may still show an education rate or a schools plan.
+  if (existsSync(dist)) {
+    let scanned = 0;
+    for (const file of builtFiles(dist)) {
+      scanned++;
+      for (const p of removedBuildProblems(readFileSync(file, 'utf8'), file.slice(dist.length))) fail(`no schools plan or education rate in the build: ${p}`);
+    }
+    if (scanned < 20) fail(`no schools plan or education rate in the build: only ${scanned} text files scanned, the scan is not looking at the build`);
+  }
 
   for (const page of pages) {
     const path = join(dist, page.file);
@@ -111,7 +129,8 @@ export function verifyPricing(dist, report) {
 
     if (count(html, /<h1[\s>]/g) !== 1) fail(`${page.file}: expected exactly one h1`);
     if (count(html, /<main[\s>]/g) !== 1) fail(`${page.file}: expected exactly one main`);
-    if (count(html, /<li class="pcard /g) !== 5) fail(`${page.file}: expected five plan cards`);
+    const cardPlans = [...html.matchAll(/<li class="pcard [^"]*"[^>]*\bdata-plan="([^"]+)"/g)].map((m) => m[1]);
+    if (cardPlans.join() !== PLANS.join()) fail(`${page.file}: the plan cards are [${cardPlans}], want [${PLANS}] (pricing goes by athlete count only)`);
     if (count(html, /<div class="faq__item"/g) !== 7) fail(`${page.file}: expected seven FAQ items`);
     if (/<details\b|<dialog\b/.test(html)) fail(`${page.file}: a <details> or <dialog> is on the page; the FAQ and "More info" are button-driven reveals`);
 
@@ -160,9 +179,9 @@ export function verifyPricing(dist, report) {
     if (/\{(?:percent|athletes|coaches|monthly|setup|amount|total|plan)\}/.test(textOf(text))) fail(`${page.file}: an unfilled {token} is in the HTML`);
 
     // Every "More info" button and FAQ question is a disclosure: it starts collapsed and points at a reveal panel that
-    // exists. Seven FAQ questions, three add-ons and the education rates make eleven.
+    // exists. Seven FAQ questions and three add-ons make ten.
     const disclosures = html.match(/<button\b[^>]*\bdata-reveal-btn\b[^>]*>/g) ?? [];
-    if (disclosures.length !== 11) fail(`${page.file}: expected 11 disclosure buttons (7 FAQ, 3 add-ons, 1 education rates), found ${disclosures.length}`);
+    if (disclosures.length !== 10) fail(`${page.file}: expected 10 disclosure buttons (7 FAQ, 3 add-ons), found ${disclosures.length}`);
     for (const button of disclosures) {
       const target = /aria-controls="([^"]+)"/.exec(button)?.[1] ?? '';
       const panel = target ? new RegExp(`<div\\b[^>]*\\bid="${target}"[^>]*>`).exec(html)?.[0] : undefined;
