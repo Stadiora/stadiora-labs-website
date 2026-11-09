@@ -7,7 +7,7 @@
 //   - the SEO contract is broken: sitemap, robots.txt, canonical and hreflang on every page, one OG card per page type that exists;
 //   - a page links to another page of the site that is not in the build, or to a #fragment that has no id on the target (a link
 //     to a redirect stub with a fragment counts: the refresh drops the fragment);
-//   - the carried pages lost a fix from the cutover PR (noindex, lead form honesty, investors wording, CNAME).
+//   - the carried pages lost a fix from the cutover PR (noindex, lead form honesty, hidden investor links/content, CNAME).
 // Markup is read with scripts/lib/html-scan.mjs, which skips comments and script/style text, so a tag that is only inside a
 // comment is not active and does not count.
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
@@ -15,7 +15,7 @@ import { join, posix, relative, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { built, carried, liveUrls, notUrls, redirects, retired } from './live-urls.mjs';
 import { isNoindex, scanTags } from './html-scan.mjs';
-import { linkProblems } from './link-guard.mjs';
+import { internalLinks, linkProblems } from './link-guard.mjs';
 import { pendingRoutes } from './engage-links.mjs';
 import { CONTACT_ENDPOINT, MIN_FILL_MS, contactHrefs, contacts, missingContactHrefs } from './contact-contract.mjs';
 
@@ -153,15 +153,23 @@ export function verifyCutover({ dist, fail, root = repoRoot }) {
 
   // ------------------------------------------------------------------ 8. investor pages are hidden until the new deck is final
   // The URLs are redirect stubs (live-urls.mjs); nothing in the build may link to them or carry the old content.
-  for (const file of walk(dist).filter((f) => f.endsWith('.html'))) {
+  for (const file of walk(dist)) {
     const url = `/${relative(dist, file).split(sep).join('/')}`;
-    const html = read(file);
-    if (/href=["'](?:https?:\/\/(?:www\.)?stadioralabs\.com)?\/investors(?:-es)?(?:\.html)?\/?[#?"']/i.test(html)) fail(`cutover: ${url} links to a hidden investor page`);
-    if (!/^\/investors(-es)?\.html$/.test(url) && /Investor Overview|Resumen para Inversores/i.test(html)) fail(`cutover: ${url} carries investor-page content`);
+    const bytes = readFileSync(file);
+    if (bytes.subarray(0, 4096).includes(0)) continue;
+    const html = bytes.toString('utf8');
+    const text = html.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ');
+    if (/Investor Overview|Resumen para Inversores/i.test(html) || /150\+\s+(?:Athletes on the Platform|Atletas en la Plataforma)/i.test(text)) fail(`cutover: ${url} carries investor-page content`);
+    if (file.endsWith('.html') && internalLinks(html, url).some(({ path }) => /^\/investors(?:-es)?(?:\.html)?\/?$/i.test(path))) fail(`cutover: ${url} links to a hidden investor page`);
   }
-  for (const url of ['/investors.html', '/investors-es.html']) {
+  for (const [url, notice] of [
+    ['/investors.html', 'Stadiora Labs This page moved to stadioralabs.com .'],
+    ['/investors-es.html', 'Stadiora Labs Esta p\u00e1gina se movi\u00f3 a stadioralabs.com/es/ .'],
+  ]) {
     const file = fileFor(dist, url);
-    if (existsSync(file) && read(file).length > 1000) fail(`cutover: ${url} must be a redirect stub, not the investor page`);
+    if (!existsSync(file)) continue;
+    const text = read(file).replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+    if (text !== notice) fail(`cutover: ${url} must contain only the redirect notice`);
   }
 
   // ------------------------------------------------------------------ 9. SEO: pages, sitemap, robots
