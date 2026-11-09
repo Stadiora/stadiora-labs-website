@@ -11,7 +11,7 @@
 import { solutionsMotionChecks } from './solutions-motion-checks.mjs';
 
 // The marks the strip is meant to show. Stated here, not read from data/logos.ts, so dropping one by accident still fails.
-const LOGO_COUNT = 8;
+const LOGO_COUNT = 7;
 
 const targets = [
   { id: 'home', label: 'home hero', path: '/', sel: '#hero .logo-marquee', themed: false, schemes: ['light'] },
