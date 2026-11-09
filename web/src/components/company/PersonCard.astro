@@ -2,7 +2,6 @@
 import { Image } from 'astro:assets';
 import anthony from '../../assets/team/anthony.webp';
 import ian from '../../assets/team/ian.webp';
-import karla from '../../assets/team/karla.webp';
 import joel from '../../assets/team/joel.webp';
 import Icon from '../ui/Icon.astro';
 import type { Person } from '../../i18n/pages/about';
@@ -13,7 +12,7 @@ interface Props {
   closeLabel: string;
 }
 const { person, linkLabel, closeLabel } = Astro.props;
-const portraits = { anthony, ian, karla, joel };
+const portraits = { anthony, ian, joel };
 const portrait = person.portrait ? portraits[person.portrait] : undefined;
 const initials = person.name
   .replace(/^Dr\.\s+/, '')
@@ -38,10 +37,12 @@ const initials = person.name
   <div class="person__pop">
     <p class="person__bio">{person.bio}</p>
     <div class="person__foot">
-      <a class="link-arrow" href={person.href} target="_blank" rel="noopener noreferrer">
-        {linkLabel}<span class="sr-only"> · {person.name}</span>
-        <Icon name="arrow-right" size={16} />
-      </a>
+      {person.href && (
+        <a class="link-arrow" href={person.href} target="_blank" rel="noopener noreferrer">
+          {linkLabel}<span class="sr-only"> · {person.name}</span>
+          <Icon name="arrow-right" size={16} />
+        </a>
+      )}
       <button class="person__close" type="button" data-person-close>{closeLabel}</button>
     </div>
   </div>

@@ -93,7 +93,6 @@ export const en = {
   },
   logos: {
     label: 'Customers and partners',
-    count: '500+',
     listLabel: 'Customers and partners',
   },
   ai: {

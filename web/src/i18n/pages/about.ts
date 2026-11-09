@@ -5,15 +5,15 @@ export interface Person {
   name: string;
   role: string;
   bio: string;
-  href: string;
+  /** Profile link; people without a public profile omit it and the card shows no link. */
+  href?: string;
   /** Portraits exist only for four people. The rest use initials, never a generated face. */
-  portrait?: 'anthony' | 'ian' | 'karla' | 'joel';
+  portrait?: 'anthony' | 'ian' | 'joel';
 }
 
 const links = {
   anthony: 'https://www.linkedin.com/in/anthonyrugama',
   ian: 'https://www.linkedin.com/in/irowe12',
-  karla: 'https://www.linkedin.com/in/karla-scott-515908111',
   joel: 'https://www.transfermarkt.com/joel-campbell/profil/spieler/131248',
   michelle: 'https://www.linkedin.com/in/michelle-allen-cr',
   marco: 'https://www.linkedin.com/in/marco-saenz-605aba42',
@@ -49,7 +49,7 @@ const en = {
       {
         id: 'anthony',
         name: 'Anthony Rugama Brown',
-        role: 'Founder and CEO',
+        role: 'Co-founder and CEO',
         bio: 'Microsoft engineer, former Olympic-level athlete, and AI researcher. Built Stadiora to make elite sports intelligence accessible to every athlete.',
         href: links.anthony,
         portrait: 'anthony',
@@ -63,12 +63,10 @@ const en = {
         portrait: 'ian',
       },
       {
-        id: 'karla',
-        name: 'Karla Scott',
-        role: 'CMO',
-        bio: 'Brand and growth strategist with deep roots in sports marketing across Latin America and the United States.',
-        href: links.karla,
-        portrait: 'karla',
+        id: 'brandon',
+        name: 'Brandon Heredia',
+        role: 'Chief Performance Officer',
+        bio: "Mexican Olympic athlete with a master's in high performance.",
       },
       {
         id: 'joel',
@@ -170,7 +168,7 @@ const es: AboutCopy = {
       {
         id: 'anthony',
         name: 'Anthony Rugama Brown',
-        role: 'Fundador y CEO',
+        role: 'Cofundador y CEO',
         bio: 'Ingeniero de Microsoft, exatleta olímpico e investigador de IA. Construyó Stadiora para acercar la inteligencia deportiva de élite a cada atleta.',
         href: links.anthony,
         portrait: 'anthony',
@@ -184,12 +182,10 @@ const es: AboutCopy = {
         portrait: 'ian',
       },
       {
-        id: 'karla',
-        name: 'Karla Scott',
-        role: 'CMO',
-        bio: 'Estratega de marca y crecimiento con raíces profundas en el marketing deportivo en América Latina y Estados Unidos.',
-        href: links.karla,
-        portrait: 'karla',
+        id: 'brandon',
+        name: 'Brandon Heredia',
+        role: 'Director de Rendimiento',
+        bio: 'Atleta olímpico mexicano con maestría en alto rendimiento.',
       },
       {
         id: 'joel',

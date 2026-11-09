@@ -95,7 +95,6 @@ export const es: Dict = {
   },
   logos: {
     label: 'Clientes y aliados',
-    count: '500+',
     listLabel: 'Clientes y aliados',
   },
   ai: {
