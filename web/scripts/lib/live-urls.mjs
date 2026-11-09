@@ -51,7 +51,6 @@ export const carried = [
     'aria_coaches_dashboard.webp',
     'aria_coaches_logo.png',
     'aria_logo.png',
-    'auge_logo.svg',
     'favicon.png',
     'fitmg_app_mock.png',
     'fitmg_logo.webp',
@@ -107,6 +106,10 @@ export const retired = [
       'shot_intelligence.webp',
       'shot_rehab.png',
     ]),
+  },
+  {
+    reason: 'The AUGE logo was removed from the site at the owner\'s request: no page may show it, so its artwork is not served.',
+    urls: ['/stadioralabs info/auge_logo.svg'],
   },
   {
     reason: 'Internal working files that were served only because Jekyll publishes everything at the repo root. Neither is linked from any page.',

@@ -922,10 +922,6 @@ html:not(.js) .sx-page .rv-mask {
   color: var(--ink-2);
   font-size: 16px;
 }
-.sx-partners__num {
-  margin-top: 6px;
-  font-size: clamp(56px, 6vw, 88px);
-}
 /* the marks move in the shared LogoMarquee; this only sizes its slot next to the count */
 .sx-partners__list {
   flex: 1;

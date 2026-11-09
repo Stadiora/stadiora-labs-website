@@ -12,13 +12,12 @@ export interface ClientLogo {
   h: number;
 }
 
-// Eight marks, shown in this order on the home marquee and the About partners strip. Widths and heights are the real pixel
+// Seven marks, shown in this order on the home marquee and the About partners strip. Widths and heights are the real pixel
 // sizes of the artwork files in public/logos/; `h` comes from `node scripts/logo-sizes.mjs`.
 export const clientLogos: ClientLogo[] = [
   { slug: 'lincoln-school', name: 'Lincoln School', ext: 'png', width: 256, height: 256, h: 62 },
   // Hidden for now at the owner's request. Uncomment to show it again; the artwork stays in public/logos/.
   // { slug: 'carfyd', name: 'CARFYD', ext: 'png', width: 433, height: 153, h: 46 },
-  { slug: 'auge', name: 'AUGE', ext: 'svg', width: 549, height: 256, h: 64 },
   { slug: 'una', name: 'UNA', ext: 'png', width: 322, height: 256, h: 64 },
   { slug: 'costa-rica-tech-week', name: 'Costa Rica Tech Week', ext: 'png', width: 551, height: 145, h: 40 },
   { slug: 'thinktank-vc', name: 'ThinkTank.vc', ext: 'svg', width: 683, height: 256, h: 52 },

@@ -415,10 +415,6 @@
   align-items: center;
   gap: 16px;
 }
-.hero-cp-n {
-  font: 900 64px/0.8 var(--f-display);
-  font-variation-settings: 'wdth' 62;
-}
 .hero-cp small {
   font: 500 11px/1.35 var(--f-mono);
   letter-spacing: 0.14em;
@@ -531,9 +527,6 @@
   }
   .hero-band-in {
     gap: 18px;
-  }
-  .hero-cp-n {
-    font-size: 46px;
   }
   .hero-cp small {
     font-size: 9.5px;
