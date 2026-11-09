@@ -7,6 +7,3 @@ export type ContactTopic = 'call' | 'question';
 export function contactHref(locale: Locale, topic: ContactTopic): string {
   return `${hrefFor('contact', locale)}?topic=${topic}`;
 }
-
-/** The existing standalone investors page stays as-is at cutover (DECISIONS #12), so it is linked, not rebuilt. */
-export const investorsHref = '/investors.html';

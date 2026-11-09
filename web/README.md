@@ -12,7 +12,7 @@ npm run build      # static output in dist/
 npm run check      # astro check (types and templates)
 npm run verify     # asserts the built pages: SEO tags, hreflang, OG, no placeholders, budgets, Jekyll exclusion
 node scripts/no-demo-wording-battery.mjs # after a build, on a clean committed tree: wording mutations through npm run verify
-npm run cutover-checks   # Playwright: redirects without JS, the 404, every carried page loads, the investor pages and cards carry an active noindex, the API footer links land, the lead form (EN and ES); `-- --shots <dir>` saves screenshots
+npm run cutover-checks   # Playwright: redirects without JS, the 404, every carried page loads, the business cards carry an active noindex, the API footer links land, the lead form (EN and ES); `-- --shots <dir>` saves screenshots
 npm run evidence   # needs a build; Playwright screenshots, interaction checks and measured budgets in .evidence/
 node scripts/evidence.mjs --coach-only   # just the Platform Coach pages, EN and ES (see below); add --checks-only to skip screenshots
 node scripts/evidence.mjs --nav-only   # just the header checks: geometry 1025 to 1440, panel height, drawer and panel focus
@@ -272,7 +272,7 @@ manifest: `built` (Astro pages), `redirects`, `carried` (copied into `public/`),
 from `dist/`, when a root file or old sitemap entry is in no group, and checks the rest of the cutover contract below. The root
 files are compared while the root `index.html` still exists; delete the legacy root once Pages is on Actions.
 
-- Carried at the same URLs (`public/`): `investors(.es).html` (noindex), `connect.html` (its dead `monitors.mp4` element is
+- Carried at the same URLs (`public/`): `connect.html` (its dead `monitors.mp4` element is
   removed; it has a canonical and an OG image and is in the sitemap, as the public link hub), `privacy.html`, `terms.html`, `api(-es).html`, `lead-magnet(-es).html`, `anthony/`, `ian/`, `stadioralabs info/`,
   `videos/api.mp4`, `CNAME`, `robots.txt` and `sitemap.xml` (a sitemap index pointing at the generated `sitemap-0.xml`).
   Edit them in place; they are static HTML and are not part of the Astro design system.
@@ -284,7 +284,11 @@ files are compared while the root `index.html` still exists; delete the legacy r
 - Markup guards read tags with `scripts/lib/html-scan.mjs`, which skips comments and script/style text: a `<meta name="robots">` inside
   a comment is not active, so it does not count as noindex.
 - Redirect stubs (meta refresh, canonical, no script): `team.html` to `/about/`, `team-es.html` to `/es/about/`,
-  `index-es.html` to `/es/`. They are out of the sitemap.
+  `index-es.html` to `/es/`, `investors.html` to `/` and `investors-es.html` to `/es/`. They are out of the sitemap.
+- The investor pages are hidden until the new investor deck is final. Their original HTML is kept unchanged in `archive/investors/`
+  (outside `public/` and `src/`, so it is never built or published). To bring them back, move the two files into `public/`,
+  overwriting the stubs, and restore the manifest entries and the wording check in `live-urls.mjs` and `cutover-verify.mjs`.
+  `npm run verify` fails if any built page links to them or carries their content while they are hidden.
 - `src/pages/404.astro`: one bilingual page (GitHub Pages cannot pick a language per path), noindex, no canonical.
 - Lead form (`lead-magnet*.html`): posts to the same contact endpoint (topic `demo`, the endpoint's enum value; role from the quiz path, honeypot and `startedAt`,
   3 s wait). "On the list" shows only on a 202; any other answer keeps a usable button and shows a message with the direct contacts.

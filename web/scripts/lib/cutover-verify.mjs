@@ -7,7 +7,7 @@
 //   - the SEO contract is broken: sitemap, robots.txt, canonical and hreflang on every page, one OG card per page type that exists;
 //   - a page links to another page of the site that is not in the build, or to a #fragment that has no id on the target (a link
 //     to a redirect stub with a fragment counts: the refresh drops the fragment);
-//   - the carried pages lost a fix from the cutover PR (noindex, lead form honesty, investors wording, CNAME).
+//   - the carried pages lost a fix from the cutover PR (noindex, lead form honesty, hidden investor links/content, CNAME).
 // Markup is read with scripts/lib/html-scan.mjs, which skips comments and script/style text, so a tag that is only inside a
 // comment is not active and does not count.
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
@@ -15,7 +15,7 @@ import { join, posix, relative, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { built, carried, liveUrls, notUrls, redirects, retired } from './live-urls.mjs';
 import { isNoindex, scanTags } from './html-scan.mjs';
-import { linkProblems } from './link-guard.mjs';
+import { internalLinks, linkProblems } from './link-guard.mjs';
 import { pendingRoutes } from './engage-links.mjs';
 import { CONTACT_ENDPOINT, MIN_FILL_MS, contactHrefs, contacts, missingContactHrefs } from './contact-contract.mjs';
 
@@ -44,7 +44,7 @@ const walk = (dir, out = []) => {
 };
 
 // Pages that must stay out of search results and out of the sitemap.
-export const noindexPages = ['/investors.html', '/investors-es.html', '/anthony/index.html', '/ian/index.html'];
+export const noindexPages = ['/anthony/index.html', '/ian/index.html'];
 // Carried legacy pages that are indexed: canonical, listed in the sitemap.
 const indexableLegacy = ['/connect.html', '/api.html', '/api-es.html', '/lead-magnet.html', '/lead-magnet-es.html', '/privacy.html', '/terms.html'];
 const hreflangPairs = { '/api.html': ['/api.html', '/api-es.html'], '/api-es.html': ['/api.html', '/api-es.html'], '/lead-magnet.html': ['/lead-magnet.html', '/lead-magnet-es.html'], '/lead-magnet-es.html': ['/lead-magnet.html', '/lead-magnet-es.html'] };
@@ -151,16 +151,25 @@ export function verifyCutover({ dist, fail, root = repoRoot }) {
     for (const href of missingContactHrefs(read(fileFor(dist, '/connect.html')), contactHrefs.filter((h) => h !== `tel:${contacts.latam.tel}`))) fail(`cutover: /connect.html is missing the contact link ${href}`);
   }
 
-  // ------------------------------------------------------------------ 8. investors wording: access to the support, never a replacement
-  for (const [url, re] of [
-    ['/investors.html', /never in place of them/],
-    ['/investors-es.html', /nunca en su lugar/],
+  // ------------------------------------------------------------------ 8. investor pages are hidden until the new deck is final
+  // The URLs are redirect stubs (live-urls.mjs); nothing in the build may link to them or carry the old content.
+  for (const file of walk(dist)) {
+    const url = `/${relative(dist, file).split(sep).join('/')}`;
+    const bytes = readFileSync(file);
+    if (bytes.subarray(0, 4096).includes(0)) continue;
+    const html = bytes.toString('utf8');
+    const text = html.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ');
+    if (/Investor Overview|Resumen para Inversores/i.test(html) || /150\+\s+(?:Athletes on the Platform|Atletas en la Plataforma)/i.test(text)) fail(`cutover: ${url} carries investor-page content`);
+    if (file.endsWith('.html') && internalLinks(html, url).some(({ path }) => /^\/investors(?:-es)?(?:\.html)?\/?$/i.test(path))) fail(`cutover: ${url} links to a hidden investor page`);
+  }
+  for (const [url, notice] of [
+    ['/investors.html', 'Stadiora Labs This page moved to stadioralabs.com .'],
+    ['/investors-es.html', 'Stadiora Labs Esta p\u00e1gina se movi\u00f3 a stadioralabs.com/es/ .'],
   ]) {
     const file = fileFor(dist, url);
     if (!existsSync(file)) continue;
-    const html = read(file);
-    if (!re.test(html)) fail(`cutover: ${url} must frame the cost comparison as access alongside coaches, never in place of them`);
-    if (/Everyone else guesses|Los demás adivinan|for the same support bought separately|por el mismo apoyo comprado por separado/.test(html)) fail(`cutover: ${url} still frames Aria as a cheaper replacement for coaches`);
+    const text = read(file).replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
+    if (text !== notice) fail(`cutover: ${url} must contain only the redirect notice`);
   }
 
   // ------------------------------------------------------------------ 9. SEO: pages, sitemap, robots
