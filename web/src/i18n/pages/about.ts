@@ -140,7 +140,6 @@ const en = {
     title: 'Work with us',
     text: 'Coaches, schools and clubs, partners and investors: start a conversation.',
     contact: 'Contact us',
-    investors: 'Investors',
   },
 };
 
@@ -261,7 +260,6 @@ const es: AboutCopy = {
     title: 'Trabaja con nosotros',
     text: 'Entrenadores, colegios y clubes, aliados e inversionistas: empecemos a conversar.',
     contact: 'Contáctanos',
-    investors: 'Inversionistas',
   },
 };
 

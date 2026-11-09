@@ -19,12 +19,13 @@ export const redirects = [
   { url: '/team.html', to: '/about/' },
   { url: '/team-es.html', to: '/es/about/' },
   { url: '/index-es.html', to: '/es/' },
+  // Hidden until the new investor deck is final. The pages are kept in web/archive/investors/ (outside the build).
+  { url: '/investors.html', to: '/' },
+  { url: '/investors-es.html', to: '/es/' },
 ];
 
 export const carried = [
   '/connect.html',
-  '/investors.html',
-  '/investors-es.html',
   '/lead-magnet.html',
   '/lead-magnet-es.html',
   '/anthony/',

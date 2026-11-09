@@ -44,7 +44,7 @@ const walk = (dir, out = []) => {
 };
 
 // Pages that must stay out of search results and out of the sitemap.
-export const noindexPages = ['/investors.html', '/investors-es.html', '/anthony/index.html', '/ian/index.html'];
+export const noindexPages = ['/anthony/index.html', '/ian/index.html'];
 // Carried legacy pages that are indexed: canonical, listed in the sitemap.
 const indexableLegacy = ['/connect.html', '/api.html', '/api-es.html', '/lead-magnet.html', '/lead-magnet-es.html', '/privacy.html', '/terms.html'];
 const hreflangPairs = { '/api.html': ['/api.html', '/api-es.html'], '/api-es.html': ['/api.html', '/api-es.html'], '/lead-magnet.html': ['/lead-magnet.html', '/lead-magnet-es.html'], '/lead-magnet-es.html': ['/lead-magnet.html', '/lead-magnet-es.html'] };
@@ -151,16 +151,17 @@ export function verifyCutover({ dist, fail, root = repoRoot }) {
     for (const href of missingContactHrefs(read(fileFor(dist, '/connect.html')), contactHrefs.filter((h) => h !== `tel:${contacts.latam.tel}`))) fail(`cutover: /connect.html is missing the contact link ${href}`);
   }
 
-  // ------------------------------------------------------------------ 8. investors wording: access to the support, never a replacement
-  for (const [url, re] of [
-    ['/investors.html', /never in place of them/],
-    ['/investors-es.html', /nunca en su lugar/],
-  ]) {
-    const file = fileFor(dist, url);
-    if (!existsSync(file)) continue;
+  // ------------------------------------------------------------------ 8. investor pages are hidden until the new deck is final
+  // The URLs are redirect stubs (live-urls.mjs); nothing in the build may link to them or carry the old content.
+  for (const file of walk(dist).filter((f) => f.endsWith('.html'))) {
+    const url = `/${relative(dist, file).split(sep).join('/')}`;
     const html = read(file);
-    if (!re.test(html)) fail(`cutover: ${url} must frame the cost comparison as access alongside coaches, never in place of them`);
-    if (/Everyone else guesses|Los demás adivinan|for the same support bought separately|por el mismo apoyo comprado por separado/.test(html)) fail(`cutover: ${url} still frames Aria as a cheaper replacement for coaches`);
+    if (/href=["'](?:https?:\/\/(?:www\.)?stadioralabs\.com)?\/investors(?:-es)?(?:\.html)?\/?[#?"']/i.test(html)) fail(`cutover: ${url} links to a hidden investor page`);
+    if (!/^\/investors(-es)?\.html$/.test(url) && /Investor Overview|Resumen para Inversores/i.test(html)) fail(`cutover: ${url} carries investor-page content`);
+  }
+  for (const url of ['/investors.html', '/investors-es.html']) {
+    const file = fileFor(dist, url);
+    if (existsSync(file) && read(file).length > 1000) fail(`cutover: ${url} must be a redirect stub, not the investor page`);
   }
 
   // ------------------------------------------------------------------ 9. SEO: pages, sitemap, robots

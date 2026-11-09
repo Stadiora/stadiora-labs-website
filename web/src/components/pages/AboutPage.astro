@@ -9,7 +9,6 @@ import { altFor } from '../../i18n/pages/common';
 import LogoMarquee from '../ui/LogoMarquee.astro';
 import { useDict, type Locale } from '../../i18n';
 import { hrefFor } from '../../data/nav';
-import { investorsHref } from '../../lib/links';
 
 interface Props {
   locale: Locale;
@@ -104,7 +103,6 @@ const missionText = missionRest.join(': ');
     title={c.work.title}
     actions={[
       { label: c.work.contact, href: hrefFor('contact', locale) },
-      { label: c.work.investors, href: investorsHref },
     ]}
   />
 </SolutionsPage>
