@@ -15,7 +15,7 @@ export interface HomeHeroCopy {
   live: string;
   /** One toast per word, same order as `words`. */
   toasts: { title: string; text: string }[];
-  customers: { count: string; label: string; listLabel: string };
+  customers: { label: string; listLabel: string };
 }
 
 const en: HomeHeroCopy = {
@@ -38,7 +38,7 @@ const en: HomeHeroCopy = {
     { title: 'Lunch logged', text: '640 kcal · estimate' },
     { title: 'Weekly report ready', text: '6 teams · 8 coaches' },
   ],
-  customers: { count: '500+', label: 'Customers and partners', listLabel: 'Customers and partners' },
+  customers: { label: 'Customers and partners', listLabel: 'Customers and partners' },
 };
 
 const es: HomeHeroCopy = {
@@ -61,7 +61,7 @@ const es: HomeHeroCopy = {
     { title: 'Almuerzo registrado', text: '640 kcal · estimado' },
     { title: 'Reporte semanal listo', text: '6 equipos · 8 coaches' },
   ],
-  customers: { count: '500+', label: 'Clientes y aliados', listLabel: 'Clientes y aliados' },
+  customers: { label: 'Clientes y aliados', listLabel: 'Clientes y aliados' },
 };
 
 export const homeHero: { en: HomeHeroCopy; es: HomeHeroCopy } = { en, es };
