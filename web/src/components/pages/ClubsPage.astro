@@ -12,7 +12,7 @@ import { clubs } from '../../i18n/pages/clubs';
 import { solutionsFx } from '../../i18n/pages/solutions-fx';
 import { contactHref } from '../../lib/links';
 import { hrefFor } from '../../data/nav';
-import { site } from '../../data/site';
+import { SHOW_PRICING, site } from '../../data/site';
 import type { Locale } from '../../i18n';
 
 interface Props {
@@ -32,7 +32,7 @@ const fx = solutionsFx[locale];
     title={c.title}
     lead={c.sub}
     primary={{ label: k.bookCall, href: contactHref(locale, 'call') }}
-    secondary={{ label: k.seePricing, href: hrefFor('pricing', locale) }}
+    secondary={SHOW_PRICING ? { label: k.seePricing, href: hrefFor('pricing', locale) } : { label: k.talkToUs, href: contactHref(locale, 'question') }}
   >
     <Conveyor variant="grid" {...clubsConveyor} />
   </SxHero>
@@ -58,9 +58,9 @@ const fx = solutionsFx[locale];
         }
       </ul>
       <div class="strip rv">
-        <p class="strip__text"><RegionPrice price="coreFrom" text={c.price.text} /></p>
+        <p class="strip__text">{SHOW_PRICING ? <RegionPrice price="coreFrom" text={c.price.text} /> : c.price.quote}</p>
         <div class="strip__actions">
-          <a class="link link-arrow" href={hrefFor('pricing', locale)}>{c.price.link}<Icon name="arrow-right" /></a>
+          {SHOW_PRICING && <a class="link link-arrow" href={hrefFor('pricing', locale)}>{c.price.link}<Icon name="arrow-right" /></a>}
           <a class="link link-arrow" href={contactHref(locale, 'question')}>{c.ask}<Icon name="arrow-right" /></a>
         </div>
       </div>

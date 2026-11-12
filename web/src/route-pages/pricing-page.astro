@@ -1,0 +1,13 @@
+---
+// The pricing page, for both locales. astro.config.mjs mounts it at /pricing/ and /es/pricing/ only while SHOW_PRICING is true.
+import Base from '../layouts/Base.astro';
+import PricingPage from '../components/pricing/PricingPage.astro';
+import { en, es } from '../i18n/pages/pricing';
+
+const locale = Astro.url.pathname.startsWith('/es/') ? 'es' : 'en';
+const t = locale === 'es' ? es : en;
+---
+
+<Base locale={locale} path="/pricing/" title={t.meta.title} description={t.meta.description} hero>
+  <PricingPage locale={locale} />
+</Base>

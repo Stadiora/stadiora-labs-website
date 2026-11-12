@@ -3,6 +3,7 @@
 // browser time zone and ?region=.
 // Expected amounts come from pricing-oracle.mjs (typed by hand), not from src/data/prices.ts, so the table, the
 // teaser and /pricing are three independent witnesses.
+import { showPricing, skipNote } from './pricing-flag.mjs';
 import { ORACLE, fmt, removedTextProblems, sizes } from './pricing-oracle.mjs';
 
 const localized = (locale, path) => (locale === 'es' ? `/es${path}` : path);
@@ -50,6 +51,7 @@ const readPricing = () => ({
 const hasCount = (line, price, count) => new RegExp(`(^|\\D)${count}(\\D|$)`).test(line.replace(price, ' '));
 
 export async function solutionsPriceChecks({ open, check }) {
+  if (!showPricing) return skipNote('solutions price teasers');
   for (const locale of ['en', 'es']) {
     const bad = Object.fromEntries(teasers.map((t) => [t.name, []]));
     for (const [timezoneId, search, expected] of cases) {

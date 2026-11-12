@@ -41,7 +41,7 @@ const en = {
     { title: 'Players', text: "Players join through their coach's invite in the athlete app and check in each day.", soon: { name: 'Aria 12', tag: 'Coming soon', text: 'our soccer app' } },
     { title: 'Families', text: 'Aria for Families keeps guardians in the loop. Included in Core and Performance.' },
   ],
-  price: { text: 'Priced by athletes, not by squads. Core from {price}/mo.', link: 'See pricing' },
+  price: { text: 'Priced by athletes, not by squads. Core from {price}/mo.', quote: 'Priced by athletes, not by squads. Talk to us for a quote.', link: 'See pricing' },
   ask: "Ask us about your club's setup",
   cta: { primary: 'Book a call', secondary: 'Start free' },
 };
@@ -89,7 +89,7 @@ const es: ClubsCopy = {
     { title: 'Jugadores', text: 'Los jugadores se unen con la invitación de su entrenador en la app para atletas y hacen su check-in cada día.', soon: { name: 'Aria 12', tag: 'Próximamente', text: 'nuestra app de fútbol' } },
     { title: 'Familias', text: 'Aria for Families mantiene informados a los tutores. Incluido en Core y Performance.' },
   ],
-  price: { text: 'Precio por atleta, no por equipo. Core desde {price}/mes.', link: 'Ver precios' },
+  price: { text: 'Precio por atleta, no por equipo. Core desde {price}/mes.', quote: 'Precio por atleta, no por equipo. Escríbenos para una cotización.', link: 'Ver precios' },
   ask: 'Pregúntanos por la configuración de tu club',
   cta: { primary: 'Agenda una llamada', secondary: 'Empieza gratis' },
 };

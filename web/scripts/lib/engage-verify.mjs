@@ -6,6 +6,7 @@ import { fileURLToPath } from 'node:url';
 import { checkLinks } from './engage-links.mjs';
 import { verifyEngageMedia } from './engage-media-guard.mjs';
 import { BRANDED, ORACLE, fmt } from './pricing-oracle.mjs';
+import { showPricing, skipNote } from './pricing-flag.mjs';
 
 const copySource = fileURLToPath(new URL('../../src/i18n/pages/engage.ts', import.meta.url));
 
@@ -48,6 +49,7 @@ const talkLabel = /^(talk to us|habla con nosotros)$/i;
 
 /** `pending` is a Map that checkLinks fills with the routes other open PRs own; the caller prints it. */
 export function verifyEngagePages({ dist, fail, pending = new Map() }) {
+  if (!showPricing) skipNote('verify-engage: the add-on fee and Core from price teasers');
   // Translations hold words and {tokens}, never amounts: those come from src/data/prices.ts.
   for (const [n, line] of readFileSync(copySource, 'utf8').split('\n').entries()) {
     if (/\$\s?\d|\d\s?(USD|dólares|dollars)/i.test(line)) fail(`src/i18n/pages/engage.ts:${n + 1}: a price in the copy ("${line.trim().slice(0, 60)}"); use a {token} filled from src/data/prices.ts`);
@@ -114,14 +116,17 @@ export function verifyEngagePages({ dist, fail, pending = new Map() }) {
     // oracle, so a wrong table entry fails here. The HTML holds the US rate; LatAm rates exist only in the script bundle.
     if (page.slug === 'custom-branded-apps') {
       const addon = text(html.match(/<p\b[^>]*\bdata-addon\b[^>]*>([\s\S]*?)<\/p>/)?.[1] ?? '');
-      if (!addon.includes(fmt(BRANDED.monthly)) || !addon.includes(fmt(BRANDED.setup))) fail(`${page.file}: the add-on line "${addon.trim()}" does not show ${fmt(BRANDED.monthly)} monthly and ${fmt(BRANDED.setup)} setup`);
+      if (!showPricing) {
+        if (/\$\s?\d/.test(addon)) fail(`${page.file}: the add-on line "${addon.trim()}" shows a price while pricing is hidden`);
+      } else if (!addon.includes(fmt(BRANDED.monthly)) || !addon.includes(fmt(BRANDED.setup))) fail(`${page.file}: the add-on line "${addon.trim()}" does not show ${fmt(BRANDED.monthly)} monthly and ${fmt(BRANDED.setup)} setup`);
     }
     if (page.slug === 'teams') {
       // The teaser is the Core "from" price (smallest size) for every school and team: pricing goes by athlete count only.
+      if (!showPricing && /data-core-from/.test(html)) fail(`${page.file}: the teaser still carries a price element while pricing is hidden`);
       const price = text(html.match(/<strong\b[^>]*\bdata-core-from="price"[^>]*>([\s\S]*?)<\/strong>/)?.[1] ?? '').trim();
       const athletes = text(html.match(/<span\b[^>]*\bdata-core-from="athletes"[^>]*>([\s\S]*?)<\/span>/)?.[1] ?? '').trim();
-      if (price !== fmt(ORACLE.us[25][1])) fail(`${page.file}: the teaser price in the HTML is "${price}", expected the US Core from price ${fmt(ORACLE.us[25][1])}`);
-      if (athletes !== '25') fail(`${page.file}: the teaser shows "${athletes}" athletes, expected 25`);
+      if (showPricing && price !== fmt(ORACLE.us[25][1])) fail(`${page.file}: the teaser price in the HTML is "${price}", expected the US Core from price ${fmt(ORACLE.us[25][1])}`);
+      if (showPricing && athletes !== '25') fail(`${page.file}: the teaser shows "${athletes}" athletes, expected 25`);
       if (copy.includes(fmt(ORACLE.latam[25][1]))) fail(`${page.file}: the LatAm Core from price ${fmt(ORACLE.latam[25][1])} is in the HTML; it belongs in the script bundle only`);
       if (!/by (the )?number of athletes|según el número de atletas/i.test(text(html.match(/<section\b[^>]*aria-labelledby="schools-title"[\s\S]*?<\/section>/)?.[0] ?? ''))) fail(`${page.file}: the teaser does not say the price goes by number of athletes`);
     }

@@ -5,6 +5,7 @@ import { fileURLToPath } from 'node:url';
 import { verifyCoachPages } from './lib/platform-coach-verify.mjs';
 import { parse } from 'yaml';
 import { verifyPricing } from './lib/pricing-verify.mjs';
+import { verifyPricingHidden } from './lib/pricing-hidden-checks.mjs';
 import { pendingReport } from './lib/engage-links.mjs';
 import { engagePages, verifyEngagePages } from './lib/engage-verify.mjs';
 import { verifyCutover } from './lib/cutover-verify.mjs';
@@ -96,6 +97,7 @@ verifyHomeMedia({ dist, fail });
 verifyHomeSelectors({ root: fileURLToPath(new URL('../', import.meta.url)), fail });
 
 verifyPricing(dist, fail);
+verifyPricingHidden({ dist, fail });
 verifySolutions({ dist, fail });
 verifySolutionsFloodlight({ dist, fail });
 const pendingLinks = new Map();

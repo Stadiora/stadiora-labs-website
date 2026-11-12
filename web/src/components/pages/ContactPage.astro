@@ -6,7 +6,7 @@ import Photo from '../ui/Photo.astro';
 import Icon from '../ui/Icon.astro';
 import { contact } from '../../i18n/pages/contact';
 import { altFor, common } from '../../i18n/pages/common';
-import { site } from '../../data/site';
+import { SHOW_PRICING, site } from '../../data/site';
 import { hrefFor } from '../../data/nav';
 import { useDict, type Locale } from '../../i18n';
 
@@ -161,7 +161,7 @@ const regions = [
     </div>
   </section>
 
-  <FinalNight title={k.ctaTitle} actions={[{ label: k.startFree, href: site.signUp }, { label: k.seePricing, href: hrefFor('pricing', locale) }]} />
+  <FinalNight title={k.ctaTitle} actions={[{ label: k.startFree, href: site.signUp }, ...(SHOW_PRICING ? [{ label: k.seePricing, href: hrefFor('pricing', locale) }] : [])]} />
 </SolutionsPage>
 
 

@@ -40,6 +40,7 @@ const en = {
   pricing: {
     lead: 'Priced by number of athletes.',
     text: ' Core from {price}/mo for {athletes} athletes.',
+    quote: ' Talk to us for a quote.',
     link: 'See pricing',
     cta: 'Book a call for your school',
   },
@@ -88,6 +89,7 @@ const es: SchoolsCopy = {
   pricing: {
     lead: 'Precio según el número de atletas.',
     text: ' Core desde {price}/mes para {athletes} atletas.',
+    quote: ' Escríbenos para una cotización.',
     link: 'Ver precios',
     cta: 'Agenda una llamada escolar',
   },

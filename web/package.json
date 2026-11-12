@@ -13,6 +13,7 @@
     "check": "astro check",
     "preview": "astro preview",
     "verify": "node scripts/verify-dist.mjs",
+    "verify:pricing-hidden": "node scripts/pricing-hidden-check.mjs",
     "evidence": "node scripts/evidence.mjs",
     "cutover-checks": "node scripts/cutover-checks.mjs"
   },

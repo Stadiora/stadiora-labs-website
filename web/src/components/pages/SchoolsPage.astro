@@ -13,6 +13,7 @@ import { solutionsFx } from '../../i18n/pages/solutions-fx';
 import { schoolsConveyor } from '../solutions/conveyors';
 import { contactHref } from '../../lib/links';
 import { hrefFor } from '../../data/nav';
+import { SHOW_PRICING } from '../../data/site';
 import type { Locale } from '../../i18n';
 
 interface Props {
@@ -33,7 +34,7 @@ const fx = solutionsFx[locale];
     lead={c.sub}
     swap={fx.swap.schools}
     primary={{ label: k.bookSchoolCall, href: contactHref(locale, 'call') }}
-    secondary={{ label: k.seePricing, href: hrefFor('pricing', locale) }}
+    secondary={SHOW_PRICING ? { label: k.seePricing, href: hrefFor('pricing', locale) } : { label: k.talkToUs, href: contactHref(locale, 'question') }}
   >
     <Conveyor variant="mini" blocks={schoolsConveyor.blocks} laneA={schoolsConveyor.laneA} laneB={schoolsConveyor.laneB} />
   </SxHero>
@@ -46,10 +47,10 @@ const fx = solutionsFx[locale];
     <div class="wrap">
       <div class="strip rv">
         <p class="strip__text">
-          <strong>{c.pricing.lead}</strong><RegionPrice price="coreFrom" text={c.pricing.text} />
+          <strong>{c.pricing.lead}</strong>{SHOW_PRICING ? <RegionPrice price="coreFrom" text={c.pricing.text} /> : c.pricing.quote}
         </p>
         <div class="strip__actions">
-          <a class="link link-arrow" href={hrefFor('pricing', locale)}>{c.pricing.link}<Icon name="arrow-right" /></a>
+          {SHOW_PRICING && <a class="link link-arrow" href={hrefFor('pricing', locale)}>{c.pricing.link}<Icon name="arrow-right" /></a>}
           <a class="btn btn--primary btn--lg" href={contactHref(locale, 'call')}>{c.pricing.cta}</a>
         </div>
       </div>
@@ -60,7 +61,7 @@ const fx = solutionsFx[locale];
     title={k.ctaTitle}
     actions={[
       { label: k.bookSchoolCall, href: contactHref(locale, 'call') },
-      { label: k.seePricing, href: hrefFor('pricing', locale) },
+      SHOW_PRICING ? { label: k.seePricing, href: hrefFor('pricing', locale) } : { label: k.talkToUs, href: contactHref(locale, 'question') },
     ]}
   />
 </SolutionsPage>

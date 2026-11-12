@@ -7,6 +7,7 @@ import { join } from 'node:path';
 import * as prices from '../../src/data/prices.ts';
 import { fill } from '../../src/lib/template.ts';
 import { en, es } from '../../src/i18n/pages/pricing.ts';
+import { showPricing, skipNote } from './pricing-flag.mjs';
 import { BRANDED, EXTRA_COACH, FREE, ANNUAL_PERCENT, DEFAULT_BAND, PLANS, brandedFromText, copyProblems, estimateOracle, fmt, removedBuildProblems, tableProblems } from './pricing-oracle.mjs';
 
 const { addOns, bands } = prices;
@@ -98,6 +99,12 @@ export function verifyPricing(dist, report) {
       for (const p of removedBuildProblems(readFileSync(file, 'utf8'), file.slice(dist.length))) fail(`no schools plan or education rate in the build: ${p}`);
     }
     if (scanned < 20) fail(`no schools plan or education rate in the build: only ${scanned} text files scanned, the scan is not looking at the build`);
+  }
+
+  // The page checks need the built pricing page; while it is a redirect stub, pricing-hidden-checks.mjs guards the stubs instead.
+  if (!showPricing) {
+    skipNote('verify-pricing: /pricing/ and /es/pricing/ page checks');
+    return;
   }
 
   for (const page of pages) {

@@ -3,6 +3,7 @@ import { existsSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { CONTACT_ENDPOINT, athleteRanges, approvedSuccess, contacts, findDeliveryClaims, missingContactHrefs, roles } from './contact-contract.mjs';
 import { FREE, ORACLE, fmt } from './pricing-oracle.mjs';
+import { showPricing, skipNote } from './pricing-flag.mjs';
 
 // What the teasers must show for US visitors (and no-JavaScript visitors): Core from at 25 athletes. Pricing goes by
 // athlete count only, so Schools quotes the same teaser as everyone and no other teaser key exists.
@@ -69,6 +70,7 @@ const pageScripts = (html, dist) => {
 };
 
 export function verifySolutions({ dist, fail }) {
+  if (!showPricing) skipNote('verify-solutions: the Core from price teasers');
   for (const route of routes) {
     for (const lang of ['en', 'es']) {
       const file = files(route.path, lang);
@@ -177,7 +179,8 @@ export function verifySolutions({ dist, fail }) {
       }
 
       if (route.path === '/solutions/schools/') {
-        need(count(html, /data-region-price="coreFrom"/g) === 1, 'the Schools page must quote the athlete-based Core from price exactly once');
+        if (showPricing) need(count(html, /data-region-price="coreFrom"/g) === 1, 'the Schools page must quote the athlete-based Core from price exactly once');
+        else need(count(html, /data-region-price/g) === 0, 'the Schools page must not quote a price while pricing is hidden');
         need(/(by|según el) (the )?(number|número) of (athletes|atletas)|según el número de atletas/i.test(pageText(html)), 'the Schools page must say the price goes by number of athletes');
         need(/included in Core and Performance|incluido en Core y Performance/i.test(pageText(html)), 'the Schools page must say Aria for Families is included in Core and Performance');
       }
