@@ -2,7 +2,7 @@
 import { Image } from 'astro:assets';
 import wordmark from '../../assets/brand/wordmark-white.png';
 import { localePath, useDict, type Locale } from '../../i18n';
-import { site } from '../../data/site';
+import { SHOW_PRICING, site } from '../../data/site';
 import { appLinks, hrefFor, platformColumns, resourceItems, solutionItems } from '../../data/nav';
 import Photo from '../ui/Photo.astro';
 import Icon from '../ui/Icon.astro';
@@ -135,9 +135,13 @@ const appStores: Record<string, { label: string; href: string }[]> = {
           </div>
         </li>
 
-        <li class="nav__item">
-          <a class="nav__link" href={hrefFor('pricing', locale)} aria-current={path === '/pricing/' ? 'page' : undefined}>{t.nav.pricing}</a>
-        </li>
+        {
+          SHOW_PRICING && (
+            <li class="nav__item">
+              <a class="nav__link" href={hrefFor('pricing', locale)} aria-current={path === '/pricing/' ? 'page' : undefined}>{t.nav.pricing}</a>
+            </li>
+          )
+        }
 
         <li class="nav__item" data-mega-item>
           <button class="nav__trigger" type="button" aria-expanded="false" aria-controls="mega-resources" data-mega-trigger>

@@ -10,6 +10,8 @@
 // `redirect` stub does not point at its target, or when a file at the repo root is neither listed here nor ignored below.
 // To retire another URL, add it to `retired` with a reason in the PR: a missing URL is never silent.
 
+import { showPricing } from './pricing-flag.mjs';
+
 const names = (dir, files) => files.map((f) => `${dir}${f}`);
 
 // The API page (EN and ES) and the two legal pages are built by Astro and keep their flat .html URLs (the flatHtml step in astro.config.mjs).
@@ -22,6 +24,8 @@ export const redirects = [
   // Hidden until the new investor deck is final. The pages are kept in web/archive/investors/ (outside the build).
   { url: '/investors.html', to: '/' },
   { url: '/investors-es.html', to: '/es/' },
+  // Built by Astro as stubs while SHOW_PRICING is false (src/data/site.ts); the page itself is built when it is true.
+  ...(showPricing ? [] : [{ url: '/pricing/', to: '/contact/' }, { url: '/es/pricing/', to: '/es/contact/' }]),
 ];
 
 export const carried = [

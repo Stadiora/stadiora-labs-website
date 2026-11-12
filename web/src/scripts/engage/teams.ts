@@ -10,6 +10,7 @@ const T = 'transform';
 const f = (...a: Frame[]) => a;
 
 const region = detectRegion(window.location.search);
+// With pricing hidden the page carries no [data-core-from] elements, so there is nothing to swap.
 const text: Record<string, string> = { price: usd(prices.coreFrom[region]), athletes: String(bands[region][0].athletes) };
 $$<HTMLElement>('[data-core-from]').forEach((el) => {
   const value = text[el.dataset.coreFrom ?? ''];

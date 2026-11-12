@@ -7,6 +7,7 @@ import { contrastProbe } from './contrast.mjs';
 import { engageA11yChecks } from './engage-a11y-checks.mjs';
 import { engageHeadingContrast } from './engage-heading-contrast.mjs';
 import { engagePages } from './engage-verify.mjs';
+import { showPricing, skipNote } from './pricing-flag.mjs';
 import { ORACLE, fmt } from './pricing-oracle.mjs';
 
 const widths = [390, 1024, 1280, 1440];
@@ -198,7 +199,8 @@ export async function engageChecks({ open, check, shot, sleep, settle, checksOnl
     // same visitor the Teams teaser (Core from, for the smallest size) must equal Core at that size on Pricing. A school pays by
     // athlete count like everyone else, so Pricing has no schools or education price to match. Expected values come from the
     // hand-typed oracle, not the table.
-    if (on('teams')) {
+    if (on('teams') && !showPricing) skipNote(`${lang}/teams: Teams and Pricing price match`);
+    if (on('teams') && showPricing) {
       const read = async (path, { timezoneId, init } = {}) => {
         const page = await open({ width: 1440, height: 900, timezoneId, init }, path);
         const teams = path.includes('/platform/teams/');

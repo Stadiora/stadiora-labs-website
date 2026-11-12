@@ -200,6 +200,7 @@ export const engageEn = {
     schools: {
       title: 'Built for schools',
       body: 'Priced by number of athletes. Core from {price}/mo for {athletes} athletes.',
+      quote: 'Pricing goes by number of athletes. Talk to us for a quote.',
       see: 'See pricing',
     },
     also: ['guardian', 'messaging', 'powerlab'],
@@ -236,6 +237,7 @@ export const engageEn = {
     howTitle: 'How it works',
     steps: ['Talk to us', 'We set up your brand with you', 'We publish it to the stores together'],
     addon: 'Add-on: {monthly}/mo + {setup} setup',
+    addonQuote: 'Available as an add-on. Talk to us for a quote.',
     seePricing: 'See pricing',
     sameTitle: 'Same platform, every app',
     sameBody: 'Programs, nutrition, readiness and chat come with every app. New features reach every brand.',
@@ -481,6 +483,7 @@ export const engageEs: EngageDict = {
     schools: {
       title: 'Hecho para colegios',
       body: 'Precio según el número de atletas. Core desde {price}/mes para {athletes} atletas.',
+      quote: 'El precio va según el número de atletas. Escríbenos para una cotización.',
       see: 'Ver precios',
     },
     also: ['guardian', 'messaging', 'powerlab'],
@@ -517,6 +520,7 @@ export const engageEs: EngageDict = {
     howTitle: 'Cómo funciona',
     steps: ['Habla con nosotros', 'Preparamos tu marca contigo', 'La publicamos juntos en las tiendas'],
     addon: 'Complemento: {monthly}/mes + {setup} de configuración',
+    addonQuote: 'Disponible como complemento. Escríbenos para una cotización.',
     seePricing: 'Ver precios',
     sameTitle: 'Una plataforma, todas las apps',
     sameBody: 'Programas, nutrición, preparación y chat vienen con cada app. Las funciones nuevas llegan a todas las marcas.',

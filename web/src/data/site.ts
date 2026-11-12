@@ -1,3 +1,6 @@
+// Flipping this to true restores the pricing page, every link to it and the price snippets on the other pages.
+export const SHOW_PRICING = false;
+
 /** Destinations shared by both languages. Paths marked `planned` belong to later slices of the epic. */
 export const site = {
   name: 'Stadiora Labs',

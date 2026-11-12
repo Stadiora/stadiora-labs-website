@@ -1,0 +1,25 @@
+---
+// A static redirect to Contact (meta refresh + canonical, no script, no styles), the same pattern as the stubs in public/.
+// astro.config.mjs mounts it at /pricing/ and /es/pricing/ while SHOW_PRICING is false. It stays out of search results.
+import { site } from '../data/site';
+import { hrefFor } from '../data/nav';
+
+const locale = Astro.url.pathname.startsWith('/es/') ? 'es' : 'en';
+const to = hrefFor('contact', locale);
+const notice = locale === 'es' ? 'Esta página se movió a' : 'This page moved to';
+---
+
+<!doctype html>
+<html lang={locale}>
+  <head>
+    <meta charset="utf-8" />
+    <title>Stadiora Labs</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex" />
+    <link rel="canonical" href={`${site.origin}${to}`} />
+    <meta http-equiv="refresh" content={`0; url=${to}`} />
+  </head>
+  <body>
+    <p>{notice} <a href={to}>stadioralabs.com{to}</a>.</p>
+  </body>
+</html>

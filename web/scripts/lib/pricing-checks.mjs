@@ -12,6 +12,7 @@ import * as table from '../../src/data/prices.ts';
 import { regionFromTimeZone } from '../../src/lib/region.ts';
 import { fill } from '../../src/lib/template.ts';
 import { en, es } from '../../src/i18n/pages/pricing.ts';
+import { showPricing, skipNote } from './pricing-flag.mjs';
 import { contrastProbe } from './contrast.mjs';
 import { estimateChecks } from './pricing-estimate-checks.mjs';
 import { motionChecks } from './pricing-motion-checks.mjs';
@@ -378,6 +379,7 @@ const describeFocus = () => {
 
 // ---------------------------------------------------------------- driver
 export async function pricingChecks({ browser, server, outDir, check, metrics, sleep, checksOnly }) {
+  if (!showPricing) return skipNote('pricing page checks');
   const out = (metrics.pricing = {});
 
   async function open(path, opts = {}) {

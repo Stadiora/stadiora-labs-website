@@ -13,7 +13,7 @@ import { contactHref } from '../../lib/links';
 import { hrefFor } from '../../data/nav';
 import { free } from '../../data/prices';
 import { fill } from '../../lib/template';
-import { site } from '../../data/site';
+import { SHOW_PRICING, site } from '../../data/site';
 import type { Locale } from '../../i18n';
 
 interface Props {
@@ -36,7 +36,7 @@ const freeLimits = { coaches: String(free.coaches), athletes: String(free.athlet
     lead={c.sub}
     swap={fx.swap.coaches}
     primary={{ label: k.startFree, href: site.signUp }}
-    secondary={{ label: k.seePricing, href: hrefFor('pricing', locale) }}
+    secondary={SHOW_PRICING ? { label: k.seePricing, href: hrefFor('pricing', locale) } : { label: k.bookCall, href: contactHref(locale, 'call') }}
   >
     <CoachClip copy={c} {locale} />
   </SxHero>
@@ -49,7 +49,7 @@ const freeLimits = { coaches: String(free.coaches), athletes: String(free.athlet
       <div class="strip rv">
         <p class="strip__text"><strong>{c.free.lead}</strong>{fill(c.free.text, freeLimits)}</p>
         <div class="strip__actions">
-          <span class="strip__price"><RegionPrice price="coreFrom" text={c.free.core} /></span>
+          {SHOW_PRICING && <span class="strip__price"><RegionPrice price="coreFrom" text={c.free.core} /></span>}
           <a class="btn btn--primary btn--lg" href={site.signUp}>{k.startFree}</a>
         </div>
       </div>
